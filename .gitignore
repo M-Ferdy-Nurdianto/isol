@@ -1,0 +1,62 @@
+node_modules/
+dist/
+build/
+
+# Environment Variables (NEVER COMMIT!)
+.env
+.env.local
+.env.production
+.env.development
+*.env
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Vercel
+.vercel
+
+# VS Code workspace
+*.code-workspace
+
+# APK files (host separately in GitHub Releases)
+*.apk
+
+# Utility scripts (one-time use)
+generate-hash.js
+fix_database.sql
+
+# Backup files
+*.backup
+*.bak
+*.tmp
+
+# Database dumps & backups
+*.sql.backup
+*.dump
+dump/
+db/*.dump
+
+vercel-env-import.txt
+
+# Non-essential markdown documentation (keep only README.md)
+ARCHITECTURE.md
+CHANGELOG.md
+CLAUDE.md
+CONTRIBUTING.md
+SECURITY.md
+TODO.md

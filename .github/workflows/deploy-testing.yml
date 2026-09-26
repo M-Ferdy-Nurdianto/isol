@@ -1,0 +1,30 @@
+name: Deploy Testing to GitHub Pages
+
+on:
+  push:
+    branches:
+      - testing
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Install and Build 🔧
+        run: |
+          cd frontend
+          npm install
+          # To fix 404/405 errors on GH Pages, add your Vercel API URL below:
+          # VITE_API_URL=https://your-project.vercel.app/api npm run build
+          npm run build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: frontend/dist
+          branch: gh-pages # Deploys to a separate branch for GH Pages

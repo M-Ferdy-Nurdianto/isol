@@ -1,0 +1,2 @@
+-- Reset seed for Kohi Sekai
+-- Database schema is defined in database/production-full-schema.sql

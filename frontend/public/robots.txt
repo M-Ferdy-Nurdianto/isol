@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://kohisekai.vercel.app/sitemap.xml

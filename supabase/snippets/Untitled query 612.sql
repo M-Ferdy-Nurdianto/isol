@@ -1,0 +1,1 @@
+SELECT member_id, nama_panggung FROM public.members ORDER BY member_id;

@@ -1,0 +1,911 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8faf9;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(7, 145, 8, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.04) 0px, transparent 50%),
+      radial-gradient(at 100% 20%, rgba(56, 189, 248, 0.03) 0px, transparent 40%),
+      radial-gradient(at 10% 80%, rgba(195, 227, 163, 0.06) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: #1a1a1a;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* When Dark Mode is active */
+  html.dark body,
+  body.dark-theme {
+    background-color: #090d16;
+    background-image: none;
+    color: #f4f4f5;
+  }
+
+  /* Snap Scroll for Mobile Carousels */
+  .snap-x {
+    scroll-snap-type: x mandatory;
+  }
+
+  .snap-center {
+    scroll-snap-align: center;
+  }
+
+  .snap-mandatory {
+    scroll-snap-type: x mandatory;
+  }
+
+  /* Hide Scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  /* Kohi Sekai Primary Colors */
+  .btn-primary {
+    @apply bg-[#079108] text-white font-bold py-3 px-8 rounded-full hover:bg-[#067a07] transition-all shadow-lg hover:shadow-[#07910855] hover:-translate-y-0.5 active:scale-95;
+  }
+
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(0, 0, 0, 0.1)];
+  }
+
+  .text-glow-green {
+    text-shadow: 0 0 10px rgba(7, 145, 8, 0.4), 0 0 20px rgba(7, 145, 8, 0.2);
+  }
+
+  .text-glow-white {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.4);
+  }
+
+  .border-glow-green {
+    @apply border border-[#079108]/30 shadow-[0_0_20px_rgba(7, 145, 8, 0.2)];
+  }
+
+  /* Vertical Text Utility */
+  .vertical-rl {
+    writing-mode: vertical-rl;
+  }
+
+  .text-orientation-mixed {
+    text-orientation: mixed;
+  }
+
+  /* Noise Texture Overlay (Disabled as requested) */
+  .noise-bg {
+    display: none;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-200 rounded-full hover:bg-gray-300;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 hover:bg-slate-600;
+  }
+}
+
+/* =========================================================================
+   DARK MODE OVERRIDES (applied ONLY when .dark or .dark-theme is active)
+   When in White Mode, everything falls back to 100% original light styles!
+   ========================================================================= */
+.dark .glass-card,
+body.dark-theme .glass-card {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+.dark .glass-panel,
+body.dark-theme .glass-panel {
+  background: rgba(18, 24, 41, 0.75);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+.dark .text-glow-green,
+body.dark-theme .text-glow-green {
+  text-shadow: 0 0 10px rgba(7, 145, 8, 0.6), 0 0 20px rgba(7, 145, 8, 0.3);
+}
+
+.dark .border-glow-green,
+body.dark-theme .border-glow-green {
+  border-color: rgba(7, 145, 8, 0.4);
+  box-shadow: 0 0 20px rgba(7, 145, 8, 0.3);
+}
+
+/* Page background containers */
+.min-h-screen.bg-white {
+  background-color: transparent;
+}
+
+.dark .min-h-screen.bg-white,
+body.dark-theme .min-h-screen.bg-white {
+  background-color: #090d16;
+  color: #f4f4f5;
+}
+
+.dark .min-h-screen.bg-gradient-to-br,
+body.dark-theme .min-h-screen.bg-gradient-to-br {
+  background: #090d16;
+  color: #f4f4f5;
+}
+
+/* Text adjustments in Dark Mode */
+.dark .text-dark,
+body.dark-theme .text-dark {
+  color: #f4f4f5;
+}
+
+html.dark .text-gray-900:not(.btn-primary *):not([style*="color: rgb(255, 255, 255)"]):not(.digital-receipt-paper *),
+body.dark-theme .text-gray-900:not(.btn-primary *):not([style*="color: rgb(255, 255, 255)"]):not(.digital-receipt-paper *) {
+  color: #f4f4f5;
+}
+
+.dark .text-gray-700:not(.digital-receipt-paper *),
+body.dark-theme .text-gray-700:not(.digital-receipt-paper *) {
+  color: #cbd5e1;
+}
+
+.dark .text-gray-600:not(.digital-receipt-paper *),
+.dark .text-gray-500:not(.digital-receipt-paper *),
+body.dark-theme .text-gray-600:not(.digital-receipt-paper *),
+body.dark-theme .text-gray-500:not(.digital-receipt-paper *) {
+  color: #94a3b8;
+}
+
+/* Card surfaces in Dark Mode (Never touch .digital-receipt-paper) */
+html.dark .bg-white:not(header *):not(.btn-primary):not(input):not(select):not(nav *):not(.digital-receipt-paper):not(.digital-receipt-paper *),
+body.dark-theme .bg-white:not(header *):not(.btn-primary):not(input):not(select):not(nav *):not(.digital-receipt-paper):not(.digital-receipt-paper *) {
+  background-color: #111726 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f4f4f5 !important;
+}
+
+html.dark .bg-gray-50:not(.digital-receipt-paper *),
+html.dark .bg-gray-100:not(.digital-receipt-paper *),
+body.dark-theme .bg-gray-50:not(.digital-receipt-paper *),
+body.dark-theme .bg-gray-100:not(.digital-receipt-paper *) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #e2e8f0 !important;
+}
+
+/* =========================================================================
+   AUTHENTIC PAPER THERMAL RECEIPT (Always pale vintage paper with subtle noise)
+   ========================================================================= */
+.digital-receipt-paper,
+html.dark .digital-receipt-paper,
+body.dark-theme .digital-receipt-paper {
+  background-color: #f7f6f2 !important;
+  background-image: 
+    radial-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 0),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(240, 238, 230, 0.5) 100%) !important;
+  background-size: 8px 8px, 100% 100% !important;
+  color: #1c1917 !important;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.04) !important;
+  position: relative !important;
+}
+
+/* Jagged / Zigzag receipt tear edge at top and bottom */
+.digital-receipt-paper::before,
+.digital-receipt-paper::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background-size: 12px 6px;
+  background-repeat: repeat-x;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.digital-receipt-paper::before {
+  top: -6px;
+  background-image: linear-gradient(135deg, transparent 50%, #f7f6f2 50%), linear-gradient(225deg, transparent 50%, #f7f6f2 50%);
+}
+
+.digital-receipt-paper::after {
+  bottom: -6px;
+  background-image: linear-gradient(315deg, transparent 50%, #f7f6f2 50%), linear-gradient(45deg, transparent 50%, #f7f6f2 50%);
+}
+
+.digital-receipt-paper * {
+  color-scheme: light !important;
+}
+
+html.dark .bg-gray-50\/50,
+body.dark-theme .bg-gray-50\/50 {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Inputs & Textareas Dual Theme */
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark textarea,
+body.dark-theme input:not([type="checkbox"]):not([type="radio"]),
+body.dark-theme textarea {
+  background-color: #0b101d !important;
+  color: #f4f4f5 !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+html.dark input:focus,
+html.dark textarea:focus,
+body.dark-theme input:focus,
+body.dark-theme textarea:focus {
+  background-color: #0e1526 !important;
+  border-color: #079108 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder,
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+  color: #64748b !important;
+}
+
+html.light :not(.admin-layout):not(.admin-layout *) input:not([type="checkbox"]):not([type="radio"]),
+html.light :not(.admin-layout):not(.admin-layout *) textarea,
+body.light-theme :not(.admin-layout):not(.admin-layout *) input:not([type="checkbox"]):not([type="radio"]),
+body.light-theme :not(.admin-layout):not(.admin-layout *) textarea {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.light :not(.admin-layout):not(.admin-layout *) input:focus,
+html.light :not(.admin-layout):not(.admin-layout *) textarea:focus,
+body.light-theme :not(.admin-layout):not(.admin-layout *) input:focus,
+body.light-theme :not(.admin-layout):not(.admin-layout *) textarea:focus {
+  background-color: #ffffff !important;
+  border-color: #079108 !important;
+}
+
+html.light :not(.admin-layout):not(.admin-layout *) input::placeholder,
+html.light :not(.admin-layout):not(.admin-layout *) textarea::placeholder,
+body.light-theme :not(.admin-layout):not(.admin-layout *) input::placeholder,
+body.light-theme :not(.admin-layout):not(.admin-layout *) textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Specific card rules for clean light mode fallback */
+html.light :not(.admin-layout):not(.admin-layout *).bg-white,
+body.light-theme :not(.admin-layout):not(.admin-layout *).bg-white {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+html.light :not(.admin-layout):not(.admin-layout *).bg-gray-50,
+body.light-theme :not(.admin-layout):not(.admin-layout *).bg-gray-50 {
+  background-color: #f8fafc;
+  color: #334155;
+}
+
+html.dark .border-gray-50,
+html.dark .border-gray-100,
+html.dark .border-gray-200,
+body.dark-theme .border-gray-50,
+body.dark-theme .border-gray-100,
+body.dark-theme .border-gray-200 {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .border-white,
+body.dark-theme .border-white {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Footer in Dark Mode */
+.dark footer,
+body.dark-theme footer {
+  background-color: #060911;
+  color: #94a3b8;
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark footer h3,
+.dark footer h4,
+body.dark-theme footer h3,
+body.dark-theme footer h4 {
+  color: #f4f4f5;
+}
+
+.dark footer a:hover,
+body.dark-theme footer a:hover {
+  color: #079108;
+}
+
+/* Special sections & modal in Dark Mode */
+.dark section.bg-dark,
+body.dark-theme section.bg-dark {
+  background-color: #060911;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .bg-custom-cream,
+body.dark-theme .bg-custom-cream {
+  background-color: #0e1424;
+  color: #f4f4f5;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure buttons stay bright white text */
+.dark .btn-primary,
+body.dark-theme .btn-primary,
+.dark .bg-\[\#079108\],
+body.dark-theme .bg-\[\#079108\] {
+  color: #ffffff !important;
+}
+
+.dark .btn-primary *,
+body.dark-theme .btn-primary *,
+.dark .bg-\[\#079108\] *,
+body.dark-theme .bg-\[\#079108\] * {
+  color: #ffffff !important;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* 7 Column Layout Helpers */
+.hero-column {
+  @apply relative h-full transition-all duration-700 ease-in-out cursor-pointer overflow-hidden;
+  flex: 1;
+}
+
+.hero-column::after {
+  content: '';
+  @apply absolute inset-0 bg-black/20 transition-opacity duration-500 opacity-60;
+}
+
+.hero-column:hover::after {
+  @apply opacity-20;
+}
+
+/* Admin Modal - Excel Style Table Selection */
+.swal2-html-container {
+  margin: 1.5em 0 0 !important;
+  max-height: 400px;
+  overflow-y: auto !important;
+  padding: 0 !important;
+  border: 1px solid #e2e8f0;
+}
+
+.excel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: sans-serif;
+  font-size: 13px;
+  background: white;
+}
+
+.excel-table th {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  font-size: 11px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.excel-table td {
+  border: 1px solid #e2e8f0;
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+
+.excel-table tr {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.excel-table tr:hover {
+  background: #f8fafc;
+}
+
+.excel-table tr.selected {
+  background: #f0fdf4;
+}
+
+.col-no { width: 45px; text-align: center; color: #94a3b8; font-family: monospace; }
+.col-name { font-weight: 500; color: #1e293b; }
+.col-radio { width: 60px; text-align: center; }
+
+.excel-table input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #079108;
+  margin: 0;
+  vertical-align: middle;
+}
+
+/* =========================================================================
+   ADMIN LAYOUT - True Dark Mode (Deep Metal Dark Theme)
+   ========================================================================= */
+.admin-layout,
+html.dark .admin-layout,
+body.dark-theme .admin-layout,
+html.light .admin-layout,
+body.light-theme .admin-layout {
+  background-color: #090d16 !important;
+  color: #f4f4f5 !important;
+  color-scheme: dark !important;
+}
+
+body:has(.admin-layout) {
+  background-color: #090d16 !important;
+  background-image: none !important;
+  color: #f4f4f5 !important;
+}
+
+.admin-layout aside,
+html.dark .admin-layout aside,
+body.dark-theme .admin-layout aside,
+html.light .admin-layout aside,
+body.light-theme .admin-layout aside {
+  background-color: rgba(12, 17, 29, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.admin-layout main {
+  background-color: #090d16 !important;
+  color: #f4f4f5 !important;
+}
+
+/* Ensure form elements inside admin stay dark and sleek */
+.admin-layout input:not([type="checkbox"]):not([type="radio"]),
+.admin-layout textarea,
+.admin-layout select {
+  background-color: #182032 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.admin-layout input::placeholder,
+.admin-layout textarea::placeholder {
+  color: #71717a !important;
+}
+
+.admin-layout input:focus,
+.admin-layout textarea:focus,
+.admin-layout select:focus {
+  background-color: #1c263c !important;
+  border-color: #079108 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(7, 145, 8, 0.25) !important;
+}
+
+.admin-layout .bg-white {
+  background-color: #111726 !important;
+  color: #f4f4f5 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-layout .bg-gray-50,
+.admin-layout .bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #cbd5e1 !important;
+}
+
+.admin-layout .text-gray-900,
+.admin-layout .text-gray-800,
+.admin-layout .text-gray-700 {
+  color: #f4f4f5 !important;
+}
+
+.admin-layout .text-gray-600,
+.admin-layout .text-gray-500,
+.admin-layout .text-gray-400 {
+  color: #a1a1aa !important;
+}
+
+/* ============================================
+   Kohi Sekai â€” SweetAlert2 Admin Theme
+   Minimalis modern, dark glass, stabil & responsif
+   ============================================ */
+
+/* --- Overlay backdrop --- */
+body:has(.admin-layout) .swal2-container {
+  backdrop-filter: blur(4px) !important;
+  background: rgba(0, 0, 0, 0.55) !important;
+  z-index: 10000 !important;
+}
+
+/* --- Popup container --- */
+body:has(.admin-layout) .swal2-popup {
+  background: #111726 !important;
+  color: #f4f4f5 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6) !important;
+  padding: 24px !important;
+  max-width: 420px !important;
+  font-family: inherit !important;
+}
+
+/* --- Icon styling aman (tetap responsif & tidak stuck) --- */
+body:has(.admin-layout) .swal2-icon {
+  margin: 0 auto 16px auto !important;
+}
+
+/* Icon colors */
+body:has(.admin-layout) .swal2-icon.swal2-warning {
+  border-color: #f59e0b !important;
+  color: #f59e0b !important;
+}
+
+body:has(.admin-layout) .swal2-icon.swal2-error {
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+}
+
+body:has(.admin-layout) .swal2-icon.swal2-success {
+  border-color: #079108 !important;
+  color: #079108 !important;
+}
+body:has(.admin-layout) .swal2-icon.swal2-success [class^='swal2-success-line'] {
+  background-color: #079108 !important;
+}
+body:has(.admin-layout) .swal2-icon.swal2-success .swal2-success-ring {
+  border: 4px solid rgba(7, 145, 8, 0.3) !important;
+}
+
+body:has(.admin-layout) .swal2-icon.swal2-question {
+  border-color: #06b6d4 !important;
+  color: #06b6d4 !important;
+}
+
+body:has(.admin-layout) .swal2-icon.swal2-info {
+  border-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+}
+
+/* --- Judul --- */
+body:has(.admin-layout) .swal2-title {
+  color: #f4f4f5 !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  padding: 0 0 8px 0 !important;
+  margin: 0 !important;
+  text-align: center !important;
+}
+
+/* --- Deskripsi / body text --- */
+body:has(.admin-layout) .swal2-html-container {
+  color: #94a3b8 !important;
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
+  margin: 0 0 20px 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* --- Tombol area --- */
+body:has(.admin-layout) .swal2-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+/* --- Tombol konfirmasi --- */
+body:has(.admin-layout) .swal2-confirm {
+  background: #079108 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 9px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 9px 18px !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition: opacity 0.15s, transform 0.12s !important;
+}
+body:has(.admin-layout) .swal2-confirm:hover {
+  opacity: 0.9 !important;
+  transform: translateY(-1px) !important;
+}
+body:has(.admin-layout) .swal2-confirm:active {
+  transform: translateY(0) !important;
+}
+
+/* --- Override warna confirm merah jika tombol bertema bahaya --- */
+body:has(.admin-layout) .swal2-confirm[style*="background-color: rgb(239, 68, 68)"],
+body:has(.admin-layout) .swal2-confirm[style*="background-color:#ef4444"],
+body:has(.admin-layout) .swal2-confirm[style*="background-color: #ef4444"] {
+  background: #dc2626 !important;
+}
+
+/* --- Tombol batal --- */
+body:has(.admin-layout) .swal2-cancel {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #cbd5e1 !important;
+  border-radius: 9px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 9px 16px !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition: background 0.15s, color 0.15s !important;
+}
+body:has(.admin-layout) .swal2-cancel:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+}
+
+/* --- Timer progress bar --- */
+body:has(.admin-layout) .swal2-timer-progress-bar-container {
+  border-radius: 0 0 16px 16px !important;
+  overflow: hidden !important;
+}
+body:has(.admin-layout) .swal2-timer-progress-bar {
+  height: 3px !important;
+  background: #079108 !important;
+}
+
+/* --- Loading spinner (showLoading) --- */
+body:has(.admin-layout) .swal2-loader {
+  border-color: #079108 transparent #079108 transparent !important;
+  width: 32px !important;
+  height: 32px !important;
+}
+
+/* --- Radio pills (export modal) --- */
+body:has(.admin-layout) .swal2-radio {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  background: transparent !important;
+  margin: 0 0 18px 0 !important;
+  padding: 0 !important;
+}
+body:has(.admin-layout) .swal2-radio label {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #94a3b8 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+body:has(.admin-layout) .swal2-radio label:hover {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #f4f4f5 !important;
+}
+body:has(.admin-layout) .swal2-radio input[type="radio"]:checked + label,
+body:has(.admin-layout) .swal2-radio label:has(input:checked) {
+  background: rgba(7, 145, 8, 0.15) !important;
+  border-color: rgba(7, 145, 8, 0.6) !important;
+  color: #f4f4f5 !important;
+}
+body:has(.admin-layout) .swal2-radio input[type="radio"] {
+  display: none !important;
+}
+
+/* --- Mobile optimization (â‰¤ 640px) --- */
+@media (max-width: 640px) {
+  body:has(.admin-layout) .swal2-container {
+    padding: 12px !important;
+  }
+
+  body:has(.admin-layout) .swal2-popup {
+    width: calc(100vw - 32px) !important;
+    max-width: 380px !important;
+    padding: 20px 16px !important;
+    border-radius: 14px !important;
+  }
+
+  body:has(.admin-layout) .swal2-icon {
+    transform: scale(0.85) !important;
+    margin: 0 auto 12px auto !important;
+  }
+
+  body:has(.admin-layout) .swal2-title {
+    font-size: 16px !important;
+    padding: 0 0 6px 0 !important;
+  }
+
+  body:has(.admin-layout) .swal2-html-container {
+    font-size: 13px !important;
+    margin: 0 0 16px 0 !important;
+    padding: 0 4px !important;
+    word-break: break-word !important;
+  }
+
+  body:has(.admin-layout) .swal2-actions {
+    flex-direction: row !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  body:has(.admin-layout) .swal2-confirm,
+  body:has(.admin-layout) .swal2-cancel {
+    flex: 1 !important;
+    padding: 10px 12px !important;
+    font-size: 12.5px !important;
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body:has(.admin-layout) .swal2-radio {
+    flex-direction: column !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+
+  body:has(.admin-layout) .swal2-radio label {
+    width: 100% !important;
+    padding: 10px 12px !important;
+  }
+}
+
+/* ============ AKHIR BLOK SWEETALERT2 ADMIN THEME ============ */
+
+body:has(.admin-layout) .excel-table {
+  background: #111726 !important;
+  color: #f4f4f5 !important;
+}
+
+body:has(.admin-layout) .excel-table th {
+  background: #182035 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+}
+
+body:has(.admin-layout) .excel-table td {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e4e4e7 !important;
+}
+
+body:has(.admin-layout) .excel-table tr:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+body:has(.admin-layout) .excel-table tr.selected {
+  background: rgba(7, 145, 8, 0.2) !important;
+}
+
+body:has(.admin-layout) .col-name {
+  color: #ffffff !important;
+}
+
+.filter-input, .filter-select {
+  @apply px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-600 text-sm font-medium transition-all duration-200 shadow-sm;
+  outline: none;
+}
+
+.admin-layout .filter-input,
+.admin-layout .filter-select {
+  background-color: #182032 !important;
+  color: #f4f4f5 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.filter-input:focus, .filter-select:focus {
+  @apply border-[#079108] ring-4 ring-[#079108]/10 shadow-md;
+}
+
+.filter-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25em;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
+.table-status-select {
+  @apply px-3 py-1 rounded-full text-[11px] font-bold border-2 cursor-pointer transition-all duration-200 outline-none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 0.9em;
+  padding-right: 1.8rem;
+}
+
+.admin-layout .table-status-select {
+  background-color: #182032 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.table-status-select:hover {
+  @apply brightness-95 shadow-sm;
+}
+
+.table-status-select:focus {
+  @apply ring-2 ring-offset-1 ring-slate-300;
+}
+
+/* Bottom Nav Safe Padding for Mobile */
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Custom Sleek Dark Scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+
+
+
