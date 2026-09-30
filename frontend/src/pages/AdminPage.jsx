@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../lib/api'
 import { supabase } from '../lib/supabase'
@@ -730,16 +730,16 @@ const AdminPage = () => {
   ]
 
   return (
-    <div className="admin-layout min-h-screen md:h-screen md:overflow-hidden bg-[#090d16] text-white flex flex-col md:flex-row selection:bg-[#079108] selection:text-white">
+    <div className="admin-layout min-h-screen md:h-screen md:overflow-hidden bg-[#1A1512] text-white flex flex-col md:flex-row selection:bg-[#E8944A] selection:text-white">
       {/* SIDEBAR â€” desktop only */}
-      <aside className="hidden md:flex w-64 md:sticky md:top-0 md:h-screen md:overflow-hidden bg-[#0c111d]/90 backdrop-blur-xl border-r border-white/10 p-6 flex-col justify-between shadow-2xl z-20">
+      <aside className="hidden md:flex w-64 md:sticky md:top-0 md:h-screen md:overflow-hidden bg-[#241E19]/95 backdrop-blur-xl border-r border-white/10 p-6 flex-col justify-between shadow-2xl z-20">
         <div>
           <div className="mb-10 px-2 flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-black text-white tracking-tight uppercase">Refresh<span className="text-[#079108]">Breeze</span></h1>
+              <h1 className="text-xl font-black text-white tracking-tight uppercase">KOHI<span className="text-[#E8944A]">SEKAI</span></h1>
               <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Admin Dashboard</p>
             </div>
-            <div className="w-2.5 h-2.5 rounded-full bg-[#079108] animate-pulse shadow-[0_0_8px_#079108]"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-[#E8944A] animate-pulse shadow-[0_0_8px_#E8944A]"></div>
           </div>
 
           <nav className="space-y-2">
@@ -757,7 +757,7 @@ const AdminPage = () => {
                 onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
                   activeTab === item.id 
-                    ? 'bg-[#079108] text-white shadow-[0_0_20px_rgba(7,145,8,0.4)] translate-x-1' 
+                    ? 'bg-[#E8944A] text-white shadow-[0_0_12px_rgba(232,148,74,0.4)] translate-x-1' 
                     : 'text-zinc-400 hover:bg-white/5 hover:text-white'
                 }`}
               >
@@ -991,7 +991,7 @@ const AdminPage = () => {
 
       {/* â”€â”€ BOTTOM NAVBAR (mobile only) â”€â”€ */}
       {!isOtsCartActive && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0c111d]/95 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#241E19]/95 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">
           <div className="flex items-stretch">
             {bottomNavItems.map(item => (
               <button
@@ -999,14 +999,14 @@ const AdminPage = () => {
                 onClick={() => { setActiveTab(item.id); setShowMoreDrawer(false) }}
                 className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-all ${
                   activeTab === item.id
-                    ? 'text-[#079108]'
+                    ? 'text-[#E8944A]'
                     : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
-                <item.icon className={`text-lg transition-all ${activeTab === item.id ? 'text-[#079108] drop-shadow-[0_0_6px_#079108]' : ''}`} />
+                <item.icon className={`text-lg transition-all ${activeTab === item.id ? 'text-[#E8944A] drop-shadow-[0_0_6px_#E8944A]' : ''}`} />
                 {item.label}
                 {activeTab === item.id && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#079108] rounded-full" />
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#E8944A] rounded-full" />
                 )}
               </button>
             ))}
@@ -1015,11 +1015,11 @@ const AdminPage = () => {
               onClick={() => setShowMoreDrawer(prev => !prev)}
               className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-all ${
                 showMoreDrawer || ['members','settings'].includes(activeTab)
-                  ? 'text-[#079108]'
+                  ? 'text-[#E8944A]'
                   : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
-              <FaEllipsisH className={`text-lg ${showMoreDrawer || ['members','settings'].includes(activeTab) ? 'text-[#079108]' : ''}`} />
+              <FaEllipsisH className={`text-lg ${showMoreDrawer || ['members','settings'].includes(activeTab) ? 'text-[#E8944A]' : ''}`} />
               More
             </button>
           </div>

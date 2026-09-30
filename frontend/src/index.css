@@ -272,7 +272,7 @@ html.dark textarea:focus,
 body.dark-theme input:focus,
 body.dark-theme textarea:focus {
   background-color: #0e1526 !important;
-  border-color: #079108 !important;
+  border-color: #E8944A !important;
 }
 
 html.dark input::placeholder,
@@ -296,7 +296,7 @@ html.light :not(.admin-layout):not(.admin-layout *) textarea:focus,
 body.light-theme :not(.admin-layout):not(.admin-layout *) input:focus,
 body.light-theme :not(.admin-layout):not(.admin-layout *) textarea:focus {
   background-color: #ffffff !important;
-  border-color: #079108 !important;
+  border-color: #E8944A !important;
 }
 
 html.light :not(.admin-layout):not(.admin-layout *) input::placeholder,
@@ -465,26 +465,26 @@ body.dark-theme .bg-\[\#079108\] * {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #079108;
+  accent-color: #E8944A;
   margin: 0;
   vertical-align: middle;
 }
 
 /* =========================================================================
-   ADMIN LAYOUT - True Dark Mode (Deep Metal Dark Theme)
+   ADMIN LAYOUT - Kohi Sekai Dark Mode (Deep Coffee Espresso Theme)
    ========================================================================= */
 .admin-layout,
 html.dark .admin-layout,
 body.dark-theme .admin-layout,
 html.light .admin-layout,
 body.light-theme .admin-layout {
-  background-color: #090d16 !important;
+  background-color: #1A1512 !important;
   color: #f4f4f5 !important;
   color-scheme: dark !important;
 }
 
 body:has(.admin-layout) {
-  background-color: #090d16 !important;
+  background-color: #1A1512 !important;
   background-image: none !important;
   color: #f4f4f5 !important;
 }
@@ -494,12 +494,12 @@ html.dark .admin-layout aside,
 body.dark-theme .admin-layout aside,
 html.light .admin-layout aside,
 body.light-theme .admin-layout aside {
-  background-color: rgba(12, 17, 29, 0.95) !important;
+  background-color: rgba(24, 30, 25, 0.95) !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .admin-layout main {
-  background-color: #090d16 !important;
+  background-color: #1A1512 !important;
   color: #f4f4f5 !important;
 }
 
@@ -507,7 +507,7 @@ body.light-theme .admin-layout aside {
 .admin-layout input:not([type="checkbox"]):not([type="radio"]),
 .admin-layout textarea,
 .admin-layout select {
-  background-color: #182032 !important;
+  background-color: #201912 !important;
   color: #ffffff !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
@@ -520,14 +520,14 @@ body.light-theme .admin-layout aside {
 .admin-layout input:focus,
 .admin-layout textarea:focus,
 .admin-layout select:focus {
-  background-color: #1c263c !important;
-  border-color: #079108 !important;
+  background-color: #2A2018 !important;
+  border-color: #E8944A !important;
   outline: none !important;
-  box-shadow: 0 0 0 2px rgba(7, 145, 8, 0.25) !important;
+  box-shadow: 0 0 0 2px rgba(232, 148, 74, 0.25) !important;
 }
 
 .admin-layout .bg-white {
-  background-color: #111726 !important;
+  background-color: #241E19 !important;
   color: #f4f4f5 !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
@@ -551,8 +551,7 @@ body.light-theme .admin-layout aside {
 }
 
 /* ============================================
-   Kohi Sekai ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â SweetAlert2 Admin Theme
-   Minimalis modern, dark glass, stabil & responsif
+   Kohi Sekai - SweetAlert2 Admin Theme
    ============================================ */
 
 /* --- Overlay backdrop --- */
@@ -564,7 +563,7 @@ body:has(.admin-layout) .swal2-container {
 
 /* --- Popup container --- */
 body:has(.admin-layout) .swal2-popup {
-  background: #111726 !important;
+  background: #241E19 !important;
   color: #f4f4f5 !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 16px !important;
@@ -574,7 +573,7 @@ body:has(.admin-layout) .swal2-popup {
   font-family: inherit !important;
 }
 
-/* --- Icon styling aman (tetap responsif & tidak stuck) --- */
+/* --- Icon styling --- */
 body:has(.admin-layout) .swal2-icon {
   margin: 0 auto 16px auto !important;
 }
@@ -591,14 +590,14 @@ body:has(.admin-layout) .swal2-icon.swal2-error {
 }
 
 body:has(.admin-layout) .swal2-icon.swal2-success {
-  border-color: #079108 !important;
-  color: #079108 !important;
+  border-color: #E8944A !important;
+  color: #E8944A !important;
 }
 body:has(.admin-layout) .swal2-icon.swal2-success [class^='swal2-success-line'] {
-  background-color: #079108 !important;
+  background-color: #E8944A !important;
 }
 body:has(.admin-layout) .swal2-icon.swal2-success .swal2-success-ring {
-  border: 4px solid rgba(7, 145, 8, 0.3) !important;
+  border: 4px solid rgba(232, 148, 74, 0.3) !important;
 }
 
 body:has(.admin-layout) .swal2-icon.swal2-question {
@@ -622,7 +621,7 @@ body:has(.admin-layout) .swal2-title {
   text-align: center !important;
 }
 
-/* --- Deskripsi / body text --- */
+/* --- Body text --- */
 body:has(.admin-layout) .swal2-html-container {
   color: #94a3b8 !important;
   font-size: 13.5px !important;
@@ -647,7 +646,7 @@ body:has(.admin-layout) .swal2-actions {
 
 /* --- Tombol konfirmasi --- */
 body:has(.admin-layout) .swal2-confirm {
-  background: #079108 !important;
+  background: #E8944A !important;
   color: #ffffff !important;
   border: none !important;
   border-radius: 9px !important;
@@ -666,7 +665,7 @@ body:has(.admin-layout) .swal2-confirm:active {
   transform: translateY(0) !important;
 }
 
-/* --- Override warna confirm merah jika tombol bertema bahaya --- */
+/* --- Override merah untuk tombol bahaya --- */
 body:has(.admin-layout) .swal2-confirm[style*="background-color: rgb(239, 68, 68)"],
 body:has(.admin-layout) .swal2-confirm[style*="background-color:#ef4444"],
 body:has(.admin-layout) .swal2-confirm[style*="background-color: #ef4444"] {
@@ -698,12 +697,12 @@ body:has(.admin-layout) .swal2-timer-progress-bar-container {
 }
 body:has(.admin-layout) .swal2-timer-progress-bar {
   height: 3px !important;
-  background: #079108 !important;
+  background: #E8944A !important;
 }
 
-/* --- Loading spinner (showLoading) --- */
+/* --- Loading spinner --- */
 body:has(.admin-layout) .swal2-loader {
-  border-color: #079108 transparent #079108 transparent !important;
+  border-color: #E8944A transparent #E8944A transparent !important;
   width: 32px !important;
   height: 32px !important;
 }
@@ -741,50 +740,35 @@ body:has(.admin-layout) .swal2-radio label:hover {
 }
 body:has(.admin-layout) .swal2-radio input[type="radio"]:checked + label,
 body:has(.admin-layout) .swal2-radio label:has(input:checked) {
-  background: rgba(7, 145, 8, 0.15) !important;
-  border-color: rgba(7, 145, 8, 0.6) !important;
+  background: rgba(232, 148, 74, 0.15) !important;
+  border-color: rgba(232, 148, 74, 0.6) !important;
   color: #f4f4f5 !important;
 }
 body:has(.admin-layout) .swal2-radio input[type="radio"] {
   display: none !important;
 }
 
-/* --- Mobile optimization (ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤ 640px) --- */
+/* --- Mobile optimization --- */
 @media (max-width: 640px) {
-  body:has(.admin-layout) .swal2-container {
-    padding: 12px !important;
-  }
-
+  body:has(.admin-layout) .swal2-container { padding: 12px !important; }
   body:has(.admin-layout) .swal2-popup {
     width: calc(100vw - 32px) !important;
     max-width: 380px !important;
     padding: 20px 16px !important;
     border-radius: 14px !important;
   }
-
   body:has(.admin-layout) .swal2-icon {
     transform: scale(0.85) !important;
     margin: 0 auto 12px auto !important;
   }
-
-  body:has(.admin-layout) .swal2-title {
-    font-size: 16px !important;
-    padding: 0 0 6px 0 !important;
-  }
-
+  body:has(.admin-layout) .swal2-title { font-size: 16px !important; padding: 0 0 6px 0 !important; }
   body:has(.admin-layout) .swal2-html-container {
     font-size: 13px !important;
     margin: 0 0 16px 0 !important;
     padding: 0 4px !important;
     word-break: break-word !important;
   }
-
-  body:has(.admin-layout) .swal2-actions {
-    flex-direction: row !important;
-    gap: 8px !important;
-    width: 100% !important;
-  }
-
+  body:has(.admin-layout) .swal2-actions { flex-direction: row !important; gap: 8px !important; width: 100% !important; }
   body:has(.admin-layout) .swal2-confirm,
   body:has(.admin-layout) .swal2-cancel {
     flex: 1 !important;
@@ -795,28 +779,19 @@ body:has(.admin-layout) .swal2-radio input[type="radio"] {
     align-items: center !important;
     justify-content: center !important;
   }
-
-  body:has(.admin-layout) .swal2-radio {
-    flex-direction: column !important;
-    gap: 6px !important;
-    width: 100% !important;
-  }
-
-  body:has(.admin-layout) .swal2-radio label {
-    width: 100% !important;
-    padding: 10px 12px !important;
-  }
+  body:has(.admin-layout) .swal2-radio { flex-direction: column !important; gap: 6px !important; width: 100% !important; }
+  body:has(.admin-layout) .swal2-radio label { width: 100% !important; padding: 10px 12px !important; }
 }
 
 /* ============ AKHIR BLOK SWEETALERT2 ADMIN THEME ============ */
 
 body:has(.admin-layout) .excel-table {
-  background: #111726 !important;
+  background: #241E19 !important;
   color: #f4f4f5 !important;
 }
 
 body:has(.admin-layout) .excel-table th {
-  background: #182035 !important;
+  background: #2A2018 !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #cbd5e1 !important;
 }
@@ -831,7 +806,7 @@ body:has(.admin-layout) .excel-table tr:hover {
 }
 
 body:has(.admin-layout) .excel-table tr.selected {
-  background: rgba(7, 145, 8, 0.2) !important;
+  background: rgba(232, 148, 74, 0.2) !important;
 }
 
 body:has(.admin-layout) .col-name {
@@ -839,19 +814,28 @@ body:has(.admin-layout) .col-name {
 }
 
 .filter-input, .filter-select {
-  @apply px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-slate-600 text-sm font-medium transition-all duration-200 shadow-sm;
+  padding: 0.625rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   outline: none;
 }
 
 .admin-layout .filter-input,
 .admin-layout .filter-select {
-  background-color: #182032 !important;
+  background-color: #201912 !important;
   color: #f4f4f5 !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 .filter-input:focus, .filter-select:focus {
-  @apply border-[#079108] ring-4 ring-[#079108]/10 shadow-md;
+  border-color: #E8944A;
+  box-shadow: 0 0 0 4px rgba(232, 148, 74, 0.1);
 }
 
 .filter-select {
@@ -865,34 +849,33 @@ body:has(.admin-layout) .col-name {
 }
 
 .table-status-select {
-  @apply px-3 py-1 rounded-full text-[11px] font-bold border-2 cursor-pointer transition-all duration-200 outline-none;
+  padding: 0.25rem 1.8rem 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 2px solid;
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.6rem center;
   background-size: 0.9em;
-  padding-right: 1.8rem;
 }
 
 .admin-layout .table-status-select {
-  background-color: #182032 !important;
+  background-color: #201912 !important;
   color: #ffffff !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-.table-status-select:hover {
-  @apply brightness-95 shadow-sm;
-}
-
-.table-status-select:focus {
-  @apply ring-2 ring-offset-1 ring-slate-300;
-}
+.table-status-select:hover { filter: brightness(0.95); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.table-status-select:focus { ring: 2px; ring-offset: 1px; ring-color: #94a3b8; }
 
 /* Bottom Nav Safe Padding for Mobile */
 @media (max-width: 1023px) {
-  body {
-    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
-  }
+  body { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* Custom Sleek Dark Scrollbar */
@@ -900,21 +883,7 @@ body:has(.admin-layout) .col-name {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 9999px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.35);
-}
-
-
-
-
+.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 9999px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.35); }

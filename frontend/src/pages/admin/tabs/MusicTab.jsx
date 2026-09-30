@@ -331,7 +331,7 @@ const MusicTab = () => {
                   <SortableMusicCard key={item.id} item={item} openForm={openForm} handleDelete={handleDelete} />
                 ))}
                 {music.filter(m => m.platform === 'spotify').length === 0 && (
-                  <div className="col-span-full py-10 text-center text-zinc-500 bg-surface/50 border border-border rounded-2xl border border-white/5 border-dashed">
+                  <div className="col-span-full py-10 text-center text-zinc-500 rounded-2xl border border-dashed border-white/10 bg-white/5">
                     Belum ada data Spotify
                   </div>
                 )}
@@ -343,7 +343,7 @@ const MusicTab = () => {
                   <SortableMusicCard key={item.id} item={item} openForm={openForm} handleDelete={handleDelete} />
                 ))}
                 {music.filter(m => m.platform === 'youtube').length === 0 && (
-                  <div className="col-span-full py-10 text-center text-zinc-500 bg-surface/50 border border-border rounded-2xl border border-white/5 border-dashed">
+                  <div className="col-span-full py-10 text-center text-zinc-500 rounded-2xl border border-dashed border-white/10 bg-white/5">
                     Belum ada data YouTube
                   </div>
                 )}
