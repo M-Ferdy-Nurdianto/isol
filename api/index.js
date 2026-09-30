@@ -13,6 +13,8 @@ import authRoutes from '../backend/routes/auth.js'
 import uploadRoutes from '../backend/routes/upload.js'
 import merchandiseRoutes from '../backend/routes/merchandise.js'
 import merchOrdersRoutes from '../backend/routes/merchOrders.js'
+import chekiPricesRoutes from '../backend/routes/chekiPrices.js'
+import usersRoutes from '../backend/routes/users.js'
 import { supabase } from '../backend/config/supabase.js'
 
 const app = express()
@@ -151,6 +153,8 @@ app.use('/api/faqs', faqRoutes)
 app.use('/api/upload', useLimiter(uploadLimiter), uploadRoutes)
 app.use('/api/merchandise', merchandiseRoutes)
 app.use('/api/merch-orders', merchOrdersRoutes)
+app.use('/api/cheki-prices', chekiPricesRoutes)
+app.use('/api/users', usersRoutes)
 
 // Health check & Keep Alive
 app.get('/api/health', async (req, res) => {

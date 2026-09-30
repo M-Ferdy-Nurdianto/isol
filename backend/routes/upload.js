@@ -77,6 +77,7 @@ router.post('/payment-proof', upload.single('file'), handleMulterError, async (r
 
     res.json({
       success: true,
+      url: result.url,
       data: {
         fileId: result.fileId,
         url: result.url,
@@ -169,8 +170,8 @@ router.post('/member-image', upload.single('file'), handleMulterError, async (re
         position: 'center'
       })
     } else {
-      // 1:1 Square auto-crop for member profile avatar
-      sharpPipeline = sharpPipeline.resize(800, 800, {
+      // 3:4 Vertical portrait auto-crop for member profile avatar
+      sharpPipeline = sharpPipeline.resize(750, 1000, {
         fit: 'cover',
         position: 'top'
       })
@@ -199,5 +200,86 @@ router.post('/member-image', upload.single('file'), handleMulterError, async (re
   }
 })
 
-export default router
+// POST: Upload fan user avatar or banner to Supabase Storage with auto-compression
+router.post('/fan-image', upload.single('file'), handleMulterError, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded.' })
+    }
 
+    const type = req.query.type === 'banner' ? 'banner' : 'avatar'
+    
+    // Auto-crop and convert to WebP
+    let sharpPipeline = sharp(req.file.buffer)
+    
+    if (type === 'banner') {
+      // 16:9 Banner (e.g. 1200x675)
+      sharpPipeline = sharpPipeline.resize(1200, 675, {
+        fit: 'cover',
+        position: 'center'
+      })
+    } else {
+      // 1:1 Avatar
+      sharpPipeline = sharpPipeline.resize(500, 500, {
+        fit: 'cover',
+        position: 'center'
+      })
+    }
+    
+    const compressedBuffer = await sharpPipeline
+      .webp({ quality: 85 })
+      .toBuffer()
+
+    const sanitizedName = req.file.originalname.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()
+    const fileName = `${type}/${Date.now()}_${sanitizedName}.webp`
+    const result = await uploadToSupabaseStorage(
+      compressedBuffer,
+      fileName,
+      'image/webp',
+      'fans' // Store in a 'fans' bucket
+    )
+
+    res.json({
+      success: true,
+      data: { url: result.url }
+    })
+  } catch (error) {
+    console.error('Error uploading fan image:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+// POST: Upload music cover to Supabase Storage with auto-compression
+router.post('/music-cover', upload.single('file'), handleMulterError, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded.' })
+    }
+
+    // Compress image to WebP 1:1 Square
+    const compressedBuffer = await sharp(req.file.buffer)
+      .resize(800, 800, { fit: 'cover', position: 'center' })
+      .webp({ quality: 85 })
+      .toBuffer()
+
+    const sanitizedName = req.file.originalname.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()
+    const fileName = `cover_${Date.now()}_${sanitizedName}.webp`
+    // Uploading to a 'media' or 'public' bucket. Let's use 'media'
+    const result = await uploadToSupabaseStorage(
+      compressedBuffer,
+      fileName,
+      'image/webp',
+      'media' 
+    )
+
+    res.json({
+      success: true,
+      data: { url: result.url }
+    })
+  } catch (error) {
+    console.error('Error uploading music cover:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
+export default router

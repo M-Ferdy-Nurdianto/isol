@@ -1,62 +1,71 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================================================
+   KOHI SEKAI DESIGN TOKENS - Warm Coffee Kawaii & Sharp Industrial Metal
+   Source of truth: docs/COLOR-PALETTE.md & docs/PROJECT-STRUCTURE.md
+   ========================================================================= */
+
+/* Light Mode (Soft Cream & Warm Coffee) */
+:root {
+  --primary: #F0A868;
+  --secondary: #F5E6D3;
+  --accent: #FF6B9D;
+  --background: #FFF9F2;
+  --surface: #FAF2E8;
+  --text-primary: #2B2420;
+  --text-secondary: #736253;
+  --border: #EADCCB;
+  --success: #7BC47F;
+  --danger: #E85D5D;
+}
+
+/* Dark Mode (Deep Coffee Metal) */
+.dark {
+  --primary: #E8944A;
+  --secondary: #3A2E24;
+  --accent: #FF85AC;
+  --background: #1A1512;
+  --surface: #241E19;
+  --text-primary: #F5E6D3;
+  --text-secondary: #B0A599;
+  --border: #3A2E24;
+  --success: #6FAE73;
+  --danger: #D65656;
+}
+
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
+  html { scroll-behavior: smooth; }
 
   body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f8faf9;
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(7, 145, 8, 0.05) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.04) 0px, transparent 50%),
-      radial-gradient(at 100% 20%, rgba(56, 189, 248, 0.03) 0px, transparent 40%),
-      radial-gradient(at 10% 80%, rgba(195, 227, 163, 0.06) 0px, transparent 50%);
-    background-attachment: fixed;
-    color: #1a1a1a;
+    background-color: var(--background);
+    background-image: none;
+    color: var(--text-primary);
     overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* When Dark Mode is active */
-  html.dark body,
-  body.dark-theme {
-    background-color: #090d16;
-    background-image: none;
-    color: #f4f4f5;
+  html.dark body, body.dark-theme {
+    background-color: var(--background);
+    color: var(--text-primary);
   }
 
-  /* Snap Scroll for Mobile Carousels */
-  .snap-x {
-    scroll-snap-type: x mandatory;
-  }
+  .snap-x { scroll-snap-type: x mandatory; }
+  .snap-center { scroll-snap-align: center; }
+  .snap-mandatory { scroll-snap-type: x mandatory; }
 
-  .snap-center {
-    scroll-snap-align: center;
-  }
-
-  .snap-mandatory {
-    scroll-snap-type: x mandatory;
-  }
-
-  /* Hide Scrollbar utility */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
 }
-
 @layer components {
   /* Kohi Sekai Primary Colors */
   .btn-primary {
-    @apply bg-[#079108] text-white font-bold py-3 px-8 rounded-full hover:bg-[#067a07] transition-all shadow-lg hover:shadow-[#07910855] hover:-translate-y-0.5 active:scale-95;
+    @apply bg-[#F0A868] text-white font-bold py-3 px-8 rounded-full hover:bg-[#E8944A] transition-all shadow-lg hover:-translate-y-0.5 active:scale-95;
   }
 
   .glass-card {
@@ -542,7 +551,7 @@ body.light-theme .admin-layout aside {
 }
 
 /* ============================================
-   Kohi Sekai â€” SweetAlert2 Admin Theme
+   Kohi Sekai ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â SweetAlert2 Admin Theme
    Minimalis modern, dark glass, stabil & responsif
    ============================================ */
 
@@ -740,7 +749,7 @@ body:has(.admin-layout) .swal2-radio input[type="radio"] {
   display: none !important;
 }
 
-/* --- Mobile optimization (â‰¤ 640px) --- */
+/* --- Mobile optimization (ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¤ 640px) --- */
 @media (max-width: 640px) {
   body:has(.admin-layout) .swal2-container {
     padding: 12px !important;

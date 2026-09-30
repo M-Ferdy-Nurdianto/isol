@@ -1,10 +1,10 @@
-﻿# Project Manifesto & AI Vibe Coding Guidelines: Kohi Sekai
+# Project Manifesto & AI Vibe Coding Guidelines: Refresh Breeze
 
 ## Core Vision
-Kohi Sekai adalah platform manajemen dan shopping yang didesain khusus untuk komunitas idol dan fan, dengan fokus pada pengalaman yang premium, cepat, dan berkarakter. Project ini bukan sekadar CMS, melainkan perpanjangan dari identitas brand "Kohi Sekai".
+Refresh Breeze adalah platform manajemen dan shopping yang didesain khusus untuk komunitas idol dan fan, dengan fokus pada pengalaman yang premium, cepat, dan berkarakter. Project ini bukan sekadar CMS, melainkan perpanjangan dari identitas brand "Refresh Breeze".
 
 ## Brand Identity: "Kawaii Metal"
-Desain Kohi Sekai mengusung tema **Kawaii Metal**. Ini berarti perpaduan antara elemen yang memikat/cantik (*kawaii*) dengan estetika yang tajam, industrial, dan premium (*metal*).
+Desain Refresh Breeze mengusung tema **Kawaii Metal**. Ini berarti perpaduan antara elemen yang memikat/cantik (*kawaii*) dengan estetika yang tajam, industrial, dan premium (*metal*).
 - **Kawaii**: Penggunaan warna pastel dan neon yang cerah (pink, teal, gold, purple), tata letak ramah, dan interaksi yang halus.
 - **Metal**: Penggunaan Glassmorphism, border tajam, background gelap yang dalam, dan efek pencahayaan neon halus.
 
@@ -42,27 +42,14 @@ Gunakan format HSL untuk fleksibilitas opacity dan glassmorphism.
   - Headline selalu `font-weight: 700` atau lebih.
   - Body text minimal `14px` di mobile.
 
-## Glassmorphism Rules
-Untuk menjaga kesan premium, gunakan aturan berikut:
-- `backdrop-filter: blur(12px) saturate(180%)`.
-- `background: rgba(255, 255, 255, 0.05)`.
-- `border: 1px solid rgba(255, 255, 255, 0.1)`.
-- `box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8)`.
-
-## Dual-Theme Specification (WAJIB DIPATUHI)
-- **Light Mode (White Mode)**:
-  - Background: Putih / abu-abu terang bersih (`#f8faf9` / `#ffffff`).
-  - Kartu & Surface: **100% PUTIH BERSIH** (`bg-white` / `#ffffff`) dengan border abu-abu halus (`border-gray-100` / `border-gray-200`).
-  - Teks: **HITAM / SLATE GELAP** (`#0f172a`, `#1a1a1a`).
-  - *Larangan*: Jangan pernah menggunakan surface gelap / abu-abu kusam atau teks putih di Light Mode.
-- **Dark Mode (Metal Black Mode)**:
-  - Background: Deep Metal Dark (`#090d16` / `#060911`).
-  - Kartu & Surface: Glassmorphism gelap (`#111726` / `hsla(240, 10%, 12%, 0.7)`).
-  - Teks: **PUTIH CERAH** (`#ffffff`, `#f4f4f5`).
+## Solid Color & Anti-Blur Specification (WAJIB DIPATUHI)
+- **DILARANG MENGGUNAKAN GRADIENT**: Seluruh elemen (tombol, kartu, aksen, background, dan teks) **DILARANG** menggunakan `bg-gradient-*` atau `linear-gradient(...)`. Wajib menggunakan **SOLID COLOR** yang tegas dan presisi (misal: `bg-primary`, `bg-surface`, `bg-background`).
+- **DILARANG MENGGUNAKAN BACKGROUND BLUR**: Seluruh komponen (modal overlay, navbar, dropdown, toast, alert/webalert) **DILARANG** menggunakan `backdrop-blur-*` atau `backdrop-filter: blur(...)`. Gunakan solid background yang bersih (misal: overlay modal menggunakan `bg-black/90` atau `bg-black/85` solid).
+- **RESPONSIF MANUAL (BUKAN OTOMATIS)**: Projek ini **TIDAK** menggunakan responsif otomatis serabutan. Wajib menulis kode manual khusus terpisah untuk Mobile (`md:hidden`) dan Desktop (`hidden md:block` / `hidden md:flex` atau conditional logic terpisah) agar layout mobile dan desktop memiliki presisi tata letak yang sempurna.
 
 ## Visual Elements
 - **Icons**: Gunakan `react-icons/fa` atau `lucide-react` dengan stroke bersih.
-- **Gradients**: Gunakan gradient halus, jangan terlalu kontras.
+- **Colors**: Solid colors only. Tidak boleh ada gradien warna.
 - **Animations**: Gunakan `framer-motion` untuk transisi halaman dan interaksi tombol.
 - **No Emojis Policy**: Jangan gunakan emoji pada judul tombol, nama tab, modal, kartu, atau teks UI. Gunakan icon SVG profesional.
 

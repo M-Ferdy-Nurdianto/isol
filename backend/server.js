@@ -13,6 +13,9 @@ import authRoutes from './routes/auth.js'
 import uploadRoutes from './routes/upload.js'
 import merchandiseRoutes from './routes/merchandise.js'
 import merchOrdersRoutes from './routes/merchOrders.js'
+import userRoutes from './routes/users.js'
+import passwordResetRoutes from './routes/passwordReset.js'
+
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -136,10 +139,13 @@ app.use('/api/faqs', faqRoutes)
 app.use('/api/upload', useLimiter(uploadLimiter), uploadRoutes)
 app.use('/api/merchandise', merchandiseRoutes)
 app.use('/api/merch-orders', merchOrdersRoutes)
+app.use('/api/users', userRoutes)
+app.use('/api/password-reset', passwordResetRoutes)
+
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Kohi Sekai API Running' })
+  res.json({ status: 'OK', message: 'Refresh Breeze API Running' })
 })
 
 // Error handling

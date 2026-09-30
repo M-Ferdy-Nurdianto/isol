@@ -181,14 +181,15 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
   try {
     const { status } = req.body
 
-    const validStatuses = ['pending', 'checked', 'completed', 'cancelled']
+    let nextStatus = status === 'checked' ? 'paid' : status
+  const validStatuses = ['pending', 'paid', 'completed', 'cancelled']
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Status tidak valid' })
     }
 
     const { data, error } = await supabase
       .from('merch_orders')
-      .update({ status })
+      .update({ status: nextStatus || status })
       .eq('id', req.params.id)
       .select()
       .single()

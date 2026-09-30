@@ -1,4 +1,4 @@
-﻿# Kohi Sekai - Idol Merchandise & Cheki Ecommerce Platform
+# Kohi Sekai - Idol Merchandise & Cheki Ecommerce Platform
 
 Kohi Sekai is a fullstack web platform engineered for idol fan communities, featuring a high-conversion Cheki and merchandise shop, digital collectible receipts, and a comprehensive Admin Command Center. Built with a signature **Kawaii Metal** design aesthetic (glassmorphism, vibrant accents, and clean contrast).
 
@@ -10,7 +10,7 @@ Kohi Sekai is a fullstack web platform engineered for idol fan communities, feat
 - **Framework**: React 18
 - **Build Tool**: Vite 5
 - **Progressive Web App (PWA)**: `vite-plugin-pwa` with service worker caching for offline readiness and native mobile installability
-- **Styling**: Vanilla CSS design tokens with Glassmorphism, Tailwind CSS utility classes, and Dual-Theme support (Clean Light Mode & Metal Dark Mode)
+- **Styling**: Vanilla CSS design tokens (lihat [Color Palette](docs/COLOR-PALETTE.md) sebagai *source of truth*), Tailwind CSS utility classes, warna solid (tanpa glassmorphism), dan Dual-Theme support (Clean Light Mode & Metal Dark Mode)
 - **Icons**: `react-icons` and `lucide-react` (No-Emojis Policy across all action UI elements)
 - **Data Visualization**: `chart.js` & `react-chartjs-2` for order and member sales analytics
 - **Animations & Interactivity**: `framer-motion`, `react-parallax-tilt`, and `aos`

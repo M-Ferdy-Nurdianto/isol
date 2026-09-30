@@ -31,6 +31,21 @@ CREATE TABLE IF NOT EXISTS admin_users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ==============================================================================
+-- 3b. TABLE: fan_users (Profil Fans / Pembeli untuk Shop & Checkout)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS fan_users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nama VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    whatsapp VARCHAR(50) NOT NULL,
+    instagram VARCHAR(100),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_fan_users_email ON fan_users(email);
+CREATE INDEX IF NOT EXISTS idx_fan_users_whatsapp ON fan_users(whatsapp);
+
 -- Akun Default Utama Admin Kohi Sekai:
 -- Username: admin / kohisekai123 (Hash bcrypt: $2b$10$w6D9tq1z923K7E2g7wJ7..p1W6s4N.u9eL)
 INSERT INTO admin_users (username, password_hash, full_name)

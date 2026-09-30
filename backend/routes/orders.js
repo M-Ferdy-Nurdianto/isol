@@ -4,6 +4,7 @@ import { supabase } from '../config/supabase.js'
 import { authMiddleware } from '../middleware/auth.js'
 import ExcelJS from 'exceljs'
 import { deletePaymentProofFiles } from '../utils/storageCleaner.js'
+import { verifyTurnstileToken } from '../utils/turnstile.js'
 
 const router = express.Router()
 
@@ -127,6 +128,16 @@ router.post('/', async (req, res) => {
     }
 
     const { event_id, nama_lengkap, kontak, items, payment_proof_url, catatan } = req.body
+    const turnstileToken = req.body['cf-turnstile-response'] || req.body.turnstile_token
+
+    // Cloudflare Turnstile Server-side verification (skip for logged-in admin testing if needed)
+    if (!isAdmin) {
+      const clientIp = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip
+      const turnstileResult = await verifyTurnstileToken(turnstileToken, clientIp)
+      if (!turnstileResult.success) {
+        return res.status(400).json({ error: turnstileResult.error || 'Verifikasi keamanan gagal' })
+      }
+    }
 
     // Validate event_id
     if (!event_id) {
@@ -134,10 +145,10 @@ router.post('/', async (req, res) => {
     }
 
     // Generate order number
-    const orderNumber = `KS${Date.now()}`
+    const orderNumber = `RB${Date.now()}`
 
     // Generate auto email from timestamp
-    const autoEmail = `order-${Date.now()}@kohisekai.com`
+    const autoEmail = `order-${Date.now()}@refreshbreeze.com`
 
     // Determine if kontak is phone or instagram
     const isPhone = /^[0-9+\-\s()]+$/.test(kontak)
@@ -200,13 +211,13 @@ router.post('/', async (req, res) => {
 // POST: Create OTS (On The Spot) order by admin
 router.post('/ots', authMiddleware, async (req, res) => {
   try {
-    const { event_id, nama_lengkap, whatsapp, email, instagram, items, payment_method } = req.body
+    const { event_id, nama_lengkap, whatsapp, email, instagram, items, payment_method, user_id } = req.body
 
     if (!event_id) {
       return res.status(400).json({ error: 'Event ID is required' })
     }
 
-    const orderNumber = `KS-OTS${Date.now()}`
+    const orderNumber = `RB-OTS${Date.now()}`
     const total_harga = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
     const { data: order, error: orderError } = await supabase
@@ -214,9 +225,10 @@ router.post('/ots', authMiddleware, async (req, res) => {
       .insert({
         order_number: orderNumber,
         event_id,
+        user_id: user_id || null,
         nama_lengkap,
         whatsapp: whatsapp || '-',
-        email: email || `ots-${Date.now()}@kohisekai.com`,
+        email: email || `ots-${Date.now()}@refreshbreeze.com`,
         instagram: instagram || '-',
         total_harga,
         status: 'checked',
@@ -264,13 +276,14 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
     const { id } = req.params
     const { status } = req.body
 
-    if (!['pending', 'checked', 'completed'].includes(status)) {
+    let nextStatus = status === 'checked' ? 'paid' : status
+  if (!['pending', 'paid', 'completed'].includes(nextStatus)) {
       return res.status(400).json({ error: 'Invalid status' })
     }
 
     const { data, error } = await supabase
       .from('orders')
-      .update({ status })
+      .update({ status: nextStatus || status })
       .eq('id', id)
       .select()
       .single()
@@ -347,9 +360,9 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
 
     const formatCurrency = (value) => `Rp ${Number(value || 0).toLocaleString('id-ID')}`
     const formatStatus = (status) => {
-      if (status === 'pending') return 'BELUM BAYAR'
-      if (status === 'checked') return 'DI BAYAR'
-      if (status === 'completed') return 'DI AMBIL'
+      if (status === 'pending') return 'PENDING'
+      if (status === 'paid' || status === 'checked') return 'PAID'
+      if (status === 'completed') return 'COMPLETED'
       return String(status || '-').toUpperCase()
     }
 
@@ -385,7 +398,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
     const eventLabel = eventInfo ? `${eventInfo.nama} - ${eventInfo.bulan} ${eventInfo.tahun}` : 'SEMUA EVENT'
     const eventMeta = eventInfo ? `Tgl: ${eventInfo.tanggal || '-'} ${eventInfo.bulan || ''} ${eventInfo.tahun || ''} | Lokasi: ${eventInfo.lokasi || '-'} | Status: ${getEventStatusLabel()}` : ''
 
-    const paidOrders = orders.filter(o => o.status === 'checked' || o.status === 'completed')
+    const paidOrders = orders.filter(o => o.status === 'paid' || o.status === 'checked' || o.status === 'completed')
     const totalRevenue = paidOrders.reduce((sum, order) => sum + (order.total_harga || 0), 0)
     const totalPolaroid = paidOrders.filter(o => o.status === 'completed').reduce((sum, order) => sum + (order.order_items?.reduce((pSum, item) => {
       const name = String(item.item_name || '').toLowerCase()
@@ -421,8 +434,8 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
       })
     })
 
-    const titleRow = worksheet.addRow(['KOHI SEKAI - LAPORAN PENJUALAN'])
-    mergeRow(titleRow.number, 'A', 'J', 'KOHI SEKAI - LAPORAN PENJUALAN', {
+    const titleRow = worksheet.addRow(['REFRESH BREEZE - LAPORAN PENJUALAN'])
+    mergeRow(titleRow.number, 'A', 'J', 'REFRESH BREEZE - LAPORAN PENJUALAN', {
       font: { bold: true, size: 14, color: { argb: 'FFFFFFFF' } },
       fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF079108' } },
       alignment: { vertical: 'middle', horizontal: 'left' }
@@ -573,7 +586,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
     addOrderSection('PO ORDERS', 'FF16A34A', poOrders)
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    res.setHeader('Content-Disposition', `attachment; filename=KohiSekai_Report_${Date.now()}.xlsx`)
+    res.setHeader('Content-Disposition', `attachment; filename=RefreshBreeze_Report_${Date.now()}.xlsx`)
 
     await workbook.xlsx.write(res)
     res.end()

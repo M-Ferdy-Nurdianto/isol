@@ -1,23 +1,19 @@
+import 'dotenv/config'
 import { createClient } from '@supabase/supabase-js'
-// Note: dotenv removed - Vercel provides environment variables directly via process.env
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
+const defaultLocalUrl = 'http://127.0.0.1:54321'
+const defaultLocalServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU'
 
-// Debugging Vercel Env Vars
+const envUrl = process.env.SUPABASE_URL
+const envKey = process.env.SUPABASE_SERVICE_KEY
+
+const supabaseUrl = (envUrl && !envUrl.includes('placeholder')) ? envUrl : defaultLocalUrl
+const supabaseServiceKey = (envKey && !envKey.includes('your_supabase') && !envKey.includes('placeholder')) ? envKey : defaultLocalServiceKey
+
 console.log('--- Supabase Config Init ---')
 console.log('NODE_ENV:', process.env.NODE_ENV)
-console.log('Supabase URL exists:', !!supabaseUrl)
-console.log('Supabase Key exists:', !!supabaseServiceKey)
+console.log('Supabase URL:', supabaseUrl)
+console.log('Supabase Key exists & valid format:', Boolean(supabaseServiceKey && supabaseServiceKey.includes('.')))
 console.log('----------------------------')
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  // Don't throw immediately to allow logging to be flushed/viewed
-  console.error('CRITICAL: Missing Supabase credentials in environment variables')
-}
-
-// Create client even if missing (will fail on use) to prevent boot crash
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseServiceKey || 'placeholder-key'
-)
+export const supabase = createClient(supabaseUrl, supabaseServiceKey)

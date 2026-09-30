@@ -70,6 +70,14 @@ router.get('/', cachePublic({ sMaxAge: 10, maxAge: 5, staleWhileRevalidate: 10 }
           tipe,
           path,
           kredit
+        ),
+        cheki_prices (
+          id,
+          member_id,
+          jenis_sesi,
+          price,
+          slot_available,
+          is_available
         )
       `)
       .order('tahun', { ascending: false })
@@ -160,6 +168,14 @@ router.get('/:id', cachePublic({ sMaxAge: 10, maxAge: 5, staleWhileRevalidate: 1
           tipe,
           path,
           kredit
+        ),
+        cheki_prices (
+          id,
+          member_id,
+          jenis_sesi,
+          price,
+          slot_available,
+          is_available
         )
       `)
       .eq('id', id)
@@ -194,12 +210,27 @@ router.post('/', authMiddleware, async (req, res) => {
         type: type || 'regular',
         is_special: type === 'special',
         theme_name: type === 'special' ? theme_name : null,
-        theme_color: type === 'special' ? theme_color : null
+        theme_color: type === 'special' ? theme_color : null,
+        deskripsi: req.body.deskripsi || null,
+        event_date: req.body.event_date || null
       })
       .select()
       .single()
 
     if (eventError) throw eventError
+
+    // Auto-create cheki_prices if cheki_prices array provided
+    if (req.body.cheki_prices && Array.isArray(req.body.cheki_prices) && req.body.cheki_prices.length > 0) {
+      const pricesToInsert = req.body.cheki_prices.map(cp => ({
+        event_id: event.id,
+        member_id: cp.member_id || null,
+        jenis_sesi: cp.jenis_sesi || '2-Shot Cheki',
+        price: Number.parseInt(cp.price, 10) || 25000,
+        slot_available: cp.slot_available !== undefined ? Number.parseInt(cp.slot_available, 10) : 30,
+        is_available: cp.is_available !== undefined ? Boolean(cp.is_available) : true
+      }))
+      await supabase.from('cheki_prices').insert(pricesToInsert)
+    }
 
     // Insert lineup if provided
     if (lineup && lineup.length > 0) {
