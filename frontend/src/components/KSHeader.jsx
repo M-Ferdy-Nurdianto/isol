@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaBars, FaTimes, FaSun, FaMoon, FaUser, FaHistory, FaSignOutAlt, FaCoffee } from 'react-icons/fa'
+import { FaBars, FaTimes, FaSun, FaMoon, FaUser, FaHistory, FaSignOutAlt, FaCoffee, FaTicketAlt } from 'react-icons/fa'
 import { useTheme } from '../context/ThemeContext'
 import { useFanAuth } from '../context/FanAuthContext'
 import FanAuthModal from './auth/FanAuthModal'
@@ -38,6 +38,8 @@ const KSHeader = () => {
     { name: 'Shop', href: '/shop' },
     { name: 'Music', href: '/music' },
   ]
+
+  const isOtsActive = location.pathname === '/ots'
 
   const isActive = (href) => {
     if (href === '/') return location.pathname === '/'
@@ -89,6 +91,22 @@ const KSHeader = () => {
                 </Link>
               )
             })}
+
+            {/* === NEW: OTS Venue Link — HANYA untuk USER LOGIN === */}
+            {isLoggedIn && (
+              <Link
+                to="/ots"
+                style={isOtsActive ? { backgroundColor: 'var(--primary)', color: '#ffffff' } : {}}
+                className={`relative px-4 py-1.5 text-xs font-black tracking-widest uppercase transition-all duration-200 rounded-full flex items-center gap-1.5 ${
+                  isOtsActive
+                    ? 'shadow-md shadow-primary/30 text-white'
+                    : 'text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10'
+                }`}
+              >
+                <FaTicketAlt style={{ fontSize: '10px' }} />
+                <span>OTS Venue</span>
+              </Link>
+            )}
           </div>
 
           {/* Actions: Theme Toggle & Fan Profile */}
@@ -167,10 +185,21 @@ const KSHeader = () => {
                         <span className="text-xs font-bold text-text-primary truncate">{fanUser?.nama}</span>
                       </div>
 
+                      {/* NEW: OTS Venue Link di Mobile — hanya saat login */}
+                      <Link
+                        to="/ots"
+                        onClick={() => setMobileOpen(false)}
+                        style={isOtsActive ? { backgroundColor: 'var(--primary)', color: '#ffffff' } : {}}
+                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold ${isOtsActive ? '' : 'bg-background text-text-primary hover:bg-primary/10'}`}
+                      >
+                        <FaTicketAlt className={isOtsActive ? 'text-white' : 'text-primary'} />
+                        <span>Pesan OTS Venue</span>
+                      </Link>
+
                       <Link
                         to="/profile"
                         onClick={() => setMobileOpen(false)}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-background text-text-primary text-xs font-bold"
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-background text-text-primary text-xs font-bold hover:bg-primary/10"
                       >
                         <FaUser className="text-primary" />
                         <span>Profil & Riwayat</span>

@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+﻿import { motion, AnimatePresence } from 'framer-motion'
 import { FaTimes, FaPlus, FaMinus, FaChevronLeft, FaChevronRight, FaShoppingCart } from 'react-icons/fa'
 import { getSizePriceIncrement } from '../../hooks/useShopCart'
 
@@ -73,7 +73,7 @@ const MerchDetailModal = ({
                         <button 
                            key={i} 
                            onClick={() => setActiveSlide(i)}
-                           className={`w-1.5 h-1.5 rounded-full transition-all ${i === activeSlide ? 'bg-[#079108] w-4' : 'bg-gray-300'}`}
+                           className={`w-1.5 h-1.5 rounded-full transition-all ${i === activeSlide ? 'bg-[var(--primary)] w-4' : 'bg-gray-300'}`}
                         />
                      ))}
                   </div>
@@ -85,10 +85,10 @@ const MerchDetailModal = ({
           <div className="w-full md:w-1/2 p-8 sm:p-12 overflow-y-auto custom-scrollbar flex flex-col">
              <div className="flex-1 space-y-8">
                  <div>
-                    <p className="text-[10px] font-black text-[#079108] uppercase tracking-[0.2em] mb-2">Official Merchandise</p>
+                    <p className="text-[10px] font-black text-[var(--primary)] uppercase tracking-[0.2em] mb-2">Official Merchandise</p>
                     <h2 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight leading-tight">{selectedMerch.nama}</h2>
                     <div className="flex items-baseline gap-2 mt-2">
-                       <p className="text-2xl font-black text-[#079108]">
+                       <p className="text-2xl font-black text-[var(--primary)]">
                           IDR {(selectedMerch.harga + getSizePriceIncrement(selectedSize)).toLocaleString()}
                        </p>
                        {getSizePriceIncrement(selectedSize) > 0 && (
@@ -111,7 +111,7 @@ const MerchDetailModal = ({
                           {selectedMerch.size_chart_urls?.length > 0 && (
                              <button 
                                onClick={() => setActiveSlide(1)}
-                               className="text-[10px] font-black text-[#079108] uppercase tracking-widest hover:underline"
+                               className="text-[10px] font-black text-[var(--primary)] uppercase tracking-widest hover:underline"
                              >
                                 Size Chart
                              </button>
@@ -122,7 +122,7 @@ const MerchDetailModal = ({
                              <button 
                                 key={size}
                                 onClick={() => setSelectedSize(size)}
-                                className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${selectedSize === size ? 'bg-[#079108] text-white shadow-lg shadow-[#079108]/20' : 'bg-gray-50 dark:bg-white/10 text-gray-400 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-white/20'}`}
+                                className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${selectedSize === size ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20' : 'bg-gray-50 dark:bg-white/10 text-gray-400 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-white/20'}`}
                              >
                                 {size}
                              </button>
@@ -141,7 +141,7 @@ const MerchDetailModal = ({
                        addToMerchCart(selectedMerch, selectedSize)
                        setSelectedMerch(null)
                     }}
-                    className="w-full bg-[#079108] hover:bg-[#067a07] text-white py-5 rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-emerald-950/20 flex items-center justify-center gap-3 transition-all"
+                    className="w-full bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-emerald-950/20 flex items-center justify-center gap-3 transition-all"
                  >
                     <FaShoppingCart /> Add to Cart
                  </motion.button>
@@ -154,3 +154,4 @@ const MerchDetailModal = ({
 }
 
 export default MerchDetailModal
+

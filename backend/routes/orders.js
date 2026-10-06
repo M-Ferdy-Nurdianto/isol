@@ -24,7 +24,8 @@ router.get('/', authMiddleware, async (req, res) => {
           item_name,
           price,
           quantity,
-          member_id
+          member_id,
+          cheki_type
         )
       `)
       .order('created_at', { ascending: false })
@@ -85,7 +86,8 @@ router.get('/:id', authMiddleware, async (req, res) => {
           item_name,
           price,
           quantity,
-          member_id
+          member_id,
+          cheki_type
         )
       `)
       .eq('id', id)
@@ -100,7 +102,9 @@ router.get('/:id', authMiddleware, async (req, res) => {
   }
 })
 
-// POST: Create new order (from customer)
+// POST: Create new PO order (from customer - Pre-Order checkout)
+// Updated 2026-10-02: Support cheki_type (regular/wide/grup), validate each toggle
+//   + recalculate price from config (never trust client price)
 router.post('/', async (req, res) => {
   try {
     // Check maintenance mode (Admin with valid token can bypass for testing)
@@ -127,7 +131,7 @@ router.post('/', async (req, res) => {
       }
     }
 
-    const { event_id, nama_lengkap, kontak, items, payment_proof_url, catatan } = req.body
+    const { event_id, nama_lengkap, kontak, items, payment_proof_url, catatan, user_id } = req.body
     const turnstileToken = req.body['cf-turnstile-response'] || req.body.turnstile_token
 
     // Cloudflare Turnstile Server-side verification (skip for logged-in admin testing if needed)
@@ -144,19 +148,95 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Event ID is required' })
     }
 
-    // Generate order number
+    if (!nama_lengkap || String(nama_lengkap).trim() === '') {
+      return res.status(400).json({ error: 'Nama lengkap wajib diisi.' })
+    }
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Minimal pilih 1 tiket.' })
+    }
+
+    // ── 1. Baca config toggles & harga PO ───────────────────────────────
+    const getConfig = async (key, fallback = null) => {
+      const { data } = await supabase.from('config').select('value').eq('key', key).maybeSingle()
+      return data ? data.value : fallback
+    }
+    const regularChekiEnabled = (await getConfig('regular_cheki_enabled', 'true')) !== 'false'
+    const wideChekiEnabled    = (await getConfig('wide_cheki_enabled', 'true'))    !== 'false'
+    const chekiGrupEnabled    = (await getConfig('cheki_grup_enabled', 'false')) === 'true' // default OFF
+    const hargaPoRegular      = Number(await getConfig('harga_cheki_per_member', '40000')) || 40000
+    const hargaPoWide         = Number(await getConfig('harga_cheki_grup', '70000'))        || 70000
+    const hargaPoChekiGrup    = Number(await getConfig('harga_cheki_grup_po', '150000'))   || 150000
+
+    // ── 2. Validasi items per cheki_type + recalc harga (JANGAN PERCAYA CLIENT) ─
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    let total_harga = 0
+    const cleanedItems = []
+
+    for (const itm of items) {
+      // Tentukan cheki_type (backward compat: item dengan member_id='group' berarti CHEKI GRUP (jika tanpa field cheki_type)
+      const legacyIsGroup = itm.member_id === 'group' || itm.member_id === 'grup'
+      let type = itm.cheki_type || (legacyIsGroup ? 'grup' : 'regular')
+      // Jika label item.name mengandung 'wide' tapi bukan grup, anggap wide (bukan grup)
+      if (!itm.cheki_type && !legacyIsGroup && typeof itm.name && /\bwide\b/i.test(itm.name)) {
+        type = 'wide'
+      }
+      const qty = Math.max(1, parseInt(itm.quantity, 10) || 1)
+      let pricePerUnit = 0
+      let itemName = ''
+      let memberIdDb = null
+
+      if (type === 'grup' || legacyIsGroup) {
+        // ── Cheki Grup (semua member) ──
+        if (!chekiGrupEnabled) {
+          return res.status(400).json({ error: 'Cheki Grup (Semua Member) saat ini tidak tersedia.' })
+        }
+        pricePerUnit = hargaPoChekiGrup
+        itemName = itm.name || 'Cheki Grup (Semua Member)'
+        memberIdDb = null
+      } else if (type === 'wide') {
+        // ── Wide Cheki (Polaroid 16:9 PER MEMBER ──
+        if (!wideChekiEnabled) {
+          return res.status(400).json({ error: 'Wide Cheki (Polaroid 16:9) saat ini tidak tersedia.' })
+        }
+        if (!UUID_REGEX.test(itm.member_id)) {
+          return res.status(400).json({ error: 'Member tidak valid untuk Wide Cheki.' })
+        }
+        pricePerUnit = hargaPoWide
+        itemName = itm.name || `Wide Cheki (16:9) ${itm.member_id}`
+        memberIdDb = itm.member_id
+      } else {
+        // ── Default: Regular Cheki PER MEMBER ──
+        if (!regularChekiEnabled) {
+          return res.status(400).json({ error: 'Regular Cheki saat ini tidak tersedia.' })
+        }
+        if (!UUID_REGEX.test(itm.member_id)) {
+          return res.status(400).json({ error: 'Member tidak valid untuk Regular Cheki.' })
+        }
+        pricePerUnit = hargaPoRegular
+        itemName = itm.name || `Regular Cheki ${itm.member_id}`
+        memberIdDb = itm.member_id
+      }
+
+      total_harga += pricePerUnit * qty
+      cleanedItems.push({
+        member_id: memberIdDb,
+        cheki_type: type === 'grup' || type === 'wide' || type === 'regular' ? type : 'regular',
+        item_name: itemName,
+        price: pricePerUnit,
+        quantity: qty
+      })
+    }
+
     const orderNumber = `RB${Date.now()}`
 
     // Generate auto email from timestamp
     const autoEmail = `order-${Date.now()}@refreshbreeze.com`
 
     // Determine if kontak is phone or instagram
-    const isPhone = /^[0-9+\-\s()]+$/.test(kontak)
+    const isPhone = kontak && /^[0-9+\-\s()]+$/.test(kontak)
     const whatsapp = isPhone ? kontak : '-'
-    const instagram = !isPhone ? kontak : '-'
-
-    // Calculate total
-    const total_harga = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    const instagram = !isPhone && kontak ? kontak : '-'
 
     // Insert order
     const { data: order, error: orderError } = await supabase
@@ -164,6 +244,7 @@ router.post('/', async (req, res) => {
       .insert({
         order_number: orderNumber,
         event_id,
+        user_id: user_id || null,
         nama_lengkap,
         whatsapp,
         email: autoEmail,
@@ -179,47 +260,105 @@ router.post('/', async (req, res) => {
 
     if (orderError) throw orderError
 
-    // Insert order items
-    const orderItems = items.map(item => {
-      // Handle group member (member_id is string "group" not UUID)
-      const memberId = (item.member_id === 'group' || typeof item.member_id === 'string' && !item.member_id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i))
-        ? null
-        : item.member_id
-
-      return {
-        order_id: order.id,
-        member_id: memberId,
-        item_name: item.name,
-        price: item.price,
-        quantity: item.quantity
-      }
-    })
-
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems)
+    // Insert order items WITH cheki_type
+    const orderItemsDb = cleanedItems.map(itm => ({ ...itm, order_id: order.id }))
+    const { error: itemsError } = await supabase.from('order_items').insert(orderItemsDb)
 
     if (itemsError) throw itemsError
 
     res.json({ success: true, order })
   } catch (error) {
-    console.error('Error creating order:', error)
+    console.error('Error creating PO order:', error)
     res.status(500).json({ error: error.message })
   }
 })
 
 // POST: Create OTS (On The Spot) order by admin
+// Updated 2026-10-02: Support cheki_type (regular/wide/grup), validate each toggle
+//   + recalculate price from config (never trust client price)
 router.post('/ots', authMiddleware, async (req, res) => {
   try {
     const { event_id, nama_lengkap, whatsapp, email, instagram, items, payment_method, user_id } = req.body
 
+    // ── 1. Baca config toggles & harga ────────────────────────────────
+    const getConfig = async (key, fallback = null) => {
+      const { data } = await supabase.from('config').select('value').eq('key', key).maybeSingle()
+      return data ? data.value : fallback
+    }
+    const regularChekiEnabled = (await getConfig('regular_cheki_enabled', 'true')) !== 'false'
+    const wideChekiEnabled    = (await getConfig('wide_cheki_enabled', 'true'))    !== 'false'
+    const chekiGrupEnabled    = (await getConfig('cheki_grup_enabled', 'false')) === 'true' // default OFF
+    const hargaOtsRegular     = Number(await getConfig('harga_ots_per_member', '40000')) || 40000
+    const hargaOtsWide        = Number(await getConfig('harga_ots_grup', '80000'))        || 80000
+    const hargaOtsChekiGrup   = Number(await getConfig('harga_cheki_grup_ots', '170000')) || 170000
+
+    // ── 2. Validasi event ─────────────────────────────────────────────
     if (!event_id) {
       return res.status(400).json({ error: 'Event ID is required' })
     }
 
-    const orderNumber = `RB-OTS${Date.now()}`
-    const total_harga = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    if (!nama_lengkap || String(nama_lengkap).trim() === '') {
+      return res.status(400).json({ error: 'Nama pembeli wajib diisi.' })
+    }
 
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Minimal pilih 1 tiket cheki.' })
+    }
+
+    // ── 3. Validasi items per cheki_type + recalc harga (JANGAN PERCAYA CLIENT) ─
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    let total_harga = 0
+    const cleanedItems = []
+
+    for (const itm of items) {
+      const type = itm.cheki_type || (itm.member_id === 'grup' || itm.member_id === 'group' ? 'grup' : 'regular')
+      const qty = Math.max(1, parseInt(itm.quantity, 10) || 1)
+      let pricePerUnit = 0
+      let itemName = ''
+      let memberIdDb = null
+
+      if (type === 'grup' || itm.member_id === 'grup' || itm.member_id === 'group') {
+        if (!chekiGrupEnabled) {
+          return res.status(400).json({ error: 'Cheki Grup (Semua Member) saat ini tidak tersedia.' })
+        }
+        pricePerUnit = hargaOtsChekiGrup
+        itemName = itm.name || 'Cheki Grup (Semua Member)'
+        memberIdDb = null
+      } else if (type === 'wide') {
+        if (!wideChekiEnabled) {
+          return res.status(400).json({ error: 'Wide Cheki (Polaroid 16:9) saat ini tidak tersedia.' })
+        }
+        if (!UUID_REGEX.test(itm.member_id)) {
+          return res.status(400).json({ error: 'Member tidak valid untuk Wide Cheki.' })
+        }
+        pricePerUnit = hargaOtsWide
+        itemName = itm.name || `Wide Cheki (16:9) ${itm.member_id}`
+        memberIdDb = itm.member_id
+      } else {
+        // Default: Regular Cheki (per member)
+        if (!regularChekiEnabled) {
+          return res.status(400).json({ error: 'Regular Cheki saat ini tidak tersedia.' })
+        }
+        if (!UUID_REGEX.test(itm.member_id)) {
+          return res.status(400).json({ error: 'Member tidak valid untuk Regular Cheki.' })
+        }
+        pricePerUnit = hargaOtsRegular
+        itemName = itm.name || `Regular Cheki ${itm.member_id}`
+        memberIdDb = itm.member_id
+      }
+
+      total_harga += pricePerUnit * qty
+      cleanedItems.push({
+        member_id: memberIdDb,
+        cheki_type: type === 'grup' || type === 'wide' || type === 'regular' ? type : 'regular',
+        item_name: itemName,
+        price: pricePerUnit,
+        quantity: qty
+      })
+    }
+
+    // ── 4. Insert ORDER (checked=lunas, created_by=admin, is_ots=true) ─
+    const orderNumber = `RB-OTS${Date.now()}`
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -234,42 +373,186 @@ router.post('/ots', authMiddleware, async (req, res) => {
         status: 'checked',
         is_ots: true,
         created_by: 'admin',
-        payment_proof_url: payment_method || 'Cash' // Store Cash/QR here
+        payment_proof_url: payment_method || 'Cash'
       })
       .select()
       .single()
 
     if (orderError) throw orderError
 
-    // Handle group member ID (convert to NULL if not valid UUID)
-    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-    const orderItems = items.map(item => {
-      const memberId = (item.member_id === 'group' || !UUID_REGEX.test(item.member_id))
-        ? null
-        : item.member_id
-
-      return {
-        order_id: order.id,
-        member_id: memberId,
-        item_name: item.name,
-        price: item.price,
-        quantity: item.quantity
-      }
-    })
-
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems)
-
+    // ── 5. Insert ORDER_ITEMS (dengan cheki_type terisi) ─────────────
+    const orderItemsDb = cleanedItems.map(itm => ({ ...itm, order_id: order.id }))
+    const { error: itemsError } = await supabase.from('order_items').insert(orderItemsDb)
     if (itemsError) throw itemsError
 
     res.json({ success: true, order })
   } catch (error) {
-    console.error('Error creating OTS order:', error)
+    console.error('Error creating OTS ADMIN order:', error)
     res.status(500).json({ error: error.message })
   }
 })
 
+// POST: Create OTS (On The Spot) order by LOGGED IN FAN USER
+router.post('/ots-user', async (req, res) => {
+  try {
+    const JWT_SECRET = process.env.JWT_SECRET || 'kohi_sekai_fan_secret_2026'
+    const { event_id, items, payment_method, user_id: bodyUserId } = req.body
+
+    // ── 1. Verifikasi fan token (MANDATORY) ─────────────────────────────
+    const token = req.headers.authorization?.split(' ')[1]
+    if (!token) {
+      return res.status(401).json({ error: 'Login terlebih dahulu untuk order OTS' })
+    }
+    let decoded
+    try {
+      decoded = jwt.verify(token, JWT_SECRET)
+    } catch {
+      return res.status(401).json({ error: 'Sesi login tidak valid. Silakan login ulang.' })
+    }
+    const fanUserId = decoded.id
+    if (!fanUserId) {
+      return res.status(401).json({ error: 'Token tidak memuat data user' })
+    }
+    // Cegah user memalsukan user_id milik orang lain (injection block)
+    if (bodyUserId && String(bodyUserId) !== String(fanUserId)) {
+      return res.status(403).json({ error: 'Anda hanya boleh membuat order atas nama akun sendiri.' })
+    }
+
+    // ── 2. Ambil data fan user dari DB (nama dari DB, bukan body client) ─
+    const { data: fanUser, error: fanUserError } = await supabase
+      .from('users')
+      .select('id, nama, email, whatsapp, instagram')
+      .eq('id', fanUserId)
+      .maybeSingle()
+    if (fanUserError || !fanUser) {
+      return res.status(404).json({ error: 'Akun fan tidak ditemukan di database.' })
+    }
+
+    // ── 3. Baca CONFIG toggles dan harga ────────────────────────────────
+    const getConfig = async (key, fallback = null) => {
+      const { data } = await supabase.from('config').select('value').eq('key', key).maybeSingle()
+      return data ? data.value : fallback
+    }
+
+    const regularChekiEnabled = (await getConfig('regular_cheki_enabled', 'true')) !== 'false'
+    const wideChekiEnabled    = (await getConfig('wide_cheki_enabled', 'true')) !== 'false'
+    const chekiGrupEnabled    = (await getConfig('cheki_grup_enabled', 'false')) === 'true' // default OFF
+    const hargaOtsRegular     = Number(await getConfig('harga_ots_per_member', '40000')) || 40000
+    const hargaOtsWide        = Number(await getConfig('harga_ots_grup', '80000')) || 80000
+    const hargaOtsChekiGrup   = Number(await getConfig('harga_cheki_grup_ots', '150000')) || 150000
+
+    // ── 4. Validasi event harus AKTIF ───────────────────────────────────
+    if (!event_id) return res.status(400).json({ error: 'Event ID wajib dipilih' })
+    const { data: eventData, error: evErr } = await supabase
+      .from('events')
+      .select('*')
+      .eq('id', event_id)
+      .maybeSingle()
+    if (evErr || !eventData) return res.status(400).json({ error: 'Event tidak valid / tidak ditemukan' })
+    if (eventData.is_past || eventData.is_special) {
+      return res.status(400).json({ error: 'Event ini tidak menerima order OTS.' })
+    }
+    // Cek tanggal event >= hari ini
+    const months = { 'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5, 'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11 }
+    const evDate = new Date(eventData.tahun, months[eventData.bulan] || 0, eventData.tanggal)
+    const today = new Date(); today.setHours(0, 0, 0, 0)
+    if (evDate < today) {
+      return res.status(400).json({ error: 'Event ini sudah lewat, tidak bisa order OTS.' })
+    }
+
+    // ── 5. Validasi items + recalculate harga dari config (JANGAN PERCAYA CLIENT) ─
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Minimal pilih 1 tiket cheki.' })
+    }
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    let total_harga = 0
+    const cleanedItems = []
+
+    for (const itm of items) {
+      const type = itm.cheki_type || 'regular'
+      const qty = Math.max(1, parseInt(itm.quantity, 10) || 1)
+      let pricePerUnit = 0
+      let itemName = ''
+      let memberIdDb = null
+
+      if (type === 'grup') {
+        // ── Validasi Cheki Grup ──
+        if (!chekiGrupEnabled) {
+          return res.status(400).json({ error: 'Cheki Grup (Semua Member) saat ini tidak tersedia.' })
+        }
+        pricePerUnit = hargaOtsChekiGrup
+        itemName = itm.name || 'Cheki Grup (Semua Member)'
+        memberIdDb = null
+      } else if (type === 'wide') {
+        // ── Validasi Wide Cheki (per member) ──
+        if (!wideChekiEnabled) {
+          return res.status(400).json({ error: 'Wide Cheki saat ini tidak tersedia.' })
+        }
+        if (!UUID_REGEX.test(itm.member_id)) {
+          return res.status(400).json({ error: 'Member tidak valid untuk Wide Cheki.' })
+        }
+        pricePerUnit = hargaOtsWide
+        itemName = itm.name || `Wide Cheki ${itm.member_id}`
+        memberIdDb = itm.member_id
+      } else {
+        // ── Default: Regular Cheki (per member) ──
+        if (!regularChekiEnabled) {
+          return res.status(400).json({ error: 'Regular Cheki saat ini tidak tersedia.' })
+        }
+        if (!UUID_REGEX.test(itm.member_id)) {
+          return res.status(400).json({ error: 'Member tidak valid untuk Regular Cheki.' })
+        }
+        pricePerUnit = hargaOtsRegular
+        itemName = itm.name || `Regular Cheki ${itm.member_id}`
+        memberIdDb = itm.member_id
+      }
+
+      total_harga += pricePerUnit * qty
+      cleanedItems.push({
+        member_id: memberIdDb,
+        cheki_type: type,
+        item_name: itemName,
+        price: pricePerUnit,
+        quantity: qty
+      })
+    }
+
+    // ── 6. Insert ORDER (pending, created_by='customer', is_ots=true) ──
+    const orderNumber = `RB-OTSU${Date.now()}`
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        order_number: orderNumber,
+        event_id,
+        user_id: fanUserId, // DIPAKSA dari token, bukan body client
+        nama_lengkap: fanUser.nama, // Nama dari DB fan user
+        whatsapp: fanUser.whatsapp || '-',
+        email: fanUser.email || `ots-user-${Date.now()}@kohisekai.com`,
+        instagram: fanUser.instagram || '-',
+        total_harga,
+        status: 'pending', // Status awal PENDING sampai admin konfirmasi di venue
+        is_ots: true,
+        created_by: 'customer', // SUMBER: user (OTS - User)
+        payment_proof_url: payment_method || 'Cash'
+      })
+      .select()
+      .single()
+    if (orderError) throw orderError
+
+    // ── 7. Insert ORDER_ITEMS (dengan cheki_type terisi) ────────────────
+    const orderItemsDb = cleanedItems.map(itm => ({ ...itm, order_id: order.id }))
+    const { error: itemsError } = await supabase.from('order_items').insert(orderItemsDb)
+    if (itemsError) throw itemsError
+
+    res.json({ success: true, order, message: 'Order OTS diajukan. Silakan hubungi / tunggu admin di venue untuk konfirmasi & pembayaran.' })
+  } catch (error) {
+    console.error('Error creating OTS USER order:', error)
+    res.status(500).json({ error: error.message || 'Terjadi kesalahan server saat menyimpan order OTS.' })
+  }
+})
+
+// Also UPDATE existing OTS ADMIN endpoint to include cheki_type & Cheki Grup validation
+// (in-place edit / override handled above by admin flow, keep endpoint compatible with old items)
 // PATCH: Update order status
 router.patch('/:id/status', authMiddleware, async (req, res) => {
   try {
@@ -309,7 +592,9 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
         order_items (
           item_name,
           price,
-          quantity
+          quantity,
+          cheki_type,
+          member_id
         )
       `)
       .order('created_at', { ascending: false })

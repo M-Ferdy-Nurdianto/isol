@@ -96,6 +96,9 @@ const KSLoginPage = () => {
   // Forgot Password Modal State
   const [showForgotModal, setShowForgotModal] = useState(false)
   const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotLoading, setForgotLoading] = useState(false)
+  const [forgotSent, setForgotSent] = useState(false)
+  const [forgotError, setForgotError] = useState(null)
 
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
@@ -280,16 +283,24 @@ const KSLoginPage = () => {
     }
   }
 
-  // Handle Forgot Password Submit
-  const handleForgotSubmit = (e) => {
+  // Handle Forgot Password Submit — kirim link reset via Gmail SMTP
+  const handleForgotSubmit = async (e) => {
     e.preventDefault()
+    setForgotError(null)
     if (!forgotEmail || !forgotEmail.includes('@')) {
-      kohiToast.error('Masukkan email terdaftar yang valid.')
+      setForgotError('Masukkan alamat email yang valid.')
       return
     }
-    kohiToast.info('Permintaan instruksi reset password telah diterima. Tim bantuan kami akan memandu proses pemulihan akun via email.')
-    setShowForgotModal(false)
-    setForgotEmail('')
+    setForgotLoading(true)
+    try {
+      await api.post('/password-reset/request-email', { email: forgotEmail.trim() })
+      setForgotSent(true)
+    } catch (err) {
+      // Endpoint selalu return sukses (anti-enumeration), tapi tangani network error
+      setForgotError(err.response?.data?.error || 'Terjadi kesalahan jaringan. Coba lagi.')
+    } finally {
+      setForgotLoading(false)
+    }
   }
 
   return (
@@ -999,7 +1010,7 @@ const KSLoginPage = () => {
       {/* FORGOT PASSWORD MODAL */}
       <AnimatePresence>
         {showForgotModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -1008,7 +1019,7 @@ const KSLoginPage = () => {
             >
               <button
                 type="button"
-                onClick={() => setShowForgotModal(false)}
+                onClick={() => { setShowForgotModal(false); setForgotSent(false); setForgotError(null); setForgotEmail('') }}
                 className="absolute top-4 right-4 w-8 h-8 rounded-full bg-background border border-border flex items-center justify-center text-text-secondary hover:text-text-primary"
               >
                 <FaTimes size={14} />
@@ -1024,49 +1035,115 @@ const KSLoginPage = () => {
                 </div>
               </div>
 
-              <form onSubmit={handleForgotSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">
-                    Email Terdaftar
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-secondary">
-                      <FaEnvelope size={14} />
-                    </div>
-                    <input
-                      type="email"
-                      value={forgotEmail}
-                      onChange={(e) => setForgotEmail(e.target.value)}
-                      placeholder="nama@email.com"
-                      className="w-full px-4 py-3 rounded-2xl bg-background border border-border text-text-primary text-xs focus:outline-none focus:border-primary"
-                      required
-                    />
+              {forgotSent ? (
+                <div className="text-center space-y-4 py-4">
+                  <div className="w-14 h-14 rounded-2xl bg-secondary/15 border border-secondary/40 flex items-center justify-center text-secondary mx-auto">
+                    <FaEnvelope size={24} />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-text-primary text-base">Email Terkirim!</h4>
+                    <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                      Jika email <strong className="text-text-primary">{forgotEmail}</strong> terdaftar, link reset password akan dikirim dalam beberapa menit. Cek folder inbox dan spam.
+                    </p>
+                  </div>
+                  <p className="text-[10px] text-text-secondary">Link berlaku 30 menit sejak email diterima.</p>
+                  <div className="space-y-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForgotModal(false)
+                        setForgotSent(false)
+                        setForgotError(null)
+                        setForgotEmail('')
+                        navigate('/reset-password')
+                      }}
+                      className="w-full py-3 rounded-2xl bg-primary/15 border border-primary/40 text-primary hover:bg-primary/25 text-xs font-bold transition flex items-center justify-center gap-2"
+                    >
+                      <FaKey size={13} />
+                      <span>Masukan Kode OTP dari Admin</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowForgotModal(false); setForgotSent(false); setForgotError(null); setForgotEmail('') }}
+                      className="w-full py-3 rounded-2xl bg-background border border-border text-text-secondary hover:text-text-primary text-xs font-bold transition"
+                    >
+                      Tutup
+                    </button>
                   </div>
                 </div>
+              ) : (
+                <form onSubmit={handleForgotSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">
+                      Email Terdaftar
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-secondary">
+                        <FaEnvelope size={14} />
+                      </div>
+                      <input
+                        type="email"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        placeholder="nama@email.com"
+                        className="w-full pl-10 pr-4 py-3 rounded-2xl bg-background border border-border text-text-primary text-xs focus:outline-none focus:border-primary transition"
+                        required
+                        disabled={forgotLoading}
+                      />
+                    </div>
+                  </div>
 
-                <div className="p-3 rounded-xl bg-background border border-border flex items-start gap-2.5 text-xs text-text-secondary">
-                  <FaExclamationTriangle className="text-warning flex-shrink-0 mt-0.5" size={13} />
-                  <span>
-                    Fitur pengiriman link reset password sedang dalam tahap integrasi backend. Menekan tombol di bawah akan mengirimkan notifikasi permohonan ke tim bantuan.
-                  </span>
-                </div>
+                  {forgotError && (
+                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+                      {forgotError}
+                    </div>
+                  )}
 
-                <div className="flex items-center gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotModal(false)}
-                    className="flex-1 py-3 rounded-2xl border border-border text-text-secondary hover:text-text-primary text-xs font-bold"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 py-3 rounded-2xl bg-primary hover:bg-primary/90 text-white text-xs font-black uppercase tracking-wider"
-                  >
-                    Kirim Reset
-                  </button>
-                </div>
-              </form>
+                  <div className="p-3 rounded-xl bg-background border border-border flex items-start gap-2.5 text-xs text-text-secondary">
+                    <FaEnvelope className="text-primary flex-shrink-0 mt-0.5" size={12} />
+                    <span>
+                      Link reset password akan dikirim ke email terdaftar via Gmail. Berlaku 30 menit. Pastikan email Anda aktif.
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => { setShowForgotModal(false); setForgotError(null) }}
+                      className="flex-1 py-3 rounded-2xl border border-border text-text-secondary hover:text-text-primary text-xs font-bold transition"
+                      disabled={forgotLoading}
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      className="flex-1 py-3 rounded-2xl bg-primary hover:bg-primary/90 text-white text-xs font-black uppercase tracking-wider transition flex items-center justify-center gap-2 disabled:opacity-60"
+                    >
+                      {forgotLoading ? (
+                        <><div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /><span>Mengirim...</span></>
+                      ) : (
+                        <span>Kirim Link Reset</span>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Direct Link to Admin OTP Reset */}
+                  <div className="pt-3 border-t border-border/60 text-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForgotModal(false)
+                        navigate('/reset-password')
+                      }}
+                      className="w-full py-2.5 rounded-2xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary/25 text-xs font-bold transition flex items-center justify-center gap-2"
+                    >
+                      <FaKey size={13} />
+                      <span>Punya Kode OTP dari Admin? Masukkan di sini →</span>
+                    </button>
+                  </div>
+                </form>
+              )}
             </motion.div>
           </div>
         )}

@@ -160,21 +160,34 @@ router.post('/register', async (req, res) => {
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const isOts = req.body.source === 'ots' || req.body.ots === true
+
+    // Email: wajib jika bukan OTS, opsional jika OTS (auto-generate placeholder)
+    let cleanEmail
     if (!email || !emailRegex.test(email.trim())) {
-      return res.status(400).json({ error: 'Format email tidak valid' })
+      if (isOts) {
+        // Auto-generate placeholder email untuk OTS tanpa email
+        const slug = fanNama.trim().toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12) || 'fan'
+        cleanEmail = `ots-${slug}-${Date.now()}@noreply.kohisekai.id`
+      } else {
+        return res.status(400).json({ error: 'Format email tidak valid' })
+      }
+    } else {
+      cleanEmail = email.trim().toLowerCase()
     }
 
     const cleanWhatsapp = (whatsapp || '').replace(/[^0-9+]/g, '')
-    if (!cleanWhatsapp || cleanWhatsapp.length < 8) {
+    // WhatsApp opsional untuk OTS admin — validasi format hanya kalau diisi
+    if (cleanWhatsapp && cleanWhatsapp.length > 0 && cleanWhatsapp.length < 8) {
       return res.status(400).json({ error: 'Nomor WhatsApp tidak valid (minimal 8 digit)' })
     }
 
-    const cleanEmail = email.trim().toLowerCase()
     const cleanNama = fanNama.trim()
     const cleanInstagram = instagram ? `@${instagram.trim().replace(/^@/, '')}` : null
 
-    // Check if user already exists in users table
-    const { data: existingUser } = await supabase
+    // Check if user already exists in users table (skip lookup for auto-generated OTS emails)
+    const isAutoEmail = cleanEmail.endsWith('@noreply.kohisekai.id')
+    const { data: existingUser } = isAutoEmail ? { data: null } : await supabase
       .from('users')
       .select('*')
       .eq('email', cleanEmail)
@@ -203,7 +216,7 @@ router.post('/register', async (req, res) => {
         .insert({
           nama: cleanNama,
           email: cleanEmail,
-          whatsapp: cleanWhatsapp,
+          whatsapp: cleanWhatsapp || null,
           instagram: cleanInstagram,
           role: 'fan'
         })
@@ -575,15 +588,62 @@ router.post('/send-otp', async (req, res) => {
     otpStore.set(cleanEmail, { otp, expiresAt: Date.now() + 10 * 60 * 1000 })
 
     const html = `
-      <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #E8D9C5; border-radius: 12px; background: #FFF9F2;">
-        <h2 style="color: #2B2420; margin-top: 0;">Halo ${nama || 'Fan'}!</h2>
-        <p style="color: #6B5D4F;">Ini adalah kode OTP untuk menyelesaikan pendaftaran akun Kohi Sekai Anda:</p>
-        <div style="background: #F0A868; color: #FFF; font-size: 32px; font-weight: 900; letter-spacing: 6px; text-align: center; padding: 20px; border-radius: 8px; margin: 24px 0;">
-          ${otp}
-        </div>
-        <p style="color: #6B5D4F; font-size: 13px;">Kode ini hanya berlaku selama 10 menit. Jangan berikan kode ini kepada siapa pun.</p>
-      </div>
-    `
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kode Verifikasi - Kohi Sekai</title>
+</head>
+<body style="margin:0;padding:0;background:#1A1512;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#1A1512;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="520" cellpadding="0" cellspacing="0" style="background:#241E19;border:1px solid #3A2E24;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+          <!-- Header Bar Accent -->
+          <tr>
+            <td style="background:#E8944A;height:4px;"></td>
+          </tr>
+          <!-- Logo & Title -->
+          <tr>
+            <td style="padding:36px 36px 24px;text-align:center;">
+              <div style="display:inline-block;background:rgba(232,148,74,0.15);border:1px solid rgba(232,148,74,0.4);border-radius:12px;padding:12px 20px;margin-bottom:20px;">
+                <span style="color:#E8944A;font-size:18px;font-weight:900;letter-spacing:2px;">KOHI SEKAI</span>
+              </div>
+              <h1 style="color:#F5E6D3;font-size:22px;font-weight:900;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;">Kode Verifikasi</h1>
+              <p style="color:#B0A599;font-size:13px;margin:0;">Halo, <strong style="color:#F5E6D3;">${nama || 'Fan'}</strong>!</p>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="padding:0 36px 36px;">
+              <p style="color:#D5C9BD;font-size:14px;line-height:1.7;margin:0 0 20px;text-align:center;">
+                Ini adalah kode OTP untuk menyelesaikan pendaftaran akun Kohi Sekai Anda:
+              </p>
+              <div style="background:#E8944A;color:#1A1512;font-size:32px;font-weight:900;letter-spacing:6px;text-align:center;padding:20px;border-radius:12px;margin:24px 0;box-shadow:0 4px 16px rgba(232,148,74,0.25);">
+                ${otp}
+              </div>
+              <div style="background:#1A1512;border:1px solid #3A2E24;border-radius:10px;padding:16px;margin-top:12px;">
+                <p style="color:#B0A599;font-size:12px;margin:0;text-align:center;line-height:1.6;">
+                  Kode ini <strong style="color:#F5E6D3;">hanya berlaku selama 10 menit</strong>. Jangan berikan kode ini kepada siapa pun.
+                </p>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 36px;border-top:1px solid #3A2E24;text-align:center;">
+              <p style="color:#736253;font-size:11px;margin:0;">
+                Email ini dikirim oleh sistem otomatis Kohi Sekai. Harap tidak membalas email ini.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
 
     const result = await sendEmail(cleanEmail, 'Kode Verifikasi Registrasi - Kohi Sekai', html)
     if (result.success) {

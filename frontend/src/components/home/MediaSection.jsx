@@ -1,14 +1,14 @@
-import { motion } from 'framer-motion'
+﻿import { motion } from 'framer-motion'
 import { FaArrowRight, FaPlay } from 'react-icons/fa'
 
 const MediaSection = ({ navigate, getAssetPath }) => {
   return (
-    <section className="py-12 sm:py-16 md:py-24 bg-[#079108]/5 text-dark overflow-hidden relative">
+    <section className="py-12 sm:py-16 md:py-24 bg-[var(--primary)]/5 text-dark overflow-hidden relative">
        <div className={`absolute top-0 left-0 w-full h-full bg-[url('${getAssetPath('/noise.png')}')] opacity-5`}></div>
        <div className="container mx-auto max-w-7xl px-4 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 sm:mb-16 gap-4 md:gap-6 text-center md:text-left">
               <h2 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tighter text-dark">
-                 Latest <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#079108] to-emerald-400">Media</span>
+                 Latest <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary)] to-emerald-400">Media</span>
               </h2>
               <button onClick={() => navigate('/media')} className="w-full md:w-auto px-6 py-3 rounded-full border border-gray-200 text-gray-500 hover:text-dark font-black text-xs uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
                  View Gallery <FaArrowRight />
@@ -40,3 +40,4 @@ const MediaSection = ({ navigate, getAssetPath }) => {
 }
 
 export default MediaSection
+

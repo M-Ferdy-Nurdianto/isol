@@ -11,7 +11,9 @@ import EventsTab from './admin/tabs/EventsTab'
 import MerchTab from './admin/tabs/MerchTab'
 import SettingsTab from './admin/tabs/SettingsTab'
 import MembersTab from './admin/tabs/MembersTab'
-import HeroTab from './admin/tabs/HeroTab'
+import HomeCmsTab from './admin/tabs/HomeCmsTab'
+import MusicTab from './admin/tabs/MusicTab'
+import UsersTab from './admin/tabs/UsersTab'
 
 import OrderDetailModal from './admin/modals/OrderDetailModal'
 import OTSOrderModal from './admin/modals/OTSOrderModal'
@@ -32,9 +34,11 @@ import {
   FaUsers,
   FaEllipsisH,
   FaTimes,
-  FaEye,
   FaShieldAlt,
-  FaSync
+  FaSync,
+  FaMusic,
+  FaUserFriends,
+  FaHome
 } from 'react-icons/fa'
 
 const AdminPage = () => {
@@ -66,18 +70,34 @@ const AdminPage = () => {
   const [isOtsCartActive, setIsOtsCartActive] = useState(false)
   const [editingEvent, setEditingEvent] = useState(null)
 
-  const [hargaPerMember, setHargaPerMember] = useState('25000')
-  const [hargaGrup, setHargaGrup] = useState('30000')
-  const [hargaOtsPerMember, setHargaOtsPerMember] = useState('25000')
-  const [hargaOtsGrup, setHargaOtsGrup] = useState('30000')
+  const [hargaPerMember, setHargaPerMember] = useState('40000')
+  const [hargaGrup, setHargaGrup] = useState('70000')
+  const [hargaOtsPerMember, setHargaOtsPerMember] = useState('40000')
+  const [hargaOtsGrup, setHargaOtsGrup] = useState('80000')
   const [paymentBank, setPaymentBank] = useState('BCA')
   const [paymentRekening, setPaymentRekening] = useState('0902683273')
   const [paymentAtasNama, setPaymentAtasNama] = useState('Natasya Angelina Putri')
   const [paymentMethod, setPaymentMethod] = useState('Manual TF')
+  // Wide Cheki toggle
+  const [wideChekiEnabled, setWideChekiEnabled] = useState(true)
+  // Regular Cheki toggle (independen dari Wide)
+  const [regularChekiEnabled, setRegularChekiEnabled] = useState(true)
+  // Custom pricing options (array of {id, label, price})
+  const [chekiCustomOptions, setChekiCustomOptions] = useState([])
+  // Payment method toggles
+  const [paymentEnableCash, setPaymentEnableCash] = useState(true)
+  const [paymentEnableTf, setPaymentEnableTf] = useState(true)
+  const [paymentEnableQris, setPaymentEnableQris] = useState(false)
+  const [paymentQrisImageUrl, setPaymentQrisImageUrl] = useState('')
+  const [paymentQrisMerchantName, setPaymentQrisMerchantName] = useState('')
   const [maintenanceMode, setMaintenanceMode] = useState(false)
   const [maintenanceMessage, setMaintenanceMessage] = useState('')
   const [maintenanceEstimatedEnd, setMaintenanceEstimatedEnd] = useState('')
   const [configLoading, setConfigLoading] = useState(false)
+  // Cheki Grup (foto semua member — terpisah dari Wide Cheki)
+  const [chekiGrupEnabled, setChekiGrupEnabled] = useState(false)
+  const [hargaChekiGrupPo, setHargaChekiGrupPo] = useState('150000')
+  const [hargaChekiGrupOts, setHargaChekiGrupOts] = useState('170000')
 
   const [merch, setMerch] = useState([])
   const [merchOrders, setMerchOrders] = useState([])
@@ -256,9 +276,28 @@ const AdminPage = () => {
       if (configData.payment_rekening) setPaymentRekening(configData.payment_rekening)
       if (configData.payment_atas_nama) setPaymentAtasNama(configData.payment_atas_nama)
       if (configData.payment_method) setPaymentMethod(configData.payment_method)
+      // Wide Cheki toggle
+      setWideChekiEnabled(configData.wide_cheki_enabled !== 'false' && configData.wide_cheki_enabled !== false)
+      // Regular Cheki toggle
+      setRegularChekiEnabled(configData.regular_cheki_enabled !== 'false' && configData.regular_cheki_enabled !== false)
+      // Custom pricing options
+      try {
+        const raw = configData.cheki_custom_options
+        const parsed = typeof raw === 'string' ? JSON.parse(raw || '[]') : (Array.isArray(raw) ? raw : [])
+        setChekiCustomOptions(parsed)
+      } catch { setChekiCustomOptions([]) }
+      // Payment toggles
+      setPaymentEnableTf(configData.payment_enable_tf !== 'false' && configData.payment_enable_tf !== false)
+      setPaymentEnableQris(configData.payment_enable_qris === 'true' || configData.payment_enable_qris === true)
+      if (configData.payment_qris_image_url !== undefined) setPaymentQrisImageUrl(configData.payment_qris_image_url || '')
+      if (configData.payment_qris_merchant_name !== undefined) setPaymentQrisMerchantName(configData.payment_qris_merchant_name || '')
       setMaintenanceMode(configData.maintenance_mode === 'true' || configData.maintenance_mode === true)
       if (configData.maintenance_message !== undefined) setMaintenanceMessage(configData.maintenance_message || '')
       if (configData.maintenance_estimated_end !== undefined) setMaintenanceEstimatedEnd(configData.maintenance_estimated_end || '')
+      // Cheki Grup (foto semua member, terpisah dari Wide)
+      setChekiGrupEnabled(configData.cheki_grup_enabled === 'true' || configData.cheki_grup_enabled === true)
+      if (configData.harga_cheki_grup_po) setHargaChekiGrupPo(configData.harga_cheki_grup_po)
+      if (configData.harga_cheki_grup_ots) setHargaChekiGrupOts(configData.harga_cheki_grup_ots)
     } catch (error) {
       console.error(error)
     }
@@ -293,7 +332,7 @@ const AdminPage = () => {
       title: 'Logout?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#079108',
+      confirmButtonColor: '#E8944A',
       cancelButtonText: 'Batal'
     }).then(r => {
       if (r.isConfirmed) {
@@ -367,7 +406,7 @@ const AdminPage = () => {
         icon: 'success',
         title: 'Berhasil!',
         text: response.data.message,
-        confirmButtonColor: '#079108'
+        confirmButtonColor: '#E8944A'
       })
       fetchOrders()
     } catch (error) {
@@ -412,7 +451,7 @@ const AdminPage = () => {
         : 'Apakah Anda yakin ingin mengaktifkan event ini kembali?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: isNowPast ? '#079108' : '#3085d6',
+      confirmButtonColor: isNowPast ? '#E8944A' : '#3085d6',
       cancelButtonColor: '#6c757d',
       confirmButtonText: isNowPast ? 'Ya, Selesaikan' : 'Ya, Aktifkan',
       cancelButtonText: 'Batal',
@@ -439,13 +478,13 @@ const AdminPage = () => {
       setConfigLoading(true)
       await api.patch('/config', updates)
       if (!silent) {
-        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Konfigurasi berhasil diupdate', confirmButtonColor: '#079108' })
+        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Konfigurasi berhasil diupdate', confirmButtonColor: '#E8944A' })
       } else {
         showToast.success('Pengaturan diperbarui')
       }
       fetchConfig()
     } catch (error) {
-      Swal.fire({ icon: 'error', title: 'Gagal!', text: error.response?.data?.error || 'Gagal update konfigurasi', confirmButtonColor: '#079108' })
+      Swal.fire({ icon: 'error', title: 'Gagal!', text: error.response?.data?.error || 'Gagal update konfigurasi', confirmButtonColor: '#E8944A' })
     } finally {
       setConfigLoading(false)
     }
@@ -725,21 +764,23 @@ const AdminPage = () => {
 
   const moreItems = [
     { id: 'members', label: 'Members', icon: FaUsers },
-    { id: 'hero', label: 'Pengaturan Hero', icon: FaEye },
+    { id: 'home-cms', label: 'Home CMS', icon: FaHome },
+    { id: 'music', label: 'Music', icon: FaMusic },
+    { id: 'users', label: 'Fan Users', icon: FaUserFriends },
     { id: 'settings', label: 'Settings', icon: FaEdit },
   ]
 
   return (
-    <div className="admin-layout min-h-screen md:h-screen md:overflow-hidden bg-[#1A1512] text-white flex flex-col md:flex-row selection:bg-[#E8944A] selection:text-white">
+    <div className="admin-layout min-h-screen md:h-screen md:overflow-hidden bg-[var(--background)] text-[var(--text-primary)] flex flex-col md:flex-row selection:bg-[var(--primary)] selection:text-white">
       {/* SIDEBAR â€” desktop only */}
-      <aside className="hidden md:flex w-64 md:sticky md:top-0 md:h-screen md:overflow-hidden bg-[#241E19]/95 backdrop-blur-xl border-r border-white/10 p-6 flex-col justify-between shadow-2xl z-20">
+      <aside className="hidden md:flex w-64 md:sticky md:top-0 md:h-screen md:overflow-hidden bg-[var(--surface)] border-r border-[var(--border)] p-6 flex-col justify-between shadow-2xl z-20">
         <div>
           <div className="mb-10 px-2 flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-black text-white tracking-tight uppercase">KOHI<span className="text-[#E8944A]">SEKAI</span></h1>
-              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Admin Dashboard</p>
+              <h1 className="text-xl font-black text-[var(--text-primary)] tracking-tight uppercase">KOHI<span className="text-[var(--primary)]">SEKAI</span></h1>
+              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mt-1">Admin Dashboard</p>
             </div>
-            <div className="w-2.5 h-2.5 rounded-full bg-[#E8944A] animate-pulse shadow-[0_0_8px_#E8944A]"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-[var(--primary)] animate-pulse shadow-[0_0_8px_var(--primary)]"></div>
           </div>
 
           <nav className="space-y-2">
@@ -748,7 +789,9 @@ const AdminPage = () => {
               { id: 'events', label: 'Events', icon: FaCalendar },
               { id: 'members', label: 'Members', icon: FaUsers },
               { id: 'merch', label: 'Merchandise', icon: FaBox },
-              { id: 'hero', label: 'Pengaturan Hero', icon: FaEye },
+              { id: 'home-cms', label: 'Home CMS', icon: FaHome },
+              { id: 'music', label: 'Music', icon: FaMusic },
+              { id: 'users', label: 'Fan Users', icon: FaUserFriends },
               { id: 'recap', label: 'Recap', icon: FaChartBar },
               { id: 'settings', label: 'Settings', icon: FaEdit },
             ].map(item => (
@@ -757,11 +800,11 @@ const AdminPage = () => {
                 onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
                   activeTab === item.id 
-                    ? 'bg-[#E8944A] text-white shadow-[0_0_12px_rgba(232,148,74,0.4)] translate-x-1' 
-                    : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                    ? 'bg-[var(--primary)] text-[var(--text-primary)] shadow-[0_0_12px_rgba(232,148,74,0.35)] translate-x-1' 
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--border)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                <item.icon className={`text-lg ${activeTab === item.id ? 'text-white' : 'text-zinc-500'}`} />
+                <item.icon className={`text-lg ${activeTab === item.id ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`} />
                 {item.label}
               </button>
             ))}
@@ -770,7 +813,7 @@ const AdminPage = () => {
 
         <button 
           onClick={handleLogout} 
-          className="mt-8 w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-sm font-bold text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200"
+          className="mt-8 w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-sm font-bold text-[var(--danger)] bg-[var(--danger)]/10 border border-[var(--danger)]/20 hover:bg-[var(--danger)]/20 transition-all duration-200"
         >
           <FaSignOutAlt /> Logout
         </button>
@@ -790,14 +833,14 @@ const AdminPage = () => {
                   <span className="text-xs font-black uppercase tracking-wider text-amber-300">Mode Tamu / Sandbox Aktif</span>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30">GS123</span>
                 </div>
-                <p className="text-xs text-zinc-300 mt-0.5">
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">
                   Anda bebas mencoba semua fitur (tambah/hapus member, event, buat OTS, ubah harga). Perubahan bersifat simulasi lokal tanpa menyentuh database asli. Data sensitif disensor.
                 </p>
               </div>
             </div>
             <button
               onClick={() => window.location.reload()}
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10"
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--border)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] text-xs font-bold transition-all border border-[var(--border)]"
               title="Reset semua simulasi ke data awal"
             >
               <FaSync className="text-[10px]" /> Reset Layar (Refresh)
@@ -844,6 +887,13 @@ const AdminPage = () => {
             members={members}
             hargaOtsPerMember={hargaOtsPerMember}
             hargaOtsGrup={hargaOtsGrup}
+            hargaChekiGrupOts={hargaChekiGrupOts}
+            regularChekiEnabled={regularChekiEnabled}
+            wideChekiEnabled={wideChekiEnabled}
+            chekiGrupEnabled={chekiGrupEnabled}
+            paymentEnableCash={paymentEnableCash}
+            paymentEnableQris={paymentEnableQris}
+            paymentEnableTf={paymentEnableTf}
             onRefreshOrders={fetchOrders}
             onOtsCartActiveChange={setIsOtsCartActive}
           />
@@ -924,6 +974,20 @@ const AdminPage = () => {
             setPaymentAtasNama={setPaymentAtasNama}
             paymentMethod={paymentMethod}
             setPaymentMethod={setPaymentMethod}
+            wideChekiEnabled={wideChekiEnabled}
+            setWideChekiEnabled={setWideChekiEnabled}
+            regularChekiEnabled={regularChekiEnabled}
+            setRegularChekiEnabled={setRegularChekiEnabled}
+            chekiCustomOptions={chekiCustomOptions}
+            setChekiCustomOptions={setChekiCustomOptions}
+            paymentEnableTf={paymentEnableTf}
+            setPaymentEnableTf={setPaymentEnableTf}
+            paymentEnableQris={paymentEnableQris}
+            setPaymentEnableQris={setPaymentEnableQris}
+            paymentQrisImageUrl={paymentQrisImageUrl}
+            setPaymentQrisImageUrl={setPaymentQrisImageUrl}
+            paymentQrisMerchantName={paymentQrisMerchantName}
+            setPaymentQrisMerchantName={setPaymentQrisMerchantName}
             maintenanceMode={maintenanceMode}
             setMaintenanceMode={setMaintenanceMode}
             maintenanceMessage={maintenanceMessage}
@@ -934,11 +998,25 @@ const AdminPage = () => {
             updateConfig={updateConfig}
             onShowBulkDeleteModal={() => setShowBulkDeleteModal(true)}
             onPurgeOldPayments={handlePurgeOldPayments}
+            chekiGrupEnabled={chekiGrupEnabled}
+            setChekiGrupEnabled={setChekiGrupEnabled}
+            hargaChekiGrupPo={hargaChekiGrupPo}
+            setHargaChekiGrupPo={setHargaChekiGrupPo}
+            hargaChekiGrupOts={hargaChekiGrupOts}
+            setHargaChekiGrupOts={setHargaChekiGrupOts}
           />
         )}
 
-        {activeTab === 'hero' && (
-          <HeroTab />
+        {activeTab === 'home-cms' && (
+          <HomeCmsTab />
+        )}
+
+        {activeTab === 'music' && (
+          <MusicTab />
+        )}
+
+        {activeTab === 'users' && (
+          <UsersTab />
         )}
       </main>
 
@@ -991,7 +1069,7 @@ const AdminPage = () => {
 
       {/* â”€â”€ BOTTOM NAVBAR (mobile only) â”€â”€ */}
       {!isOtsCartActive && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#241E19]/95 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--surface)] border-t border-[var(--border)] shadow-[0_-4px_20px_rgba(26,21,18,0.8)]">
           <div className="flex items-stretch">
             {bottomNavItems.map(item => (
               <button
@@ -999,14 +1077,14 @@ const AdminPage = () => {
                 onClick={() => { setActiveTab(item.id); setShowMoreDrawer(false) }}
                 className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-all ${
                   activeTab === item.id
-                    ? 'text-[#E8944A]'
-                    : 'text-zinc-500 hover:text-zinc-300'
+                    ? 'text-[var(--primary)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-secondary)]'
                 }`}
               >
-                <item.icon className={`text-lg transition-all ${activeTab === item.id ? 'text-[#E8944A] drop-shadow-[0_0_6px_#E8944A]' : ''}`} />
+                <item.icon className={`text-lg transition-all ${activeTab === item.id ? 'text-[var(--primary)] drop-shadow-[0_0_6px_#E8944A]' : ''}`} />
                 {item.label}
                 {activeTab === item.id && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#E8944A] rounded-full" />
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[var(--primary)] rounded-full" />
                 )}
               </button>
             ))}
@@ -1014,12 +1092,12 @@ const AdminPage = () => {
             <button
               onClick={() => setShowMoreDrawer(prev => !prev)}
               className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-all ${
-                showMoreDrawer || ['members','settings'].includes(activeTab)
-                  ? 'text-[#E8944A]'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                showMoreDrawer || ['members','settings','home-cms','music','users'].includes(activeTab)
+                  ? 'text-[var(--primary)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-secondary)]'
               }`}
             >
-              <FaEllipsisH className={`text-lg ${showMoreDrawer || ['members','settings'].includes(activeTab) ? 'text-[#E8944A]' : ''}`} />
+              <FaEllipsisH className={`text-lg ${showMoreDrawer || ['members','settings','home-cms','music','users'].includes(activeTab) ? 'text-[var(--primary)]' : ''}`} />
               More
             </button>
           </div>
@@ -1035,8 +1113,8 @@ const AdminPage = () => {
             onClick={() => setShowMoreDrawer(false)}
           />
           {/* Drawer */}
-          <div className="md:hidden fixed bottom-[60px] left-0 right-0 z-40 bg-[#0c111d]/98 backdrop-blur-xl border-t border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.7)] rounded-t-2xl px-4 py-4 animate-fade-in">
-            <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-4" />
+          <div className="md:hidden fixed bottom-[60px] left-0 right-0 z-40 bg-[var(--surface)] border-t border-[var(--border)] shadow-[0_-8px_32px_rgba(0,0,0,0.7)] rounded-t-2xl px-4 py-4 animate-fade-in">
+            <div className="w-10 h-1 bg-[var(--border)] rounded-full mx-auto mb-4" />
             <div className="space-y-2">
               {moreItems.map(item => (
                 <button
@@ -1044,8 +1122,8 @@ const AdminPage = () => {
                   onClick={() => { setActiveTab(item.id); setShowMoreDrawer(false) }}
                   className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all ${
                     activeTab === item.id
-                      ? 'bg-[#079108]/20 text-[#079108] border border-[#079108]/40'
-                      : 'text-zinc-300 hover:bg-white/5'
+                      ? 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/40'
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--border)]'
                   }`}
                 >
                   <item.icon className="text-base" />
@@ -1067,3 +1145,7 @@ const AdminPage = () => {
 }
 
 export default AdminPage
+
+
+
+

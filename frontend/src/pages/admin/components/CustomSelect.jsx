@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
+﻿import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { FaChevronDown } from 'react-icons/fa'
 
@@ -109,7 +109,7 @@ const CustomSelect = ({
       case 'completed':
         return 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
       default:
-        return 'bg-white/10 text-zinc-300 border-white/10 hover:bg-white/15'
+        return 'bg-[var(--border)] text-[var(--text-secondary)] border-[var(--border)] hover:bg-[var(--primary)]/15'
     }
   }
 
@@ -120,11 +120,11 @@ const CustomSelect = ({
         onClick={handleOpen}
         className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border outline-none ${
           variant === 'filter' 
-            ? 'bg-[#182032] text-white border-white/10 hover:bg-white/10 hover:border-white/20 min-w-[140px]' 
+            ? 'bg-[var(--background)] text-[var(--text-primary)] border-[var(--border)] hover:bg-[var(--primary)]/10 hover:border-[var(--primary)]/40 min-w-[140px]' 
             : `cursor-pointer ${getStatusStyle(value)} ${className}`
         }`}
       >
-        <span className={`truncate ${!value ? 'text-zinc-400' : ''}`}>
+        <span className={`truncate ${!value ? 'text-[var(--text-secondary)]' : ''}`}>
           {selectedOption?.label || (value ? value : placeholder)}
         </span>
         <FaChevronDown className={`text-[10px] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -132,7 +132,7 @@ const CustomSelect = ({
 
       {isOpen && createPortal(
         <div 
-          className={`absolute bg-[#161f33] rounded-xl shadow-2xl border border-white/15 py-1.5 z-[9999] custom-dropdown-portal-menu animate-in fade-in slide-in-from-${openUp ? 'bottom' : 'top'}-2 duration-200 backdrop-blur-xl`}
+          className={`absolute bg-[var(--background)] rounded-xl shadow-2xl border border-[var(--border)] py-1.5 z-[9999] custom-dropdown-portal-menu animate-in fade-in slide-in-from-${openUp ? 'bottom' : 'top'}-2 duration-200 backdrop-blur-xl`}
           style={{
             position: 'absolute',
             top: `${openUp ? coords.top - 4 : coords.top + 4}px`,
@@ -149,8 +149,8 @@ const CustomSelect = ({
                 onClick={() => handleSelect(opt.value)}
                 className={`w-full text-left px-4 py-2 text-xs font-medium transition-colors ${
                   opt.value === value 
-                    ? 'bg-[#079108]/20 text-[#079108] font-bold border-l-2 border-[#079108]' 
-                    : 'text-zinc-200 hover:bg-white/10 hover:text-white'
+                    ? 'bg-[var(--primary)]/15 text-[var(--primary)] font-bold border-l-2 border-[var(--primary)]' 
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 hover:text-[var(--text-primary)]'
                 }`}
               >
                 {opt.label}
@@ -165,3 +165,6 @@ const CustomSelect = ({
 }
 
 export default CustomSelect
+
+
+

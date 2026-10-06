@@ -76,21 +76,28 @@ const KSCheckoutPage = () => {
     })
   }, [allMembers])
 
-  // Determine if Group Cheki is active globally
-  const isGroupEnabled = useMemo(() => {
-    if (groupMember && (groupMember.hadir === false || groupMember.hadir === 'false')) {
-      return false
-    }
-    if (config) {
-      if (
-        config.enable_group_cheki === 'false' || config.enable_group_cheki === false ||
-        config.enable_group === 'false' || config.enable_group === false
-      ) {
-        return false
-      }
-    }
-    return true
+  // === BARU: 3 TOGGLE INDEPENDENT ===
+  // Regular Cheki: per member 2-shot (Rp40k PO / Rp40k OTS)
+  const isRegularEnabled = useMemo(() => {
+    if (!config) return true
+    return config.regular_cheki_enabled !== 'false' && config.regular_cheki_enabled !== false
+  }, [config])
+
+  // Wide Cheki: PER MEMBER format 16:9 (BUKAN SEMUA MEMBER!) — Rp70k PO / Rp80k OTS)
+  const wideChekiEnabled = useMemo(() => {
+    if (!config) return false
+    return config.wide_cheki_enabled === 'true' || config.wide_cheki_enabled === true
+  }, [config])
+
+  // Cheki Grup: 1 frame SEMUA MEMBER (DEFAULT OFF, tipe terpisah dari Wide)
+  const chekiGrupEnabled = useMemo(() => {
+    if (!config) return false
+    if (groupMember && (groupMember.hadir === false || groupMember.hadir === 'false')) return false
+    return config.cheki_grup_enabled === 'true' || config.cheki_grup_enabled === true
   }, [groupMember, config])
+
+  // Backward compat: isGroupEnabled untuk tombol pilih Cheki Grup (SESUAIKAN ke chekiGrupEnabled
+  const isGroupEnabled = chekiGrupEnabled
 
   // Filter active individual members (hadir !== false) & match event lineup
   const filteredMembers = useMemo(() => {
@@ -208,6 +215,18 @@ const KSCheckoutPage = () => {
     }
   }, [isGroupEnabled, ticketType, filteredMembers, selectedMember])
 
+  // Auto-select first available chekiVariant when toggles change
+  useEffect(() => {
+    if (chekiVariant === 'regular' && !isRegularEnabled) {
+      if (wideChekiEnabled) setChekiVariant('wide')
+      else if (customOptions.length > 0) setChekiVariant(customOptions[0].label)
+    }
+    if (chekiVariant === 'wide' && !wideChekiEnabled) {
+      if (isRegularEnabled) setChekiVariant('regular')
+      else if (customOptions.length > 0) setChekiVariant(customOptions[0].label)
+    }
+  }, [isRegularEnabled, wideChekiEnabled, chekiVariant, customOptions])
+
   // Custom Price Options & Config prices
   const customOptions = useMemo(() => {
     if (!config?.cheki_custom_options) return []
@@ -221,9 +240,10 @@ const KSCheckoutPage = () => {
     }
   }, [config])
 
+  // Pricelist: Regular 40k, Wide PO 70k, Cheki Grup PO (default 150k OFF)
   const regularPrice = config?.harga_cheki_per_member ? Number(config.harga_cheki_per_member) : 40000
-  const widePrice = config?.harga_cheki_grup ? Number(config.harga_cheki_grup) : 70000
-  const groupChekiPrice = config?.harga_group_cheki ? Number(config.harga_group_cheki) : 100000
+  const widePrice = config?.harga_cheki_grup ? Number(config.harga_cheki_grup) : 70000 // Wide PO 70k = harga_cheki_grup backward compat
+  const groupChekiPrice = config?.harga_cheki_grup_po ? Number(config.harga_cheki_grup_po) : 150000 // Cheki Grup default OFF
 
   // Pricing calculations
   const basePrice = useMemo(() => {
@@ -264,12 +284,23 @@ const KSCheckoutPage = () => {
     }, 100)
   }
 
-  // Cart item management
+  // Cart item management — with explicit cheki_type mapping
   const handleAddToCart = () => {
     const isGroup = ticketType === 'group'
-    const memberName = isGroup ? 'Group Cheki (Full Member)' : (selectedMember?.nama_panggung || 'Member')
+    let finalChekiType = chekiVariant === 'wide' ? 'wide' : 'regular'
+    if (isGroup) finalChekiType = 'grup'
+
+    let finalLabelPrefix = 'Regular Cheki'
+    let memberName = ''
+    if (isGroup) {
+      memberName = 'Cheki Grup (Semua Member)'
+    } else {
+      if (finalChekiType === 'wide') finalLabelPrefix = 'Wide Cheki (16:9)'
+      memberName = `${finalLabelPrefix} ${selectedMember?.nama_panggung || 'Member'}`
+    }
+
     const memberPhoto = isGroup
-      ? '/images/members/placeholder.svg'
+      ? '/images/members/group.webp'
       : (selectedMember?.shop_image_url || selectedMember?.image_url || '/images/members/placeholder.svg')
 
     const newItem = {
@@ -279,6 +310,7 @@ const KSCheckoutPage = () => {
       memberName,
       memberPhoto,
       chekiVariant,
+      cheki_type: finalChekiType, // EXPLICIT cheki_type for server
       sesiMode,
       unitPrice,
       quantity,
@@ -301,11 +333,12 @@ const KSCheckoutPage = () => {
 
   // Payment account & QRIS info from config or fallback
   const enableTf = config ? (config.payment_enable_tf !== 'false' && config.payment_enable_tf !== false) : true
-  const enableQris = config ? (config.payment_enable_qris !== 'false' && config.payment_enable_qris !== false) : true
+  const enableQris = config ? (config.payment_enable_qris === 'true' || config.payment_enable_qris === true) : false
   const qrisImageUrl = config?.payment_qris_image_url || ''
-  const bankName = config?.payment_bank || config?.bank_name || 'BCA (Bank Central Asia)'
-  const rekeningNumber = config?.payment_rekening || config?.no_rekening || '1234567890'
-  const rekeningName = config?.payment_atas_nama || config?.atas_nama || 'Kohi Sekai Official'
+  const qrisMerchantName = config?.payment_qris_merchant_name || 'Kohi Sekai Official'
+  const bankName = config?.payment_bank || 'BCA'
+  const rekeningNumber = config?.payment_rekening || '0902683273'
+  const rekeningName = config?.payment_atas_nama || 'Kohi Sekai Official'
 
   const [paymentMethodSelected, setPaymentMethodSelected] = useState('tf')
 
@@ -404,6 +437,7 @@ const KSCheckoutPage = () => {
 
     try {
       const firstItem = itemsToSubmit[0]
+      // Map cheki_type dari cart item (sudah di set di handleAddToCart)
       const orderPayload = {
         event_id: event.id,
         user_id: fanUser?.id || null,
@@ -420,13 +454,22 @@ const KSCheckoutPage = () => {
         catatan: catatan.trim() || null,
         payment_proof_url: paymentProofUrl,
         metode_pembayaran: paymentMethodSelected === 'qris' ? 'QRIS' : 'Transfer Bank',
-        items: itemsToSubmit.map(item => ({
-          member_id: item.ticketType === 'group' ? 'group' : (item.member?.id || item.member?.member_id || null),
-          name: `${item.memberName} (${item.sesiMode === '1SHT' ? '1-Shot' : '2-Shot'} - ${item.chekiVariant === 'wide' ? 'Wide' : 'Regular'})`,
-          price: item.unitPrice,
-          quantity: item.quantity,
-          catatan: catatan.trim() || null
-        }))
+        items: itemsToSubmit.map(item => {
+          const ct = item.cheki_type || (item.ticketType === 'group' ? 'grup' : (item.chekiVariant === 'wide' ? 'wide' : 'regular'))
+          let finalName = item.memberName
+          if (item.ticketType !== 'group' && !item.memberName.includes('Cheki')) {
+            const prefix = ct === 'wide' ? 'Wide Cheki (16:9)' : 'Regular Cheki'
+            finalName = `${prefix} ${item.memberName}`
+          }
+          return {
+            member_id: ct === 'grup' ? 'grup' : (item.member?.id || item.member?.member_id || null),
+            cheki_type: ct, // <- KRITIS: dikirim ke backend untuk validasi toggle + recalc harga
+            name: `${finalName} (${item.sesiMode === '1SHT' ? '1-Shot' : '2-Shot'})`,
+            price: item.unitPrice,
+            quantity: item.quantity,
+            catatan: catatan.trim() || null
+          }
+        })
       }
 
       const res = await api.post('/orders', orderPayload)
@@ -704,8 +747,8 @@ const KSCheckoutPage = () => {
 
                     {/* Member Lineup Cards Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      {/* Group Cheki Option Card (Only shown if active) */}
-                      {isGroupEnabled && (
+                      {/* Cheki Grup (Semua Member) Card (DEFAULT OFF, hanya tampil jika admin aktifkan) */}
+                      {chekiGrupEnabled && (
                         <button
                           type="button"
                           onClick={handleSelectGroup}
@@ -727,10 +770,10 @@ const KSCheckoutPage = () => {
                               <FaUsers size={26} />
                             </div>
                             <span className="text-xs font-black uppercase text-text-primary text-center tracking-wide block">
-                              Group Cheki
+                              Cheki Grup
                             </span>
                             <span className="text-[10px] text-text-secondary text-center mt-1 font-medium">
-                              Full Member
+                              Semua Member · 1 Frame
                             </span>
                           </div>
                         </button>
@@ -842,8 +885,8 @@ const KSCheckoutPage = () => {
                                 className="accent-primary w-4 h-4"
                               />
                               <div>
-                                <span className="text-xs font-black uppercase text-text-primary block">Group Cheki (Full Member)</span>
-                                <span className="text-[10px] text-text-secondary block font-normal">Sesi Foto Bersama Seluruh Idol Stage</span>
+                                <span className="text-xs font-black uppercase text-text-primary block">Cheki Grup (Semua Member)</span>
+                                <span className="text-[10px] text-text-secondary block font-normal">1x foto polaroid bersama seluruh idol dalam satu frame</span>
                               </div>
                             </div>
                             <span className="text-xs font-bold text-text-primary font-mono">
@@ -852,6 +895,8 @@ const KSCheckoutPage = () => {
                           </label>
                         ) : (
                           <>
+                            {/* Regular Cheki — hide if disabled by admin */}
+                            {isRegularEnabled && (
                             <label
                               onClick={() => setChekiVariant('regular')}
                               className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${
@@ -861,24 +906,18 @@ const KSCheckoutPage = () => {
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                <input
-                                  type="radio"
-                                  name="chekiVariant"
-                                  value="regular"
-                                  checked={chekiVariant === 'regular'}
-                                  onChange={() => setChekiVariant('regular')}
-                                  className="accent-primary w-4 h-4 cursor-pointer"
-                                />
+                                <input type="radio" name="chekiVariant" value="regular" checked={chekiVariant === 'regular'} onChange={() => setChekiVariant('regular')} className="accent-primary w-4 h-4 cursor-pointer" />
                                 <div>
                                   <span className="text-xs font-black uppercase text-text-primary block">Regular Cheki</span>
-                                  <span className="text-[10px] text-text-secondary block font-normal">Ukuran Standar</span>
+                                  <span className="text-[10px] text-text-secondary block font-normal">Ukuran Standar · Priority Line (PO) / Regular Line (OTS)</span>
                                 </div>
                               </div>
-                              <span className="text-xs font-bold text-text-primary font-mono">
-                                Rp {regularPrice.toLocaleString('id-ID')}
-                              </span>
+                              <span className="text-xs font-bold text-text-primary font-mono">Rp {regularPrice.toLocaleString('id-ID')}</span>
                             </label>
+                            )}
 
+                            {/* Wide Cheki 16:9 PER MEMBER — hide if disabled by admin */}
+                            {wideChekiEnabled && (
                             <label
                               onClick={() => setChekiVariant('wide')}
                               className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${
@@ -888,23 +927,15 @@ const KSCheckoutPage = () => {
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                <input
-                                  type="radio"
-                                  name="chekiVariant"
-                                  value="wide"
-                                  checked={chekiVariant === 'wide'}
-                                  onChange={() => setChekiVariant('wide')}
-                                  className="accent-primary w-4 h-4 cursor-pointer"
-                                />
+                                <input type="radio" name="chekiVariant" value="wide" checked={chekiVariant === 'wide'} onChange={() => setChekiVariant('wide')} className="accent-primary w-4 h-4 cursor-pointer" />
                                 <div>
-                                  <span className="text-xs font-black uppercase text-text-primary block">Wide Cheki</span>
-                                  <span className="text-[10px] text-text-secondary block font-normal">Ukuran Ekstra Lebar</span>
+                                  <span className="text-xs font-black uppercase text-text-primary block">Wide Cheki (Polaroid 16:9)</span>
+                                  <span className="text-[10px] text-text-secondary block font-normal">Format lebar 16:9 · 1x foto dengan member pilihan · VIP Line</span>
                                 </div>
                               </div>
-                              <span className="text-xs font-bold text-text-primary font-mono">
-                                Rp {widePrice.toLocaleString('id-ID')}
-                              </span>
+                              <span className="text-xs font-bold text-text-primary font-mono">Rp {widePrice.toLocaleString('id-ID')}</span>
                             </label>
+                            )}
 
                             {/* Custom options added by Admin */}
                             {customOptions.map((opt) => (
@@ -1111,16 +1142,23 @@ const KSCheckoutPage = () => {
                             <img
                               src={qrisImageUrl}
                               alt="QRIS Barcode"
-                              className="w-48 h-48 object-contain rounded-xl border border-border bg-white p-2"
+                              className="w-52 h-52 object-contain rounded-xl border border-border bg-white p-2"
                             />
                           ) : (
-                            <div className="w-48 h-48 flex flex-col items-center justify-center bg-surface rounded-xl p-3 text-text-secondary">
+                            <div className="w-52 h-52 flex flex-col items-center justify-center bg-surface rounded-xl p-3 text-text-secondary border border-dashed border-border">
                               <FaQrcode size={56} className="mb-2 text-text-secondary" />
                               <span className="text-xs font-black uppercase text-text-primary">QRIS Kohi Sekai</span>
                             </div>
                           )}
+                          {qrisMerchantName && (
+                            <p className="text-xs font-black text-text-primary uppercase tracking-wider">{qrisMerchantName}</p>
+                          )}
+                          <div className="px-4 py-2 rounded-xl bg-primary/10 border border-primary/30">
+                            <p className="text-[10px] text-text-secondary font-medium">Total yang harus dibayar</p>
+                            <p className="text-lg font-black text-primary">Rp {grandTotal.toLocaleString('id-ID')}</p>
+                          </div>
                           <p className="text-xs text-text-secondary max-w-sm leading-relaxed">
-                            Buka aplikasi mobile banking atau e-wallet (GoPay, Dana, OVO, ShopeePay), scan barcode QRIS di atas dan masukkan nominal pembayaran.
+                            Buka aplikasi mobile banking atau e-wallet (GoPay, Dana, OVO, ShopeePay), scan barcode QRIS di atas dan masukkan nominal di atas.
                           </p>
                         </div>
                       )}

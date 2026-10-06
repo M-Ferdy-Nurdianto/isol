@@ -17,7 +17,7 @@ const StoryPage = () => {
             alt="Kohi Sekai Group" 
             className="w-full h-full object-cover scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-dark/60 via-dark/40 to-white dark:to-[#090d16]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-dark/60 via-dark/40 to-white dark:to-[#1A1512]"></div>
         </div>
 
         <motion.div 
@@ -25,7 +25,7 @@ const StoryPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="relative z-10 text-center px-4"
         >
-          <div className="inline-block px-4 py-2 bg-[#079108] rounded-full text-[10px] font-black tracking-[0.3em] text-white uppercase mb-6 shadow-xl">
+          <div className="inline-block px-4 py-2 bg-[var(--primary)] rounded-full text-[10px] font-black tracking-[0.3em] text-white uppercase mb-6 shadow-xl">
              Since 2026
           </div>
           <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-white uppercase mb-4 drop-shadow-2xl">
@@ -43,11 +43,11 @@ const StoryPage = () => {
            <div className="space-y-8">
               <div className="space-y-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-1 bg-[#079108]"></div>
-                    <span className="text-[#079108] font-black tracking-[0.4em] text-xs uppercase">PHILOSOPHY</span>
+                    <div className="w-12 h-1 bg-[var(--primary)]"></div>
+                    <span className="text-[var(--primary)] font-black tracking-[0.4em] text-xs uppercase">PHILOSOPHY</span>
                   </div>
                   <h2 className="text-4xl md:text-6xl font-black tracking-tight text-dark uppercase mb-6 leading-none">
-                    LEBIH DARI <span className="text-[#079108]">SEKADAR</span> IDOLA
+                    LEBIH DARI <span className="text-[var(--primary)]">SEKADAR</span> IDOLA
                   </h2>
               </div>
               <div className="space-y-6 text-gray-500 text-lg leading-relaxed font-light">
@@ -95,7 +95,7 @@ const StoryPage = () => {
         <div className="container mx-auto max-w-5xl px-4">
            <div className="text-center mb-16">
               <h3 className="text-3xl font-black text-dark uppercase tracking-widest mb-4">MILESTONES</h3>
-              <div className="w-20 h-1.5 bg-[#079108] mx-auto rounded-full"></div>
+              <div className="w-20 h-1.5 bg-[var(--primary)] mx-auto rounded-full"></div>
            </div>
 
            <div className="space-y-12">
@@ -112,13 +112,13 @@ const StoryPage = () => {
               ].map((m, i, arr) => (
                 <div key={i} className="flex gap-8 group">
                    <div className="flex flex-col items-center">
-                      <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-black text-xs z-10 shadow-lg group-hover:scale-110 transition-transform ${m.isTeaser ? 'bg-gradient-to-br from-purple-600 to-indigo-600 animate-pulse' : 'bg-[#079108]'}`}>
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-black text-xs z-10 shadow-lg group-hover:scale-110 transition-transform ${m.isTeaser ? 'bg-gradient-to-br from-purple-600 to-indigo-600 animate-pulse' : 'bg-[var(--primary)]'}`}>
                         {m.year}
                       </div>
                       {i !== arr.length - 1 && <div className="w-0.5 flex-1 bg-gray-200 mt-4"></div>}
                    </div>
                    <div className="flex-1 pb-12">
-                      <h4 className={`text-2xl font-black uppercase mb-2 group-hover:text-[#079108] transition-colors ${m.isTeaser ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 italic' : 'text-dark'}`}>
+                      <h4 className={`text-2xl font-black uppercase mb-2 group-hover:text-[var(--primary)] transition-colors ${m.isTeaser ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 italic' : 'text-dark'}`}>
                         {m.title}
                       </h4>
                       <p className={`font-light leading-relaxed ${m.isTeaser ? 'text-indigo-400 font-bold' : 'text-gray-500'}`}>
@@ -134,10 +134,10 @@ const StoryPage = () => {
       {/* Call to Action */}
       <section className="py-24 container mx-auto max-w-4xl px-4 text-center">
          <div className="bg-dark rounded-[3rem] p-12 md:p-20 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#079108] blur-[150px] opacity-20"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--primary)] blur-[150px] opacity-20"></div>
             <div className="relative z-10 space-y-8">
                <h3 className="text-3xl md:text-5xl font-black tracking-tight leading-none uppercase">
-                 JADILAH BAGIAN DARI <br/> <span className="text-[#079108]">KISAH KAMI</span>
+                 JADILAH BAGIAN DARI <br/> <span className="text-[var(--primary)]">KISAH KAMI</span>
                </h3>
                <p className="text-white/60 font-medium text-lg">
                  Ikuti kegiatan kami lebih dekat lewat media sosial dan jangan lewatkan penampilan kami berikutnya!
@@ -155,7 +155,7 @@ const StoryPage = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       whileHover={{ y: -5, scale: 1.1 }}
-                      className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl text-white hover:text-white hover:bg-[#079108] transition-all shadow-sm"
+                      className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl text-white hover:text-white hover:bg-[var(--primary)] transition-all shadow-sm"
                     >
                       {social.icon}
                     </motion.a>
@@ -170,3 +170,5 @@ const StoryPage = () => {
 }
 
 export default StoryPage
+
+

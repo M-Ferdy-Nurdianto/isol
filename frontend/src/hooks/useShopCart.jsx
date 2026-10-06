@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { rbToast } from '../components/ui/RBToast'
 
 export const getSizePriceIncrement = (size) => {
@@ -10,7 +10,13 @@ export const getSizePriceIncrement = (size) => {
   return 0;
 }
 
-export const useShopCart = (hargaMember, hargaGrup) => {
+// chekiType: 'regular' | 'wide' | 'grup'
+export const useShopCart = (hargaMember, hargaGrup, {
+  chekiGrupEnabled = false,
+  regularChekiEnabled = true,
+  wideChekiEnabled = false,
+  hargaChekiGrupPo = 150000,
+} = {}) => {
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem('ks_cart')
@@ -30,52 +36,77 @@ export const useShopCart = (hargaMember, hargaGrup) => {
     localStorage.setItem('ks_cart', JSON.stringify(cart))
   }, [cart])
 
-  // Sync prices with config if they change
+  // Sync prices with config if they change.
+  // Now item can be:
+  //   cheki_type='grup'    → hargaChekiGrupPo (semua member, if enabled)
+  //   cheki_type='wide'    → hargaGrup (= Wide Cheki per member 16:9)
+  //   cheki_type='regular' → hargaMember (= Regular per member, 2-shot)
   useEffect(() => {
     setCart(prev => prev.map(item => {
-      const expectedPrice = item.id === 'group' ? hargaGrup : hargaMember
+      let expectedPrice = hargaMember
+      const type = item.cheki_type || (item.id === 'group' || item.id === 'grup' ? 'grup' : 'regular')
+      if (type === 'grup') expectedPrice = Number(hargaChekiGrupPo) || 150000
+      else if (type === 'wide') expectedPrice = hargaGrup
       if (item.price !== expectedPrice) {
-        return { ...item, price: expectedPrice }
+        return { ...item, price: expectedPrice, cheki_type: type }
       }
-      return item
+      return { ...item, cheki_type: type }
     }))
-  }, [hargaMember, hargaGrup])
+  }, [hargaMember, hargaGrup, hargaChekiGrupPo])
 
   useEffect(() => {
     localStorage.setItem('ks_merch_cart', JSON.stringify(merchCart))
   }, [merchCart])
 
   // --- Cheki Cart Logic ---
-  const addToCart = (type, member = null, getMemberImage) => {
-    const isGroup = type === 'group'
-    const imageUrl = isGroup
+  // chekiType: 'regular' | 'wide' | 'grup'
+  const addToCart = (type, member = null, getMemberImage, chekiType = 'regular') => {
+    const isGrup = type === 'group' || type === 'grup' || chekiType === 'grup'
+
+    // Fallback ke tipe aman jika toggle OFF (protect)
+    let finalType = chekiType
+    if (isGrup) finalType = 'grup'
+    if (finalType === 'grup' && !chekiGrupEnabled) return
+    if (finalType === 'wide' && !wideChekiEnabled) finalType = 'regular'
+    if (finalType === 'regular' && !regularChekiEnabled) return
+
+    let price = Number(hargaMember)
+    let labelPrefix = 'Regular Cheki'
+    if (finalType === 'wide') { price = Number(hargaGrup); labelPrefix = 'Wide Cheki (16:9)' }
+    if (finalType === 'grup') { price = Number(hargaChekiGrupPo) || 150000; labelPrefix = 'Cheki Grup' }
+
+    const imageUrl = isGrup || finalType === 'grup'
       ? (member?.image_url || '/images/members/group.webp')
       : getMemberImage(member)
 
-    const itemName = isGroup 
-      ? 'Cheki Group' 
-      : (member.is_secret ? 'Cheki Mystery (Secret Member)' : `Cheki ${member.nama_panggung}`)
+    const itemName = (isGrup || finalType === 'grup')
+      ? 'Cheki Grup (Semua Member)'
+      : (member.is_secret ? `${labelPrefix} Mystery (Secret Member)` : `${labelPrefix} ${member.nama_panggung}`)
+
+    // Unique id = member + cheki_type (sehingga same member bisa punya 2 item: regular + wide terpisah)
+    const uniqueId = (isGrup || finalType === 'grup')
+      ? 'grup'
+      : `${member.id}-${finalType}`
 
     const item = {
-      id: isGroup ? 'group' : member.id,
-      member_id: isGroup ? 'group' : member.id,
+      id: uniqueId,
+      cheki_type: finalType,
+      member_id: (isGrup || finalType === 'grup') ? 'grup' : member.id,
       name: itemName,
       is_secret: Boolean(member?.is_secret),
-      price: isGroup ? hargaGrup : hargaMember,
+      price,
       quantity: 1,
       image: imageUrl
     }
 
-    const existing = cart.find(i => i.id === item.id)
+    const existing = cart.find(i => i.id === uniqueId)
     const newQty = existing ? existing.quantity + 1 : 1
-
-    // Toast dipindahkan ke animasi melayang "Fly to Cart"
-    // rbToast.cart(item.name.replace('Cheki ', ''), emoji, newQty)
+    void newQty
 
     setCart(prev => {
-      const existingInPrev = prev.find(i => i.id === item.id)
+      const existingInPrev = prev.find(i => i.id === uniqueId)
       if (existingInPrev) {
-        return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i)
+        return prev.map(i => i.id === uniqueId ? { ...i, quantity: i.quantity + 1 } : i)
       }
       return [...prev, item]
     })

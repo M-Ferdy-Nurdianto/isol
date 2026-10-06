@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import Swal from 'sweetalert2'
 import { FaTimes } from 'react-icons/fa'
 import api from '../../../lib/api'
@@ -57,7 +57,7 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
       Swal.fire({
         icon: 'success',
         title: 'Order OTS Berhasil!',
-        confirmButtonColor: '#079108'
+        confirmButtonColor: '#E8944A'
       })
       onSuccess()
     } catch (error) {
@@ -65,7 +65,7 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
         icon: 'error',
         title: 'Gagal',
         text: error.response?.data?.error || error.message,
-        confirmButtonColor: '#079108'
+        confirmButtonColor: '#E8944A'
       })
     } finally {
       setSubmitting(false)
@@ -75,11 +75,11 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
   const totalPrice = formData.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-[#111726] border border-white/10 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar text-white">
-        <div className="p-5 border-b border-white/10 flex justify-between items-center bg-[#161f33] sticky top-0 z-10">
-          <h3 className="text-base md:text-lg font-bold text-white uppercase tracking-wider">Order OTS <span className="text-[#079108]">(On The Spot)</span></h3>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white text-lg transition-colors p-1">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 animate-fade-in">
+      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar text-[var(--text-primary)]">
+        <div className="p-5 border-b border-[var(--border)] flex justify-between items-center bg-[var(--background)] sticky top-0 z-10">
+          <h3 className="text-base md:text-lg font-bold text-[var(--text-primary)] uppercase tracking-wider">Order OTS <span className="text-[var(--primary)]">(On The Spot)</span></h3>
+          <button onClick={onClose} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-lg transition-colors p-1">
             <FaTimes />
           </button>
         </div>
@@ -88,7 +88,7 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Pilih Event *</label>
+                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Pilih Event *</label>
                 <CustomSelect
                   options={events.filter(event => {
                     if (event.is_special) return false;
@@ -109,27 +109,27 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Nama Pembeli *</label>
+                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Nama Pembeli *</label>
                 <input
                   type="text"
                   placeholder="Contoh: Kiki"
                   value={formData.nama_lengkap}
                   onChange={(e) => setFormData({...formData, nama_lengkap: e.target.value})}
-                  className="w-full px-4 py-2.5 bg-[#182032] border border-white/10 text-white text-xs rounded-xl placeholder-zinc-500 focus:border-[#079108] focus:outline-none"
+                  className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl placeholder-[var(--text-secondary)]/50 focus:border-[var(--primary)] focus:outline-none"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Metode Pembayaran *</label>
+                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Metode Pembayaran *</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setFormData({...formData, payment_method: 'Cash'})}
                     className={`px-4 py-2.5 rounded-xl font-bold text-xs border transition-all ${
                       formData.payment_method === 'Cash'
-                        ? 'bg-[#079108] text-white border-[#079108] shadow-[0_0_12px_rgba(7,145,8,0.4)]'
-                        : 'bg-[#182032] text-zinc-300 border-white/10 hover:border-white/30'
+                        ? 'bg-[var(--primary)] text-[var(--text-primary)] border-[var(--primary)] shadow-[0_2px_8px_rgba(232,148,74,0.35)]'
+                        : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40'
                     }`}
                   >
                     Cash
@@ -139,8 +139,8 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
                     onClick={() => setFormData({...formData, payment_method: 'QR'})}
                     className={`px-4 py-2.5 rounded-xl font-bold text-xs border transition-all ${
                       formData.payment_method === 'QR'
-                        ? 'bg-[#079108] text-white border-[#079108] shadow-[0_0_12px_rgba(7,145,8,0.4)]'
-                        : 'bg-[#182032] text-zinc-300 border-white/10 hover:border-white/30'
+                        ? 'bg-[var(--primary)] text-[var(--text-primary)] border-[var(--primary)] shadow-[0_2px_8px_rgba(232,148,74,0.35)]'
+                        : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40'
                     }`}
                   >
                     QR Code
@@ -148,18 +148,18 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
                 </div>
               </div>
 
-              <div className="border-t border-white/10 pt-4">
-                <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-300 mb-2">Items Dipilih:</h4>
+              <div className="border-t border-[var(--border)] pt-4">
+                <h4 className="font-bold text-xs uppercase tracking-wider text-[var(--text-secondary)] mb-2">Items Dipilih:</h4>
                 {formData.items.length === 0 ? (
-                  <p className="text-zinc-500 text-xs italic">Pilih member di panel kanan →</p>
+                  <p className="text-[var(--text-secondary)] text-xs italic">Pilih member di panel kanan →</p>
                 ) : (
                   <div className="space-y-2">
                     <div className="max-h-[140px] overflow-y-auto custom-scrollbar space-y-2 pr-1">
                       {formData.items.map((item, index) => (
-                        <div key={index} className="flex justify-between items-center bg-[#182032] border border-white/5 p-2.5 rounded-xl">
-                          <span className="text-xs text-zinc-200">{item.name} <span className="font-bold text-[#079108]">x{item.quantity}</span></span>
+                        <div key={index} className="flex justify-between items-center bg-[var(--background)] border border-[var(--border)] p-2.5 rounded-xl">
+                          <span className="text-xs text-[var(--text-secondary)]">{item.name} <span className="font-bold text-[var(--primary)]">x{item.quantity}</span></span>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-[#079108]">Rp {(item.price * item.quantity).toLocaleString('id-ID')}</span>
+                            <span className="text-xs font-bold text-[var(--primary)]">Rp {(item.price * item.quantity).toLocaleString('id-ID')}</span>
                             <button
                               type="button"
                               onClick={() => removeItem(index)}
@@ -171,17 +171,17 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
                         </div>
                       ))}
                     </div>
-                    <div className="pt-3 border-t border-white/10 flex justify-between font-bold text-sm">
-                      <span className="text-zinc-300">Total Harga:</span>
-                      <span className="text-[#079108] font-black text-base">Rp {totalPrice.toLocaleString('id-ID')}</span>
+                    <div className="pt-3 border-t border-[var(--border)] flex justify-between font-bold text-sm">
+                      <span className="text-[var(--text-secondary)]">Total Harga:</span>
+                      <span className="text-[var(--primary)] font-black text-base">Rp {totalPrice.toLocaleString('id-ID')}</span>
                     </div>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-6">
-              <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-300 mb-3">Pilih Member / Items:</h4>
+            <div className="border-t md:border-t-0 md:border-l border-[var(--border)] pt-4 md:pt-0 md:pl-6">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-[var(--text-secondary)] mb-3">Pilih Member / Items:</h4>
               <div className="grid grid-cols-2 gap-2.5 max-h-96 overflow-y-auto custom-scrollbar pr-1">
                 {members.map((member) => {
                   const selectedEvent = events.find(e => e.id === formData.event_id);
@@ -199,7 +199,7 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
                       type="button"
                       onClick={() => {
                         if (!formData.event_id) {
-                          Swal.fire({ icon: 'warning', title: 'Pilih Event', text: 'Silakan pilih event terlebih dahulu.', confirmButtonColor: '#079108' });
+                          Swal.fire({ icon: 'warning', title: 'Pilih Event', text: 'Silakan pilih event terlebih dahulu.', confirmButtonColor: '#E8944A' });
                           return;
                         }
                         addItem(member);
@@ -207,14 +207,14 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
                       disabled={!isAllowed}
                       className={`p-3 border rounded-xl transition-all text-left ${
                         isAllowed 
-                          ? 'bg-[#182032] border-white/10 hover:border-[#079108] hover:bg-[#079108]/10 cursor-pointer' 
-                          : 'bg-white/5 border-white/5 text-zinc-500 cursor-not-allowed opacity-50'
+                          ? 'bg-[var(--background)] border-[var(--border)] hover:border-[var(--primary)] hover:bg-[var(--primary)]/10 cursor-pointer' 
+                          : 'bg-[var(--border)] border-[var(--border)] text-[var(--text-secondary)] cursor-not-allowed opacity-50'
                       }`}
                     >
-                      <div className={`text-xs font-bold ${isAllowed ? 'text-white' : 'text-zinc-500'}`}>
+                      <div className={`text-xs font-bold ${isAllowed ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
                         {formatMemberName(member.nama_panggung)}
                       </div>
-                      <div className="text-[11px] text-[#079108] font-semibold mt-0.5">
+                      <div className="text-[11px] text-[var(--primary)] font-semibold mt-0.5">
                         Rp {parseInt(member.member_id === 'group' ? hargaOtsGrup : hargaOtsPerMember, 10).toLocaleString('id-ID')}
                       </div>
                       {!isAllowed && <div className="text-[9px] text-red-400 mt-1 font-bold">Tidak Hadir</div>}
@@ -225,18 +225,18 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col-reverse md:flex-row gap-3 pt-4 border-t border-white/10 justify-end">
+          <div className="mt-6 flex flex-col-reverse md:flex-row gap-3 pt-4 border-t border-[var(--border)] justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 bg-white/10 text-zinc-300 rounded-xl font-bold text-xs hover:bg-white/20 transition-all"
+              className="px-6 py-2.5 bg-[var(--border)] text-[var(--text-secondary)] rounded-xl font-bold text-xs hover:bg-[var(--primary)]/15 transition-all"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={submitting || formData.items.length === 0}
-              className="px-6 py-2.5 bg-[#079108] text-white rounded-xl font-bold text-xs hover:bg-[#067a07] disabled:opacity-50 transition-all shadow-[0_0_15px_rgba(7,145,8,0.3)]"
+              className="px-6 py-2.5 bg-[var(--primary)] text-[var(--text-primary)] rounded-xl font-bold text-xs hover:bg-[var(--primary)]/85 disabled:opacity-50 transition-all shadow-[0_2px_10px_rgba(232,148,74,0.25)]"
             >
               {submitting ? 'Menyimpan...' : 'Simpan Order OTS'}
             </button>
@@ -248,3 +248,5 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
 }
 
 export default OTSOrderModal
+
+

@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -154,13 +154,13 @@ body.dark-theme .border-glow-green {
 
 .dark .min-h-screen.bg-white,
 body.dark-theme .min-h-screen.bg-white {
-  background-color: #090d16;
+  background-color: #1A1512;
   color: #f4f4f5;
 }
 
 .dark .min-h-screen.bg-gradient-to-br,
 body.dark-theme .min-h-screen.bg-gradient-to-br {
-  background: #090d16;
+  background: #1A1512;
   color: #f4f4f5;
 }
 
@@ -184,13 +184,13 @@ body.dark-theme .text-gray-700:not(.digital-receipt-paper *) {
 .dark .text-gray-500:not(.digital-receipt-paper *),
 body.dark-theme .text-gray-600:not(.digital-receipt-paper *),
 body.dark-theme .text-gray-500:not(.digital-receipt-paper *) {
-  color: #94a3b8;
+  color: rgba(176, 165, 153, 0.6);
 }
 
 /* Card surfaces in Dark Mode (Never touch .digital-receipt-paper) */
 html.dark .bg-white:not(header *):not(.btn-primary):not(input):not(select):not(nav *):not(.digital-receipt-paper):not(.digital-receipt-paper *),
 body.dark-theme .bg-white:not(header *):not(.btn-primary):not(input):not(select):not(nav *):not(.digital-receipt-paper):not(.digital-receipt-paper *) {
-  background-color: #111726 !important;
+  background-color: #241E19 !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #f4f4f5 !important;
 }
@@ -257,54 +257,173 @@ body.dark-theme .bg-gray-50\/50 {
   background-color: rgba(255, 255, 255, 0.03) !important;
 }
 
-/* Inputs & Textareas Dual Theme */
-html.dark input:not([type="checkbox"]):not([type="radio"]),
-html.dark textarea,
-body.dark-theme input:not([type="checkbox"]):not([type="radio"]),
-body.dark-theme textarea {
-  background-color: #0b101d !important;
-  color: #f4f4f5 !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+/* =========================================================================
+   GLOBAL FORM CONTROLS — Kohi Sekai Brown/Amber Theme
+   Berlaku untuk SEMUA halaman (admin + user) di dark dan light mode.
+   Menggunakan CSS variable --input-bg / --input-border / --input-focus
+   ========================================================================= */
+
+/* Input variables — dark mode */
+html.dark,
+body.dark-theme,
+.admin-layout {
+  --input-bg:          #201912;
+  --input-bg-focus:    #2A2018;
+  --input-border:      #3A2E24;
+  --input-focus:       #E8944A;
+  --input-text:        #F5E6D3;
+  --input-placeholder: rgba(176, 165, 153, 0.6);
+  --input-disabled-bg: #1A1512;
+  --input-disabled-opacity: 0.45;
 }
 
-html.dark input:focus,
-html.dark textarea:focus,
-body.dark-theme input:focus,
-body.dark-theme textarea:focus {
-  background-color: #0e1526 !important;
-  border-color: #E8944A !important;
+/* Input variables — light mode */
+:root {
+  --input-bg:          #FFF2E8;
+  --input-bg-focus:    #FFFAF5;
+  --input-border:      #EADCCB;
+  --input-focus:       #F0A868;
+  --input-text:        #2B2420;
+  --input-placeholder: rgba(115, 98, 83, 0.55);
+  --input-disabled-bg: #FAF2E8;
+  --input-disabled-opacity: 0.5;
 }
 
-html.dark input::placeholder,
-html.dark textarea::placeholder,
-body.dark-theme input::placeholder,
-body.dark-theme textarea::placeholder {
-  color: #64748b !important;
+/* ── Base reset for ALL inputs/textareas/selects ───────────────────────── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+textarea,
+select {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+  caret-color: var(--input-focus) !important;
+  color-scheme: dark;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
-html.light :not(.admin-layout):not(.admin-layout *) input:not([type="checkbox"]):not([type="radio"]),
-html.light :not(.admin-layout):not(.admin-layout *) textarea,
-body.light-theme :not(.admin-layout):not(.admin-layout *) input:not([type="checkbox"]):not([type="radio"]),
-body.light-theme :not(.admin-layout):not(.admin-layout *) textarea {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-  border-color: #e2e8f0 !important;
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"])::placeholder,
+textarea::placeholder {
+  color: var(--input-placeholder) !important;
+  opacity: 1 !important;
 }
 
-html.light :not(.admin-layout):not(.admin-layout *) input:focus,
-html.light :not(.admin-layout):not(.admin-layout *) textarea:focus,
-body.light-theme :not(.admin-layout):not(.admin-layout *) input:focus,
-body.light-theme :not(.admin-layout):not(.admin-layout *) textarea:focus {
-  background-color: #ffffff !important;
-  border-color: #E8944A !important;
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):focus,
+textarea:focus,
+select:focus {
+  background-color: var(--input-bg-focus) !important;
+  border-color: var(--input-focus) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(232, 148, 74, 0.2) !important;
 }
 
-html.light :not(.admin-layout):not(.admin-layout *) input::placeholder,
-html.light :not(.admin-layout):not(.admin-layout *) textarea::placeholder,
-body.light-theme :not(.admin-layout):not(.admin-layout *) input::placeholder,
-body.light-theme :not(.admin-layout):not(.admin-layout *) textarea::placeholder {
-  color: #94a3b8 !important;
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background-color: var(--input-disabled-bg) !important;
+  opacity: var(--input-disabled-opacity) !important;
+  cursor: not-allowed !important;
 }
+
+/* ── Light mode override (user-facing pages) ───────────────────────────── */
+html.light input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+html.light textarea,
+html.light select,
+body.light-theme input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+body.light-theme textarea,
+body.light-theme select {
+  color-scheme: light;
+}
+
+/* ── Autofill — override browser navy/blue injection ──────────────────── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+  -webkit-text-fill-color: var(--input-text) !important;
+  caret-color: var(--input-focus) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ── Select option list ────────────────────────────────────────────────── */
+select option {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+}
+
+/* ── Text selection ────────────────────────────────────────────────────── */
+::selection {
+  background-color: rgba(232, 148, 74, 0.35);
+  color: var(--input-text);
+}
+
+/* ── Scrollbar (global) ────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* ── Exceptions: receipt paper stays white ─────────────────────────────── */
+.digital-receipt-paper input,
+.digital-receipt-paper textarea,
+.digital-receipt-paper select {
+  background-color: #f7f6f2 !important;
+  color: #1c1917 !important;
+  border-color: #d6d0c6 !important;
+  color-scheme: light !important;
+  -webkit-box-shadow: none !important;
+  -webkit-text-fill-color: #1c1917 !important;
+}
+
+/* ── Exceptions: color picker stays native ─────────────────────────────── */
+input[type="color"] {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* ── Date/time inputs ──────────────────────────────────────────────────── */
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="month"],
+input[type="week"] {
+  color-scheme: dark;
+}
+
+html.light input[type="date"],
+html.light input[type="datetime-local"],
+html.light input[type="time"],
+body.light-theme input[type="date"],
+body.light-theme input[type="datetime-local"] {
+  color-scheme: light;
+}
+
+/* ── Range slider ──────────────────────────────────────────────────────── */
+input[type="range"] {
+  accent-color: var(--primary) !important;
+}
+
+/* ── File input ────────────────────────────────────────────────────────── */
+input[type="file"] {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+}
+input[type="file"]::file-selector-button {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  transition: opacity 0.15s;
+}
+input[type="file"]::file-selector-button:hover { opacity: 0.85; }
 
 /* Specific card rules for clean light mode fallback */
 html.light :not(.admin-layout):not(.admin-layout *).bg-white,
@@ -336,8 +455,8 @@ body.dark-theme .border-white {
 /* Footer in Dark Mode */
 .dark footer,
 body.dark-theme footer {
-  background-color: #060911;
-  color: #94a3b8;
+  background-color: #1A1512;
+  color: rgba(176, 165, 153, 0.6);
   border-top-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -356,7 +475,7 @@ body.dark-theme footer a:hover {
 /* Special sections & modal in Dark Mode */
 .dark section.bg-dark,
 body.dark-theme section.bg-dark {
-  background-color: #060911;
+  background-color: #1A1512;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -457,7 +576,7 @@ body.dark-theme .bg-\[\#079108\] * {
   background: #f0fdf4;
 }
 
-.col-no { width: 45px; text-align: center; color: #94a3b8; font-family: monospace; }
+.col-no { width: 45px; text-align: center; color: rgba(176, 165, 153, 0.6); font-family: monospace; }
 .col-name { font-weight: 500; color: #1e293b; }
 .col-radio { width: 60px; text-align: center; }
 
@@ -471,83 +590,163 @@ body.dark-theme .bg-\[\#079108\] * {
 }
 
 /* =========================================================================
-   ADMIN LAYOUT - Kohi Sekai Dark Mode (Deep Coffee Espresso Theme)
+   ADMIN LAYOUT - Kohi Sekai Deep Coffee Espresso Theme
+   Semua warna mengikuti design token coklat/amber, BUKAN hitam/navy.
    ========================================================================= */
+
+/* Force dark CSS variables untuk seluruh admin — override light mode token */
+.admin-layout {
+  --primary:        #E8944A;
+  --secondary:      #3A2E24;
+  --accent:         #FF85AC;
+  --background:     #1A1512;
+  --surface:        #241E19;
+  --text-primary:   #F5E6D3;
+  --text-secondary: #B0A599;
+  --border:         #3A2E24;
+  --success:        #6FAE73;
+  --danger:         #D65656;
+}
+
 .admin-layout,
 html.dark .admin-layout,
 body.dark-theme .admin-layout,
 html.light .admin-layout,
 body.light-theme .admin-layout {
   background-color: #1A1512 !important;
-  color: #f4f4f5 !important;
+  color: #F5E6D3 !important;
   color-scheme: dark !important;
 }
 
 body:has(.admin-layout) {
   background-color: #1A1512 !important;
   background-image: none !important;
-  color: #f4f4f5 !important;
+  color: #F5E6D3 !important;
 }
 
+/* Sidebar / aside — coklat espresso agak lebih terang */
 .admin-layout aside,
 html.dark .admin-layout aside,
 body.dark-theme .admin-layout aside,
 html.light .admin-layout aside,
 body.light-theme .admin-layout aside {
-  background-color: rgba(24, 30, 25, 0.95) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: #1E1814 !important;
+  border-color: #3A2E24 !important;
 }
 
 .admin-layout main {
   background-color: #1A1512 !important;
-  color: #f4f4f5 !important;
+  color: #F5E6D3 !important;
 }
 
-/* Ensure form elements inside admin stay dark and sleek */
-.admin-layout input:not([type="checkbox"]):not([type="radio"]),
-.admin-layout textarea,
-.admin-layout select {
+/* ---- Form elements: input / textarea / select ---- */
+/* Variables di-set ulang untuk admin-layout (selalu dark espresso) */
+.admin-layout {
+  --input-bg:          #201912;
+  --input-bg-focus:    #2A2018;
+  --input-border:      #3A2E24;
+  --input-focus:       #E8944A;
+  --input-text:        #F5E6D3;
+  --input-placeholder: rgba(176, 165, 153, 0.6);
+  --input-disabled-bg: #1A1512;
+}
+/* Global rule di atas sudah handle admin input via variable — tidak perlu duplikat */
+
+/* ---- Hardcoded dark card backgrounds — remap ke coklat ---- */
+/* Komponen lama masih pakai bg-[#241E19] / bg-[#201912] / bg-[#0e1422] */
+.admin-layout [class*="bg-\\[\\#241E19\\]"],
+.admin-layout [class*="bg-\\[\\#0e1422\\]"],
+.admin-layout [class*="bg-\\[\\#161f33\\]"],
+.admin-layout [class*="bg-\\[\\#182035\\]"] {
+  background-color: #241E19 !important;
+}
+
+.admin-layout [class*="bg-\\[\\#201912\\]"] {
   background-color: #201912 !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-.admin-layout input::placeholder,
-.admin-layout textarea::placeholder {
-  color: #71717a !important;
+/* ---- border-white/x → coklat border ---- */
+.admin-layout [class*="border-white\\/"] {
+  border-color: #3A2E24 !important;
 }
 
-.admin-layout input:focus,
-.admin-layout textarea:focus,
-.admin-layout select:focus {
-  background-color: #2A2018 !important;
+/* ---- text-white → krem terang ---- */
+.admin-layout [class*="text-white"] {
+  color: #F5E6D3 !important;
+}
+
+/* ---- text-zinc-* → tone coklat ---- */
+.admin-layout [class*="text-zinc-400"],
+.admin-layout [class*="text-zinc-500"],
+.admin-layout [class*="text-zinc-600"] {
+  color: #B0A599 !important;
+}
+.admin-layout [class*="text-zinc-300"],
+.admin-layout [class*="text-zinc-200"] {
+  color: #D4C5B8 !important;
+}
+
+/* ---- bg-white/5, bg-white/10, bg-white/[0.04] → coklat muted ---- */
+.admin-layout [class*="bg-white\\/"],
+.admin-layout [class*="bg-white\\/\\["] {
+  background-color: rgba(58, 46, 36, 0.5) !important;
+}
+
+/* ---- hover:bg-white/* → harus tetap terasa hover ---- */
+.admin-layout [class*="hover\\:bg-white\\/"] {
+  --tw-bg-opacity: 1;
+}
+.admin-layout [class*="hover\\:bg-white\\/5"]:hover,
+.admin-layout [class*="hover\\:bg-white\\/10"]:hover {
+  background-color: rgba(58, 46, 36, 0.7) !important;
+}
+
+/* ---- divide-white/* → divider coklat ---- */
+.admin-layout [class*="divide-white\\/"] > * + * {
+  border-color: #3A2E24 !important;
+}
+
+/* ---- Warna hijau lama (#079108) → primary coklat/amber ---- */
+.admin-layout [class*="text-\\[\\#079108\\]"] {
+  color: #E8944A !important;
+}
+.admin-layout [class*="bg-\\[\\#079108\\]"] {
+  background-color: #E8944A !important;
+}
+.admin-layout [class*="border-\\[\\#079108\\]"],
+.admin-layout [class*="border-\\[\\#079108\\]\\/"] {
+  border-color: rgba(232, 148, 74, 0.5) !important;
+}
+.admin-layout [class*="focus\\:border-\\[\\#079108\\]"]:focus {
   border-color: #E8944A !important;
-  outline: none !important;
-  box-shadow: 0 0 0 2px rgba(232, 148, 74, 0.25) !important;
+}
+.admin-layout [class*="shadow-\\[0_0_15px_rgba\\(7\\,145\\,8"] {
+  box-shadow: 0 0 15px rgba(232, 148, 74, 0.25) !important;
 }
 
+/* ---- bg-white → surface coklat ---- */
 .admin-layout .bg-white {
   background-color: #241E19 !important;
-  color: #f4f4f5 !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #F5E6D3 !important;
+  border-color: #3A2E24 !important;
 }
 
 .admin-layout .bg-gray-50,
 .admin-layout .bg-gray-100 {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  color: #cbd5e1 !important;
+  background-color: rgba(58, 46, 36, 0.4) !important;
+  color: #B0A599 !important;
 }
 
 .admin-layout .text-gray-900,
 .admin-layout .text-gray-800,
 .admin-layout .text-gray-700 {
-  color: #f4f4f5 !important;
+  color: #F5E6D3 !important;
 }
 
 .admin-layout .text-gray-600,
 .admin-layout .text-gray-500,
 .admin-layout .text-gray-400 {
-  color: #a1a1aa !important;
+  color: #B0A599 !important;
 }
 
 /* ============================================
@@ -623,7 +822,7 @@ body:has(.admin-layout) .swal2-title {
 
 /* --- Body text --- */
 body:has(.admin-layout) .swal2-html-container {
-  color: #94a3b8 !important;
+  color: rgba(176, 165, 153, 0.6) !important;
   font-size: 13.5px !important;
   line-height: 1.55 !important;
   margin: 0 0 20px 0 !important;
@@ -727,7 +926,7 @@ body:has(.admin-layout) .swal2-radio label {
   border-radius: 10px !important;
   background: rgba(255, 255, 255, 0.04) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #94a3b8 !important;
+  color: rgba(176, 165, 153, 0.6) !important;
   font-size: 13px !important;
   font-weight: 500 !important;
   cursor: pointer !important;
@@ -871,7 +1070,7 @@ body:has(.admin-layout) .col-name {
 }
 
 .table-status-select:hover { filter: brightness(0.95); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-.table-status-select:focus { ring: 2px; ring-offset: 1px; ring-color: #94a3b8; }
+.table-status-select:focus { ring: 2px; ring-offset: 1px; ring-color: rgba(176, 165, 153, 0.6); }
 
 /* Bottom Nav Safe Padding for Mobile */
 @media (max-width: 1023px) {

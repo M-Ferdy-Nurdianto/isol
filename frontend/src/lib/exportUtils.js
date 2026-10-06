@@ -266,7 +266,7 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
     }
     const loadLogoDataUrl = async () => {
       const logoPaths = [
-        '/images/logos/logo.webp',
+        '/images/logos/logo.svg',
         '/apple-touch-icon.png',
         '/android-chrome-192x192.png'
       ]

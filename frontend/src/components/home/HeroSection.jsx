@@ -136,19 +136,19 @@ const HeroSection = ({
 
       {/* Mobile Hero */}
       {showMobile && (
-        <section className={`relative bg-[#0c111d] text-white flex flex-col ${isPreview ? 'w-full' : 'md:hidden pt-16'}`}>
-          <motion.div initial={isPreview ? false : { opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="px-6 py-6 text-center bg-[#0c111d] border-b border-white/10">
+        <section className={`relative bg-[var(--surface)] text-white flex flex-col ${isPreview ? 'w-full' : 'md:hidden pt-16'}`}>
+          <motion.div initial={isPreview ? false : { opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="px-6 py-6 text-center bg-[var(--surface)] border-b border-white/10">
             <p className="text-[8px] tracking-[0.5em] font-black text-white/70 uppercase mb-2" style={{ color: heroTaglineColor || 'rgba(255,255,255,0.7)' }}>
               {taglineText}
             </p>
-            <h1 className="text-3xl font-black tracking-tight text-[#079108] mb-1 uppercase" style={{ color: heroTitleColor || '#079108' }}>
+            <h1 className="text-3xl font-black tracking-tight text-[var(--primary)] mb-1 uppercase" style={{ color: heroTitleColor || '#079108' }}>
               {titleText}
             </h1>
             <p className="text-xs font-black tracking-[0.4em] text-accent-yellow" style={{ color: heroSubtitleColor || '#FBBF24' }}>
               {subtitleText}
             </p>
           </motion.div>
-          <div className="flex flex-col relative bg-[#0c111d]">
+          <div className="flex flex-col relative bg-[var(--surface)]">
             {members.map((member, idx) => (
               <motion.div
                 key={member.id || idx}
@@ -200,3 +200,4 @@ const HeroSection = ({
 }
 
 export default HeroSection
+

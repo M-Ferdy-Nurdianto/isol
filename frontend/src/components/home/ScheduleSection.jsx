@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+﻿import { motion } from 'framer-motion'
 import { FaMapMarkerAlt, FaClock, FaArrowRight, FaStar } from 'react-icons/fa'
 
 const ScheduleSection = ({ events, navigate }) => {
@@ -8,11 +8,11 @@ const ScheduleSection = ({ events, navigate }) => {
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 sm:mb-20 gap-6 md:gap-8 text-center md:text-left">
               <div className="w-full">
                    <div className="flex items-center justify-center md:justify-start gap-4 mb-4">
-                      <div className="w-8 h-1 bg-[#079108]"></div>
-                      <span className="text-[#079108] font-black tracking-[0.4em] text-xs uppercase">SCHEDULE</span>
+                      <div className="w-8 h-1 bg-[var(--primary)]"></div>
+                      <span className="text-[var(--primary)] font-black tracking-[0.4em] text-xs uppercase">SCHEDULE</span>
                    </div>
                    <h2 className="text-4xl md:text-6xl font-black text-dark tracking-tighter uppercase mb-4">
-                      Upcoming <span className="text-[#079108]">Events</span>
+                      Upcoming <span className="text-[var(--primary)]">Events</span>
                    </h2>
                    <p className="text-gray-400 font-medium max-w-lg mx-auto md:mx-0">Jangan lewatkan penampilan seru kami di event terdekat!</p>
               </div>
@@ -70,3 +70,4 @@ const ScheduleSection = ({ events, navigate }) => {
 }
 
 export default ScheduleSection
+

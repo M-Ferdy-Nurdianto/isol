@@ -29,10 +29,18 @@ if (import.meta.env.MODE === 'production') {
 // Add auth token to requests and handle Content-Type + Guest Mode sandbox interceptor
 api.interceptors.request.use(
   (config) => {
-    const token = getValidAdminToken()
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    const adminToken = getValidAdminToken()
+    if (adminToken) {
+      config.headers.Authorization = `Bearer ${adminToken}`
       touchAdminSession()
+    } else {
+      // Fallback: send FAN token if available (for logged-in fan users)
+      try {
+        const fanToken = typeof localStorage !== 'undefined' ? localStorage.getItem('ks_fan_token') : null
+        if (fanToken) {
+          config.headers.Authorization = `Bearer ${fanToken}`
+        }
+      } catch {}
     }
 
     // Only set Content-Type to JSON if data is not FormData

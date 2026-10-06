@@ -447,6 +447,16 @@ const KSProfilePage = () => {
                             <FaTicketAlt size={10} /> Pre-Order (PO)
                           </span>
                         )}
+                        {isOts && (order.created_by === 'admin' || !order.created_by) ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                            Admin Input
+                          </span>
+                        ) : null}
+                        {isOts && order.created_by === 'customer' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                            Order Sendiri
+                          </span>
+                        ) : null}
 
                         <button
                           onClick={() => handleCopyOrderNumber(displayOrderNumber.replace('#', ''))}

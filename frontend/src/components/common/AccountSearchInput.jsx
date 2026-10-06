@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+﻿import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { FaSearch, FaUser, FaTimes, FaSpinner, FaExchangeAlt, FaIdBadge, FaCheck } from 'react-icons/fa'
 import { useAccountSearch } from '../../hooks/useAccountSearch'
 
@@ -17,7 +17,7 @@ const HighlightMatch = React.memo(({ text, query }) => {
     <span>
       {parts.map((part, i) =>
         part.toLowerCase() === cleanQ.toLowerCase() ? (
-          <span key={i} className="text-[#079108] font-black bg-[#079108]/20 px-0.5 rounded">
+          <span key={i} className="text-[var(--primary)] font-black bg-[var(--primary)]/20 px-0.5 rounded">
             {part}
           </span>
         ) : (
@@ -43,7 +43,7 @@ const AccountSearchItem = React.memo(({ account, query, isActive, onSelect }) =>
       onClick={() => onSelect(account)}
       className={`px-3.5 py-2.5 flex items-center justify-between cursor-pointer border-b border-white/5 transition-colors select-none ${
         isActive
-          ? 'bg-[#079108]/20 border-l-4 border-l-[#079108]'
+          ? 'bg-[var(--primary)]/20 border-l-4 border-l-[var(--primary)]'
           : 'hover:bg-white/5 border-l-4 border-l-transparent'
       }`}
     >
@@ -85,10 +85,10 @@ const AccountSearchItem = React.memo(({ account, query, isActive, onSelect }) =>
 
       {/* Fan Code Badge */}
       <div className="shrink-0 flex items-center gap-1.5">
-        <span className="px-2 py-0.5 rounded bg-[#182032] border border-[#079108]/40 text-[#079108] text-[10px] font-mono font-bold">
+        <span className="px-2 py-0.5 rounded bg-[var(--input-bg)] border border-[var(--primary)]/40 text-[var(--primary)] text-[10px] font-mono font-bold">
           ID #{fanCode}
         </span>
-        {isActive && <FaCheck className="text-[#079108] text-xs ml-1" />}
+        {isActive && <FaCheck className="text-[var(--primary)] text-xs ml-1" />}
       </div>
     </div>
   )
@@ -230,10 +230,10 @@ const AccountSearchInput = ({
     const fanCode = selectedAccount.fan_code || String(selectedAccount.fan_id || '').padStart(4, '0')
 
     return (
-      <div className="bg-[#182032] border border-[#079108]/50 rounded-xl p-3.5 flex items-center justify-between shadow-md">
+      <div className="bg-[var(--input-bg)] border border-[var(--primary)]/50 rounded-xl p-3.5 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-3 min-w-0 pr-2">
           {/* Avatar */}
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-white/10 border border-[#079108]/40 shrink-0 flex items-center justify-center text-zinc-300">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-white/10 border border-[var(--primary)]/40 shrink-0 flex items-center justify-center text-zinc-300">
             {selectedAccount.image_url ? (
               <img
                 src={selectedAccount.image_url}
@@ -255,7 +255,7 @@ const AccountSearchInput = ({
               <span className="text-sm font-bold text-white truncate">
                 {selectedAccount.nama}
               </span>
-              <span className="px-2 py-0.5 rounded bg-[#079108]/20 border border-[#079108] text-[#079108] text-[10px] font-mono font-black">
+              <span className="px-2 py-0.5 rounded bg-[var(--primary)]/20 border border-[var(--primary)] text-[var(--primary)] text-[10px] font-mono font-black">
                 ID #{fanCode}
               </span>
             </div>
@@ -312,7 +312,7 @@ const AccountSearchInput = ({
             }
           }}
           placeholder={placeholder}
-          className="w-full pl-9 pr-16 py-2.5 bg-[#182032] border border-white/10 text-white text-xs rounded-xl placeholder-zinc-500 focus:border-[#079108] focus:outline-none transition"
+          className="w-full pl-9 pr-16 py-2.5 bg-[var(--input-bg)] border border-white/10 text-white text-xs rounded-xl placeholder-[var(--text-secondary)]/60 focus:border-[var(--primary)] focus:outline-none transition"
           autoComplete="off"
           spellCheck="false"
         />
@@ -320,7 +320,7 @@ const AccountSearchInput = ({
         {/* Right Action Icons: Spinner / Clear */}
         <div className="absolute right-2.5 flex items-center gap-1.5">
           {loading && (
-            <FaSpinner className="text-[#079108] text-xs animate-spin" />
+            <FaSpinner className="text-[var(--primary)] text-xs animate-spin" />
           )}
 
           {(query || manualName) && !loading && (
@@ -344,7 +344,7 @@ const AccountSearchInput = ({
       {isOpen && (
         <div
           ref={listRef}
-          className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-[#182032] border border-white/15 rounded-xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar"
+          className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-[var(--input-bg)] border border-white/15 rounded-xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar"
         >
           {/* Error Message */}
           {error && (
@@ -356,7 +356,7 @@ const AccountSearchInput = ({
           {/* Results List */}
           {results.length > 0 && (
             <div role="listbox" className="divide-y divide-white/5">
-              <div className="px-3.5 py-1.5 bg-[#111726] text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex justify-between items-center">
+              <div className="px-3.5 py-1.5 bg-[var(--surface)] text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex justify-between items-center">
                 <span>Hasil Pencarian Akun</span>
                 <span className="text-[9px] text-zinc-500 lowercase">Gunakan panah & Enter</span>
               </div>
@@ -390,7 +390,7 @@ const AccountSearchInput = ({
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
-                    className="px-3 py-1 rounded bg-[#079108]/20 border border-[#079108]/50 text-[#079108] text-xs font-bold hover:bg-[#079108]/30 transition"
+                    className="px-3 py-1 rounded bg-[var(--primary)]/20 border border-[var(--primary)]/50 text-[var(--primary)] text-xs font-bold hover:bg-[var(--primary)]/30 transition"
                   >
                     Gunakan "{manualName}" (Non-Akun)
                   </button>
@@ -412,3 +412,6 @@ const AccountSearchInput = ({
 }
 
 export default React.memo(AccountSearchInput)
+
+
+

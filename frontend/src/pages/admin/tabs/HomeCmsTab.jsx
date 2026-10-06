@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+﻿import React, { useState, useEffect } from 'react'
 import api from '../../../lib/api'
 import { showToast } from '../../../lib/toast'
 import { getAssetPath } from '../../../lib/pathUtils'
@@ -344,7 +344,6 @@ const HomeCmsTab = () => {
 
 
   const tabs = [
-    { id: 'hero', label: 'Hero Config' },
     { id: 'about', label: 'About Us Page' },
     { id: 'news', label: 'News Carousel' },
     { id: 'faq', label: 'FAQ Text' },
@@ -361,7 +360,7 @@ const HomeCmsTab = () => {
           <button
             key={t.id}
             onClick={() => setSubTab(t.id)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${subTab === t.id ? 'bg-primary text-white' : 'bg-white/5 text-zinc-400 hover:text-white'}`}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${subTab === t.id ? 'bg-primary text-white' : 'bg-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
           >
             {t.label}
           </button>
@@ -372,7 +371,7 @@ const HomeCmsTab = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between bg-surface p-4 rounded-2xl border border-border">
             <h2 className="text-xl font-bold">Hero Section Settings</h2>
-            <button onClick={() => handleSave('hero_settings', heroSection)} disabled={saving} className="bg-primary text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2">
+            <button onClick={() => handleSave('hero_settings', heroSection)} disabled={saving} className="bg-primary text-[var(--text-primary)] px-6 py-2 rounded-lg font-bold flex items-center gap-2">
               <FaSave /> Simpan
             </button>
           </div>
@@ -381,15 +380,15 @@ const HomeCmsTab = () => {
           <div className="bg-surface p-6 rounded-2xl border border-border space-y-4">
             <h2 className="text-xl font-bold">Judul & Teks Utama</h2>
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Tagline (Teks kecil di atas judul)</label>
-              <input type="text" value={heroSection.tagline} onChange={e => setHeroSection({...heroSection, tagline: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2" placeholder="Contoh: KAMI ADALAH KOHI SEKAI" />
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Tagline (Teks kecil di atas judul)</label>
+              <input type="text" value={heroSection.tagline} onChange={e => setHeroSection({...heroSection, tagline: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Contoh: KAMI ADALAH KOHI SEKAI" />
             </div>
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Judul Utama</label>
-              <input type="text" value={heroSection.title} onChange={e => setHeroSection({...heroSection, title: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2" placeholder="Contoh: KOHI SEKAI" />
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Judul Utama</label>
+              <input type="text" value={heroSection.title} onChange={e => setHeroSection({...heroSection, title: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Contoh: KOHI SEKAI" />
             </div>
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Subtitle (Deskripsi di bawah judul)</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Subtitle (Deskripsi di bawah judul)</label>
               <textarea value={heroSection.subtitle} onChange={e => setHeroSection({...heroSection, subtitle: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2 h-20" placeholder="Contoh: Tiga rasa, satu dunia..." />
             </div>
           </div>
@@ -399,22 +398,22 @@ const HomeCmsTab = () => {
             <h2 className="text-xl font-bold">Teks Dekorasi (Pojok Layar)</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-zinc-400 mb-1">Kiri Atas 1 (Baris 1)</label>
-                <input type="text" value={heroSection.corner_left_1} onChange={e => setHeroSection({...heroSection, corner_left_1: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2" placeholder="コーヒーの世界へ" />
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Kiri Atas 1 (Baris 1)</label>
+                <input type="text" value={heroSection.corner_left_1} onChange={e => setHeroSection({...heroSection, corner_left_1: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="コーヒーの世界へ" />
               </div>
               <div>
-                <label className="block text-xs text-zinc-400 mb-1">Kiri Atas 2 (Baris 2)</label>
-                <input type="text" value={heroSection.corner_left_2} onChange={e => setHeroSection({...heroSection, corner_left_2: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2" placeholder="Kohi Sekai 2026" />
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Kiri Atas 2 (Baris 2)</label>
+                <input type="text" value={heroSection.corner_left_2} onChange={e => setHeroSection({...heroSection, corner_left_2: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Kohi Sekai 2026" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-zinc-400 mb-1">Kanan Atas 1 (Baris 1)</label>
-                <input type="text" value={heroSection.corner_right_1} onChange={e => setHeroSection({...heroSection, corner_right_1: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2" placeholder="ラテ · マキアート" />
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Kanan Atas 1 (Baris 1)</label>
+                <input type="text" value={heroSection.corner_right_1} onChange={e => setHeroSection({...heroSection, corner_right_1: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="ラテ · マキアート" />
               </div>
               <div>
-                <label className="block text-xs text-zinc-400 mb-1">Kanan Atas 2 (Baris 2)</label>
-                <input type="text" value={heroSection.corner_right_2} onChange={e => setHeroSection({...heroSection, corner_right_2: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2" placeholder="アフォガート" />
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Kanan Atas 2 (Baris 2)</label>
+                <input type="text" value={heroSection.corner_right_2} onChange={e => setHeroSection({...heroSection, corner_right_2: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="アフォガート" />
               </div>
             </div>
           </div>
@@ -423,7 +422,7 @@ const HomeCmsTab = () => {
           <div className="bg-surface p-6 rounded-2xl border border-border space-y-6">
             <div>
               <h2 className="text-xl font-bold mb-1">Hero / Group Image (16:9 Landscape)</h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-[var(--text-secondary)]">
                 Foto ini akan ditampilkan di bawah judul utama (di atas bagian Member).
               </p>
             </div>
@@ -431,12 +430,12 @@ const HomeCmsTab = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
               {/* Left: Preview */}
               <div className="space-y-2">
-                <label className="block text-xs font-bold text-zinc-400">Preview Gambar Saat Ini</label>
+                <label className="block text-xs font-bold text-[var(--text-secondary)]">Preview Gambar Saat Ini</label>
                 <div className="w-full aspect-video bg-background border border-border border-dashed rounded-xl overflow-hidden flex items-center justify-center">
                   {groupPhoto.url ? (
                     <img src={groupPhoto.url} alt="Hero Image" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-xs text-zinc-500">Belum ada gambar</span>
+                    <span className="text-xs text-[var(--text-secondary)]">Belum ada gambar</span>
                   )}
                 </div>
               </div>
@@ -444,7 +443,7 @@ const HomeCmsTab = () => {
               {/* Right: Upload & Texts */}
               <div className="space-y-6">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 mb-2">Upload Foto Baru (Otomatis WebP & Crop 16:9)</label>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] mb-2">Upload Foto Baru (Otomatis WebP & Crop 16:9)</label>
                   <DragDropZone onFileDrop={handleGroupPhotoFileSelect} className="w-full">
                     <label className="inline-flex items-center gap-2 px-4 py-3 bg-primary/20 border border-primary/40 hover:bg-primary/30 text-primary text-sm font-bold rounded-xl cursor-pointer transition-colors w-full justify-center">
                       <FaUpload /> {uploadingGroupPhoto ? 'Uploading...' : 'Pilih File / Tarik Ke Sini'}
@@ -456,21 +455,21 @@ const HomeCmsTab = () => {
                 <div className="space-y-4">
                   <div className="p-4 bg-background border border-border rounded-xl space-y-4">
                     <h3 className="text-sm font-bold text-primary">Pengaturan Overlay Teks</h3>
-                    <p className="text-[10px] text-zinc-400 leading-relaxed">
+                    <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed">
                       Teks ini akan melayang di atas foto bagian kiri bawah. Saat pengguna mengarahkan kursor (hover) ke foto, teks ini akan menghilang.
                     </p>
                     <div>
-                      <label className="block text-xs text-zinc-400 mb-1">Judul Overlay</label>
+                      <label className="block text-xs text-[var(--text-secondary)] mb-1">Judul Overlay</label>
                       <input 
                         type="text" 
                         value={groupPhoto.overlay_text || ''} 
                         onChange={e => setGroupPhoto({...groupPhoto, overlay_text: e.target.value})} 
-                        className="w-full bg-surface border border-border rounded-lg p-2 text-sm" 
+                        className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-sm text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" 
                         placeholder="KOHI SEKAI" 
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-zinc-400 mb-1">Deskripsi Singkat (Opsional)</label>
+                      <label className="block text-xs text-[var(--text-secondary)] mb-1">Deskripsi Singkat (Opsional)</label>
                       <textarea 
                         value={groupPhoto.overlay_desc || ''} 
                         onChange={e => setGroupPhoto({...groupPhoto, overlay_desc: e.target.value})} 
@@ -497,46 +496,46 @@ const HomeCmsTab = () => {
         <div className="bg-surface p-6 rounded-2xl border border-border space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">About Us Page Settings</h2>
-            <button onClick={() => handleSave('about_us', aboutUs)} disabled={saving} className="bg-primary text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+            <button onClick={() => handleSave('about_us', aboutUs)} disabled={saving} className="bg-primary text-[var(--text-primary)] px-4 py-2 rounded-lg font-bold flex items-center gap-2">
               <FaSave /> Simpan
             </button>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Judul (Title)</label>
-              <input type="text" value={aboutUs.title || ''} onChange={e => setAboutUs({...aboutUs, title: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2" placeholder="KOHI SEKAI" />
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Judul (Title)</label>
+              <input type="text" value={aboutUs.title || ''} onChange={e => setAboutUs({...aboutUs, title: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="KOHI SEKAI" />
             </div>
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Subtitle (Kanji/Jepang)</label>
-              <input type="text" value={aboutUs.subtitle || ''} onChange={e => setAboutUs({...aboutUs, subtitle: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2" placeholder="コーヒーの世界へようこそ" />
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Subtitle (Kanji/Jepang)</label>
+              <input type="text" value={aboutUs.subtitle || ''} onChange={e => setAboutUs({...aboutUs, subtitle: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="コーヒーの世界へようこそ" />
             </div>
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Deskripsi Lengkap</label>
-              <textarea value={aboutUs.description || ''} onChange={e => setAboutUs({...aboutUs, description: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2 h-32" placeholder="Kohi Sekai adalah..." />
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Deskripsi Lengkap</label>
+              <textarea value={aboutUs.description || ''} onChange={e => setAboutUs({...aboutUs, description: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 h-32 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Kohi Sekai adalah..." />
             </div>
 
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Tahun Berdiri (Since)</label>
-              <input type="text" value={aboutUs.since || '2026'} onChange={e => setAboutUs({...aboutUs, since: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2" placeholder="2026" />
+              <label className="block text-xs text-[var(--text-secondary)] mb-1">Tahun Berdiri (Since)</label>
+              <input type="text" value={aboutUs.since || '2026'} onChange={e => setAboutUs({...aboutUs, since: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="2026" />
             </div>
 
             <div className="pt-4 border-t border-border">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold">Carousel Foto Grup (Maksimal 3 Gambar)</h3>
-                <span className="text-xs text-zinc-400">Rasio Crop: 16:9</span>
+                <span className="text-xs text-[var(--text-secondary)]">Rasio Crop: 16:9</span>
               </div>
-              <p className="text-xs text-zinc-400 mb-3">Setiap foto dapat disesuaikan crop & zoom-nya agar posisi di carousel About Us selalu pas.</p>
+              <p className="text-xs text-[var(--text-secondary)] mb-3">Setiap foto dapat disesuaikan crop & zoom-nya agar posisi di carousel About Us selalu pas.</p>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 {(aboutUs.images || []).map((imgUrl, i) => (
-                  <div key={i} className="relative group aspect-video rounded-lg overflow-hidden border border-border bg-black">
+                  <div key={i} className="relative group aspect-video rounded-lg overflow-hidden border border-border bg-[var(--background)]">
                     <img src={getAssetPath(imgUrl)} alt={`Foto Grup ${i+1}`} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
                       <button 
                         type="button"
                         onClick={() => handleEditAboutCrop(i)}
-                        className="bg-primary hover:bg-primary/90 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
+                        className="bg-primary hover:bg-primary/90 text-[var(--text-primary)] px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
                         title="Atur Crop & Zoom"
                       >
                         <FaCrop size={12} /> Atur Crop
@@ -544,7 +543,7 @@ const HomeCmsTab = () => {
                       <button 
                         type="button"
                         onClick={() => removeAboutImage(i)} 
-                        className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg text-xs transition-colors"
+                        className="bg-red-500 hover:bg-red-600 text-[var(--text-primary)] p-2 rounded-lg text-xs transition-colors"
                         title="Hapus Foto"
                       >
                         <FaTrash size={12} />
@@ -571,7 +570,7 @@ const HomeCmsTab = () => {
         <div className="bg-surface p-6 rounded-2xl border border-border space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">News Carousel Settings</h2>
-            <button onClick={handleSaveNews} disabled={saving} className="bg-primary text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+            <button onClick={handleSaveNews} disabled={saving} className="bg-primary text-[var(--text-primary)] px-4 py-2 rounded-lg font-bold flex items-center gap-2">
               <FaSave /> Simpan
             </button>
           </div>
@@ -580,7 +579,7 @@ const HomeCmsTab = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold">Daftar Berita (Maksimal 9)</h3>
               {newsItems.length < 9 && (
-                <button onClick={addNewsItem} className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg font-bold">
+                <button onClick={addNewsItem} className="text-xs bg-[var(--border)] hover:bg-[var(--border)] px-3 py-1.5 rounded-lg font-bold">
                   + Tambah Berita
                 </button>
               )}
@@ -597,28 +596,28 @@ const HomeCmsTab = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-xs text-zinc-400 mb-1">Judul Berita</label>
-                        <input type="text" value={item.title} onChange={e => updateNewsItem(index, 'title', e.target.value)} className="w-full bg-surface border border-border rounded-lg p-2 text-sm" placeholder="Judul..." />
+                        <label className="block text-xs text-[var(--text-secondary)] mb-1">Judul Berita</label>
+                        <input type="text" value={item.title} onChange={e => updateNewsItem(index, 'title', e.target.value)} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-sm text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Judul..." />
                       </div>
                       <div>
-                        <label className="block text-xs text-zinc-400 mb-1">Link Instagram (Opsional)</label>
-                        <input type="text" value={item.ig_link} onChange={e => updateNewsItem(index, 'ig_link', e.target.value)} className="w-full bg-surface border border-border rounded-lg p-2 text-sm" placeholder="https://instagram.com/..." />
+                        <label className="block text-xs text-[var(--text-secondary)] mb-1">Link Instagram (Opsional)</label>
+                        <input type="text" value={item.ig_link} onChange={e => updateNewsItem(index, 'ig_link', e.target.value)} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-sm text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="https://instagram.com/..." />
                       </div>
                       <div>
-                        <label className="block text-xs text-zinc-400 mb-1">Isi Singkat (Summary)</label>
+                        <label className="block text-xs text-[var(--text-secondary)] mb-1">Isi Singkat (Summary)</label>
                         <textarea value={item.summary} onChange={e => updateNewsItem(index, 'summary', e.target.value)} className="w-full bg-surface border border-border rounded-lg p-2 text-sm h-20" placeholder="Isi berita..." />
                       </div>
                     </div>
                     
                     <div>
-                      <label className="block text-xs text-zinc-400 mb-1">Gambar Banner (Landscape)</label>
+                      <label className="block text-xs text-[var(--text-secondary)] mb-1">Gambar Banner (Landscape)</label>
                       {item.image_url ? (
                         <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-border mb-2">
                           <img src={item.image_url} alt="Preview" className="w-full h-full object-cover" />
                         </div>
                       ) : (
                         <div className="w-full aspect-video bg-surface border border-dashed border-border rounded-lg flex items-center justify-center mb-2">
-                          <span className="text-xs text-zinc-500">Belum ada gambar</span>
+                          <span className="text-xs text-[var(--text-secondary)]">Belum ada gambar</span>
                         </div>
                       )}
                       <DragDropZone onFileDrop={(e) => handleNewsImageUpload(e, index)} className="w-full">
@@ -633,7 +632,7 @@ const HomeCmsTab = () => {
               ))}
               
               {newsItems.length === 0 && (
-                <div className="text-center py-8 text-zinc-500 text-sm">Belum ada berita. Klik tombol + Tambah Berita.</div>
+                <div className="text-center py-8 text-[var(--text-secondary)] text-sm">Belum ada berita. Klik tombol + Tambah Berita.</div>
               )}
             </div>
           </div>
@@ -644,7 +643,7 @@ const HomeCmsTab = () => {
         <div className="bg-surface p-6 rounded-2xl border border-border space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">FAQ Section Settings</h2>
-            <button onClick={handleSaveFaq} disabled={saving} className="bg-primary text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+            <button onClick={handleSaveFaq} disabled={saving} className="bg-primary text-[var(--text-primary)] px-4 py-2 rounded-lg font-bold flex items-center gap-2">
               <FaSave /> Simpan
             </button>
           </div>
@@ -660,32 +659,32 @@ const HomeCmsTab = () => {
                   <FaTrash />
                 </button>
                 <div>
-                  <label className="block text-xs text-zinc-400 mb-1">Pertanyaan (Q)</label>
-                  <input type="text" value={item.q} onChange={e => handleChangeFaqItem(i, 'q', e.target.value)} className="w-full bg-surface border border-border rounded-lg p-2" placeholder="Contoh: Bagaimana cara membeli tiket?" />
+                  <label className="block text-xs text-[var(--text-secondary)] mb-1">Pertanyaan (Q)</label>
+                  <input type="text" value={item.q} onChange={e => handleChangeFaqItem(i, 'q', e.target.value)} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Contoh: Bagaimana cara membeli tiket?" />
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-400 mb-1">Jawaban (A)</label>
-                  <textarea value={item.a} onChange={e => handleChangeFaqItem(i, 'a', e.target.value)} className="w-full bg-surface border border-border rounded-lg p-2 h-24" placeholder="Contoh: Kamu bisa memesan di halaman shop." />
+                  <label className="block text-xs text-[var(--text-secondary)] mb-1">Jawaban (A)</label>
+                  <textarea value={item.a} onChange={e => handleChangeFaqItem(i, 'a', e.target.value)} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 h-24 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Contoh: Kamu bisa memesan di halaman shop." />
                 </div>
               </div>
             ))}
             
-            <button onClick={handleAddFaqItem} className="w-full py-3 border-2 border-dashed border-border rounded-lg text-zinc-400 hover:text-primary hover:border-primary transition-colors flex items-center justify-center gap-2">
+            <button onClick={handleAddFaqItem} className="w-full py-3 border-2 border-dashed border-border rounded-lg text-[var(--text-secondary)] hover:text-primary hover:border-primary transition-colors flex items-center justify-center gap-2">
               <FaPlus /> Tambah Pertanyaan
             </button>
           </div>
           
           <div className="border-t border-border pt-6 space-y-4">
             <h3 className="font-bold text-lg">Contact Person (WhatsApp)</h3>
-            <p className="text-xs text-zinc-400">Atur Contact Person (CP) yang ditampilkan di bawah tombol "Tanya via IG".</p>
+            <p className="text-xs text-[var(--text-secondary)]">Atur Contact Person (CP) yang ditampilkan di bawah tombol "Tanya via IG".</p>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="w-full sm:w-1/2">
-                <label className="block text-xs text-zinc-400 mb-1">Nama CP (opsional)</label>
-                <input type="text" value={faqCp.name || ''} onChange={e => setFaqCp({...faqCp, name: e.target.value})} className="w-full bg-surface border border-border rounded-lg p-2" placeholder="Contoh: Kiki" />
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Nama CP (opsional)</label>
+                <input type="text" value={faqCp.name || ''} onChange={e => setFaqCp({...faqCp, name: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Contoh: Kiki" />
               </div>
               <div className="w-full sm:w-1/2">
-                <label className="block text-xs text-zinc-400 mb-1">Nomor WhatsApp CP (opsional)</label>
-                <input type="text" value={faqCp.phone || ''} onChange={e => setFaqCp({...faqCp, phone: e.target.value})} className="w-full bg-surface border border-border rounded-lg p-2" placeholder="Contoh: 6281234567890" />
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Nomor WhatsApp CP (opsional)</label>
+                <input type="text" value={faqCp.phone || ''} onChange={e => setFaqCp({...faqCp, phone: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Contoh: 6281234567890" />
               </div>
             </div>
           </div>
@@ -696,7 +695,7 @@ const HomeCmsTab = () => {
         <div className="bg-surface p-6 rounded-2xl border border-border space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Social Media Settings</h2>
-            <button onClick={handleSaveSocial} disabled={saving} className="bg-primary text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+            <button onClick={handleSaveSocial} disabled={saving} className="bg-primary text-[var(--text-primary)] px-4 py-2 rounded-lg font-bold flex items-center gap-2">
               <FaSave /> Simpan
             </button>
           </div>
@@ -712,7 +711,7 @@ const HomeCmsTab = () => {
                     type="text" 
                     value={link.url} 
                     onChange={e => updateSocialLink(index, 'url', e.target.value)} 
-                    className="w-full bg-surface border border-border rounded-lg p-2 text-sm" 
+                    className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-sm text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" 
                     placeholder={`Kosongkan untuk redirect ke IG Kohi Sekai`} 
                   />
                 </div>
@@ -726,14 +725,14 @@ const HomeCmsTab = () => {
         <div className="bg-surface p-6 rounded-2xl border border-border space-y-4">
           <h2 className="text-xl font-bold">Footer Settings</h2>
           <div>
-            <label className="block text-xs text-zinc-400 mb-1">Brand Description</label>
-            <textarea value={footerSection.brand_description} onChange={e => setFooterSection({...footerSection, brand_description: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2 h-24" />
+            <label className="block text-xs text-[var(--text-secondary)] mb-1">Brand Description</label>
+            <textarea value={footerSection.brand_description} onChange={e => setFooterSection({...footerSection, brand_description: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 h-24 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" />
           </div>
           <div>
-            <label className="block text-xs text-zinc-400 mb-1">Copyright Text</label>
-            <input type="text" value={footerSection.copyright_text} onChange={e => setFooterSection({...footerSection, copyright_text: e.target.value})} className="w-full bg-background border border-border rounded-lg p-2" />
+            <label className="block text-xs text-[var(--text-secondary)] mb-1">Copyright Text</label>
+            <input type="text" value={footerSection.copyright_text} onChange={e => setFooterSection({...footerSection, copyright_text: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" />
           </div>
-          <button onClick={() => handleSave('footer_settings', footerSection)} disabled={saving} className="bg-primary text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+          <button onClick={() => handleSave('footer_settings', footerSection)} disabled={saving} className="bg-primary text-[var(--text-primary)] px-4 py-2 rounded-lg font-bold flex items-center gap-2">
             <FaSave /> Simpan
           </button>
         </div>
@@ -761,3 +760,6 @@ const HomeCmsTab = () => {
 }
 
 export default HomeCmsTab
+
+
+

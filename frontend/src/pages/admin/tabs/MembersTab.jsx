@@ -33,7 +33,7 @@ const PRESET_COLORS = [
   { name: 'Royal Purple', hex: '#6D28D9' },
   { name: 'Mint Teal', hex: '#2DD4BF' },
   { name: 'Emerald Green', hex: '#10B981' },
-  { name: 'Breeze Green', hex: '#079108' },
+  { name: 'Breeze Green', hex: '#E8944A' },
   { name: 'Crimson Red', hex: '#9E1527' },
   { name: 'Rose Pink', hex: '#F472B6' },
   { name: 'Neon Coral', hex: '#FF6B9D' },
@@ -470,7 +470,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
       cancelButtonColor: '#374151',
       confirmButtonText: 'Ya, Hapus!',
       cancelButtonText: 'Batal',
-      background: '#111726',
+      background: 'var(--surface)',
       color: '#fff'
     })
 
@@ -510,19 +510,19 @@ const MembersTab = ({ members = [], onRefresh }) => {
   // =========================================================
   if (viewMode === 'editor') {
     return (
-      <div className="space-y-6 animate-fade-in text-white pb-16">
+      <div className="space-y-6 animate-fade-in text-[var(--text-primary)] pb-16">
         {/* Full Page Navigation Header */}
-        <div className="bg-[#111726] border border-white/10 p-4 md:p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
+        <div className="bg-[var(--surface)] border border-[var(--border)] p-4 md:p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
           <div className="flex items-center gap-4">
             <button
               type="button"
               onClick={handleCloseEditor}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white text-xs font-bold transition"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--border)] hover:bg-[var(--border)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-bold transition"
             >
               <FaArrowLeft /> Kembali ke Daftar Member
             </button>
 
-            <div className="h-6 w-px bg-white/10 hidden md:block" />
+            <div className="h-6 w-px bg-[var(--border)] hidden md:block" />
 
             <div className="flex items-center gap-2.5">
               <div
@@ -530,10 +530,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 style={{ backgroundColor: formData.color }}
               />
               <div>
-                <h2 className="text-base md:text-xl font-black uppercase tracking-tight text-white flex items-center gap-2">
+                <h2 className="text-base md:text-xl font-black uppercase tracking-tight text-[var(--text-primary)] flex items-center gap-2">
                   {isEditing ? (isGroup ? 'Edit Profil & Banner Grup' : `Edit Member: ${editingMember.nama_panggung}`) : 'Tambah Member Baru'}
                 </h2>
-                <p className="text-[11px] text-zinc-400">
+                <p className="text-[11px] text-[var(--text-secondary)]">
                   {isGroup ? 'Pengaturan visual banner utama & paket Cheki grup' : 'Pengaturan profil, foto, dan identitas idol'}
                 </p>
               </div>
@@ -545,7 +545,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
               type="button"
               onClick={handleCloseEditor}
               disabled={saving}
-              className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white text-xs font-bold transition"
+              className="px-4 py-2.5 rounded-xl bg-[var(--border)] hover:bg-[var(--border)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-bold transition"
             >
               Batal
             </button>
@@ -553,7 +553,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
               type="button"
               onClick={handleSaveMember}
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#079108] hover:bg-[#067a07] text-white text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-emerald-900/40 disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-[var(--text-primary)] text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-emerald-900/40 disabled:opacity-50"
             >
               <FaSave /> {saving ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan' : 'Tambah Member')}
             </button>
@@ -575,9 +575,9 @@ const MembersTab = ({ members = [], onRefresh }) => {
           {/* Left Column: Visual Assets (Avatar, Color, 3 Gallery Slots) */}
           <div className="lg:col-span-5 space-y-6">
             {/* Foto Utama Card */}
-            <div className="bg-[#111726] border border-white/10 rounded-2xl p-5 shadow-lg space-y-4">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                   Foto {isGroup ? 'Banner / Cover Utama' : 'Profil Member'}
                 </label>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
@@ -585,7 +585,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 </span>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-[#161f33] border border-white/5 rounded-xl">
+              <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border border-[var(--border)] rounded-xl">
                 <div
                   className="relative w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border-2 cursor-pointer group shadow-xl shrink-0 bg-black/50"
                   style={{ borderColor: formData.color }}
@@ -602,21 +602,21 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       }}
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-zinc-500 p-2 text-center">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-[var(--text-secondary)] p-2 text-center">
                       <FaCamera className="text-3xl mb-1" />
                       <span className="text-[10px]">Pilih Foto</span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-semibold gap-1.5">
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5">
                     <FaUpload /> Ganti Foto
                   </div>
                 </div>
 
                 <div className="space-y-2 text-center sm:text-left">
-                  <p className="text-xs text-zinc-300 font-medium">
+                  <p className="text-xs text-[var(--text-secondary)] font-medium">
                     {avatarFile ? avatarFile.name : (formData.image_url ? 'Foto profil aktif' : 'Belum ada foto yang dipilih')}
                   </p>
-                  <p className="text-[11px] text-zinc-400">
+                  <p className="text-[11px] text-[var(--text-secondary)]">
                     {isGroup 
                       ? 'Format JPG, PNG, WEBP. Otomatis di-crop dan dikonversi ke WebP 16:9 (1200Ã—675 px).' 
                       : 'Format JPG, PNG, WEBP. Otomatis di-crop 1:1 fokus wajah dan dikonversi ke WebP 800Ã—800 px.'}
@@ -631,7 +631,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                   <button
                     type="button"
                     onClick={() => avatarInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-bold text-white transition"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--border)] hover:bg-[var(--primary)]/15 border border-[var(--border)] text-xs font-bold text-[var(--text-primary)] transition"
                   >
                     <FaUpload /> Unggah Foto Baru
                   </button>
@@ -640,9 +640,9 @@ const MembersTab = ({ members = [], onRefresh }) => {
             </div>
 
             {/* Foto Pajangan Shop (Tiket Cheki) Card */}
-            <div className="bg-[#111726] border border-white/10 rounded-2xl p-5 shadow-lg space-y-4">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                   Foto Pajangan Shop (Tiket Cheki)
                 </label>
                 <div className="flex items-center gap-1.5">
@@ -655,7 +655,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-[#161f33] border border-white/5 rounded-xl">
+              <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border border-[var(--border)] rounded-xl">
                 <div
                   className="relative w-28 h-36 md:w-32 md:h-40 rounded-2xl overflow-hidden border-2 cursor-pointer group shadow-xl shrink-0 bg-black/50"
                   style={{ borderColor: formData.color || '#2DD4BF' }}
@@ -672,12 +672,12 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       }}
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-zinc-500 p-2 text-center">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-[var(--text-secondary)] p-2 text-center">
                       <FaCamera className="text-3xl mb-1 text-teal-400/60" />
                       <span className="text-[10px]">Pilih Foto Shop</span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-semibold gap-1.5 text-center p-2">
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5 text-center p-2">
                     <FaUpload /> Ganti Foto Shop
                   </div>
                   <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-teal-300 rounded text-[9px] font-bold">
@@ -686,10 +686,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 </div>
 
                 <div className="space-y-2 text-center sm:text-left">
-                  <p className="text-xs text-zinc-300 font-medium">
+                  <p className="text-xs text-[var(--text-secondary)] font-medium">
                     {shopAvatarFile ? shopAvatarFile.name : (formData.shop_image_url ? 'Foto tiket shop aktif' : 'Belum ada foto khusus shop')}
                   </p>
-                  <p className="text-[11px] text-zinc-400">
+                  <p className="text-[11px] text-[var(--text-secondary)]">
                     Foto idol vertikal untuk kartu <strong>Tiket Cheki 2-Shot</strong> di /shop. Otomatis di-crop 3:4 fokus badan & wajah.
                   </p>
                   <input
@@ -711,9 +711,9 @@ const MembersTab = ({ members = [], onRefresh }) => {
             </div>
 
             {/* Color Branding Card */}
-            <div className="bg-[#111726] border border-white/10 rounded-2xl p-5 shadow-lg space-y-4">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-2">
+                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-2">
                   <FaPalette style={{ color: formData.color }} />
                   Warna Identitas Member (HEX)
                 </label>
@@ -729,13 +729,13 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     value={formData.color || ''}
                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                     placeholder="#10B981"
-                    className="w-24 px-2.5 py-1 bg-[#182032] border border-white/10 rounded-lg text-xs font-mono font-bold text-center focus:outline-none focus:border-emerald-500"
+                    className="w-24 px-2.5 py-1 bg-[var(--background)] border border-[var(--border)] rounded-lg text-xs font-mono font-bold text-center focus:outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
 
               <div>
-                <span className="text-[11px] text-zinc-400 block mb-2">Preset Palet Warna Idol:</span>
+                <span className="text-[11px] text-[var(--text-secondary)] block mb-2">Preset Palet Warna Idol:</span>
                 <div className="grid grid-cols-6 gap-2">
                   {PRESET_COLORS.map((preset) => (
                     <button
@@ -751,7 +751,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       style={{ backgroundColor: preset.hex }}
                     >
                       {formData.color?.toLowerCase() === preset.hex.toLowerCase() && (
-                        <FaCheck className="text-white text-xs drop-shadow" />
+                        <FaCheck className="text-[var(--text-primary)] text-xs drop-shadow" />
                       )}
                     </button>
                   ))}
@@ -760,13 +760,13 @@ const MembersTab = ({ members = [], onRefresh }) => {
             </div>
 
             {/* 3 Gallery Photos Card */}
-            <div className="bg-[#111726] border border-white/10 rounded-2xl p-5 shadow-lg space-y-4">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                  <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                     3 Slot Galeri Foto
                   </label>
-                  <p className="text-[10px] text-zinc-500 mt-0.5">Tampil pada popup detail profil member di halaman publik</p>
+                  <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Tampil pada popup detail profil member di halaman publik</p>
                 </div>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
                   600 Ã— 800 px (3:4)
@@ -779,7 +779,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                   return (
                     <div
                       key={idx}
-                      className="relative aspect-[3/4] bg-[#161f33] border border-white/10 rounded-xl overflow-hidden flex flex-col items-center justify-center group shadow-md"
+                      className="relative aspect-[3/4] bg-[var(--background)] border border-[var(--border)] rounded-xl overflow-hidden flex flex-col items-center justify-center group shadow-md"
                     >
                       {previewUrl ? (
                         <>
@@ -796,7 +796,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                             <button
                               type="button"
                               onClick={() => galleryInputRefs[idx].current?.click()}
-                              className="p-2 bg-[#079108] hover:bg-[#067a07] rounded-lg text-white text-xs transition"
+                              className="p-2 bg-[var(--primary)] hover:bg-[var(--primary)]/85 rounded-lg text-[var(--text-primary)] text-xs transition"
                               title="Ganti Foto"
                             >
                               <FaUpload />
@@ -804,24 +804,24 @@ const MembersTab = ({ members = [], onRefresh }) => {
                             <button
                               type="button"
                               onClick={() => handleRemoveGalleryItem(idx)}
-                              className="p-2 bg-red-600/80 hover:bg-red-600 rounded-lg text-white text-xs transition"
+                              className="p-2 bg-red-600/80 hover:bg-red-600 rounded-lg text-[var(--text-primary)] text-xs transition"
                               title="Hapus Foto"
                             >
                               <FaTrash />
                             </button>
                           </div>
-                          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/60 text-white rounded text-[9px] font-mono">
+                          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/60 text-[var(--text-primary)] rounded text-[9px] font-mono">
                             Slot {idx + 1}
                           </span>
                         </>
                       ) : (
                         <div
                           onClick={() => galleryInputRefs[idx].current?.click()}
-                          className="w-full h-full flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300 cursor-pointer p-2 text-center transition hover:bg-white/5"
+                          className="w-full h-full flex flex-col items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-secondary)] cursor-pointer p-2 text-center transition hover:bg-[var(--border)]"
                         >
-                          <FaCamera className="text-xl mb-1 text-zinc-600" />
+                          <FaCamera className="text-xl mb-1 text-[var(--text-secondary)]" />
                           <span className="text-[10px] font-bold">Slot {idx + 1}</span>
-                          <span className="text-[8px] text-zinc-500">Klik untuk upload</span>
+                          <span className="text-[8px] text-[var(--text-secondary)]">Klik untuk upload</span>
                         </div>
                       )}
                       <input
@@ -841,14 +841,14 @@ const MembersTab = ({ members = [], onRefresh }) => {
           {/* Right Column: Bio, Identity, and CMS Details */}
           <div className="lg:col-span-7 space-y-6">
             {/* Identity Card */}
-            <div className="bg-[#111726] border border-white/10 rounded-2xl p-5 shadow-lg space-y-4">
-              <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-wider pb-2 border-b border-white/5">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
+              <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider pb-2 border-b border-[var(--border)]">
                 Identitas Panggung
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
                     Nama Panggung <span className="text-pink-500">*</span>
                   </label>
                   <input
@@ -857,12 +857,12 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     onChange={(e) => setFormData({ ...formData, nama_panggung: e.target.value })}
                     placeholder="Contoh: Sinta"
                     required
-                    className="w-full px-4 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-500 text-xs focus:outline-none focus:border-[#079108]"
+                    className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
                     Member ID / Slug <span className="text-pink-500">*</span>
                   </label>
                   <input
@@ -872,28 +872,28 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     placeholder="Contoh: sinta"
                     required
                     disabled={isEditing && isGroup}
-                    className="w-full px-4 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-500 text-xs focus:outline-none focus:border-[#079108] disabled:opacity-40"
+                    className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)] disabled:opacity-40"
                   />
-                  <span className="text-[10px] text-zinc-500 mt-1 block">ID unik huruf kecil tanpa spasi (e.g. cissi, acaa).</span>
+                  <span className="text-[10px] text-[var(--text-secondary)] mt-1 block">ID unik huruf kecil tanpa spasi (e.g. cissi, acaa).</span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Tagline Member</label>
+                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Tagline Member</label>
                 <input
                   type="text"
                   value={formData.tagline}
                   onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
                   placeholder="Contoh: Morning Breeze, Forest Breeze"
-                  className="w-full px-4 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-500 text-xs focus:outline-none focus:border-[#079108]"
+                  className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
                 />
-                <span className="text-[10px] text-zinc-500 mt-1 block">Konsep tema elemen member (e.g. Morning Breeze, Forest Breeze).</span>
+                <span className="text-[10px] text-[var(--text-secondary)] mt-1 block">Konsep tema elemen member (e.g. Morning Breeze, Forest Breeze).</span>
               </div>
             </div>
 
             {/* Jikoshoukai Card */}
-            <div className="bg-[#111726] border border-white/10 rounded-2xl p-5 shadow-lg space-y-3">
-              <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-3">
+              <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                 Jikoshoukai (Salam Perkenalan Panggung)
               </label>
               <textarea
@@ -901,48 +901,48 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 value={formData.jikoshoukai}
                 onChange={(e) => setFormData({ ...formData, jikoshoukai: e.target.value })}
                 placeholder='"Si pemalu tetapi suka hal-hal baru, haloo semuanya aku Sintaa!"'
-                className="w-full px-4 py-3 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-500 text-xs focus:outline-none focus:border-[#079108] leading-relaxed"
+                className="w-full px-4 py-3 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)] leading-relaxed"
               />
-              <p className="text-[10px] text-zinc-400">Kalimat ciri khas ikonik member saat menyapa audiens dan fans.</p>
+              <p className="text-[10px] text-[var(--text-secondary)]">Kalimat ciri khas ikonik member saat menyapa audiens dan fans.</p>
             </div>
 
             {/* Biodata & Social Card */}
-            <div className="bg-[#111726] border border-white/10 rounded-2xl p-5 shadow-lg space-y-4">
-              <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-wider pb-2 border-b border-white/5">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
+              <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider pb-2 border-b border-[var(--border)]">
                 Biodata & Media Sosial
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Tanggal Lahir</label>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Tanggal Lahir</label>
                   <input
                     type="text"
                     value={formData.tanggal_lahir}
                     onChange={(e) => setFormData({ ...formData, tanggal_lahir: e.target.value })}
                     placeholder="e.g. 12 Oktober"
-                    className="w-full px-4 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-500 text-xs focus:outline-none focus:border-[#079108]"
+                    className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Hobi</label>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Hobi</label>
                   <input
                     type="text"
                     value={formData.hobi}
                     onChange={(e) => setFormData({ ...formData, hobi: e.target.value })}
                     placeholder="e.g. Memasak, menyanyi"
-                    className="w-full px-4 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-500 text-xs focus:outline-none focus:border-[#079108]"
+                    className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">Instagram</label>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Instagram</label>
                   <input
                     type="text"
                     value={formData.instagram}
                     onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
                     placeholder="e.g. @sii_ntaa"
-                    className="w-full px-4 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-500 text-xs focus:outline-none focus:border-[#079108]"
+                    className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
                   />
                 </div>
               </div>
@@ -950,15 +950,15 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
             {/* Secret / Teaser Member Card */}
             {!isGroup && (
-              <div className="bg-[#111726] border border-purple-500/30 rounded-2xl p-5 shadow-lg space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-white/5">
+              <div className="bg-[var(--surface)] border border-purple-500/30 rounded-2xl p-5 shadow-lg space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
                   <div className="flex items-center gap-2">
                     <FaUserSecret className="text-purple-400 text-base" />
                     <div>
-                      <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                      <h3 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
                         Mode Secret / Siluet Teaser Member
                       </h3>
-                      <p className="text-[10px] text-zinc-400">
+                      <p className="text-[10px] text-[var(--text-secondary)]">
                         Untuk member baru atau trainee yang identitas aslinya masih dirahasiakan
                       </p>
                     </div>
@@ -978,7 +978,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                         }`}
                       />
                     </button>
-                    <span className={`text-xs font-bold ${formData.is_secret ? 'text-purple-300' : 'text-zinc-500'}`}>
+                    <span className={`text-xs font-bold ${formData.is_secret ? 'text-purple-300' : 'text-[var(--text-secondary)]'}`}>
                       {formData.is_secret ? 'SECRET AKTIF' : 'NORMAL'}
                     </span>
                   </div>
@@ -993,7 +993,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       </span>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-[#161f33] border border-purple-500/20 rounded-xl">
+                    <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border border-purple-500/20 rounded-xl">
                       <div
                         className="relative w-28 h-36 md:w-32 md:h-40 rounded-2xl overflow-hidden border-2 border-dashed border-purple-400 cursor-pointer group shadow-xl shrink-0 bg-black/60"
                         onClick={() => silhouetteInputRef.current?.click()}
@@ -1009,12 +1009,12 @@ const MembersTab = ({ members = [], onRefresh }) => {
                             }}
                           />
                         ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center text-zinc-500 p-2 text-center">
+                          <div className="w-full h-full flex flex-col items-center justify-center text-[var(--text-secondary)] p-2 text-center">
                             <FaQuestion className="text-3xl mb-1 text-purple-400/80" />
                             <span className="text-[10px] text-purple-300 font-bold">Pilih Foto Siluet</span>
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-semibold gap-1.5 text-center p-2">
+                        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5 text-center p-2">
                           <FaUpload /> Ganti Siluet
                         </div>
                         <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-purple-900/90 text-purple-200 rounded text-[9px] font-bold">
@@ -1023,10 +1023,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       </div>
 
                       <div className="space-y-2 text-center sm:text-left">
-                        <p className="text-xs text-zinc-300 font-medium">
+                        <p className="text-xs text-[var(--text-secondary)] font-medium">
                           {silhouetteFile ? silhouetteFile.name : (formData.silhouette_image_url ? 'Foto siluet tersimpan' : 'Belum ada foto siluet khusus')}
                         </p>
-                        <p className="text-[11px] text-zinc-400">
+                        <p className="text-[11px] text-[var(--text-secondary)]">
                           Unggah foto siluet gelap berlatar transparan atau gelap untuk teaser teaser idol. Jika dikosongkan, sistem memakai siluet standar.
                         </p>
                         <input
@@ -1051,23 +1051,23 @@ const MembersTab = ({ members = [], onRefresh }) => {
             )}
 
             {/* CMS Sorting & Status Settings */}
-            <div className="bg-[#111726] border border-white/10 rounded-2xl p-5 shadow-lg space-y-4">
-              <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-wider pb-2 border-b border-white/5">
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
+              <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider pb-2 border-b border-[var(--border)]">
                 Pengaturan Tampilan & Status
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-center">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
                     Urutan Tampil
                   </label>
                   <input
                     type="number"
                     value={formData.order_index}
                     onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2.5 bg-[#182032] border border-white/10 text-white text-xs rounded-xl focus:border-[#079108] focus:outline-none"
+                    className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:border-[var(--primary)] focus:outline-none"
                   />
-                  <span className="text-[10px] text-zinc-500 mt-1 block">Urutan kemunculan kartu member di halaman website</span>
+                  <span className="text-[10px] text-[var(--text-secondary)] mt-1 block">Urutan kemunculan kartu member di halaman website</span>
                 </div>
 
                 <div className="flex items-center gap-3 pt-4">
@@ -1075,7 +1075,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     type="button"
                     onClick={() => setFormData({ ...formData, hadir: !formData.hadir })}
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      formData.hadir ? 'bg-[#079108]' : 'bg-zinc-700'
+                      formData.hadir ? 'bg-[var(--primary)]' : 'bg-zinc-700'
                     }`}
                   >
                     <span
@@ -1085,10 +1085,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     />
                   </button>
                   <div>
-                    <span className="text-xs font-bold text-white block">
+                    <span className="text-xs font-bold text-[var(--text-primary)] block">
                       {formData.hadir ? 'Status Aktif (Tampil)' : 'Nonaktif (Sembunyi)'}
                     </span>
-                    <span className="text-[10px] text-zinc-400">
+                    <span className="text-[10px] text-[var(--text-secondary)]">
                       {formData.hadir ? 'Member aktif di halaman publik dan shop' : 'Member disembunyikan sementara'}
                     </span>
                   </div>
@@ -1101,14 +1101,14 @@ const MembersTab = ({ members = [], onRefresh }) => {
               <button
                 type="button"
                 onClick={handleCloseEditor}
-                className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white text-xs font-bold transition"
+                className="px-5 py-2.5 rounded-xl bg-[var(--border)] hover:bg-[var(--border)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-bold transition"
               >
                 Batal
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-7 py-2.5 rounded-xl bg-[#079108] hover:bg-[#067a07] text-white text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-emerald-900/40 disabled:opacity-50"
+                className="flex items-center gap-2 px-7 py-2.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-[var(--text-primary)] text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-emerald-900/40 disabled:opacity-50"
               >
                 <FaSave /> {saving ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan' : 'Tambah Member')}
               </button>
@@ -1138,14 +1138,14 @@ const MembersTab = ({ members = [], onRefresh }) => {
   })
 
   return (
-    <div className="space-y-6 animate-fade-in text-white pb-12">
+    <div className="space-y-6 animate-fade-in text-[var(--text-primary)] pb-12">
       {/* Top Action Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#111726] border border-white/10 p-4 md:p-6 rounded-2xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[var(--surface)] border border-[var(--border)] p-4 md:p-6 rounded-2xl">
         <div>
           <h2 className="text-lg md:text-xl font-black uppercase tracking-wider">
             Manajemen Member & Grup
           </h2>
-          <p className="text-xs text-zinc-400 mt-1">
+          <p className="text-xs text-[var(--text-secondary)] mt-1">
             Daftar member & profil idol.
           </p>
         </div>
@@ -1153,14 +1153,14 @@ const MembersTab = ({ members = [], onRefresh }) => {
         <div className="flex items-center gap-2.5">
           <button
             onClick={onRefresh}
-            className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-zinc-300 hover:text-white transition"
+            className="p-2.5 bg-[var(--border)] hover:bg-[var(--border)] border border-[var(--border)] rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
             title="Muat Ulang Data"
           >
             <FaSync />
           </button>
           <button
             onClick={() => handleOpenEditor(null)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#079108] hover:bg-[#067a07] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-[0_0_15px_rgba(7,145,8,0.3)] active:scale-95"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-[var(--text-primary)] rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-[0_2px_10px_rgba(232,148,74,0.3)] active:scale-95"
           >
             <FaPlus /> Tambah Member
           </button>
@@ -1169,7 +1169,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
       {/* Group Profile / Banner Section */}
       {groupEntity && (
-        <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-[#111726] via-[#162035] to-[#111726] p-4 md:p-6 shadow-xl">
+        <div className="relative overflow-hidden rounded-2xl border border-[var(--primary)]/30 bg-gradient-to-r from-[var(--surface)] via-[var(--background)] to-[var(--surface)] p-4 md:p-6 shadow-xl">
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
@@ -1190,13 +1190,13 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold tracking-wider uppercase mb-1.5 border border-emerald-500/30">
                   <FaUsers className="text-xs" /> Profil & Banner Grup
                 </div>
-                <h3 className="text-lg md:text-xl font-black text-white uppercase tracking-tight">
+                <h3 className="text-lg md:text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">
                   {groupEntity.nama_panggung || 'Kohi Sekai'}
                 </h3>
-                <p className="text-xs text-zinc-300 max-w-xl line-clamp-2 mt-0.5">
+                <p className="text-xs text-[var(--text-secondary)] max-w-xl line-clamp-2 mt-0.5">
                   {groupEntity.tagline || '6 individu berbakat yang siap menghibur dan menginspirasi dengan energi positif mereka!'}
                 </p>
-                <div className="flex items-center gap-3 mt-2 text-[11px] text-zinc-400">
+                <div className="flex items-center gap-3 mt-2 text-[11px] text-[var(--text-secondary)]">
                   <span>Urutan: #{groupEntity.order_index}</span>
                   <span>â€¢</span>
                   <span>Total Member Aktif: {individualMembers.filter(m => m.hadir !== false).length}</span>
@@ -1217,36 +1217,36 @@ const MembersTab = ({ members = [], onRefresh }) => {
       )}
 
       {/* Filter & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#111726] border border-white/10 p-3.5 rounded-xl">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[var(--surface)] border border-[var(--border)] p-3.5 rounded-xl">
         <div className="relative w-full sm:w-72">
-          <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs" />
+          <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] text-xs" />
           <input
             type="text"
             placeholder="Cari nama, slug, atau tagline..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3.5 py-2 bg-[#182032] border border-white/10 rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#079108]"
+            className="w-full pl-9 pr-3.5 py-2 bg-[var(--background)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] placeholder-[var(--text-secondary)]/60 focus:outline-none focus:border-[var(--primary)]"
           />
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <span className="text-[11px] text-zinc-400">Filter:</span>
-          <div className="inline-flex rounded-lg bg-[#182032] p-0.5 border border-white/10 text-xs">
+          <span className="text-[11px] text-[var(--text-secondary)]">Filter:</span>
+          <div className="inline-flex rounded-lg bg-[var(--background)] p-0.5 border border-[var(--border)] text-xs">
             <button
               onClick={() => setFilterStatus('all')}
-              className={`px-3 py-1 rounded-md transition ${filterStatus === 'all' ? 'bg-[#079108] text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+              className={`px-3 py-1 rounded-md transition ${filterStatus === 'all' ? 'bg-[var(--primary)] text-[var(--text-primary)] font-bold' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
             >
               Semua ({individualMembers.length})
             </button>
             <button
               onClick={() => setFilterStatus('active')}
-              className={`px-3 py-1 rounded-md transition ${filterStatus === 'active' ? 'bg-[#079108] text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+              className={`px-3 py-1 rounded-md transition ${filterStatus === 'active' ? 'bg-[var(--primary)] text-[var(--text-primary)] font-bold' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
             >
               Aktif ({individualMembers.filter(m => m.hadir !== false).length})
             </button>
             <button
               onClick={() => setFilterStatus('inactive')}
-              className={`px-3 py-1 rounded-md transition ${filterStatus === 'inactive' ? 'bg-[#079108] text-white font-bold' : 'text-zinc-400 hover:text-white'}`}
+              className={`px-3 py-1 rounded-md transition ${filterStatus === 'inactive' ? 'bg-[var(--primary)] text-[var(--text-primary)] font-bold' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
             >
               Nonaktif ({individualMembers.filter(m => m.hadir === false).length})
             </button>
@@ -1256,9 +1256,9 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
       {/* Individual Members Grid */}
       {filteredMembers.length === 0 ? (
-        <div className="text-center py-16 bg-[#111726] border border-white/10 rounded-2xl p-6">
-          <FaUsers className="mx-auto text-4xl text-zinc-600 mb-2" />
-          <p className="text-zinc-400 text-sm">Tidak ada member yang sesuai filter.</p>
+        <div className="text-center py-16 bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6">
+          <FaUsers className="mx-auto text-4xl text-[var(--text-secondary)] mb-2" />
+          <p className="text-[var(--text-secondary)] text-sm">Tidak ada member yang sesuai filter.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1269,7 +1269,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
             return (
               <div
                 key={member.id}
-                className="bg-[#111726] border border-white/10 hover:border-white/20 rounded-2xl p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl group"
+                className="bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--border)] rounded-2xl p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl group"
                 style={{
                   boxShadow: `0 8px 24px -10px ${memberColor}25`
                 }}
@@ -1280,7 +1280,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     <div className="flex items-center gap-2 shrink-0">
                       {/* Avatar Profil */}
                       <div
-                        className="relative w-16 h-20 rounded-xl overflow-hidden border-2 shrink-0 shadow-md bg-zinc-900 group/img"
+                        className="relative w-16 h-20 rounded-xl overflow-hidden border-2 shrink-0 shadow-md bg-[var(--surface)] group/img"
                         style={{ borderColor: memberColor }}
                         title="Foto Profil Member (Meet The Members)"
                       >
@@ -1293,14 +1293,14 @@ const MembersTab = ({ members = [], onRefresh }) => {
                             e.target.src = resolveMemberImage('', member.member_id, member.nama_panggung)
                           }}
                         />
-                        <span className="absolute bottom-0 inset-x-0 bg-black/75 text-[8px] font-bold text-center text-zinc-300 py-0.5">
+                        <span className="absolute bottom-0 inset-x-0 bg-black/75 text-[8px] font-bold text-center text-[var(--text-secondary)] py-0.5">
                           PROFIL
                         </span>
                       </div>
 
                       {/* Foto Pajangan Shop */}
                       <div
-                        className="relative w-14 h-20 rounded-xl overflow-hidden border border-teal-500/40 shrink-0 shadow-md bg-zinc-900 group/shop"
+                        className="relative w-14 h-20 rounded-xl overflow-hidden border border-teal-500/40 shrink-0 shadow-md bg-[var(--surface)] group/shop"
                         title="Foto Pajangan Shop (Tiket Cheki)"
                       >
                         <img
@@ -1321,7 +1321,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <h4 className="font-bold text-base text-white truncate group-hover:text-emerald-300 transition-colors">
+                          <h4 className="font-bold text-base text-[var(--text-primary)] truncate group-hover:text-emerald-300 transition-colors">
                             {member.nama_panggung}
                           </h4>
                           {member.is_secret && (
@@ -1331,17 +1331,17 @@ const MembersTab = ({ members = [], onRefresh }) => {
                           )}
                         </div>
                         <span
-                          className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shrink-0 shadow-sm"
+                          className="px-2 py-0.5 rounded-full text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider shrink-0 shadow-sm"
                           style={{ backgroundColor: memberColor }}
                         >
                           {memberColor}
                         </span>
                       </div>
 
-                      <p className="text-[11px] text-zinc-400 font-mono">@{member.member_id}</p>
+                      <p className="text-[11px] text-[var(--text-secondary)] font-mono">@{member.member_id}</p>
                       
                       {member.tagline && (
-                        <p className="text-xs text-zinc-300 italic line-clamp-2 mt-1">
+                        <p className="text-xs text-[var(--text-secondary)] italic line-clamp-2 mt-1">
                           "{member.tagline}"
                         </p>
                       )}
@@ -1349,22 +1349,22 @@ const MembersTab = ({ members = [], onRefresh }) => {
                   </div>
 
                   {/* Member Details */}
-                  <div className="mt-3.5 pt-3 border-t border-white/5 space-y-1 text-xs text-zinc-300">
+                  <div className="mt-3.5 pt-3 border-t border-[var(--border)] space-y-1 text-xs text-[var(--text-secondary)]">
                     {member.tanggal_lahir && (
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-zinc-500">Lahir:</span>
-                        <span className="text-zinc-300 font-medium">{member.tanggal_lahir}</span>
+                        <span className="text-[var(--text-secondary)]">Lahir:</span>
+                        <span className="text-[var(--text-secondary)] font-medium">{member.tanggal_lahir}</span>
                       </div>
                     )}
                     {member.instagram && (
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-zinc-500 flex items-center gap-1"><FaInstagram /> IG:</span>
+                        <span className="text-[var(--text-secondary)] flex items-center gap-1"><FaInstagram /> IG:</span>
                         <span className="text-emerald-400 font-mono">{member.instagram}</span>
                       </div>
                     )}
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-zinc-500 flex items-center gap-1"><FaImages /> Galeri:</span>
-                      <span className="text-zinc-300 font-medium">{galleryCount} / 3 foto terpasang</span>
+                      <span className="text-[var(--text-secondary)] flex items-center gap-1"><FaImages /> Galeri:</span>
+                      <span className="text-[var(--text-secondary)] font-medium">{galleryCount} / 3 foto terpasang</span>
                     </div>
                   </div>
 
@@ -1376,7 +1376,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                         return (
                           <div
                             key={idx}
-                            className="aspect-[3/4] rounded-xl overflow-hidden bg-black/40 border border-white/10 shadow-sm"
+                            className="aspect-[3/4] rounded-xl overflow-hidden bg-black/40 border border-[var(--border)] shadow-sm"
                           >
                             {img ? (
                               <img
@@ -1389,7 +1389,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                                 }}
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-[9px] text-zinc-600">
+                              <div className="w-full h-full flex items-center justify-center text-[9px] text-[var(--text-secondary)]">
                                 Kosong
                               </div>
                             )}
@@ -1401,34 +1401,34 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 </div>
 
                 {/* Card Footer: Status & Actions */}
-                <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+                <div className="mt-4 pt-3 border-t border-[var(--border)] flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleToggleHadir(member)}
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase transition ${
                         member.hadir !== false
                           ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30'
-                          : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 border border-zinc-700'
+                          : 'bg-zinc-800 text-[var(--text-secondary)] hover:bg-zinc-700 border border-zinc-700'
                       }`}
                       title="Klik untuk toggle status aktif/hadir"
                     >
                       {member.hadir !== false ? <FaUserCheck /> : <FaUserTimes />}
                       {member.hadir !== false ? 'Aktif' : 'Nonaktif'}
                     </button>
-                    <span className="text-[10px] text-zinc-500">Urutan: #{member.order_index}</span>
+                    <span className="text-[10px] text-[var(--text-secondary)]">Urutan: #{member.order_index}</span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => handleOpenEditor(member)}
-                      className="p-2 bg-white/5 hover:bg-emerald-600/20 hover:text-emerald-300 text-zinc-300 border border-white/10 rounded-lg text-xs transition"
+                      className="p-2 bg-[var(--border)] hover:bg-emerald-600/20 hover:text-emerald-300 text-[var(--text-secondary)] border border-[var(--border)] rounded-lg text-xs transition"
                       title="Edit Member"
                     >
                       <FaEdit />
                     </button>
                     <button
                       onClick={() => handleDeleteMember(member)}
-                      className="p-2 bg-white/5 hover:bg-red-600/20 hover:text-red-400 text-zinc-400 border border-white/10 rounded-lg text-xs transition"
+                      className="p-2 bg-[var(--border)] hover:bg-red-600/20 hover:text-red-400 text-[var(--text-secondary)] border border-[var(--border)] rounded-lg text-xs transition"
                       title="Hapus Member"
                     >
                       <FaTrash />
@@ -1445,3 +1445,9 @@ const MembersTab = ({ members = [], onRefresh }) => {
 }
 
 export default MembersTab
+
+
+
+
+
+

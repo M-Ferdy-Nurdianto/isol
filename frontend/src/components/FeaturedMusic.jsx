@@ -9,7 +9,7 @@ const FeaturedMusic = () => {
         initial={{ opacity: 0, rotateX: 10, y: 50 }}
         animate={{ opacity: 1, rotateX: 0, y: 0 }}
         transition={{ duration: 1, type: "spring", bounce: 0.4 }}
-        className="relative rounded-[2rem] sm:rounded-[3rem] p-0 sm:p-[2px] bg-gradient-to-b from-[#1DB954]/50 via-[#079108]/30 to-[#4A90B5]/50 shadow-[0_10px_30px_-5px_rgba(7,145,8,0.3)] group w-full overflow-hidden"
+        className="relative rounded-[2rem] sm:rounded-[3rem] p-0 sm:p-[2px] bg-gradient-to-b from-[#1DB954]/50 via-[var(--primary)]/30 to-[#4A90B5]/50 shadow-[0_10px_30px_-5px_rgba(7,145,8,0.3)] group w-full overflow-hidden"
       >
         <div className="absolute inset-0 rounded-[2rem] sm:rounded-[3rem] bg-black/80 backdrop-blur-3xl overflow-hidden -z-10">
            {/* Animated soundwaves background */}
@@ -60,7 +60,7 @@ const FeaturedMusic = () => {
                    background: "repeating-radial-gradient(#111 0, #111 4px, #000 5px, #000 6px)"
                  }}
                >
-                  <div className="w-1/3 h-1/3 bg-gradient-to-br from-[#079108] to-[#4A90B5] rounded-full flex items-center justify-center relative shadow-inner">
+                  <div className="w-1/3 h-1/3 bg-gradient-to-br from-[var(--primary)] to-[#4A90B5] rounded-full flex items-center justify-center relative shadow-inner">
                      <div className="w-4 h-4 bg-black rounded-full absolute border border-gray-700"></div>
                      <FaMusic className="text-black/30 text-2xl absolute -ml-8 -mt-8 rotate-12" />
                      <FaMusic className="text-black/30 text-xl absolute ml-8 mt-8 -rotate-12" />
@@ -96,3 +96,4 @@ const FeaturedMusic = () => {
 }
 
 export default FeaturedMusic
+

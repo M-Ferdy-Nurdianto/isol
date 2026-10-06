@@ -282,4 +282,31 @@ router.post('/music-cover', upload.single('file'), handleMulterError, async (req
   }
 })
 
+// POST: Upload QRIS image to Supabase Storage
+router.post('/qris-image', upload.single('file'), handleMulterError, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded.' })
+    }
+
+    const compressedBuffer = await sharp(req.file.buffer)
+      .resize(600, 600, { fit: 'inside', withoutEnlargement: true })
+      .png({ quality: 90 })
+      .toBuffer()
+
+    const fileName = `qris/qris_${Date.now()}.png`
+    const result = await uploadToSupabaseStorage(
+      compressedBuffer,
+      fileName,
+      'image/png',
+      'media'
+    )
+
+    res.json({ success: true, data: { url: result.url } })
+  } catch (error) {
+    console.error('Error uploading QRIS image:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
 export default router

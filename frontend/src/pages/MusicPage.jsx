@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+﻿import { motion } from 'framer-motion'
 import { FaMusic, FaInstagram, FaTwitter, FaYoutube, FaTiktok, FaWhatsapp, FaSpotify } from 'react-icons/fa'
 import Header from '../components/Header'
 import { getAssetPath } from '../lib/pathUtils'
@@ -21,12 +21,12 @@ const MusicPage = () => {
              <motion.div 
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-8 border-2 border-dashed border-[#079108]/20 rounded-full"
+                className="absolute -inset-8 border-2 border-dashed border-[var(--primary)]/20 rounded-full"
              ></motion.div>
              <motion.div 
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 4, repeat: Infinity }}
-                className="w-32 h-32 bg-gradient-to-br from-[#079108] to-[#4A90B5] rounded-[2.5rem] flex items-center justify-center text-white shadow-2xl relative z-10"
+                className="w-32 h-32 bg-gradient-to-br from-[var(--primary)] to-[#4A90B5] rounded-[2.5rem] flex items-center justify-center text-white shadow-2xl relative z-10"
              >
                <FaMusic className="text-5xl" />
              </motion.div>
@@ -34,9 +34,9 @@ const MusicPage = () => {
 
           <div className="space-y-6">
             <div className="flex flex-col items-center gap-2">
-                <span className="text-[#079108] font-black tracking-[0.5em] text-xs uppercase">COLLECTION</span>
+                <span className="text-[var(--primary)] font-black tracking-[0.5em] text-xs uppercase">COLLECTION</span>
                 <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-dark uppercase leading-none">
-                  OUR <span className="text-[#079108]">MUSIC</span>
+                  OUR <span className="text-[var(--primary)]">MUSIC</span>
                 </h1>
             </div>
             <div className="w-24 h-2 bg-dark mx-auto rounded-full"></div>
@@ -75,7 +75,7 @@ const MusicPage = () => {
 
         {/* Decorative Background Elements */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-full h-full max-w-4xl opacity-20 pointer-events-none">
-            <div className="absolute top-0 left-0 w-64 h-64 bg-[#079108] rounded-full blur-[120px]"></div>
+            <div className="absolute top-0 left-0 w-64 h-64 bg-[var(--primary)] rounded-full blur-[120px]"></div>
             <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#4A90B5] rounded-full blur-[150px]"></div>
         </div>
       </main>
@@ -84,3 +84,4 @@ const MusicPage = () => {
 }
 
 export default MusicPage
+

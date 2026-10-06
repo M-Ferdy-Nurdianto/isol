@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaPlus, FaMinus, FaQuestionCircle, FaChevronLeft } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
@@ -37,7 +37,7 @@ const FAQPage = () => {
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => navigate(-1)}
-          className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-[#079108] transition-colors mb-16 group"
+          className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 hover:text-[var(--primary)] transition-colors mb-16 group"
         >
           <FaChevronLeft className="group-hover:-translate-x-1 transition-transform" /> Back to Previous
         </motion.button>
@@ -53,7 +53,7 @@ const FAQPage = () => {
           >
             HELP CENTER
           </motion.h1>
-          <div className="w-32 h-1.5 bg-[#079108] mx-auto mb-8 shadow-[0_0_15px_rgba(7,145,8,0.3)]"></div>
+          <div className="w-32 h-1.5 bg-[var(--primary)] mx-auto mb-8 shadow-[0_0_15px_rgba(7,145,8,0.3)]"></div>
           <p className="text-gray-400 font-bold uppercase tracking-[0.4em] text-[10px]">
              Pertanyaan yang Sering Diajukan • Kohi Sekai
           </p>
@@ -72,14 +72,14 @@ const FAQPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className={`border-2 rounded-[2.5rem] overflow-hidden transition-all duration-500 ${openFaq === idx ? 'border-[#079108]/20 bg-[#079108]/[0.02] shadow-xl shadow-[#079108]/5' : 'border-gray-50 bg-white'}`}
+                className={`border-2 rounded-[2.5rem] overflow-hidden transition-all duration-500 ${openFaq === idx ? 'border-[var(--primary)]/20 bg-[var(--primary)]/[0.02] shadow-xl shadow-[var(--primary)]/5' : 'border-gray-50 bg-white'}`}
               >
                 <button 
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
                   className="w-full p-10 text-left flex items-center justify-between gap-8 group"
                 >
                   <div className="flex items-center gap-6">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${openFaq === idx ? 'bg-[#079108] text-white' : 'bg-gray-100 text-gray-400 group-hover:bg-[#079108]/10 group-hover:text-[#079108]'}`}>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${openFaq === idx ? 'bg-[var(--primary)] text-white' : 'bg-gray-100 text-gray-400 group-hover:bg-[var(--primary)]/10 group-hover:text-[var(--primary)]'}`}>
                       <FaQuestionCircle className="text-xl" />
                     </div>
                     <span className="text-lg md:text-xl font-black text-gray-800 leading-tight tracking-tight uppercase">{faq.tanya}</span>
@@ -109,11 +109,11 @@ const FAQPage = () => {
         </div>
 
         <div className="mt-32 p-12 bg-dark rounded-[3.5rem] text-center space-y-8 relative overflow-hidden shadow-2xl">
-           <div className="absolute top-0 left-0 w-40 h-40 bg-[#079108]/20 rounded-full blur-3xl -ml-20 -mt-20"></div>
+           <div className="absolute top-0 left-0 w-40 h-40 bg-[var(--primary)]/20 rounded-full blur-3xl -ml-20 -mt-20"></div>
            <h3 className="text-2xl font-black text-white tracking-widest uppercase">Masih Bingung?</h3>
            <p className="text-white/40 text-sm font-medium uppercase tracking-[0.2em]">Hubungi tim kami melalui Instagram atau WhatsApp resmi.</p>
            <div className="flex justify-center gap-6">
-              <a href="https://instagram.com/refresh.breeze" target="_blank" className="px-12 py-5 bg-[#079108] text-white rounded-full font-black tracking-widest text-[10px] uppercase hover:scale-105 transition-all shadow-xl">Contact Instagram</a>
+              <a href="https://instagram.com/refresh.breeze" target="_blank" className="px-12 py-5 bg-[var(--primary)] text-white rounded-full font-black tracking-widest text-[10px] uppercase hover:scale-105 transition-all shadow-xl">Contact Instagram</a>
            </div>
         </div>
       </main>
@@ -122,3 +122,4 @@ const FAQPage = () => {
 }
 
 export default FAQPage
+

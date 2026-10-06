@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+﻿import { motion, AnimatePresence } from 'framer-motion'
 import { FaShoppingCart, FaPlus, FaMinus, FaTrash, FaChevronRight, FaUniversity, FaShoppingBag } from 'react-icons/fa'
 
 const CartSidebar = ({ 
@@ -22,7 +22,7 @@ const CartSidebar = ({
         <div className="sticky top-32">
           <div className="bg-white dark:bg-[#111726] rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-white/10 transition-colors duration-300">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center text-[#079108]">
+              <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center text-[var(--primary)]">
                 <FaShoppingCart className="text-xl" />
               </div>
               <div>
@@ -123,7 +123,7 @@ const CartSidebar = ({
                 
                 <button 
                   onClick={onCheckout}
-                  className="w-full bg-[#079108] text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-emerald-900/10 hover:bg-[#067a07] transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-[var(--primary)] text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-emerald-900/10 hover:bg-[var(--primary)]/85 transition-all flex items-center justify-center gap-2"
                 >
                   Checkout Sekarang
                   <FaChevronRight className="text-[10px]" />
@@ -152,7 +152,7 @@ const CartSidebar = ({
               className="w-full bg-white dark:bg-[#111726] text-gray-900 dark:text-white p-4 rounded-3xl shadow-2xl flex items-center justify-between border border-gray-200 dark:border-white/10 backdrop-blur-md transition-all active:scale-[0.98]"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#079108] rounded-xl flex items-center justify-center shadow-md shadow-[#079108]/30" data-cart-icon>
+                <div className="w-10 h-10 bg-[var(--primary)] rounded-xl flex items-center justify-center shadow-md shadow-[var(--primary)]/30" data-cart-icon>
                   <FaShoppingCart className="text-white text-sm" />
                 </div>
                 <div className="flex flex-col items-start">
@@ -161,7 +161,7 @@ const CartSidebar = ({
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-base font-bold text-[#079108] dark:text-emerald-400">Rp {(totalHarga + totalMerchHarga).toLocaleString()}</span>
+                <span className="text-base font-bold text-[var(--primary)] dark:text-emerald-400">Rp {(totalHarga + totalMerchHarga).toLocaleString()}</span>
                 <div className="w-8 h-8 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-white rounded-full flex items-center justify-center">
                   <FaChevronRight className="text-[10px]" />
                 </div>
@@ -176,3 +176,4 @@ const CartSidebar = ({
 
 
 export default CartSidebar
+

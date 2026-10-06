@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import { FaPlus, FaEdit, FaTrash, FaArrowLeft, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaUsers } from 'react-icons/fa'
 import api from '../../../lib/api'
 import { formatMemberName } from '../../../lib/memberUtils'
@@ -147,34 +147,34 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
         <div className="flex items-center gap-3">
           <button
             onClick={closeForm}
-            className="text-zinc-400 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 hover:bg-[var(--primary)]/10 rounded-lg transition-colors"
             title="Kembali"
           >
             <FaArrowLeft />
           </button>
           <div>
-            <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">
+            <h2 className="text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tight">
               {editingEvent ? 'Edit Event' : 'Tambah Event Baru'}
             </h2>
-            <p className="text-xs text-zinc-400 font-medium">
+            <p className="text-xs text-[var(--text-secondary)] font-medium">
               {editingEvent ? `Mengubah "${editingEvent.nama}"` : 'Isi detail event dan pilih lineup member.'}
             </p>
           </div>
         </div>
 
         {/* Segmented control, bukan tab full-width */}
-        <div className="inline-flex bg-[#161f33] border border-white/10 rounded-full p-1">
+        <div className="inline-flex bg-[var(--background)] border border-[var(--border)] rounded-full p-1">
           <button
             type="button"
             onClick={() => setEventType('regular')}
-            className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all ${eventType === 'regular' ? 'bg-[#079108] text-white' : 'text-zinc-400 hover:text-white'}`}
+            className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all ${eventType === 'regular' ? 'bg-[var(--primary)] text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
           >
             Event Regular
           </button>
           <button
             type="button"
             onClick={() => setEventType('special')}
-            className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all ${eventType === 'special' ? 'bg-pink-500 text-white' : 'text-zinc-400 hover:text-white'}`}
+            className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all ${eventType === 'special' ? 'bg-pink-500 text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
           >
             Event Spesial
           </button>
@@ -182,28 +182,28 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-5 gap-5">
           {/* Kolom kiri: detail event */}
-          <div className="lg:col-span-3 bg-[#111726]/90 backdrop-blur-xl rounded-2xl border border-white/10 p-6 space-y-5">
+          <div className="lg:col-span-3 bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 space-y-5">
             <div>
-              <label className="block text-xs text-zinc-400 mb-1.5">Nama event</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Nama event</label>
               <input
                 type="text"
                 placeholder="Refresh Carnival Vol. 3"
                 value={formData.nama}
                 onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-600 text-sm focus:outline-none focus:border-[#079108]"
+                className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-[var(--primary)]"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs text-zinc-400 mb-1.5">Tanggal event</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Tanggal event</label>
               <div className="grid grid-cols-3 gap-2">
                 <input
                   type="number"
                   placeholder="Tgl"
                   value={formData.tanggal}
                   onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-600 text-sm focus:outline-none focus:border-[#079108]"
+                  className="w-full px-3 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-[var(--primary)]"
                   min="1" max="31" required
                 />
                 <CustomSelect
@@ -217,7 +217,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                   placeholder="Tahun"
                   value={formData.tahun}
                   onChange={(e) => setFormData({ ...formData, tahun: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-600 text-sm focus:outline-none focus:border-[#079108]"
+                  className="w-full px-3 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-[var(--primary)]"
                   required
                 />
               </div>
@@ -227,35 +227,35 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-1.5">Lokasi</label>
+                    <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Lokasi</label>
                     <input
                       type="text"
                       placeholder="Tulungagung Cultural Hall"
                       value={formData.lokasi}
                       onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-600 text-sm focus:outline-none focus:border-[#079108]"
+                      className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-[var(--primary)]"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-1.5">Jam event</label>
+                    <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Jam event</label>
                     <input
                       type="text"
                       placeholder="14:00 WIB"
                       value={formData.event_time}
                       onChange={(e) => setFormData({ ...formData, event_time: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-600 text-sm focus:outline-none focus:border-[#079108]"
+                      className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-[var(--primary)]"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-400 mb-1.5">Jam cheki</label>
+                  <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Jam cheki</label>
                   <input
                     type="text"
                     placeholder="15:00 - 17:00 WIB"
                     value={formData.cheki_time}
                     onChange={(e) => setFormData({ ...formData, cheki_time: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-600 text-sm focus:outline-none focus:border-[#079108]"
+                    className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-[var(--primary)]"
                   />
                 </div>
               </>
@@ -270,18 +270,18 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                     placeholder="Valentine Edition"
                     value={formData.theme_name}
                     onChange={(e) => setFormData({ ...formData, theme_name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-[#182032] border border-pink-500/30 text-white rounded-xl placeholder-zinc-600 text-sm focus:outline-none focus:border-pink-500"
+                    className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-pink-500/30 text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-pink-500"
                     required
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-zinc-400 mr-1">Warna tema</span>
+                  <span className="text-xs text-[var(--text-secondary)] mr-1">Warna tema</span>
                   {presetColors.map((color) => (
                     <button
                       key={color}
                       type="button"
                       onClick={() => setFormData({ ...formData, theme_color: color })}
-                      className={`w-6 h-6 rounded-full transition-transform ${formData.theme_color === color ? 'ring-2 ring-offset-2 ring-offset-[#111726] ring-white scale-110' : ''}`}
+                      className={`w-6 h-6 rounded-full transition-transform ${formData.theme_color === color ? 'ring-2 ring-offset-2 ring-offset-[var(--surface)] ring-[var(--text-primary)] scale-110' : ''}`}
                       style={{ backgroundColor: color }}
                     />
                   ))}
@@ -292,10 +292,10 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
           </div>
 
           {/* Kolom kanan: lineup, mengisi ruang & sejajar tinggi sama kolom kiri */}
-          <div className="lg:col-span-2 bg-[#111726]/90 backdrop-blur-xl rounded-2xl border border-white/10 p-6 flex flex-col">
+          <div className="lg:col-span-2 bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 flex flex-col">
             <div className="flex items-center justify-between mb-3">
-              <label className="text-xs text-zinc-400">Lineup member</label>
-              <span className="text-xs font-bold text-[#079108]">{formData.lineup?.length || 0} dipilih</span>
+              <label className="text-xs text-[var(--text-secondary)]">Lineup member</label>
+              <span className="text-xs font-bold text-[var(--primary)]">{formData.lineup?.length || 0} dipilih</span>
             </div>
             <div className="space-y-1.5 flex-1">
               {selectableMembers.map((member) => {
@@ -307,14 +307,14 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                     onClick={() => toggleMemberInLineup(member.id)}
                     className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
                       active
-                        ? 'bg-[#079108]/15 border-[#079108]/40 text-white'
-                        : 'bg-[#182032] border-white/5 text-zinc-400 hover:border-white/20 hover:text-white'
+                        ? 'bg-[var(--primary)]/15 border-[var(--primary)]/40 text-[var(--text-primary)]'
+                        : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--primary)]/30 hover:text-[var(--text-primary)]'
                     }`}
                   >
                     {formatMemberName(member.nama_panggung)}
-                    <span className={`w-4.5 h-4.5 rounded-full border flex items-center justify-center ${active ? 'bg-[#079108] border-[#079108]' : 'border-zinc-600'}`}>
+                    <span className={`w-4.5 h-4.5 rounded-full border flex items-center justify-center ${active ? 'bg-[var(--primary)] border-[var(--primary)]' : 'border-zinc-600'}`}>
                       {active && (
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-3 h-3 text-[var(--text-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                       )}
@@ -326,13 +326,13 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
           </div>
 
           <div className="lg:col-span-5 flex gap-2 pt-1 max-w-md ml-auto">
-            <button type="button" onClick={closeForm} className="flex-1 bg-white/10 px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-300 hover:bg-white/20 transition-all">
+            <button type="button" onClick={closeForm} className="flex-1 bg-[var(--border)] px-4 py-2.5 rounded-xl text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--primary)]/15 transition-all">
               Batal
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className={`flex-1 text-white px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-50 transition-all shadow-[0_0_15px_rgba(7,145,8,0.3)] ${eventType === 'special' ? 'bg-pink-500 hover:bg-pink-600' : 'bg-[#079108] hover:bg-[#067a07]'}`}
+              className={`flex-1 text-[var(--text-primary)] px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-50 transition-all shadow-[0_2px_10px_rgba(232,148,74,0.25)] ${eventType === 'special' ? 'bg-pink-500 hover:bg-pink-600' : 'bg-[var(--primary)] hover:bg-[var(--primary)]/85'}`}
             >
               {submitting ? 'Menyimpan...' : 'Simpan Event'}
             </button>
@@ -347,16 +347,16 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
     <div className="space-y-6">
       <div className="flex justify-between items-center flex-wrap gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">Event <span className="text-[#079108]">Management</span></h2>
-          <p className="text-xs text-zinc-400 font-medium mt-1">Jadwal & lineup event.</p>
+          <h2 className="text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tight">Event <span className="text-[var(--primary)]">Management</span></h2>
+          <p className="text-xs text-[var(--text-secondary)] font-medium mt-1">Jadwal & lineup event.</p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setHideOlderThanMonth(prev => !prev)}
             className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5 ${
               hideOlderThanMonth
-                ? 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
-                : 'bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white'
+                ? 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/30 hover:bg-[var(--primary)]/20'
+                : 'bg-[var(--border)] text-[var(--text-secondary)] border-[var(--border)] hover:bg-[var(--primary)]/10 hover:text-[var(--text-primary)]'
             }`}
             title="Event yang sudah lebih dari 1 bulan disembunyikan otomatis untuk menjaga performa"
           >
@@ -364,7 +364,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
           </button>
           <button
             onClick={openCreateForm}
-            className="bg-[#079108] text-white px-5 py-2.5 rounded-xl font-bold hover:bg-[#067a07] transition-all flex items-center gap-2 text-xs shadow-[0_0_15px_rgba(7,145,8,0.3)] active:scale-95"
+            className="bg-[var(--primary)] text-[var(--text-primary)] px-5 py-2.5 rounded-xl font-bold hover:bg-[var(--primary)]/85 transition-all flex items-center gap-2 text-xs shadow-[0_2px_10px_rgba(232,148,74,0.25)] active:scale-95"
           >
             <FaPlus /> Tambah Event
           </button>
@@ -374,7 +374,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
       {/* Mobile Card List (< md) */}
       <div className="md:hidden space-y-3">
         {displayedEvents.length === 0 ? (
-          <div className="bg-[#111726]/90 rounded-2xl border border-white/10 p-8 text-center text-zinc-400 text-xs">
+          <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-8 text-center text-[var(--text-secondary)] text-xs">
             {events.length > 0 && hideOlderThanMonth
               ? 'Semua event tersimpan sudah lebih dari 1 bulan dan disembunyikan. Klik tombol di atas untuk menampilkan.'
               : 'Belum ada event'}
@@ -386,15 +386,15 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
             const visibleLineupCount = event.event_lineup?.length || 0
 
             return (
-              <div key={event.id} className="bg-[#111726]/90 backdrop-blur-xl rounded-2xl border border-white/10 p-4 shadow-xl space-y-3">
+              <div key={event.id} className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-4 shadow-xl space-y-3">
                 {/* Header card: nama + badge tema & badge status */}
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-bold text-white text-sm">{event.nama}</h3>
+                      <h3 className="font-bold text-[var(--text-primary)] text-sm">{event.nama}</h3>
                       {event.is_special && (
                         <span
-                          className="px-2 py-0.5 rounded-full text-white text-[10px] font-bold"
+                          className="px-2 py-0.5 rounded-full text-[var(--text-primary)] text-[10px] font-bold"
                           style={{ backgroundColor: event.theme_color || '#FF6B9D' }}
                         >
                           {event.theme_name || 'Special'}
@@ -406,7 +406,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                   {/* Status Toggle / Badge */}
                   <div className="shrink-0">
                     {pastByDate ? (
-                      <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-white/10 text-zinc-400 border border-white/10 inline-block">
+                      <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-[var(--border)] text-[var(--text-secondary)] border border-[var(--border)] inline-block">
                         Selesai
                       </span>
                     ) : (
@@ -414,8 +414,8 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                         onClick={() => onTogglePast(event.id, event.is_past)}
                         className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all border ${
                           past
-                            ? 'bg-white/10 text-zinc-400 border-white/10 hover:bg-emerald-500/20 hover:text-emerald-300'
-                            : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20 hover:bg-white/10 hover:text-zinc-400'
+                            ? 'bg-[var(--border)] text-[var(--text-secondary)] border-[var(--border)] hover:bg-[var(--success)]/15 hover:text-[var(--success)]'
+                            : 'bg-[var(--success)]/10 text-[var(--success)] border-[var(--success)]/20 hover:bg-[var(--border)] hover:text-[var(--text-secondary)]'
                         }`}
                         title={past ? 'Klik untuk aktifkan kembali' : 'Klik untuk tandai selesai secara manual'}
                       >
@@ -426,21 +426,21 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                 </div>
 
                 {/* Detail: Tanggal, Jam, Lokasi */}
-                <div className="space-y-1.5 text-xs text-zinc-300 border-y border-white/5 py-2.5">
+                <div className="space-y-1.5 text-xs text-[var(--text-secondary)] border-y border-[var(--border)] py-2.5">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="flex items-center gap-1.5 font-medium">
-                      <FaCalendarAlt className="text-[#079108] text-xs shrink-0" />
+                      <FaCalendarAlt className="text-[var(--primary)] text-xs shrink-0" />
                       {event.tanggal} {event.bulan} {event.tahun}
                     </span>
                     {event.event_time && (
-                      <span className="flex items-center gap-1 text-zinc-400 ml-2">
-                        <FaClock className="text-xs text-zinc-400 shrink-0" />
+                      <span className="flex items-center gap-1 text-[var(--text-secondary)] ml-2">
+                        <FaClock className="text-xs text-[var(--text-secondary)] shrink-0" />
                         {event.event_time}
                       </span>
                     )}
                   </div>
                   {event.lokasi && (
-                    <div className="flex items-center gap-1.5 text-zinc-400">
+                    <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
                       <FaMapMarkerAlt className="text-red-400 text-xs shrink-0" />
                       <span className="truncate">{event.lokasi}</span>
                     </div>
@@ -449,7 +449,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
 
                 {/* Footer card: Lineup & Aksi */}
                 <div className="flex items-center justify-between pt-0.5">
-                  <div className="flex items-center gap-1.5 text-xs text-[#00e5e5] font-bold">
+                  <div className="flex items-center gap-1.5 text-xs text-[var(--primary)] font-bold">
                     <FaUsers className="text-xs shrink-0" />
                     <span>{visibleLineupCount} member</span>
                   </div>
@@ -457,7 +457,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => openEditForm(event)}
-                      className="text-zinc-400 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
+                      className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 hover:bg-[var(--primary)]/10 rounded-lg transition-colors"
                       title="Edit Event"
                     >
                       <FaEdit className="text-base" />
@@ -478,10 +478,10 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
       </div>
 
       {/* Desktop Table (≥ md) */}
-      <div className="hidden md:block bg-[#111726]/90 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+      <div className="hidden md:block bg-[var(--surface)] rounded-2xl border border-[var(--border)] shadow-xl overflow-hidden">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-[#182035] text-zinc-300 uppercase text-[11px] font-bold tracking-wider border-b border-white/10">
+            <thead className="bg-[var(--background)] text-[var(--text-secondary)] uppercase text-[11px] font-bold tracking-wider border-b border-[var(--border)]">
               <tr>
                 <th className="px-4 py-3.5">Event</th>
                 <th className="px-4 py-3.5">Tanggal</th>
@@ -491,10 +491,10 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                 <th className="px-4 py-3.5 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-sm text-zinc-200">
+            <tbody className="divide-y divide-[var(--border)] text-sm text-[var(--text-secondary)]">
               {displayedEvents.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="text-center py-12 text-zinc-400">
+                  <td colSpan="6" className="text-center py-12 text-[var(--text-secondary)]">
                     {events.length > 0 && hideOlderThanMonth
                       ? 'Semua event tersimpan sudah lebih dari 1 bulan dan disembunyikan. Klik tombol "Tampilkan Semua Event" di atas untuk melihat.'
                       : 'Belum ada event'}
@@ -506,29 +506,29 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                   const past = isEventPast(event)
                   const visibleLineupCount = event.event_lineup?.length || 0
                   return (
-                    <tr key={event.id} className="hover:bg-white/[0.04] transition-colors">
+                    <tr key={event.id} className="hover:bg-[var(--primary)]/5 transition-colors">
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-white text-sm">{event.nama}</span>
+                          <span className="font-bold text-[var(--text-primary)] text-sm">{event.nama}</span>
                           {event.is_special && (
                             <span
-                              className="px-2.5 py-0.5 rounded-full text-white text-[10px] font-bold shadow-sm"
+                              className="px-2.5 py-0.5 rounded-full text-[var(--text-primary)] text-[10px] font-bold shadow-sm"
                               style={{ backgroundColor: event.theme_color || '#FF6B9D' }}
                             >
                               {event.theme_name || 'Special'}
                             </span>
                           )}
                         </div>
-                        {event.event_time && <p className="text-xs text-zinc-400 mt-0.5">{event.event_time}</p>}
+                        {event.event_time && <p className="text-xs text-[var(--text-secondary)] mt-0.5">{event.event_time}</p>}
                       </td>
-                      <td className="px-4 py-3.5 text-xs text-zinc-300 font-medium">
+                      <td className="px-4 py-3.5 text-xs text-[var(--text-secondary)] font-medium">
                         {event.tanggal} {event.bulan} {event.tahun}
                       </td>
-                      <td className="px-4 py-3.5 text-xs text-zinc-300">{event.lokasi}</td>
+                      <td className="px-4 py-3.5 text-xs text-[var(--text-secondary)]">{event.lokasi}</td>
                       <td className="px-4 py-3.5 text-xs text-[#00e5e5] font-bold">{visibleLineupCount} member</td>
                       <td className="px-4 py-3.5 text-center">
                         {pastByDate ? (
-                          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-white/10 text-zinc-400 border border-white/10">
+                          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-[var(--border)] text-[var(--text-secondary)] border border-[var(--border)]">
                             Selesai
                           </span>
                         ) : (
@@ -536,8 +536,8 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                             onClick={() => onTogglePast(event.id, event.is_past)}
                             className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all border ${
                               past
-                                ? 'bg-white/10 text-zinc-400 border-white/10 hover:bg-emerald-500/20 hover:text-emerald-300'
-                                : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20 hover:bg-white/10 hover:text-zinc-400'
+                                ? 'bg-[var(--border)] text-[var(--text-secondary)] border-[var(--border)] hover:bg-[var(--success)]/15 hover:text-[var(--success)]'
+                                : 'bg-[var(--success)]/10 text-[var(--success)] border-[var(--success)]/20 hover:bg-[var(--border)] hover:text-[var(--text-secondary)]'
                             }`}
                             title={past ? 'Klik untuk aktifkan kembali' : 'Klik untuk tandai selesai secara manual'}
                           >
@@ -549,7 +549,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                         <div className="flex items-center justify-center gap-1.5">
                           <button
                             onClick={() => openEditForm(event)}
-                            className="text-zinc-400 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
+                            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 hover:bg-[var(--primary)]/10 rounded-lg transition-colors"
                             title="Edit Event"
                           >
                             <FaEdit className="text-base" />
@@ -576,3 +576,6 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
 }
 
 export default EventsTab
+
+
+

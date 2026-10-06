@@ -65,14 +65,14 @@ const MediaPage = () => {
            <motion.div 
              initial={{ opacity: 0, scale: 0.9 }}
              animate={{ opacity: 1, scale: 1 }}
-             className="w-16 h-16 bg-[#079108]/10 rounded-2xl flex items-center justify-center text-[#079108] text-2xl shadow-lg"
+             className="w-16 h-16 bg-[var(--primary)]/10 rounded-2xl flex items-center justify-center text-[var(--primary)] text-2xl shadow-lg"
            >
              <FaImage />
            </motion.div>
            <div className="space-y-2">
-              <span className="text-[#079108] font-black tracking-[0.5em] text-[10px] uppercase">GROUP MOMENTS</span>
+              <span className="text-[var(--primary)] font-black tracking-[0.5em] text-[10px] uppercase">GROUP MOMENTS</span>
               <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-dark uppercase leading-none">
-                OUR <span className="text-[#079108]">TOGETHERNESS</span>
+                OUR <span className="text-[var(--primary)]">TOGETHERNESS</span>
               </h1>
            </div>
            <p className="text-gray-400 font-medium max-w-lg tracking-widest text-[10px] uppercase">
@@ -114,13 +114,13 @@ const MediaPage = () => {
 
       {/* Video Section */}
       <section className="py-24 bg-dark relative overflow-hidden rounded-[4rem] sm:rounded-[6rem] mx-4 mb-24">
-         <div className="absolute top-0 right-0 w-96 h-96 bg-[#079108] blur-[150px] opacity-20"></div>
+         <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--primary)] blur-[150px] opacity-20"></div>
          <div className="container mx-auto max-w-7xl px-4 relative z-10">
             <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
                <div className="space-y-2 text-center md:text-left">
-                  <span className="text-[#079108] font-black tracking-[0.5em] text-[10px] uppercase">YOUTUBE CONTENT</span>
+                  <span className="text-[var(--primary)] font-black tracking-[0.5em] text-[10px] uppercase">YOUTUBE CONTENT</span>
                   <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tight italic leading-none">
-                     PERFORMANCE <span className="text-[#079108]">VIDEOS</span>
+                     PERFORMANCE <span className="text-[var(--primary)]">VIDEOS</span>
                   </h2>
                </div>
                <motion.a 
@@ -143,7 +143,7 @@ const MediaPage = () => {
                   >
                      <SafeYouTubeThumbnail youtubeId={video.youtubeId} title={video.title} />
                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-20 h-20 bg-[#079108] text-white rounded-full flex items-center justify-center text-3xl shadow-[0_0_30px_rgba(7,145,8,0.5)] group-hover:scale-110 transition-transform">
+                        <div className="w-20 h-20 bg-[var(--primary)] text-white rounded-full flex items-center justify-center text-3xl shadow-[0_0_30px_rgba(7,145,8,0.5)] group-hover:scale-110 transition-transform">
                            <FaPlay className="ml-1" />
                         </div>
                      </div>
@@ -214,7 +214,7 @@ const MediaPage = () => {
                  />
               </div>
               <div className="text-center space-y-2">
-                 <p className="text-[#079108] font-black tracking-[0.4em] text-[10px] uppercase">PROJECT REBREEZE</p>
+                 <p className="text-[var(--primary)] font-black tracking-[0.4em] text-[10px] uppercase">PROJECT REBREEZE</p>
                  <h3 className="text-white text-3xl md:text-5xl font-black uppercase tracking-tighter italic">{selectedImage.title}</h3>
                  <button 
                    onClick={() => setSelectedImage(null)}
@@ -232,3 +232,4 @@ const MediaPage = () => {
 }
 
 export default MediaPage
+

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+﻿import { createContext, useContext, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaShoppingCart } from 'react-icons/fa'
 
@@ -69,12 +69,12 @@ export const FlyToCartProvider = ({ children }) => {
                 ease: [0.2, 0.8, 0.2, 1]
               }}
               onAnimationComplete={() => removeFly(fly.id)}
-              className="absolute w-12 h-12 rounded-full bg-white dark:bg-[#111726] border-2 border-[#079108] shadow-2xl overflow-hidden p-1 flex items-center justify-center pointer-events-none"
+              className="absolute w-12 h-12 rounded-full bg-white dark:bg-[#111726] border-2 border-[var(--primary)] shadow-2xl overflow-hidden p-1 flex items-center justify-center pointer-events-none"
             >
               {fly.imageUrl ? (
                 <img src={fly.imageUrl} alt="Fly item" className="w-full h-full object-cover rounded-full" />
               ) : (
-                <FaShoppingCart className="text-[#079108]" style={{ fontSize: '14px' }} />
+                <FaShoppingCart className="text-[var(--primary)]" style={{ fontSize: '14px' }} />
               )}
             </motion.div>
           ))}
@@ -91,3 +91,4 @@ export const useFlyToCart = () => {
   }
   return context
 }
+

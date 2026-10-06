@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FaShoppingCart, FaSpinner, FaTicketAlt, FaChevronDown } from 'react-icons/fa'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -275,8 +275,8 @@ const ShopPage = () => {
   const themeColor = isSpecialEvent ? (selectedEventForTheme.theme_color || '#FF6B9D') : '#079108'
 
   if (loading) return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 dark:bg-[#090d16] dark:from-[#090d16] dark:via-[#090d16] dark:to-[#090d16] flex items-center justify-center">
-        <FaSpinner className="text-4xl text-[#079108] animate-spin" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 dark:bg-[var(--background)] dark:from-[#1A1512] dark:via-[#1A1512] dark:to-[#1A1512] flex items-center justify-center">
+        <FaSpinner className="text-4xl text-[var(--primary)] animate-spin" />
     </div>
   )
 
@@ -285,10 +285,10 @@ const ShopPage = () => {
     : 'pb-0 lg:pb-10'   // checkout form & halaman sukses, konten pendek
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 dark:bg-[#090d16] dark:from-[#090d16] dark:via-[#090d16] dark:to-[#090d16] text-gray-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 dark:bg-[var(--background)] dark:from-[#1A1512] dark:via-[#1A1512] dark:to-[#1A1512] text-gray-900 dark:text-white transition-colors duration-300">
       
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-[#079108]/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[var(--primary)]/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-40 right-20 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl"></div>
       </div>
 
@@ -312,7 +312,7 @@ const ShopPage = () => {
                 {/* Event Selector */}
                 <div className="relative z-30 bg-white dark:bg-[#111726] border border-gray-100 dark:border-white/10 rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 shadow-xl">
                   <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-6">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#079108] to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-[#079108]/20 shrink-0">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[var(--primary)] to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-[var(--primary)]/20 shrink-0">
                       <FaTicketAlt className="text-lg sm:text-xl" />
                     </div>
                     <div>
@@ -351,7 +351,7 @@ const ShopPage = () => {
                                 className={`px-6 py-4 cursor-pointer flex items-center justify-between group transition-all ${formData.event_id === event.id ? 'bg-emerald-50 dark:bg-emerald-500/20' : 'hover:bg-gray-50 dark:hover:bg-white/5'}`}
                               >
                                 <div className="flex flex-col">
-                                  <span className={`font-black text-xs sm:text-sm uppercase tracking-tight ${formData.event_id === event.id ? 'text-[#079108] dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>{event.nama}</span>
+                                  <span className={`font-black text-xs sm:text-sm uppercase tracking-tight ${formData.event_id === event.id ? 'text-[var(--primary)] dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>{event.nama}</span>
                                   <span className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{event.tanggal} {event.bulan}</span>
                                 </div>
                                 {formData.event_id === event.id && (
@@ -427,3 +427,7 @@ const ShopPage = () => {
 }
 
 export default ShopPage
+
+
+
+

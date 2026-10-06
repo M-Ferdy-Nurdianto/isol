@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+﻿import { Link } from 'react-router-dom'
 import Tilt from 'react-parallax-tilt'
 import { FaInstagram, FaTwitter, FaYoutube, FaMapMarkerAlt, FaEnvelope, FaTiktok, FaDiscord, FaWhatsapp, FaSpotify } from 'react-icons/fa'
 
@@ -16,7 +16,7 @@ const Footer = () => {
             <p className="text-gray-500 text-sm font-medium leading-relaxed max-w-md">
               Membawa pesona musik dan energi idol modern bersama Kohi Sekai.
             </p>
-            <p className="text-[#079108] font-bold text-xs tracking-widest uppercase">
+            <p className="text-[var(--primary)] font-bold text-xs tracking-widest uppercase">
               コヒ・セカイ
             </p>
           </div>
@@ -33,7 +33,7 @@ const Footer = () => {
                 { name: 'Shop', href: '/shop' }
               ].map(link => (
                 <li key={link.name}>
-                  <Link to={link.href} className="text-gray-500 hover:text-[#079108] text-sm font-medium transition-colors">
+                  <Link to={link.href} className="text-gray-500 hover:text-[var(--primary)] text-sm font-medium transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -66,7 +66,7 @@ const Footer = () => {
                     href={social.href} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-[#079108] hover:border-[#079108] hover:text-white transition-all duration-300"
+                    className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-[var(--primary)] hover:border-[var(--primary)] hover:text-white transition-all duration-300"
                   >
                     {social.icon}
                   </a>
@@ -79,8 +79,8 @@ const Footer = () => {
         <div className="mt-12 md:mt-16 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-gray-400 font-medium">
           <p>© 2026 KOHI SEKAI. ALL RIGHTS RESERVED.</p>
           <div className="flex gap-8">
-             <Link to="/admin/login" className="hover:text-[#079108] transition-colors">Staff Login</Link>
-             <a href="#" className="hover:text-[#079108] transition-colors">Privacy Policy</a>
+             <Link to="/admin/login" className="hover:text-[var(--primary)] transition-colors">Staff Login</Link>
+             <a href="#" className="hover:text-[var(--primary)] transition-colors">Privacy Policy</a>
           </div>
         </div>
       </div>
@@ -89,3 +89,4 @@ const Footer = () => {
 }
 
 export default Footer
+

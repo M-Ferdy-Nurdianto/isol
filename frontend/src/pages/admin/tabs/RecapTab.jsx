@@ -53,8 +53,11 @@ const RecapTab = ({ orders, events, recapEventFilter, setRecapEventFilter }) => 
     order.order_items?.forEach(item => {
       let memberName = stripEmoji(item.item_name.replace('Cheki ', '').replace(' (Pre-Order)', ''))
 
-      if (memberName.toLowerCase().includes('all member') || memberName.toLowerCase().includes('group')) {
-        memberName = 'All Member (Group)'
+      if (memberName.toLowerCase().includes('all member') ||
+          memberName.toLowerCase().includes('semua member') ||
+          memberName.toLowerCase().includes('cheki grup') ||
+          memberName.toLowerCase().includes('group')) {
+        memberName = 'Cheki Grup (Semua Member)'
       }
 
       if (!memberStats[memberName]) {
@@ -82,18 +85,18 @@ const RecapTab = ({ orders, events, recapEventFilter, setRecapEventFilter }) => 
     plugins: {
       legend: {
         position: 'top',
-        labels: { color: '#e4e4e7', font: { weight: 'bold', size: 11 }, boxWidth: 12, padding: 16 }
+        labels: { color: '#F5E6D3', font: { weight: 'bold', size: 11 }, boxWidth: 12, padding: 16 }
       },
       title: { display: false },
     },
     scales: {
       x: {
-        ticks: { color: '#a1a1aa', font: { size: 11 } },
-        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+        ticks: { color: '#B0A599', font: { size: 11 } },
+        grid: { color: 'rgba(232, 148, 74, 0.08)' }
       },
       y: {
-        ticks: { color: '#a1a1aa', font: { size: 11 } },
-        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+        ticks: { color: '#B0A599', font: { size: 11 } },
+        grid: { color: 'rgba(232, 148, 74, 0.08)' },
         beginAtZero: true
       }
     }
@@ -127,8 +130,8 @@ const RecapTab = ({ orders, events, recapEventFilter, setRecapEventFilter }) => 
       {
         label: 'Total Pendapatan (Rp)',
         data: revenueData,
-        backgroundColor: 'rgba(7, 145, 8, 0.7)',
-        borderColor: '#079108',
+        backgroundColor: 'rgba(232, 148, 74, 0.8)',
+        borderColor: '#E8944A',
         borderWidth: 1,
         borderRadius: 6
       }
@@ -146,12 +149,12 @@ const RecapTab = ({ orders, events, recapEventFilter, setRecapEventFilter }) => 
 
   const EmptyChartState = ({ message }) => (
     <div className="flex flex-col items-center justify-center h-64 text-center gap-2">
-      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
-        <svg className="w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="w-10 h-10 rounded-full bg-[var(--border)] flex items-center justify-center">
+        <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3v18h18M7 14l4-4 4 4 5-5" />
         </svg>
       </div>
-      <p className="text-sm text-zinc-500 font-medium">{message}</p>
+      <p className="text-sm text-[var(--text-secondary)] font-medium">{message}</p>
     </div>
   )
 
@@ -160,8 +163,8 @@ const RecapTab = ({ orders, events, recapEventFilter, setRecapEventFilter }) => 
       {/* Header */}
       <div className="flex justify-between items-center flex-wrap gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">Rekapitulasi <span className="text-[#079108]">Penjualan</span></h2>
-          <p className="text-xs text-zinc-400 font-medium mt-1">Ringkasan omset & performa penjualan.</p>
+          <h2 className="text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tight">Rekapitulasi <span className="text-[var(--primary)]">Penjualan</span></h2>
+          <p className="text-xs text-[var(--text-secondary)] font-medium mt-1">Ringkasan omset & performa penjualan.</p>
         </div>
 
         <CustomSelect
@@ -176,24 +179,24 @@ const RecapTab = ({ orders, events, recapEventFilter, setRecapEventFilter }) => 
 
       {/* Baris utama: 1 angka hero (Pemasukan) + 1 pendukung (Cheki), sisanya jadi strip kecil */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 bg-gradient-to-br from-[#079108]/15 to-[#111726]/80 backdrop-blur-xl border border-[#079108]/25 p-6 rounded-2xl flex items-center justify-between">
+        <div className="lg:col-span-2 bg-gradient-to-br from-[var(--primary)]/15 to-[var(--surface)] border border-[var(--primary)]/25 p-6 rounded-2xl flex items-center justify-between">
           <div>
-            <div className="text-xs font-semibold text-emerald-300/80 mb-1">Total Pemasukan</div>
-            <div className="text-3xl md:text-4xl font-black text-white tracking-tight">
+            <div className="text-xs font-semibold text-[var(--primary)]/80 mb-1">Total Pemasukan</div>
+            <div className="text-3xl md:text-4xl font-black text-[var(--text-primary)] tracking-tight">
               Rp {totalRevenue.toLocaleString('id-ID')}
             </div>
           </div>
-          <div className="hidden sm:flex w-12 h-12 rounded-xl bg-[#079108]/20 items-center justify-center shrink-0">
-            <svg className="w-6 h-6 text-[#079108]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="hidden sm:flex w-12 h-12 rounded-xl bg-[var(--primary)]/20 items-center justify-center shrink-0">
+            <svg className="w-6 h-6 text-[var(--primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2m9-8a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
         </div>
 
-        <div className="bg-[#111726]/80 backdrop-blur-xl border border-white/10 p-6 rounded-2xl flex items-center justify-between">
+        <div className="bg-[var(--surface)] border border-[var(--border)] p-6 rounded-2xl flex items-center justify-between">
           <div>
-            <div className="text-xs font-semibold text-zinc-400 mb-1">Total Cheki Tercetak</div>
-            <div className="text-3xl font-black text-white tracking-tight">{totalPolaroidRecap} <span className="text-base font-semibold text-zinc-500">pcs</span></div>
+            <div className="text-xs font-semibold text-[var(--text-secondary)] mb-1">Total Cheki Tercetak</div>
+            <div className="text-3xl font-black text-[var(--text-primary)] tracking-tight">{totalPolaroidRecap} <span className="text-base font-semibold text-[var(--text-secondary)]">pcs</span></div>
           </div>
           <div className="hidden sm:flex w-12 h-12 rounded-xl bg-pink-500/10 items-center justify-center shrink-0">
             <svg className="w-6 h-6 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -205,26 +208,26 @@ const RecapTab = ({ orders, events, recapEventFilter, setRecapEventFilter }) => 
       </div>
 
       {/* Strip status order — kecil & rata, bukan card gede sejajar sama hero stat */}
-      <div className="bg-[#111726]/60 border border-white/5 rounded-2xl px-2 py-1 flex flex-wrap divide-x divide-white/5">
+      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl px-2 py-1 flex flex-wrap divide-x divide-[var(--border)]">
         {statusItems.map((item, i) => (
           <div key={i} className="flex-1 min-w-[110px] px-4 py-3 text-center sm:text-left">
-            <div className="text-[11px] text-zinc-500 font-medium">{item.label}</div>
-            <div className="text-lg font-bold text-white">{item.value}</div>
+            <div className="text-[11px] text-[var(--text-secondary)] font-medium">{item.label}</div>
+            <div className="text-lg font-bold text-[var(--text-primary)]">{item.value}</div>
           </div>
         ))}
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-[#111726]/80 backdrop-blur-xl p-6 rounded-2xl border border-white/10">
-          <h3 className="text-sm font-bold text-white mb-4">Cheki per Member — Pre-Order vs OTS</h3>
+        <div className="bg-[var(--surface)] p-6 rounded-2xl border border-[var(--border)]">
+          <h3 className="text-sm font-bold text-[var(--text-primary)] mb-4">Cheki per Member — Pre-Order vs OTS</h3>
           {hasData
             ? <Bar options={chartOptions} data={quantityChartData} />
             : <EmptyChartState message="Belum ada data cheki untuk event ini." />}
         </div>
 
-        <div className="bg-[#111726]/80 backdrop-blur-xl p-6 rounded-2xl border border-white/10">
-          <h3 className="text-sm font-bold text-white mb-4">Total Pemasukan per Member</h3>
+        <div className="bg-[var(--surface)] p-6 rounded-2xl border border-[var(--border)]">
+          <h3 className="text-sm font-bold text-[var(--text-primary)] mb-4">Total Pemasukan per Member</h3>
           {hasData
             ? <Bar
                 options={{ ...chartOptions, plugins: { ...chartOptions.plugins, title: { display: false } } }}
@@ -238,3 +241,4 @@ const RecapTab = ({ orders, events, recapEventFilter, setRecapEventFilter }) => 
 }
 
 export default RecapTab
+

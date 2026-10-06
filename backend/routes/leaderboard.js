@@ -74,67 +74,56 @@ router.get('/', async (req, res) => {
 
     if (!member_id || member_id === 'all') {
       // === ALL MEMBERS MODE ===
-      // Group fan chekis by idol member, then pick the TOP 1 spender for EACH idol member!
-      const memberFanStats = {} // { memberId: { memberName, memberPhoto, topFan: { name, chekiCount, points } } }
+      // Hitung total cheki per fan dari semua member (kecuali grup),
+      // lalu ambil top 10 fan unik berdasarkan total cheki terbanyak.
+      // Juga catat member mana yang paling banyak mereka beli (favorit).
+      const fanStats = {} // { fanKey: { name, chekiCount, points, memberCounts } }
 
       orders?.forEach(order => {
         const fanName = (order.nama_lengkap || 'Fan').trim()
         const fanKey = fanName.toUpperCase()
 
         order.order_items?.forEach(item => {
-          // Exclude group cheki items
           if (!item.member_id || (item.item_name && item.item_name.toLowerCase().includes('group'))) {
             return
           }
 
           const mId = item.member_id
           const mName = item.members?.nama_panggung || item.item_name || 'Member'
-          const mPhoto = item.members?.image_url || null
-
-          if (!memberFanStats[mId]) {
-            memberFanStats[mId] = {
-              memberId: mId,
-              memberName: mName,
-              memberPhoto: mPhoto,
-              fans: {}
-            }
-          }
-
           const qty = item.quantity || 1
           const itemPrice = item.price || 0
           const pts = Math.max(1, Math.floor((itemPrice * qty) / 10000))
 
-          if (!memberFanStats[mId].fans[fanKey]) {
-            memberFanStats[mId].fans[fanKey] = {
-              name: fanName,
-              chekiCount: 0,
-              points: 0
-            }
+          if (!fanStats[fanKey]) {
+            fanStats[fanKey] = { name: fanName, chekiCount: 0, points: 0, memberCounts: {} }
           }
 
-          memberFanStats[mId].fans[fanKey].chekiCount += qty
-          memberFanStats[mId].fans[fanKey].points += pts
+          fanStats[fanKey].chekiCount += qty
+          fanStats[fanKey].points += pts
+
+          // Track per-member count to determine favorite member
+          if (!fanStats[fanKey].memberCounts[mId]) {
+            fanStats[fanKey].memberCounts[mId] = { name: mName, count: 0 }
+          }
+          fanStats[fanKey].memberCounts[mId].count += qty
         })
       })
 
-      // For each member, extract the TOP 1 fan
-      const leaderboard = []
-      Object.values(memberFanStats).forEach(mStat => {
-        const topFanList = Object.values(mStat.fans).sort((a, b) => b.chekiCount - a.chekiCount)
-        if (topFanList.length > 0) {
-          const topFan = topFanList[0]
-          leaderboard.push({
-            name: topFan.name,
-            chekiCount: topFan.chekiCount,
-            points: topFan.points,
-            memberName: mStat.memberName,
-            memberPhoto: mStat.memberPhoto
-          })
-        }
-      })
-
-      // Sort the top fans per member by chekiCount descending
-      leaderboard.sort((a, b) => b.chekiCount - a.chekiCount)
+      // Build leaderboard: top 10 unique fans, with their favorite member
+      const leaderboard = Object.values(fanStats)
+        .sort((a, b) => b.chekiCount - a.chekiCount)
+        .slice(0, 10)
+        .map(fan => {
+          // Find favorite member (most cheki bought)
+          const favMember = Object.values(fan.memberCounts)
+            .sort((a, b) => b.count - a.count)[0]
+          return {
+            name: fan.name,
+            chekiCount: fan.chekiCount,
+            points: fan.points,
+            memberName: favMember?.name || null
+          }
+        })
 
       res.json({ success: true, data: leaderboard })
     } else {

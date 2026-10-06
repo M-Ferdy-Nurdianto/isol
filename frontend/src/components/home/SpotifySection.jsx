@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+﻿import { motion } from 'framer-motion'
 import { FaSpotify } from 'react-icons/fa'
 
 const SpotifySection = () => {
@@ -33,7 +33,7 @@ const SpotifySection = () => {
               Debut Single
             </h2>
             <p className="text-gray-400 font-medium text-xs sm:text-sm md:text-base mb-6 md:mb-0 max-w-md mx-auto md:mx-0 px-2 sm:px-0 leading-relaxed">
-              Dengarkan single terbaru dari <span className="text-[#079108] font-bold drop-shadow-[0_0_8px_rgba(7,145,8,0.5)]">Kohi Sekai</span>. Tambahkan ke playlist favoritmu sekarang!
+              Dengarkan single terbaru dari <span className="text-[var(--primary)] font-bold drop-shadow-[0_0_8px_rgba(7,145,8,0.5)]">Kohi Sekai</span>. Tambahkan ke playlist favoritmu sekarang!
             </p>
           </div>
 
@@ -64,3 +64,4 @@ const SpotifySection = () => {
 }
 
 export default SpotifySection
+

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaMusic, FaSpotify, FaYoutube, FaPlay, FaExternalLinkAlt, FaTimes } from 'react-icons/fa'
 import KSHeader from '../components/KSHeader'
@@ -26,9 +26,9 @@ const PlayerModal = ({ track, onClose }) => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-4xl bg-[#0c111d] rounded-2xl border border-white/10 overflow-hidden shadow-2xl"
+        className="relative w-full max-w-4xl bg-[var(--surface)] rounded-2xl border border-white/10 overflow-hidden shadow-2xl"
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#0c111d]/80 backdrop-blur-xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[var(--surface)]/80 backdrop-blur-xl">
           <div className="flex items-center gap-3">
             <FaYoutube className="text-red-500 text-xl" />
             <h3 className="font-bold text-white line-clamp-1">{track.title}</h3>
@@ -269,3 +269,4 @@ const KSMusicPage = () => {
 }
 
 export default KSMusicPage
+

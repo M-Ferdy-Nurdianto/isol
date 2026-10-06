@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+﻿import React, { useState, useEffect, useRef } from 'react'
 import { FaPlus, FaEdit, FaTrash, FaYoutube, FaSpotify, FaImage, FaArrowLeft, FaGripVertical } from 'react-icons/fa'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy, useSortable } from '@dnd-kit/sortable'
@@ -25,33 +25,33 @@ const SortableMusicCard = ({ item, openForm, handleDelete }) => {
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-surface border border-border rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.8)] group transition-all duration-300 hover:border-white/20 relative">
+    <div ref={setNodeRef} style={style} className="bg-surface border border-border rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.8)] group transition-all duration-300 hover:border-[var(--border)] relative">
       <div 
         {...attributes} 
         {...listeners} 
-        className="absolute top-3 left-3 w-8 h-8 bg-black/80 border border-white/10 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white cursor-grab active:cursor-grabbing z-20 shadow-lg hover:bg-white/10 transition-colors"
+        className="absolute top-3 left-3 w-8 h-8 bg-black/80 border border-[var(--border)] rounded-lg flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-grab active:cursor-grabbing z-20 shadow-lg hover:bg-[var(--border)] transition-colors"
         title="Drag untuk mengubah urutan"
       >
         <FaGripVertical />
       </div>
 
-      <div className="relative aspect-video bg-zinc-900 border-b border-white/10 flex items-center justify-center overflow-hidden">
+      <div className="relative aspect-video bg-[var(--surface)] border-b border-[var(--border)] flex items-center justify-center overflow-hidden">
         {item.thumbnail_url ? (
           <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
-          <div className="text-zinc-600">
+          <div className="text-[var(--text-secondary)]">
             <FaImage size={40} />
           </div>
         )}
-        <div className="absolute top-3 right-3 px-3 py-1 bg-black/80 rounded-full text-xs font-bold border border-white/10 flex items-center gap-1.5 shadow-lg">
+        <div className="absolute top-3 right-3 px-3 py-1 bg-black/80 rounded-full text-xs font-bold border border-[var(--border)] flex items-center gap-1.5 shadow-lg">
           {item.platform === 'youtube' ? <FaYoutube className="text-red-500" /> : <FaSpotify className="text-[#1DB954]" />}
           <span className="capitalize">{item.platform}</span>
         </div>
       </div>
       <div className="p-5">
-        <h3 className="text-lg font-bold text-white truncate">{item.title}</h3>
+        <h3 className="text-lg font-bold text-[var(--text-primary)] truncate">{item.title}</h3>
         <div className="flex gap-2 mt-5">
-          <button onClick={() => openForm(item)} className="flex-1 bg-white/5 hover:bg-white/10 text-white px-3 py-2 rounded-lg text-sm font-bold flex justify-center items-center gap-2 border border-white/10 transition-colors">
+          <button onClick={() => openForm(item)} className="flex-1 bg-[var(--border)] hover:bg-[var(--border)] text-[var(--text-primary)] px-3 py-2 rounded-lg text-sm font-bold flex justify-center items-center gap-2 border border-[var(--border)] transition-colors">
             <FaEdit /> Edit
           </button>
           <button onClick={() => handleDelete(item.id, item.title)} className="px-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 flex items-center justify-center transition-colors">
@@ -147,6 +147,8 @@ const MusicTab = () => {
     }
   }
 
+  const [fetchingMeta, setFetchingMeta] = useState(false)
+
   const handleLinkChange = async (e) => {
     const link = e.target.value
     setFormData(prev => ({ ...prev, link }))
@@ -154,31 +156,47 @@ const MusicTab = () => {
     if (formData.platform === 'youtube') {
       const videoId = extractYouTubeID(link)
       if (videoId) {
-        setFormData(prev => ({ ...prev, thumbnail_url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` }))
+        // Set thumbnail immediately from YouTube's image CDN (no CORS)
+        setFormData(prev => ({
+          ...prev,
+          link,
+          thumbnail_url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+        }))
+        // Fetch title via noembed (CORS-friendly alternative)
+        setFetchingMeta(true)
         try {
-          const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(link)}&format=json`)
+          const res = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(link)}`)
           const data = await res.json()
-          if (data.title) {
+          if (data?.title) {
             setFormData(prev => ({ ...prev, title: data.title }))
           }
-        } catch(err) { console.error(err) }
+        } catch (err) {
+          console.warn('[MusicTab] noembed fetch failed:', err)
+        } finally {
+          setFetchingMeta(false)
+        }
       } else {
         setFormData(prev => ({ ...prev, thumbnail_url: '' }))
       }
     } else if (formData.platform === 'spotify') {
       if (link.includes('spotify.com')) {
+        setFetchingMeta(true)
         try {
           const res = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(link)}`)
           const data = await res.json()
-          setFormData(prev => ({ 
-            ...prev, 
+          setFormData(prev => ({
+            ...prev,
             title: data.title || prev.title,
-            thumbnail_url: data.thumbnail_url || prev.thumbnail_url 
+            thumbnail_url: data.thumbnail_url || prev.thumbnail_url
           }))
           if (data.thumbnail_url) {
             setCoverPreview(data.thumbnail_url)
           }
-        } catch(err) { console.error(err) }
+        } catch (err) {
+          console.warn('[MusicTab] Spotify oEmbed fetch failed:', err)
+        } finally {
+          setFetchingMeta(false)
+        }
       }
     }
   }
@@ -304,14 +322,14 @@ const MusicTab = () => {
         <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface border border-border p-6 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+          <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)] flex items-center gap-2">
             Music CMS
           </h2>
-          <p className="text-sm text-zinc-400 mt-1">Kelola portofolio musik (YouTube & Spotify)</p>
+          <p className="text-sm text-[var(--text-secondary)] mt-1">Kelola portofolio musik (YouTube & Spotify)</p>
         </div>
         <button
           onClick={() => openForm()}
-          className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(240,168,104,0.4)]"
+          className="bg-primary hover:bg-primary/90 text-[var(--text-primary)] px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(240,168,104,0.4)]"
         >
           <FaPlus /> Tambah Musik
         </button>
@@ -325,25 +343,25 @@ const MusicTab = () => {
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={music.map(i => i.id)} strategy={rectSortingStrategy}>
             <div>
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><FaSpotify className="text-[#1DB954]" /> Spotify Tracks</h3>
+              <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2"><FaSpotify className="text-[#1DB954]" /> Spotify Tracks</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                 {music.filter(m => m.platform === 'spotify').map(item => (
                   <SortableMusicCard key={item.id} item={item} openForm={openForm} handleDelete={handleDelete} />
                 ))}
                 {music.filter(m => m.platform === 'spotify').length === 0 && (
-                  <div className="col-span-full py-10 text-center text-zinc-500 rounded-2xl border border-dashed border-white/10 bg-white/5">
+                  <div className="col-span-full py-10 text-center text-[var(--text-secondary)] rounded-2xl border border-dashed border-[var(--border)] bg-[var(--border)]">
                     Belum ada data Spotify
                   </div>
                 )}
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><FaYoutube className="text-red-500" /> YouTube Videos</h3>
+              <h3 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2"><FaYoutube className="text-red-500" /> YouTube Videos</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {music.filter(m => m.platform === 'youtube').map(item => (
                   <SortableMusicCard key={item.id} item={item} openForm={openForm} handleDelete={handleDelete} />
                 ))}
                 {music.filter(m => m.platform === 'youtube').length === 0 && (
-                  <div className="col-span-full py-10 text-center text-zinc-500 rounded-2xl border border-dashed border-white/10 bg-white/5">
+                  <div className="col-span-full py-10 text-center text-[var(--text-secondary)] rounded-2xl border border-dashed border-[var(--border)] bg-[var(--border)]">
                     Belum ada data YouTube
                   </div>
                 )}
@@ -358,16 +376,16 @@ const MusicTab = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={closeForm}
-              className="text-zinc-400 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-2 hover:bg-[var(--border)] rounded-lg transition-colors"
               title="Kembali"
             >
               <FaArrowLeft />
             </button>
             <div>
-              <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">
+              <h2 className="text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tight">
                 {editingItem ? 'Edit Musik' : 'Tambah Musik Baru'}
               </h2>
-              <p className="text-xs text-zinc-400 font-medium mt-1">
+              <p className="text-xs text-[var(--text-secondary)] font-medium mt-1">
                 {editingItem ? 'Ubah detail lagu / video musik.' : 'Tambahkan lagu atau video musik ke halaman Music.'}
               </p>
             </div>
@@ -375,7 +393,7 @@ const MusicTab = () => {
             
           <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-2xl p-6 space-y-6 shadow-2xl">
               <div className="space-y-4">
-                <label className="block text-sm font-bold text-zinc-300">Platform</label>
+                <label className="block text-sm font-bold text-[var(--text-secondary)]">Platform</label>
                 <div className="flex gap-4">
                   <button
                     type="button"
@@ -383,7 +401,7 @@ const MusicTab = () => {
                     className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border font-bold transition-all ${
                       formData.platform === 'youtube' 
                       ? 'bg-red-500/10 border-red-500/50 text-red-400' 
-                      : 'bg-white/5 border-white/10 text-zinc-400 hover:bg-white/10'
+                      : 'bg-[var(--border)] border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--border)]'
                     }`}
                   >
                     <FaYoutube size={20} /> YouTube
@@ -394,7 +412,7 @@ const MusicTab = () => {
                     className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border font-bold transition-all ${
                       formData.platform === 'spotify' 
                       ? 'bg-[#1DB954]/10 border-[#1DB954]/50 text-[#1DB954]' 
-                      : 'bg-white/5 border-white/10 text-zinc-400 hover:bg-white/10'
+                      : 'bg-[var(--border)] border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--border)]'
                     }`}
                   >
                     <FaSpotify size={20} /> Spotify
@@ -403,33 +421,48 @@ const MusicTab = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-bold text-zinc-300">Judul (Title) <span className="text-red-400">*</span></label>
+                <label className="block text-sm font-bold text-[var(--text-secondary)]">Judul (Title) <span className="text-red-400">*</span></label>
                 <input
                   type="text"
                   required
                   value={formData.title}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
+                  className="w-full bg-black/30 border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
                   placeholder="Contoh: Close Friend"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-bold text-zinc-300">Link {formData.platform === 'youtube' ? 'Video' : 'Track/Album'} <span className="text-red-400">*</span></label>
-                <input
-                  type="url"
-                  required
-                  value={formData.link}
-                  onChange={handleLinkChange}
-                  className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
-                  placeholder={formData.platform === 'youtube' ? 'https://youtube.com/watch?v=...' : 'https://open.spotify.com/track/...'}
-                />
+                <label className="block text-sm font-bold text-[var(--text-secondary)]">Link {formData.platform === 'youtube' ? 'Video' : 'Track/Album'} <span className="text-red-400">*</span></label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    required
+                    value={formData.link}
+                    onChange={handleLinkChange}
+                    className="w-full bg-black/30 border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all pr-10"
+                    placeholder={formData.platform === 'youtube' ? 'https://youtube.com/watch?v=...' : 'https://open.spotify.com/track/...'}
+                  />
+                  {fetchingMeta && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+                {fetchingMeta && (
+                  <p className="text-[11px] text-[var(--text-secondary)] animate-pulse">Mengambil judul & thumbnail otomatis...</p>
+                )}
+                {!fetchingMeta && formData.title && formData.link && (
+                  <p className="text-[11px] text-emerald-400 flex items-center gap-1">
+                    <span>&#10003;</span> Judul otomatis terisi: <span className="font-bold truncate max-w-[300px]">{formData.title}</span>
+                  </p>
+                )}
               </div>
 
               {formData.platform === 'youtube' && formData.thumbnail_url && (
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-zinc-300">Preview Thumbnail</label>
-                  <div className="aspect-video w-full max-w-sm rounded-xl overflow-hidden border border-white/10 bg-black">
+                  <label className="block text-sm font-bold text-[var(--text-secondary)]">Preview Thumbnail</label>
+                  <div className="aspect-video w-full max-w-sm rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--background)]">
                     <img src={formData.thumbnail_url} alt="Thumbnail preview" className="w-full h-full object-cover" />
                   </div>
                 </div>
@@ -437,7 +470,7 @@ const MusicTab = () => {
 
               {formData.platform === 'spotify' && (
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-zinc-300">Cover Artwork (Opsional)</label>
+                  <label className="block text-sm font-bold text-[var(--text-secondary)]">Cover Artwork (Opsional)</label>
                   <DragDropImageUpload
                     onImageChange={handleCoverChange}
                     previewUrl={coverPreview}
@@ -446,11 +479,11 @@ const MusicTab = () => {
                 </div>
               )}
 
-              <div className="pt-4 flex justify-end gap-3 border-t border-white/10">
-                <button type="button" onClick={closeForm} className="px-6 py-2.5 rounded-xl font-bold text-zinc-300 hover:bg-white/5 transition-colors">
+              <div className="pt-4 flex justify-end gap-3 border-t border-[var(--border)]">
+                <button type="button" onClick={closeForm} className="px-6 py-2.5 rounded-xl font-bold text-[var(--text-secondary)] hover:bg-[var(--border)] transition-colors">
                   Batal
                 </button>
-                <button type="submit" disabled={saving} className="bg-primary hover:bg-primary/90 text-white px-8 py-2.5 rounded-xl font-bold transition-all disabled:opacity-50">
+                <button type="submit" disabled={saving} className="bg-primary hover:bg-primary/90 text-[var(--text-primary)] px-8 py-2.5 rounded-xl font-bold transition-all disabled:opacity-50">
                   {saving ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>
@@ -462,3 +495,8 @@ const MusicTab = () => {
 }
 
 export default MusicTab
+
+
+
+
+

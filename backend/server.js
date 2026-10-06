@@ -15,6 +15,9 @@ import merchandiseRoutes from './routes/merchandise.js'
 import merchOrdersRoutes from './routes/merchOrders.js'
 import userRoutes from './routes/users.js'
 import passwordResetRoutes from './routes/passwordReset.js'
+import musicRoutes from './routes/music.js'
+import leaderboardRoutes from './routes/leaderboard.js'
+import newsRoutes from './routes/news.js'
 
 
 const app = express()
@@ -141,6 +144,9 @@ app.use('/api/merchandise', merchandiseRoutes)
 app.use('/api/merch-orders', merchOrdersRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/password-reset', passwordResetRoutes)
+app.use('/api/music', musicRoutes)
+app.use('/api/leaderboard', leaderboardRoutes)
+app.use('/api/news', newsRoutes)
 
 
 // Health check

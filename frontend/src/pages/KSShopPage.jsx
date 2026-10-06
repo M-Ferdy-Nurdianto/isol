@@ -345,18 +345,39 @@ const KSShopPage = () => {
     return null
   }, [currentEvent])
 
-  const hargaGrup = groupChekiPriceObj ? Number(groupChekiPriceObj.price) : (Number(config?.harga_cheki_grup) || 30000)
-
-  // Check if Group Cheki is active (hadir !== false)
-  const isGroupActive = useMemo(() => {
-    if (config?._groupMember) {
-      if (config._groupMember.hadir === false || config._groupMember.hadir === 'false') return false
-    }
-    if (config) {
-      if (config.enable_group_cheki === 'false' || config.enable_group_cheki === false || config.enable_group === 'false' || config.enable_group === false) return false
-    }
-    return true
+  // === NEW: 3 TOGGLE TERBARU (Sesuai migration/config baru)
+  // regularChekiEnabled: Regular Cheki per-member (2-shot, Rp40k)
+  // wideChekiEnabled:    Wide Cheki 16:9 per-member (Rp70k PO / Rp80k OTS) — BUKAN semua member!
+  // chekiGrupEnabled:    Cheki Grup (semua member dalam 1 frame), DEFAULT OFF
+  const regularChekiEnabled = useMemo(() => {
+    if (!config) return true
+    return config.regular_cheki_enabled !== 'false' && config.regular_cheki_enabled !== false
   }, [config])
+
+  const wideChekiEnabled = useMemo(() => {
+    if (!config) return false
+    return config.wide_cheki_enabled === 'true' || config.wide_cheki_enabled === true
+  }, [config])
+
+  const chekiGrupEnabled = useMemo(() => {
+    if (!config) return false // DEFAULT OFF
+    if (config?._groupMember && (config._groupMember.hadir === false || config._groupMember.hadir === 'false')) return false
+    return config.cheki_grup_enabled === 'true' || config.cheki_grup_enabled === true
+  }, [config])
+
+  // === HARGA BARU SESUAI PRICELIST POSTER ===
+  // Regular: harga_per_member config key (harga_cheki_per_member)
+  // Wide PO: harga_grup config key (=70k, OTS 80k nanti di OTS form)
+  // Cheki Grup PO: harga_cheki_grup_po config key
+  const hargaMember = Number(config?.harga_cheki_per_member) || 40000
+  const hargaWidePo = Number(config?.harga_cheki_grup) || 70000
+  const hargaChekiGrupPo = Number(config?.harga_cheki_grup_po) || 150000
+  void groupChekiPriceObj
+  const hargaGrup = hargaWidePo // backward compat: hargaGrup di codebase=Wide PO (bukan Grup)
+
+  // Backward-compat alias (variable isGroupActive/isRegularActive untuk existing code sections):
+  const isGroupActive = chekiGrupEnabled // Hero chekiGrupEnabled dipakai untuk section Hero
+  const isRegularActive = regularChekiEnabled || wideChekiEnabled // Section lineup tampil jika salah satu enable
 
   // Helper to find member-specific cheki price
   const getMemberChekiPrice = (member) => {
@@ -371,7 +392,6 @@ const KSShopPage = () => {
     return null
   }
 
-  const hargaMember = Number(config?.harga_cheki_per_member) || 25000
   const hargaMemberFallback = hargaMember
 
   // Lineup for current event
@@ -768,19 +788,33 @@ const KSShopPage = () => {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-text-secondary">
-                    Harga Member: <strong className="text-text-primary">Rp {hargaMember.toLocaleString()}</strong>
-                  </span>
-                  <span className="text-border">•</span>
-                  <span className="text-xs font-medium text-text-secondary">
-                    Harga Group: <strong className="text-text-primary">Rp {hargaGrup.toLocaleString()}</strong>
-                  </span>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  {regularChekiEnabled && (
+                    <>
+                      <span className="text-xs font-medium text-text-secondary">
+                        Regular: <strong className="text-text-primary">Rp {hargaMember.toLocaleString('id-ID')}</strong>
+                      </span>
+                      {wideChekiEnabled && <span className="text-border">•</span>}
+                    </>
+                  )}
+                  {wideChekiEnabled && (
+                    <>
+                      <span className="text-xs font-medium text-text-secondary">
+                        Wide 16:9: <strong className="text-text-primary">Rp {hargaWidePo.toLocaleString('id-ID')}</strong>
+                      </span>
+                      {chekiGrupEnabled && <span className="text-border">•</span>}
+                    </>
+                  )}
+                  {chekiGrupEnabled && (
+                    <span className="text-xs font-medium text-text-secondary">
+                      Cheki Grup: <strong className="text-text-primary">Rp {hargaChekiGrupPo.toLocaleString('id-ID')}</strong>
+                    </span>
+                  )}
                 </div>
               </div>
 
-              {/* OPTION 1: GROUP CHEKI HERO BANNER CARD (Only rendered if isGroupActive) */}
-              {isGroupActive && (
+              {/* OPTION 1: CHEKI GRUP HERO BANNER CARD (Only rendered if chekiGrupEnabled) — DEFAULT OFF */}
+              {chekiGrupEnabled && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -788,26 +822,24 @@ const KSShopPage = () => {
                   className="relative rounded-3xl sm:rounded-[2.5rem] overflow-hidden bg-surface border border-primary/20 shadow-xl group hover:border-primary/40 transition-all"
                 >
                   <div className="flex flex-col md:flex-row items-stretch">
-                    {/* Photo area */}
                     <div className="md:w-1/2 relative min-h-[220px] sm:min-h-[260px] overflow-hidden bg-black/40">
                       <img
                         src={
                           config?._groupMember?.shop_image_url || config?._groupMember?.image_url
                             ? getAssetPath(config._groupMember.shop_image_url || config._groupMember.image_url)
-                            : getAssetPath('/images/members/placeholder.svg')
+                            : getAssetPath('/images/members/group.webp')
                         }
-                        alt="Group Cheki Kohi Sekai"
+                        alt="Cheki Grup Kohi Sekai"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
                       <div className="absolute top-4 left-4">
                         <span className="px-3 py-1 rounded-full bg-gradient-to-r from-primary to-accent text-white text-[10px] font-black uppercase tracking-wider shadow-md">
-                          Best Value · All Members
+                          <FaUsers className="inline mr-1.5" /> Limited · All Members
                         </span>
                       </div>
                     </div>
 
-                    {/* Details & CTA */}
                     <div className="md:w-1/2 p-6 sm:p-8 md:p-10 flex flex-col justify-between space-y-6">
                       <div>
                         <div className="flex items-center gap-2 text-xs font-bold text-primary mb-1">
@@ -815,10 +847,10 @@ const KSShopPage = () => {
                           <span>SESI GRUP KHUSUS</span>
                         </div>
                         <h3 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
-                          Group Cheki (Full Member)
+                          Cheki Grup (Semua Member)
                         </h3>
                         <p className="text-xs sm:text-sm text-text-secondary leading-relaxed mt-2">
-                          Foto polaroid 2-Shot eksklusif bersama seluruh member Kohi Sekai sekaligus dalam satu frame kenangan tak terlupakan.
+                          Foto polaroid eksklusif bersama SELURUH member Kohi Sekai sekaligus dalam satu frame kenangan. Hanya tersedia di event terpilih.
                         </p>
                       </div>
 
@@ -826,7 +858,7 @@ const KSShopPage = () => {
                         <div>
                           <span className="text-[10px] uppercase tracking-wider text-text-secondary font-bold block">Biaya Tiket</span>
                           <span className="text-2xl sm:text-3xl font-black text-text-primary">
-                            Rp {hargaGrup.toLocaleString()}
+                            Rp {hargaChekiGrupPo.toLocaleString('id-ID')}
                           </span>
                         </div>
 
@@ -843,13 +875,28 @@ const KSShopPage = () => {
                 </motion.div>
               )}
 
-              {/* OPTION 2: MEMBER LINEUP CHART CARDS */}
+              {/* OPTION 2: MEMBER LINEUP CHART CARDS — tampil jika Regular ATAU Wide enabled */}
+              {isRegularActive && (
               <div className="space-y-4 pt-4">
-                <div className="flex items-center gap-2">
-                  <FaCamera className="text-primary" />
-                  <h3 className="text-xl font-black text-text-primary tracking-tight uppercase">
-                    Member 2-Shot Cheki Lineup
-                  </h3>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <FaCamera className="text-primary" />
+                    <h3 className="text-xl font-black text-text-primary tracking-tight uppercase">
+                      Member Cheki Lineup
+                    </h3>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-[9px] sm:text-[10px]">
+                    {regularChekiEnabled && (
+                      <span className="px-2 py-0.5 rounded-full bg-primary/10 border border-primary/25 text-primary font-bold">
+                        Regular 4:3
+                      </span>
+                    )}
+                    {wideChekiEnabled && (
+                      <span className="px-2 py-0.5 rounded-full bg-[var(--primary)]/10 border border-[var(--primary)]/25 text-[var(--primary)] font-bold">
+                        Wide 16:9
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -869,7 +916,6 @@ const KSShopPage = () => {
                         transition={{ delay: idx * 0.08 }}
                         className="group relative rounded-3xl overflow-hidden bg-surface border border-border hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col justify-between"
                       >
-                        {/* Member Photo area */}
                         <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-surface to-background">
                           {photoUrl ? (
                             <img
@@ -887,7 +933,6 @@ const KSShopPage = () => {
 
                           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
 
-                          {/* Flavor / Role Badge */}
                           <div className="absolute top-3 left-3">
                             <span
                               className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider text-white shadow-sm"
@@ -897,7 +942,6 @@ const KSShopPage = () => {
                             </span>
                           </div>
 
-                          {/* Member Stage Name on Bottom of Photo */}
                           <div className="absolute bottom-3 left-3 right-3">
                             <p className="text-[10px] font-black uppercase tracking-widest text-primary/80">
                               {member.nama_kanji || 'コーヒー・アイドル'}
@@ -908,29 +952,42 @@ const KSShopPage = () => {
                           </div>
                         </div>
 
-                        {/* Card Footer Info */}
-                        <div className="p-5 flex items-center justify-between gap-3 border-t border-border">
-                          <div>
+                        {/* Card Footer: 2 baris harga (Regular + Wide jika aktif) */}
+                        <div className="p-5 space-y-3 border-t border-border">
+                          <div className="space-y-1.5">
                             <div className="flex items-center gap-1.5">
-                              <span className="text-[9px] uppercase tracking-wider text-text-secondary font-bold block">
-                                Tiket 2-Shot
+                              <span className="text-[9px] uppercase tracking-wider text-text-secondary font-bold">
+                                Daftar Harga
                               </span>
                               {slotCount !== undefined && (
-                                <span className="text-[9px] font-bold text-primary">
-                                  ({slotCount} slot)
+                                <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                                  Sisa: {slotCount} slot
                                 </span>
                               )}
                             </div>
-                            <span className="text-lg font-black text-text-primary">
-                              Rp {memberPrice.toLocaleString()}
-                            </span>
+                            {regularChekiEnabled && (
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-text-secondary">Regular · 2-Shot</span>
+                                <span className="text-sm font-black text-text-primary">
+                                  Rp {memberPrice.toLocaleString('id-ID')}
+                                </span>
+                              </div>
+                            )}
+                            {wideChekiEnabled && (
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-[var(--primary)]">Wide · 16:9</span>
+                                <span className="text-sm font-black text-[var(--primary)]">
+                                  Rp {hargaWidePo.toLocaleString('id-ID')}
+                                </span>
+                              </div>
+                            )}
                           </div>
 
                           <button
                             onClick={handleScrollToCalendar}
-                            className="py-2.5 px-5 rounded-full bg-primary/20 border border-primary/40 hover:bg-primary text-primary hover:text-white font-bold text-xs uppercase tracking-wider shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-1.5"
+                            className="w-full py-2.5 px-5 rounded-full bg-primary/20 border border-primary/40 hover:bg-primary text-primary hover:text-white font-bold text-xs uppercase tracking-wider shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-1.5"
                           >
-                            <span>Pilih Event</span>
+                            <span>Pilih Event untuk Pesan</span>
                             <FaArrowRight size={10} />
                           </button>
                         </div>
@@ -939,6 +996,7 @@ const KSShopPage = () => {
                   })}
                 </div>
               </div>
+              )}
             </section>
           )}
 
@@ -956,3 +1014,6 @@ const KSShopPage = () => {
 }
 
 export default KSShopPage
+
+
+

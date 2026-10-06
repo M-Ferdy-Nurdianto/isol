@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react'
+﻿import React, { useRef, useState, useEffect } from 'react'
 import { FaDownload, FaChevronLeft, FaExclamationTriangle, FaWhatsapp } from 'react-icons/fa'
 import { toPng } from 'html-to-image'
 
@@ -125,7 +125,7 @@ const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false }
       
       {/* Glow Effects */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-400/20 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#079108]/15 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[var(--primary)]/15 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div 
         className="relative z-10 transition-transform duration-300"
@@ -148,7 +148,7 @@ const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false }
         >
         {/* Header */}
         <div className="flex flex-col items-center text-center space-y-1 mb-4 mt-2">
-          <img src="/images/logos/logo.webp" alt="Kohi Sekai" className="h-16 object-contain mb-1" />
+          <img src="/images/logos/logo.svg" alt="Kohi Sekai" className="h-16 object-contain mb-1" />
           <h2 className="text-2xl font-bold tracking-[0.1em] text-black uppercase">KOHI SEKAI</h2>
           <p className="text-xs font-bold text-gray-600 uppercase tracking-widest">Official Website</p>
         </div>
@@ -343,7 +343,7 @@ const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false }
             )}
             <button 
               onClick={handleDownload}
-              className={`${isPreview ? 'w-full' : 'flex-[2]'} bg-gray-900 text-white py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-3 hover:bg-black transition-colors`}
+              className={`${isPreview ? 'w-full' : 'flex-[2]'} bg-[var(--surface)] text-white py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-3 hover:bg-black transition-colors`}
             >
               <FaDownload className="text-xs" />
               Download Nota
@@ -357,3 +357,4 @@ const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false }
 }
 
 export default DigitalReceipt
+

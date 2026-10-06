@@ -130,9 +130,9 @@ const AdminLogin = () => {
   }
 
   return (
-    <div className="admin-layout min-h-screen bg-[#090d16] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="admin-layout min-h-screen bg-[var(--background)] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Subtle Radial Glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#079108]/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[var(--primary)]/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-10 right-10 w-72 h-72 bg-[#00e5e5]/5 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="relative bg-[#111726]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.6)] p-8 w-full max-w-md">
@@ -144,13 +144,13 @@ const AdminLogin = () => {
             title="Kohi Sekai"
           >
             <img 
-              src={getAssetPath('/images/logos/logo.webp')} 
+              src={getAssetPath('/images/logos/logo.svg')} 
               alt="Kohi Sekai Logo" 
               className="w-full h-full object-contain filter drop-shadow-[0_4px_12px_rgba(7,145,8,0.2)] group-hover:brightness-110 transition-all"
             />
           </div>
           <h1 className="text-2xl font-black tracking-tight text-white uppercase">
-            Login <span className="text-[#079108]">Staff</span>
+            Login <span className="text-[var(--primary)]">Staff</span>
           </h1>
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mt-1">Kohi Sekai Portal</p>
         </div>
@@ -164,7 +164,7 @@ const AdminLogin = () => {
               type="text"
               value={formData.username}
               onChange={(e) => setFormData({...formData, username: e.target.value})}
-              className="w-full px-4 py-3 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-500 focus:outline-none focus:border-[#079108] focus:ring-1 focus:ring-[#079108] transition-all text-sm"
+              className="w-full px-4 py-3 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-[var(--text-secondary)]/60 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all text-sm"
               placeholder="Enter username"
               required
             />
@@ -179,7 +179,7 @@ const AdminLogin = () => {
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
-                className="w-full px-4 py-3 pr-12 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-zinc-500 focus:outline-none focus:border-[#079108] focus:ring-1 focus:ring-[#079108] transition-all text-sm"
+                className="w-full px-4 py-3 pr-12 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-[var(--text-secondary)]/60 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all text-sm"
                 placeholder="Enter password"
                 required
               />
@@ -197,7 +197,7 @@ const AdminLogin = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#079108] text-white font-bold py-3.5 px-4 rounded-xl hover:bg-[#067a07] transition-all shadow-[0_0_20px_rgba(7,145,8,0.3)] hover:shadow-[0_0_25px_rgba(7,145,8,0.5)] flex justify-center items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            className="w-full bg-[var(--primary)] text-white font-bold py-3.5 px-4 rounded-xl hover:bg-[var(--primary)]/85 transition-all shadow-[0_0_20px_rgba(7,145,8,0.3)] hover:shadow-[0_0_25px_rgba(7,145,8,0.5)] flex justify-center items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-2"
           >
             {loading ? (
               <>
@@ -227,3 +227,5 @@ const AdminLogin = () => {
 }
 
 export default AdminLogin
+
+

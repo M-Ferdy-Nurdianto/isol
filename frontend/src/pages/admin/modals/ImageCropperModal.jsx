@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+﻿import React, { useState, useCallback } from 'react'
 import Cropper from 'react-easy-crop'
 import { FaTimes, FaCheck } from 'react-icons/fa'
 
@@ -77,13 +77,13 @@ const ImageCropperModal = ({ isOpen, onClose, imageSrc, onCropComplete, aspect =
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border bg-surface">
           <h3 className="font-bold text-lg">Sesuaikan Gambar</h3>
-          <button onClick={onClose} className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/10">
+          <button onClick={onClose} className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg hover:bg-[var(--border)]">
             <FaTimes />
           </button>
         </div>
 
         {/* Cropper Area */}
-        <div className="relative w-full h-[50vh] bg-black">
+        <div className="relative w-full h-[50vh] bg-[var(--background)]">
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -103,7 +103,7 @@ const ImageCropperModal = ({ isOpen, onClose, imageSrc, onCropComplete, aspect =
         <div className="p-6 bg-surface border-t border-border space-y-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-2">Zoom</label>
+              <label className="block text-xs font-bold text-[var(--text-secondary)] mb-2">Zoom</label>
               <input
                 type="range"
                 value={zoom}
@@ -116,7 +116,7 @@ const ImageCropperModal = ({ isOpen, onClose, imageSrc, onCropComplete, aspect =
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-2">Rotasi (Derajat)</label>
+              <label className="block text-xs font-bold text-[var(--text-secondary)] mb-2">Rotasi (Derajat)</label>
               <input
                 type="range"
                 value={rotation}
@@ -133,14 +133,14 @@ const ImageCropperModal = ({ isOpen, onClose, imageSrc, onCropComplete, aspect =
           <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <button
               onClick={onClose}
-              className="px-6 py-2 rounded-xl text-sm font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="px-6 py-2 rounded-xl text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border)] transition-colors"
             >
               Batal
             </button>
             <button
               onClick={handleSave}
               disabled={isProcessing}
-              className="px-6 py-2 rounded-xl text-sm font-bold bg-primary hover:bg-primary/90 text-white flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
+              className="px-6 py-2 rounded-xl text-sm font-bold bg-primary hover:bg-primary/90 text-[var(--text-primary)] flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
             >
               <FaCheck /> {isProcessing ? 'Memproses...' : 'Terapkan & Simpan (WebP)'}
             </button>
@@ -152,3 +152,5 @@ const ImageCropperModal = ({ isOpen, onClose, imageSrc, onCropComplete, aspect =
 }
 
 export default ImageCropperModal
+
+

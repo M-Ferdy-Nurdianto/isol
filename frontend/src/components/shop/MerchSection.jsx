@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+﻿import { motion } from 'framer-motion'
 import { FaBox, FaPlus } from 'react-icons/fa'
 import { useFlyToCart } from '../../context/FlyToCartContext'
 
@@ -9,7 +9,7 @@ const MerchSection = ({ merch, merchCart, setSelectedMerch, addToMerchCart }) =>
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 bg-gradient-to-br from-[#079108] to-emerald-400 rounded-xl flex items-center justify-center shadow-lg shadow-[#079108]/20">
+        <div className="w-10 h-10 bg-gradient-to-br from-[var(--primary)] to-emerald-400 rounded-xl flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
           <FaBox className="text-white" />
         </div>
         <div>
@@ -53,7 +53,7 @@ const MerchSection = ({ merch, merchCart, setSelectedMerch, addToMerchCart }) =>
                   </div>
                 )}
                 {!habis && !isClosed && inCart && (
-                  <div className="absolute top-2 right-2 bg-[#079108] text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg">
+                  <div className="absolute top-2 right-2 bg-[var(--primary)] text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg">
                     {inCart.quantity}x
                   </div>
                 )}
@@ -63,13 +63,13 @@ const MerchSection = ({ merch, merchCart, setSelectedMerch, addToMerchCart }) =>
                 <h4 className="font-black text-sm uppercase tracking-tight text-gray-900 dark:text-white leading-tight">{item.nama}</h4>
                 {item.deskripsi && <p className="text-[10px] text-gray-500 dark:text-slate-400 line-clamp-2 leading-relaxed whitespace-pre-line">{item.deskripsi}</p>}
                 <div className="flex items-center justify-between pt-1">
-                  <span className={`text-base font-black ${isClosed ? 'text-gray-400 dark:text-slate-500' : 'text-[#079108]'}`}>
+                  <span className={`text-base font-black ${isClosed ? 'text-gray-400 dark:text-slate-500' : 'text-[var(--primary)]'}`}>
                     IDR {item.harga.toLocaleString()}
                   </span>
                   {!habis && !isClosed && (
                       <motion.div
                         whileTap={{ scale: 0.9 }}
-                        className="w-8 h-8 rounded-full bg-[#079108] flex items-center justify-center text-white shadow-md cursor-pointer"
+                        className="w-8 h-8 rounded-full bg-[var(--primary)] flex items-center justify-center text-white shadow-md cursor-pointer"
                         onClick={e => { 
                           e.stopPropagation(); 
                           const rect = e.currentTarget.getBoundingClientRect()
@@ -102,3 +102,4 @@ const MerchSection = ({ merch, merchCart, setSelectedMerch, addToMerchCart }) =>
 }
 
 export default MerchSection
+

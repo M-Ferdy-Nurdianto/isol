@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaHeart, FaArrowLeft, FaBirthdayCake, FaInstagram, FaPalette, FaQuoteLeft, FaLock } from 'react-icons/fa'
 import { getAssetPath } from '../lib/pathUtils'
@@ -95,7 +95,7 @@ const MembersPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900 overflow-x-hidden">
       {/* Background decorations */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-[#079108]/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[var(--primary)]/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-40 right-20 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-pink-100/20 via-purple-100/20 to-blue-100/20 rounded-full blur-3xl"></div>
       </div>
@@ -282,7 +282,7 @@ const MembersPage = () => {
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="relative w-full lg:w-[45%] aspect-[4/5] bg-white dark:bg-[#182238] p-4 pb-16 md:p-6 md:pb-24 shadow-2xl rounded-sm border-t border-l border-gray-100 dark:border-white/10 flex-shrink-0"
                       >
-                        <div className="w-full h-full overflow-hidden bg-gray-50 dark:bg-[#0c1220] rounded-sm">
+                        <div className="w-full h-full overflow-hidden bg-gray-50 dark:bg-[var(--surface)] rounded-sm">
                           <img 
                             src={getProfileImage(selectedMember)} 
                             alt={data.namaPanggung}
@@ -454,3 +454,4 @@ const MembersPage = () => {
 }
 
 export default MembersPage
+

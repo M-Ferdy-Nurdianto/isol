@@ -49,7 +49,7 @@ const InternalPaymentInfo = ({ payment, copyToClipboard, copied }) => (
           className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all shrink-0 ${
             copied 
               ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/30' 
-              : 'bg-emerald-50 text-[#079108] border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30 active:scale-95'
+              : 'bg-emerald-50 text-[var(--primary)] border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30 active:scale-95'
           }`}
         >
           {copied ? <FaCheckCircle className="text-xs" /> : <FaRegCopy className="text-xs" />}
@@ -208,7 +208,7 @@ const InternalCartSummary = ({
         type="button"
         onClick={onConfirm}
         disabled={isDisabled || !hasItems}
-        className="hidden lg:flex w-full bg-[#079108] hover:bg-[#067a07] text-white py-3.5 rounded-2xl font-bold text-sm items-center justify-center transition-all disabled:opacity-50 active:scale-95 shadow-md shadow-emerald-500/20"
+        className="hidden lg:flex w-full bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-white py-3.5 rounded-2xl font-bold text-sm items-center justify-center transition-all disabled:opacity-50 active:scale-95 shadow-md shadow-emerald-500/20"
       >
         CONFIRM PESANAN
       </button>
@@ -362,7 +362,7 @@ const CheckoutProcess = ({
                 </span>
               </button>
               <div className="flex items-center gap-2 pl-3 border-l border-gray-200 dark:border-white/10">
-                <span className="bg-[#079108] text-white px-3 py-1 rounded-full text-[10px] font-bold">
+                <span className="bg-[var(--primary)] text-white px-3 py-1 rounded-full text-[10px] font-bold">
                   {step === 2 ? 'Tickets' : 'Merchandise'}
                 </span>
               </div>
@@ -402,7 +402,7 @@ const CheckoutProcess = ({
               </div>
 
               {/* Baris 3: Nomor Rekening + Tombol Copy â€” baris sendiri */}
-              <div className="mt-3 flex items-center justify-between gap-3 bg-white/70 dark:bg-[#0d1724] border border-emerald-100 dark:border-white/10 rounded-xl px-3.5 py-2.5">
+              <div className="mt-3 flex items-center justify-between gap-3 bg-white/70 dark:bg-[var(--surface)] border border-emerald-100 dark:border-white/10 rounded-xl px-3.5 py-2.5">
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-0.5">
                     Nomor rekening
@@ -418,7 +418,7 @@ const CheckoutProcess = ({
                   className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-all active:scale-95 ${
                     copied
                       ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/30'
-                      : 'bg-emerald-50 text-[#079108] border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30'
+                      : 'bg-emerald-50 text-[var(--primary)] border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30'
                   }`}
                 >
                   {copied ? (
@@ -500,7 +500,7 @@ const CheckoutProcess = ({
                                   <span
                                     className={`font-bold text-sm ${
                                       isSelected
-                                        ? 'text-[#079108] dark:text-emerald-400'
+                                        ? 'text-[var(--primary)] dark:text-emerald-400'
                                         : 'text-gray-900 dark:text-white'
                                     }`}
                                   >
@@ -606,7 +606,7 @@ const CheckoutProcess = ({
                   className={`relative rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden group h-28 flex items-center justify-center ${
                     activeFilePreview
                       ? 'border-emerald-500 bg-emerald-50/30 dark:bg-emerald-500/5'
-                      : 'border-gray-200 dark:border-white/15 border-dashed hover:border-emerald-500 bg-gray-50 dark:bg-[#0b101d]'
+                      : 'border-gray-200 dark:border-white/15 border-dashed hover:border-emerald-500 bg-gray-50 dark:bg-[var(--input-bg)]'
                   }`}
                 >
                   {activeFilePreview ? (
@@ -807,7 +807,7 @@ const CheckoutProcess = ({
             type="submit"
             form="checkout-form"
             disabled={isSubmitDisabled}
-            className="flex-1 bg-[#079108] hover:bg-[#067a07] text-white py-3.5 px-6 rounded-2xl font-bold text-xs shadow-lg shadow-emerald-500/30 flex items-center justify-center transition-all disabled:opacity-50 active:scale-95"
+            className="flex-1 bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-white py-3.5 px-6 rounded-2xl font-bold text-xs shadow-lg shadow-emerald-500/30 flex items-center justify-center transition-all disabled:opacity-50 active:scale-95"
           >
             CONFIRM
           </button>
@@ -826,7 +826,7 @@ const LoadingOverlay = ({ isVisible, message }) => (
         initial={{ opacity: 0 }} 
         animate={{ opacity: 1 }} 
         exit={{ opacity: 0 }} 
-        className="fixed inset-0 z-[9999] bg-white/90 dark:bg-[#090d16]/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center"
+        className="fixed inset-0 z-[9999] bg-white/90 dark:bg-[var(--background)]/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center"
       >
         <div className="relative">
           <div className="w-24 h-24 rounded-full border-4 border-emerald-100 dark:border-emerald-950 border-t-emerald-500 animate-spin"></div>
@@ -851,3 +851,5 @@ const LoadingOverlay = ({ isVisible, message }) => (
 )
 
 export default CheckoutProcess
+
+

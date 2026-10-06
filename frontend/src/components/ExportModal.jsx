@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react'
+﻿import React, { useState, useEffect, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaFilePdf, FaFileExcel, FaCalendarAlt, FaTicketAlt, FaLayerGroup, FaTimes, FaCheck, FaDownload } from 'react-icons/fa'
 import CustomSelect from '../pages/admin/components/CustomSelect'
@@ -50,7 +50,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
             <div className="bg-[#161f33] px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <FaDownload className="text-[#079108]" />
+                  <FaDownload className="text-[var(--primary)]" />
                   Export Data Order
                 </h3>
                 <p className="text-[11px] text-zinc-400">Unduh laporan transaksi dalam format Excel atau PDF</p>
@@ -76,14 +76,14 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
                     onClick={() => setFormat('excel')}
                     className={`relative p-3.5 rounded-xl border flex flex-col items-center gap-2 transition-all ${
                       format === 'excel'
-                        ? 'border-[#079108] bg-[#079108]/15 text-[#22c55e] shadow-[0_0_15px_rgba(7,145,8,0.25)]'
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/15 text-[#22c55e] shadow-[0_0_15px_rgba(7,145,8,0.25)]'
                         : 'border-white/10 bg-[#161f33] text-zinc-400 hover:border-white/20 hover:text-zinc-200'
                     }`}
                   >
                     <FaFileExcel className="text-2xl" />
                     <span className="font-bold text-xs">Excel (.xlsx)</span>
                     {format === 'excel' && (
-                      <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-[#079108] flex items-center justify-center text-[10px] text-white">
+                      <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-[var(--primary)] flex items-center justify-center text-[10px] text-white">
                         <FaCheck size={8} />
                       </span>
                     )}
@@ -119,7 +119,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
                   <label
                     className={`flex items-center p-3 rounded-xl border cursor-pointer transition-all ${
                       scope === 'current'
-                        ? 'border-[#079108] bg-[#079108]/10 text-white'
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/10 text-white'
                         : 'border-white/10 bg-[#161f33] text-zinc-300 hover:border-white/20'
                     }`}
                   >
@@ -128,7 +128,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
                       name="scope"
                       checked={scope === 'current'}
                       onChange={() => setScope('current')}
-                      className="w-4 h-4 accent-[#079108] cursor-pointer"
+                      className="w-4 h-4 accent-[var(--primary)] cursor-pointer"
                     />
                     <div className="ml-3 flex items-center gap-2.5 text-xs font-semibold">
                       <FaLayerGroup className={scope === 'current' ? 'text-[#22c55e]' : 'text-zinc-400'} />
@@ -140,7 +140,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
                   <div
                     className={`rounded-xl border transition-all overflow-hidden ${
                       scope === 'event'
-                        ? 'border-[#079108] bg-[#079108]/10'
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/10'
                         : 'border-white/10 bg-[#161f33] hover:border-white/20'
                     }`}
                   >
@@ -150,7 +150,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
                         name="scope"
                         checked={scope === 'event'}
                         onChange={() => setScope('event')}
-                        className="w-4 h-4 accent-[#079108] cursor-pointer"
+                        className="w-4 h-4 accent-[var(--primary)] cursor-pointer"
                       />
                       <div className="ml-3 flex items-center gap-2.5 text-xs font-semibold text-zinc-200">
                         <FaTicketAlt className={scope === 'event' ? 'text-[#22c55e]' : 'text-zinc-400'} />
@@ -177,7 +177,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
                   <div
                     className={`rounded-xl border transition-all overflow-hidden ${
                       scope === 'month'
-                        ? 'border-[#079108] bg-[#079108]/10'
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/10'
                         : 'border-white/10 bg-[#161f33] hover:border-white/20'
                     }`}
                   >
@@ -187,7 +187,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
                         name="scope"
                         checked={scope === 'month'}
                         onChange={() => setScope('month')}
-                        className="w-4 h-4 accent-[#079108] cursor-pointer"
+                        className="w-4 h-4 accent-[var(--primary)] cursor-pointer"
                       />
                       <div className="ml-3 flex items-center gap-2.5 text-xs font-semibold text-zinc-200">
                         <FaCalendarAlt className={scope === 'month' ? 'text-[#22c55e]' : 'text-zinc-400'} />
@@ -201,7 +201,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
                           type="month"
                           value={selectedMonth}
                           onChange={(e) => setSelectedMonth(e.target.value)}
-                          className="w-full bg-[#182032] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:border-[#079108] focus:outline-none"
+                          className="w-full bg-[#182032] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:border-[var(--primary)] focus:outline-none"
                         />
                       </div>
                     )}
@@ -224,7 +224,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
                 onClick={handleExport}
                 className={`px-5 py-2 rounded-xl text-xs font-bold text-white shadow-lg transition-all flex items-center gap-2 active:scale-95 ${
                   format === 'excel'
-                    ? 'bg-[#079108] hover:bg-[#067a07] shadow-[#079108]/30'
+                    ? 'bg-[var(--primary)] hover:bg-[var(--primary)]/85 shadow-[var(--primary)]/30'
                     : 'bg-red-500 hover:bg-red-600 shadow-red-500/30'
                 }`}
               >
@@ -239,4 +239,5 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
 })
 
 export default ExportModal
+
 

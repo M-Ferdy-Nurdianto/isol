@@ -14,6 +14,7 @@ const KSMusicPage = lazy(() => import('./pages/KSMusicPage'))
 const KSLoginPage = lazy(() => import('./pages/KSLoginPage'))
 const KSProfilePage = lazy(() => import('./pages/KSProfilePage'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
+const KSUserOTSPage = lazy(() => import('./pages/KSUserOTSPage'))
 
 // Admin Pages
 const AdminPage = lazy(() => import('./pages/AdminPage'))
@@ -85,6 +86,7 @@ function App() {
                   <Route path="/music" element={<MaintenanceGuard><KSMusicPage /></MaintenanceGuard>} />
                   <Route path="/login" element={<KSLoginPage />} />
                   <Route path="/profile" element={<MaintenanceGuard><KSProfilePage /></MaintenanceGuard>} />
+                  <Route path="/ots" element={<MaintenanceGuard><KSUserOTSPage /></MaintenanceGuard>} />
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
 
                   {/* Admin Portal Routes */}
