@@ -1,13 +1,77 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Swal from 'sweetalert2'
-import { FaTimes, FaPlus, FaMinus, FaCheckCircle, FaMoneyBillWave, FaQrcode, FaUsers, FaChevronUp, FaChevronDown, FaSearch, FaUserCheck, FaUser, FaTimesCircle, FaLandmark, FaImage } from 'react-icons/fa'
+import {
+  FaTimes,
+  FaPlus,
+  FaMinus,
+  FaCheckCircle,
+  FaMoneyBillWave,
+  FaQrcode,
+  FaUsers,
+  FaChevronUp,
+  FaChevronDown,
+  FaSearch,
+  FaUserCheck,
+  FaUser,
+  FaTimesCircle,
+  FaLandmark,
+  FaImage,
+  FaShoppingBag,
+  FaTicketAlt
+} from 'react-icons/fa'
 import api from '../../../lib/api'
 import { formatMemberName } from '../../../lib/memberUtils'
+import { getAssetPath } from '../../../lib/pathUtils'
 import CustomSelect from './CustomSelect'
+
+const DEFAULT_OFFICIAL_MERCH = [
+  {
+    id: 'merch-tshirt-01',
+    nama: 'Kohi Sekai Official T-Shirt - Kawaii Metal Vol. 1',
+    deskripsi: 'Kaos katun combed 24s premium bertema Kawaii Metal dengan sablon plastisol halus tahan lama.',
+    harga: 175000,
+    stok: 25,
+    available: true,
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    gambar_url: '/images/members/placeholder.svg'
+  },
+  {
+    id: 'merch-lightstick-01',
+    nama: 'Official Lightstick - Neon Glow Stick 15 Colors',
+    deskripsi: 'Lightstick resmi Kohi Sekai dengan 15 pilihan warna cerah dan tali lanyard eksklusif.',
+    harga: 150000,
+    stok: 40,
+    available: true,
+    sizes: [],
+    gambar_url: '/images/members/placeholder.svg'
+  },
+  {
+    id: 'merch-photocard-01',
+    nama: 'Exclusive Photocard Pack Vol. 1 (5 Cards)',
+    deskripsi: 'Set photocard holographic eksklusif isi 5 kartu menampilkan seluruh member idol Kohi Sekai.',
+    harga: 50000,
+    stok: 60,
+    available: true,
+    sizes: [],
+    gambar_url: '/images/members/placeholder.svg'
+  },
+  {
+    id: 'merch-acrylic-01',
+    nama: 'Kohi Sekai Idol Acrylic Standee',
+    deskripsi: 'Standee akrilik premium tebal 3mm tinggi 12cm dengan cetakan UV jernih.',
+    harga: 65000,
+    stok: 35,
+    available: true,
+    sizes: [],
+    gambar_url: '/images/members/placeholder.svg'
+  }
+]
 
 const OTSOrderInlineForm = ({
   members = [],
+  merch = [],
   events = [],
+  defaultEventId = '',
   onClose,
   onSuccess,
   onCartChange,
@@ -23,15 +87,30 @@ const OTSOrderInlineForm = ({
   paymentEnableQris = true,
   paymentEnableTf = false,
 }) => {
-  const validEvents = events.filter(event => {
-    if (event.is_special) return false
-    if (event.is_past) return false
+  const validEvents = useMemo(() => {
+    if (!events || events.length === 0) return []
     const months = { 'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5, 'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11 }
-    const eventDate = new Date(event.tahun, months[event.bulan] || 0, event.tanggal)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return eventDate >= today
-  })
+
+    // Prioritize active (non-past) events, sorted by date
+    const active = events
+      .filter(e => !e.is_past)
+      .sort((a, b) => {
+        const da = new Date(a.tahun, months[a.bulan] || 0, a.tanggal)
+        const db = new Date(b.tahun, months[b.bulan] || 0, b.tanggal)
+        return da - db
+      })
+
+    if (active.length > 0) return active
+    return events
+  }, [events])
+
+  const initialEventId = () => {
+    if (defaultEventId && defaultEventId !== 'all') {
+      const match = events.find(e => String(e.id) === String(defaultEventId))
+      if (match) return match.id
+    }
+    return validEvents.length > 0 ? validEvents[0].id : ''
+  }
 
   const defaultPayment = (() => {
     if (paymentEnableCash) return 'Cash'
@@ -43,12 +122,30 @@ const OTSOrderInlineForm = ({
   const [formData, setFormData] = useState({
     nama_lengkap: mode === 'user' && fanUser ? fanUser.nama : '',
     user_id: mode === 'user' && fanUser ? fanUser.id : undefined,
-    event_id: validEvents.length > 0 ? validEvents[0].id : '',
+    event_id: initialEventId(),
     payment_method: defaultPayment,
     items: []
   })
+
+  // Auto-sync event_id when validEvents or defaultEventId loads
+  useEffect(() => {
+    if (!formData.event_id && validEvents.length > 0) {
+      const targetId = (defaultEventId && defaultEventId !== 'all' && events.some(e => String(e.id) === String(defaultEventId)))
+        ? defaultEventId
+        : validEvents[0].id
+      setFormData(prev => ({ ...prev, event_id: targetId }))
+    }
+  }, [validEvents, defaultEventId, events, formData.event_id])
+
   const [submitting, setSubmitting] = useState(false)
   const [cartExpanded, setCartExpanded] = useState(false)
+  const [activeCategory, setActiveCategory] = useState('cheki') // 'cheki' | 'merch'
+  const [selectedMerchSizes, setSelectedMerchSizes] = useState({})
+
+  const displayMerch = useMemo(() => {
+    if (merch && merch.length > 0) return merch
+    return DEFAULT_OFFICIAL_MERCH
+  }, [merch])
 
   // ── Fan account search state ───────────────────────────────────────────────
   const [fanSearchQuery, setFanSearchQuery] = useState('')
@@ -141,7 +238,7 @@ const OTSOrderInlineForm = ({
     m => !(m.member_id === 'group' || m.member_id === 'kohisekai' || m.nama_panggung?.toLowerCase().includes('kohi'))
   )
 
-  // addItem now accepts chekiType: 'regular' | 'wide' | 'grup'
+  // addItem: chekiType: 'regular' | 'wide' | 'grup'
   const addItem = (member, chekiType = 'regular') => {
     const isGrupCard = chekiType === 'grup'
     let price = 0
@@ -158,7 +255,6 @@ const OTSOrderInlineForm = ({
       displayName = 'Cheki Grup (Semua Member)'
     }
 
-    // Key is combination of member_id + cheki_type (same member can have regular & wide separately)
     const keyMember = isGrupCard ? 'grup' : member.id
     const existingIndex = formData.items.findIndex(
       item => item.member_id === keyMember && (item.cheki_type || 'regular') === chekiType
@@ -177,6 +273,41 @@ const OTSOrderInlineForm = ({
           price,
           quantity: 1
         }]
+      })
+    }
+  }
+
+  // addMerchItem: official merchandise with optional size
+  const addMerchItem = (item) => {
+    const hasSizes = Array.isArray(item.sizes) && item.sizes.length > 0
+    const chosenSize = hasSizes ? (selectedMerchSizes[item.id] || item.sizes[0]) : null
+    const key = chosenSize ? `merch_${item.id}_${chosenSize}` : `merch_${item.id}`
+    const displayName = chosenSize ? `${item.nama} (${chosenSize})` : item.nama
+    const price = Number(item.harga) || 0
+
+    const existingIndex = formData.items.findIndex(
+      i => i.item_key === key || (i.merchandise_id === item.id && i.size === chosenSize)
+    )
+
+    if (existingIndex > -1) {
+      const updated = [...formData.items]
+      updated[existingIndex].quantity += 1
+      setFormData({ ...formData, items: updated })
+    } else {
+      setFormData({
+        ...formData,
+        items: [
+          ...formData.items,
+          {
+            item_key: key,
+            merchandise_id: item.id,
+            cheki_type: 'merch',
+            size: chosenSize,
+            name: displayName,
+            price,
+            quantity: 1
+          }
+        ]
       })
     }
   }
@@ -203,7 +334,7 @@ const OTSOrderInlineForm = ({
       return
     }
     if (formData.items.length === 0) {
-      Swal.fire({ icon: 'warning', title: 'Belum Ada Item', text: 'Pilih minimal satu tiket cheki member.', confirmButtonColor: '#E8944A' })
+      Swal.fire({ icon: 'warning', title: 'Belum Ada Item', text: 'Pilih minimal satu tiket cheki atau merchandise.', confirmButtonColor: '#E8944A' })
       return
     }
     if (!formData.nama_lengkap || formData.nama_lengkap.trim() === '') {
@@ -215,7 +346,6 @@ const OTSOrderInlineForm = ({
     try {
       const payload = { ...formData }
       if (mode === 'user' && fanUser) {
-        // Force user_id dan nama dari token fan (server akan validasi juga)
         payload.user_id = fanUser.id
         payload.nama_lengkap = fanUser.nama
       }
@@ -257,27 +387,64 @@ const OTSOrderInlineForm = ({
 
   const eventOptions = [
     { value: '', label: '-- Pilih Event OTS --' },
-    ...validEvents.map(event => ({ value: event.id, label: `${event.nama} (${event.tanggal} ${event.bulan} ${event.tahun})` }))
+    ...events.map(event => ({
+      value: event.id,
+      label: `${event.nama} (${event.tanggal} ${event.bulan} ${event.tahun})${event.is_special ? ' · [Special]' : ''}${event.is_past ? ' · [Selesai]' : ''}`
+    }))
   ]
 
-  // Dipakai di 2 tempat (desktop sidebar & mobile expanded sheet) â€” hindari duplikasi JSX
+  // Dipakai di desktop sidebar & mobile expanded sheet
   const CartItemsList = () => (
     <div className="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pr-1">
       {formData.items.map((item, idx) => (
         <div key={idx} className="flex justify-between items-center bg-[var(--surface)] border border-[var(--border)] px-2.5 py-1.5 rounded-lg text-xs">
-          <div className="truncate max-w-[140px]">
+          <div className="truncate max-w-[150px]">
             <div className="text-[var(--text-primary)] font-semibold truncate">{item.name}</div>
-            <div className="text-[10px] text-[var(--primary)]">Rp {item.price.toLocaleString('id-ID')}</div>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-[10px] text-[var(--primary)] font-mono font-bold">
+                Rp {item.price.toLocaleString('id-ID')}
+              </span>
+              {item.cheki_type === 'merch' ? (
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                  Merch
+                </span>
+              ) : item.cheki_type === 'wide' ? (
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  Wide
+                </span>
+              ) : item.cheki_type === 'grup' ? (
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  Grup
+                </span>
+              ) : (
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-[var(--primary)]/20 text-[var(--primary)] border border-[var(--primary)]/30">
+                  Cheki
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-1.5">
-            <button type="button" onClick={() => updateQuantity(idx, -1)} className="w-6 h-6 flex items-center justify-center bg-[var(--border)] hover:bg-[var(--primary)]/20 text-[var(--text-secondary)] rounded">
+            <button
+              type="button"
+              onClick={() => updateQuantity(idx, -1)}
+              className="w-6 h-6 flex items-center justify-center bg-[var(--border)] hover:bg-[var(--primary)]/20 text-[var(--text-secondary)] rounded transition"
+            >
               <FaMinus className="text-[9px]" />
             </button>
             <span className="font-bold text-[var(--text-primary)] text-xs px-1">{item.quantity}</span>
-            <button type="button" onClick={() => updateQuantity(idx, 1)} className="w-6 h-6 flex items-center justify-center bg-[var(--border)] hover:bg-[var(--primary)]/20 text-[var(--text-secondary)] rounded">
+            <button
+              type="button"
+              onClick={() => updateQuantity(idx, 1)}
+              className="w-6 h-6 flex items-center justify-center bg-[var(--border)] hover:bg-[var(--primary)]/20 text-[var(--text-secondary)] rounded transition"
+            >
               <FaPlus className="text-[9px]" />
             </button>
-            <button type="button" onClick={() => removeItem(idx)} className="ml-1 text-red-400 hover:text-red-300 p-1" title="Hapus">
+            <button
+              type="button"
+              onClick={() => removeItem(idx)}
+              className="ml-1 text-red-400 hover:text-red-300 p-1 transition"
+              title="Hapus"
+            >
               <FaTimes className="text-xs" />
             </button>
           </div>
@@ -474,10 +641,315 @@ const OTSOrderInlineForm = ({
     </div>
   )
 
+  const MerchGrid = () => (
+    <div className="bg-[var(--background)] border border-[var(--border)] p-4 rounded-xl flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <h4 className="font-bold text-xs text-[var(--text-secondary)] flex items-center gap-2">
+          <FaShoppingBag className="text-teal-400" /> Official Merchandise ({displayMerch.length})
+        </h4>
+        <span className="text-[10px] text-[var(--text-secondary)] font-mono">
+          Ready Stock di Venue
+        </span>
+      </div>
+
+      {displayMerch.length === 0 ? (
+        <div className="p-6 rounded-xl bg-[var(--surface)] border border-[var(--border)] text-center text-[var(--text-secondary)] text-xs">
+          Belum ada produk merchandise yang tersedia saat ini.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {displayMerch.map((item) => {
+            const hasSizes = Array.isArray(item.sizes) && item.sizes.length > 0
+            const currentSelectedSize = hasSizes ? (selectedMerchSizes[item.id] || item.sizes[0]) : null
+            const itemKey = currentSelectedSize ? `merch_${item.id}_${currentSelectedSize}` : `merch_${item.id}`
+            const selectedItem = formData.items.find(i => i.item_key === itemKey || (i.merchandise_id === item.id && i.size === currentSelectedSize))
+            const count = selectedItem ? selectedItem.quantity : 0
+            const price = Number(item.harga) || 0
+            const stockCount = typeof item.stok === 'number' ? item.stok : 0
+            const isOutOfStock = typeof item.stok === 'number' && item.stok <= 0
+
+            return (
+              <div
+                key={item.id}
+                className={`p-3 rounded-xl border transition-all flex flex-col justify-between gap-2.5 ${
+                  count > 0
+                    ? 'bg-teal-500/10 border-teal-500/70 shadow-[0_0_12px_rgba(20,184,166,0.15)] ring-1 ring-teal-500/30'
+                    : 'bg-[var(--surface)] border-[var(--border)] hover:border-teal-500/40'
+                }`}
+              >
+                <div className="flex gap-2.5 items-start">
+                  <div className="w-14 h-14 rounded-lg bg-[var(--background)] border border-[var(--border)] overflow-hidden shrink-0 flex items-center justify-center relative">
+                    <img
+                      src={getAssetPath(item.gambar_url || '/images/members/placeholder.svg')}
+                      alt={item.nama}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null
+                        e.target.src = getAssetPath('/images/members/placeholder.svg')
+                      }}
+                    />
+                    {count > 0 && (
+                      <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-teal-500 text-black text-[9px] font-black shadow">
+                        {count}x
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs font-bold text-[var(--text-primary)] line-clamp-2 leading-tight">
+                      {item.nama}
+                    </span>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <span className="text-xs font-black text-teal-400 font-mono">
+                        Rp {price.toLocaleString('id-ID')}
+                      </span>
+                      {stockCount > 0 ? (
+                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/30 font-mono">
+                          Stok: {stockCount}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-400 font-bold border border-amber-500/30">
+                          Pre-Order
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Size selector if available */}
+                {hasSizes && (
+                  <div className="pt-1.5 border-t border-[var(--border)]">
+                    <div className="text-[10px] font-bold text-[var(--text-secondary)] mb-1">
+                      Pilihan Ukuran:
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {item.sizes.map((sz) => {
+                        const isSizeActive = currentSelectedSize === sz
+                        return (
+                          <button
+                            key={sz}
+                            type="button"
+                            onClick={() => setSelectedMerchSizes(prev => ({ ...prev, [item.id]: sz }))}
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold border transition ${
+                              isSizeActive
+                                ? 'bg-teal-500 text-black border-teal-400 font-black'
+                                : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-teal-400/50'
+                            }`}
+                          >
+                            {sz}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Add button */}
+                <button
+                  type="button"
+                  onClick={() => addMerchItem(item)}
+                  disabled={isOutOfStock}
+                  className={`w-full py-2 px-3 rounded-lg text-xs font-bold border transition flex items-center justify-center gap-1.5 ${
+                    isOutOfStock
+                      ? 'bg-neutral-800 border-neutral-700 text-neutral-500 cursor-not-allowed'
+                      : count > 0
+                        ? 'bg-teal-500 text-black border-teal-400 shadow-[0_2px_8px_rgba(20,184,166,0.3)]'
+                        : 'bg-[var(--background)] hover:bg-teal-500/15 text-[var(--text-primary)] border-[var(--border)] hover:border-teal-400/50'
+                  }`}
+                >
+                  <FaPlus className="text-[10px]" />
+                  <span>{count > 0 ? `Tambah Lagi (${count}x)` : 'Tambah ke Order'}</span>
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+
+  const ItemsCatalog = () => (
+    <div className="space-y-3">
+      {/* Switcher Tab: Tiket Cheki vs Official Merchandise */}
+      <div className="flex bg-[var(--background)] p-1 rounded-xl border border-[var(--border)]">
+        <button
+          type="button"
+          onClick={() => setActiveCategory('cheki')}
+          className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+            activeCategory === 'cheki'
+              ? 'bg-[var(--primary)] text-[var(--text-primary)] shadow-sm'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)]'
+          }`}
+        >
+          <FaTicketAlt className="text-xs" />
+          <span>Tiket Cheki</span>
+          <span className="text-[10px] px-1.5 py-0.2 rounded bg-black/25 font-mono">
+            {individualMembers.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveCategory('merch')}
+          className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+            activeCategory === 'merch'
+              ? 'bg-teal-500 text-black shadow-sm font-black'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)]'
+          }`}
+        >
+          <FaShoppingBag className="text-xs" />
+          <span>Official Merch</span>
+          <span className="text-[10px] px-1.5 py-0.2 rounded bg-black/25 font-mono">
+            {displayMerch.length}
+          </span>
+        </button>
+      </div>
+
+      {/* Catalog Render */}
+      {activeCategory === 'cheki' ? <MemberGrid /> : <MerchGrid />}
+    </div>
+  )
+
+  const PaymentSelector = () => (
+    <div>
+      <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">Metode pembayaran</label>
+      <div className={`grid gap-2.5 ${
+        (paymentEnableCash ? 1 : 0) + (paymentEnableQris ? 1 : 0) + (paymentEnableTf ? 1 : 0) <= 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+        {paymentEnableCash && (
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, payment_method: 'Cash' })}
+            className={`py-2.5 px-3 rounded-xl font-bold text-xs border flex items-center justify-center gap-2 transition-all ${
+              formData.payment_method === 'Cash' ? 'bg-[var(--primary)] text-[var(--text-primary)] border-[var(--primary)] shadow-[0_2px_8px_rgba(232,148,74,0.3)]' : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40'
+            }`}
+          >
+            <FaMoneyBillWave /> Cash / Tunai
+          </button>
+        )}
+        {paymentEnableQris && (
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, payment_method: 'QR' })}
+            className={`py-2.5 px-3 rounded-xl font-bold text-xs border flex items-center justify-center gap-2 transition-all ${
+              formData.payment_method === 'QR' ? 'bg-[var(--primary)] text-[var(--text-primary)] border-[var(--primary)] shadow-[0_2px_8px_rgba(232,148,74,0.3)]' : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40'
+            }`}
+          >
+            <FaQrcode /> QRIS
+          </button>
+        )}
+        {paymentEnableTf && (
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, payment_method: 'Transfer' })}
+            className={`py-2.5 px-3 rounded-xl font-bold text-xs border flex items-center justify-center gap-2 transition-all ${
+              formData.payment_method === 'Transfer' ? 'bg-[var(--primary)] text-[var(--text-primary)] border-[var(--primary)] shadow-[0_2px_8px_rgba(232,148,74,0.3)]' : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40'
+            }`}
+          >
+            <FaLandmark /> Transfer
+          </button>
+        )}
+      </div>
+    </div>
+  )
+
+  const renderFanInput = () => {
+    if (mode === 'user' && fanUser) {
+      return (
+        <div className="flex items-center gap-2 px-3.5 py-3 bg-[var(--primary)]/10 border border-[var(--primary)]/50 rounded-xl">
+          <div className="w-9 h-9 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center shrink-0">
+            <FaUserCheck className="text-[var(--primary)]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-[var(--text-primary)] truncate">{fanUser.nama}</p>
+            <p className="text-[11px] text-[var(--text-secondary)] truncate">Akunmu · Fan #{fanUser.fan_code || '-'}{fanUser.whatsapp ? ` · ${fanUser.whatsapp}` : ''}</p>
+          </div>
+          <span className="px-2.5 py-1 rounded-md bg-[var(--primary)]/15 text-[var(--primary)] text-[11px] font-bold border border-[var(--primary)]/30">
+            Otomatis dari akun
+          </span>
+        </div>
+      )
+    }
+
+    if (selectedFan) {
+      return (
+        <div className="flex items-center gap-2 px-3.5 py-2.5 bg-[var(--primary)]/10 border border-[var(--primary)]/50 rounded-xl">
+          <div className="w-7 h-7 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center shrink-0">
+            <FaUserCheck className="text-[var(--primary)] text-sm" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-[var(--text-primary)] truncate">{selectedFan.nama}</p>
+            <p className="text-[10px] text-[var(--text-secondary)] truncate">Fan #{selectedFan.fan_code}{selectedFan.whatsapp ? ` · ${selectedFan.whatsapp}` : ''}</p>
+          </div>
+          <button type="button" onClick={handleClearFan} className="text-[var(--text-secondary)] hover:text-red-400 transition shrink-0 p-1" title="Ganti akun">
+            <FaTimesCircle className="text-sm" />
+          </button>
+        </div>
+      )
+    }
+
+    return (
+      <div className="space-y-1.5">
+        <div className="relative" ref={fanSearchRef}>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] pointer-events-none">
+            {fanSearchLoading ? (
+              <span className="w-3 h-3 border border-[var(--primary)] border-t-transparent rounded-full animate-spin block" />
+            ) : (
+              <FaSearch className="text-xs" />
+            )}
+          </span>
+          <input
+            type="text"
+            placeholder="Cari akun fan (nama/Fan ID)..."
+            value={fanSearchQuery}
+            onChange={(e) => handleFanSearch(e.target.value)}
+            onFocus={() => fanSearchResults.length > 0 && setShowFanDropdown(true)}
+            className="w-full pl-8 pr-3 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl placeholder-[var(--text-secondary)]/50 focus:border-[var(--primary)] focus:outline-none transition"
+          />
+          {showFanDropdown && fanSearchResults.length > 0 && (
+            <div ref={fanDropdownRef} className="absolute top-full left-0 right-0 mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl z-50 overflow-hidden max-h-52 overflow-y-auto">
+              {fanSearchResults.map((fan) => (
+                <button
+                  key={fan.id}
+                  type="button"
+                  onClick={() => handleSelectFan(fan)}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[var(--primary)]/10 transition text-left border-b border-[var(--border)] last:border-0"
+                >
+                  <div className="w-7 h-7 rounded-full bg-[var(--border)] flex items-center justify-center shrink-0 text-[var(--text-secondary)]">
+                    <FaUser className="text-[10px]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-[var(--text-primary)] truncate">{fan.nama}</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] truncate">
+                      Fan #{fan.fan_code}{fan.whatsapp ? ` · ${fan.whatsapp}` : ''}
+                    </p>
+                  </div>
+                  <span className="text-[10px] text-[var(--primary)] font-bold shrink-0">Pilih</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {showFanDropdown && !fanSearchLoading && fanSearchQuery.length >= 2 && fanSearchResults.length === 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl z-50 px-3 py-2.5 text-xs text-[var(--text-secondary)]">
+              Akun tidak ditemukan.
+            </div>
+          )}
+        </div>
+        <p className="text-[10px] text-[var(--text-secondary)] px-0.5">Atau ketik nama langsung jika fan belum punya akun:</p>
+        <input
+          type="text"
+          placeholder="Contoh: Kiki"
+          value={formData.nama_lengkap}
+          onChange={(e) => setFormData({ ...formData, nama_lengkap: e.target.value })}
+          className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-sm rounded-xl placeholder-[var(--text-secondary)]/50 focus:border-[var(--primary)] focus:outline-none transition"
+          required
+        />
+      </div>
+    )
+  }
+
   return (
-    // pb-24 di mobile = ruang aman untuk floating cart bar + bottom navbar; md:pb-0 supaya tidak nambah spasi di desktop
+    // pb-24 di mobile = ruang aman untuk floating cart bar; md:pb-6 di desktop
     <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 md:p-6 shadow-xl animate-fade-in relative pb-24 md:pb-6">
-      {/* Header â€” compact 1 baris teratur di mobile (< md), 1 baris di desktop (â‰¥ md) */}
+      {/* Header — compact 1 baris di mobile (< md), 1 baris di desktop (≥ md) */}
       <div className="pb-4 mb-5 border-b border-[var(--border)]">
         {/* Mobile Header (< md) */}
         <div className="md:hidden flex items-center justify-between gap-2">
@@ -486,7 +958,7 @@ const OTSOrderInlineForm = ({
             <h3 className="text-base font-black text-[var(--text-primary)] truncate">Order OTS</h3>
             {totalQty > 0 && (
               <span className="px-2 py-0.5 rounded-full bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30 text-xs font-bold font-mono shrink-0">
-                {totalQty} items
+                {totalQty} item
               </span>
             )}
           </div>
@@ -501,17 +973,17 @@ const OTSOrderInlineForm = ({
           </button>
         </div>
 
-        {/* Desktop Header (â‰¥ md) */}
+        {/* Desktop Header (≥ md) */}
         <div className="hidden md:flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[var(--primary)] animate-pulse shrink-0"></span>
               <h3 className="text-lg font-black text-[var(--text-primary)]">
-                Form Order OTS <span className="text-[var(--primary)] font-mono text-sm">(On The Spot)</span>
+                Form Order OTS <span className="text-[var(--primary)] font-mono text-sm">(Cheki & Merchandise)</span>
               </h3>
             </div>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              Input pemesanan tiket 2-Shot langsung di tempat venue tanpa modal popup.
+              Input pemesanan tiket 2-Shot dan official merchandise langsung di venue tanpa popup.
             </p>
           </div>
 
@@ -527,206 +999,88 @@ const OTSOrderInlineForm = ({
       </div>
 
       <form onSubmit={handleSubmit}>
-        {/* ============ MOBILE: 1 kolom, member grid duluan ============ */}
+        {/* ============ MOBILE: 1 kolom berurutan ============ */}
         <div className="lg:hidden space-y-4">
           <div>
             <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
               Event aktif <span className="text-red-400">*</span>
             </label>
-            <CustomSelect options={eventOptions} value={formData.event_id} onChange={(e) => setFormData({ ...formData, event_id: e.target.value })} className="w-full" />
+            <CustomSelect
+              options={eventOptions}
+              value={formData.event_id}
+              onChange={(e) => setFormData({ ...formData, event_id: e.target.value })}
+              className="w-full"
+            />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
               Nama pembeli / fan <span className="text-red-400">*</span>
             </label>
-            {/* Mode USER: nama readonly dari akun */}
-            {mode === 'user' && fanUser ? (
-              <div className="flex items-center gap-2 px-3.5 py-2.5 bg-[var(--primary)]/10 border border-[var(--primary)]/50 rounded-xl">
-                <div className="w-7 h-7 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center shrink-0">
-                  <FaUserCheck className="text-[var(--primary)] text-sm" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-[var(--text-primary)] truncate">{fanUser.nama}</p>
-                  <p className="text-[10px] text-[var(--text-secondary)] truncate">Akunmu · Fan #{fanUser.fan_code || '-'}</p>
-                </div>
-                <span className="px-2 py-0.5 rounded-md bg-[var(--primary)]/15 text-[var(--primary)] text-[10px] font-bold border border-[var(--primary)]/30">
-                  Otomatis
-                </span>
-              </div>
-            ) : selectedFan ? (
-              <div className="flex items-center gap-2 px-3.5 py-2.5 bg-[var(--primary)]/10 border border-[var(--primary)]/50 rounded-xl">
-                <div className="w-7 h-7 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center shrink-0">
-                  <FaUserCheck className="text-[var(--primary)] text-sm" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-[var(--text-primary)] truncate">{selectedFan.nama}</p>
-                  <p className="text-[10px] text-[var(--text-secondary)] truncate">Fan #{selectedFan.fan_code}{selectedFan.whatsapp ? ` · ${selectedFan.whatsapp}` : ''}</p>
-                </div>
-                <button type="button" onClick={handleClearFan} className="text-[var(--text-secondary)] hover:text-red-400 transition shrink-0 p-1" title="Ganti akun">
-                  <FaTimesCircle className="text-sm" />
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                <div className="relative" ref={fanSearchRef}>
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] pointer-events-none">
-                    {fanSearchLoading ? (
-                      <span className="w-3 h-3 border border-[var(--primary)] border-t-transparent rounded-full animate-spin block" />
-                    ) : (
-                      <FaSearch className="text-xs" />
-                    )}
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="Cari akun fan (nama/Fan ID)..."
-                    value={fanSearchQuery}
-                    onChange={(e) => handleFanSearch(e.target.value)}
-                    onFocus={() => fanSearchResults.length > 0 && setShowFanDropdown(true)}
-                    className="w-full pl-8 pr-3 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl placeholder-[var(--text-secondary)]/50 focus:border-[var(--primary)] focus:outline-none transition"
-                  />
-                  {showFanDropdown && fanSearchResults.length > 0 && (
-                    <div ref={fanDropdownRef} className="absolute top-full left-0 right-0 mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl z-50 overflow-hidden max-h-52 overflow-y-auto">
-                      {fanSearchResults.map((fan) => (
-                        <button
-                          key={fan.id}
-                          type="button"
-                          onClick={() => handleSelectFan(fan)}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[var(--primary)]/10 transition text-left border-b border-[var(--border)] last:border-0"
-                        >
-                          <div className="w-7 h-7 rounded-full bg-[var(--border)] flex items-center justify-center shrink-0 text-[var(--text-secondary)]">
-                            <FaUser className="text-[10px]" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold text-[var(--text-primary)] truncate">{fan.nama}</p>
-                            <p className="text-[10px] text-[var(--text-secondary)] truncate">
-                              Fan #{fan.fan_code}{fan.whatsapp ? ` · ${fan.whatsapp}` : ''}
-                            </p>
-                          </div>
-                          <span className="text-[10px] text-[var(--primary)] font-bold shrink-0">Pilih</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  {showFanDropdown && !fanSearchLoading && fanSearchQuery.length >= 2 && fanSearchResults.length === 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl z-50 px-3 py-2.5 text-xs text-[var(--text-secondary)]">
-                      Akun tidak ditemukan.
-                    </div>
-                  )}
-                </div>
-                <p className="text-[10px] text-[var(--text-secondary)] px-0.5">Atau ketik nama langsung jika fan belum punya akun:</p>
-                <input
-                  type="text"
-                  placeholder="Contoh: Kiki"
-                  value={formData.nama_lengkap}
-                  onChange={(e) => setFormData({ ...formData, nama_lengkap: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-sm rounded-xl placeholder-[var(--text-secondary)]/50 focus:border-[var(--primary)] focus:outline-none transition"
-                  required
-                />
-              </div>
-            )}
+            {renderFanInput()}
+          </div>
+
+          <PaymentSelector />
+
+          <div>
+            <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
+              Pilih Item Pemesanan
+            </label>
+            <ItemsCatalog />
           </div>
         </div>
 
-        {/* ============ DESKTOP: 2 kolom seperti sebelumnya ============ */}
+        {/* ============ DESKTOP: 2 kolom lebar + sidebar ringkasan ============ */}
         <div className="hidden lg:grid lg:grid-cols-12 gap-6">
           <div className="lg:col-span-5 space-y-4">
             <div>
               <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
                 Event aktif <span className="text-red-400">*</span>
               </label>
-              <CustomSelect options={eventOptions} value={formData.event_id} onChange={(e) => setFormData({ ...formData, event_id: e.target.value })} className="w-full" />
+              <CustomSelect
+                options={eventOptions}
+                value={formData.event_id}
+                onChange={(e) => setFormData({ ...formData, event_id: e.target.value })}
+                className="w-full"
+              />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
                 Nama pembeli / fan <span className="text-red-400">*</span>
-            </label>
-              {/* Mode USER: nama readonly dari akun */}
-              {mode === 'user' && fanUser ? (
-                <div className="flex items-center gap-2 px-3.5 py-3 bg-[var(--primary)]/10 border border-[var(--primary)]/50 rounded-xl">
-                  <div className="w-9 h-9 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center shrink-0">
-                    <FaUserCheck className="text-[var(--primary)]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-[var(--text-primary)] truncate">{fanUser.nama}</p>
-                    <p className="text-[11px] text-[var(--text-secondary)] truncate">Akunmu · Fan #{fanUser.fan_code || '-'}{fanUser.whatsapp ? ` · ${fanUser.whatsapp}` : ''}</p>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-md bg-[var(--primary)]/15 text-[var(--primary)] text-[11px] font-bold border border-[var(--primary)]/30">
-                    Otomatis dari akun
-                  </span>
-                </div>
-              ) : (
-                <input
-                  type="text"
-                  placeholder="Contoh: Kiki"
-                  value={formData.nama_lengkap}
-                  onChange={(e) => setFormData({ ...formData, nama_lengkap: e.target.value })}
-                  className="w-full px-3.5 py-3 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-base rounded-xl placeholder-[var(--text-secondary)]/50 focus:border-[var(--primary)] focus:outline-none transition"
-                  required
-                />
-              )}
+              </label>
+              {renderFanInput()}
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">Metode pembayaran</label>
-              <div className={`grid gap-2.5 ${
-                (paymentEnableCash ? 1 : 0) + (paymentEnableQris ? 1 : 0) + (paymentEnableTf ? 1 : 0) <= 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-                {paymentEnableCash && (
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, payment_method: 'Cash' })}
-                    className={`py-2.5 px-3 rounded-xl font-bold text-xs border flex items-center justify-center gap-2 transition-all ${
-                      formData.payment_method === 'Cash' ? 'bg-[var(--primary)] text-[var(--text-primary)] border-[var(--primary)] shadow-[0_2px_8px_rgba(232,148,74,0.3)]' : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40'
-                    }`}
-                  >
-                    <FaMoneyBillWave /> Cash / Tunai
-                  </button>
-                )}
-                {paymentEnableQris && (
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, payment_method: 'QR' })}
-                    className={`py-2.5 px-3 rounded-xl font-bold text-xs border flex items-center justify-center gap-2 transition-all ${
-                      formData.payment_method === 'QR' ? 'bg-[var(--primary)] text-[var(--text-primary)] border-[var(--primary)] shadow-[0_2px_8px_rgba(232,148,74,0.3)]' : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40'
-                    }`}
-                  >
-                    <FaQrcode /> QRIS
-                  </button>
-                )}
-                {paymentEnableTf && (
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, payment_method: 'Transfer' })}
-                    className={`py-2.5 px-3 rounded-xl font-bold text-xs border flex items-center justify-center gap-2 transition-all ${
-                      formData.payment_method === 'Transfer' ? 'bg-[var(--primary)] text-[var(--text-primary)] border-[var(--primary)] shadow-[0_2px_8px_rgba(232,148,74,0.3)]' : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40'
-                    }`}
-                  >
-                    <FaLandmark /> Transfer
-                  </button>
-                )}
-              </div>
-            </div>
+            <PaymentSelector />
 
             <div className="bg-[var(--background)] border border-[var(--border)] p-3.5 rounded-xl space-y-3">
               <div className="flex justify-between items-center text-xs font-bold text-[var(--text-secondary)]">
-                <span>Pesanan ({totalQty} tiket)</span>
+                <span>Pesanan ({totalQty} item)</span>
                 {formData.items.length > 0 && (
-                  <button type="button" onClick={() => setFormData({ ...formData, items: [] })} className="text-[10px] text-red-400 hover:underline font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, items: [] })}
+                    className="text-[10px] text-red-400 hover:underline font-semibold"
+                  >
                     Kosongkan
                   </button>
                 )}
               </div>
 
               {formData.items.length === 0 ? (
-                <p className="text-[11px] text-[var(--text-secondary)] py-3 text-center">Pilih member lineup di bawah untuk menambahkan tiket</p>
+                <p className="text-[11px] text-[var(--text-secondary)] py-3 text-center">
+                  Pilih tiket cheki atau merchandise di samping untuk menambahkan ke pesanan
+                </p>
               ) : (
                 <CartItemsList />
               )}
 
               <div className="pt-2 border-t border-[var(--border)] flex justify-between items-center">
                 <span className="text-xs text-[var(--text-secondary)]">Total Tagihan:</span>
-                <span className="text-base font-black text-[var(--primary)]">Rp {totalPrice.toLocaleString('id-ID')}</span>
+                <span className="text-base font-black text-[var(--primary)]">
+                  Rp {totalPrice.toLocaleString('id-ID')}
+                </span>
               </div>
 
               <button
@@ -741,7 +1095,7 @@ const OTSOrderInlineForm = ({
           </div>
 
           <div className="lg:col-span-7">
-            <MemberGrid />
+            <ItemsCatalog />
           </div>
         </div>
       </form>
@@ -749,12 +1103,18 @@ const OTSOrderInlineForm = ({
       {/* ============ MOBILE: floating cart bar ============ */}
       {formData.items.length > 0 && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40">
-          {/* Expanded sheet â€” daftar item + kosongkan, muncul di atas bar ringkas */}
+          {/* Expanded sheet — daftar item + kosongkan, muncul di atas bar ringkas */}
           {cartExpanded && (
             <div className="bg-[var(--surface)] border-t border-x border-[var(--border)] rounded-t-2xl p-4 shadow-[0_-8px_20px_rgba(26,21,18,0.8)] max-h-[50vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-xs font-bold text-[var(--text-secondary)]">Pesanan ({totalQty} tiket)</span>
-                <button type="button" onClick={() => setFormData({ ...formData, items: [] })} className="text-[10px] text-red-400 hover:underline font-semibold">
+                <span className="text-xs font-bold text-[var(--text-secondary)]">
+                  Pesanan ({totalQty} item)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, items: [] })}
+                  className="text-[10px] text-red-400 hover:underline font-semibold"
+                >
                   Kosongkan
                 </button>
               </div>
@@ -762,18 +1122,20 @@ const OTSOrderInlineForm = ({
             </div>
           )}
 
-          {/* Bar ringkas â€” flush bottom-0 mengisi posisi bottom navbar secara eksklusif */}
+          {/* Bar ringkas — solid background (no blur) */}
           <button
             type="button"
             onClick={() => setCartExpanded(prev => !prev)}
-            className={`w-full bg-[var(--surface)] backdrop-blur-xl border-t border-[var(--border)] px-4 py-3 flex items-center justify-between shadow-[0_-4px_24px_rgba(0,0,0,0.6)] ${cartExpanded ? '' : 'rounded-t-2xl'}`}
+            className={`w-full bg-[var(--surface)] border-t border-[var(--border)] px-4 py-3 flex items-center justify-between shadow-[0_-4px_24px_rgba(0,0,0,0.6)] ${cartExpanded ? '' : 'rounded-t-2xl'}`}
           >
             <div className="flex items-center gap-2.5 text-left">
               <div className="w-7 h-7 rounded-lg bg-[var(--border)] border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)]">
                 {cartExpanded ? <FaChevronDown className="text-xs" /> : <FaChevronUp className="text-xs" />}
               </div>
               <div>
-                <div className="text-xs font-bold text-[var(--text-primary)]">{totalQty} tiket Â· Rp {totalPrice.toLocaleString('id-ID')}</div>
+                <div className="text-xs font-bold text-[var(--text-primary)]">
+                  {totalQty} item · Rp {totalPrice.toLocaleString('id-ID')}
+                </div>
                 <div className="text-[10px] text-[var(--text-secondary)]">Tap untuk detail item</div>
               </div>
             </div>
@@ -794,6 +1156,3 @@ const OTSOrderInlineForm = ({
 }
 
 export default OTSOrderInlineForm
-
-
-

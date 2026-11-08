@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FaCalendarAlt, FaInfoCircle, FaTicketAlt, FaArrowLeft } from 'react-icons/fa'
+import { FaCalendarAlt, FaInfoCircle, FaTicketAlt, FaArrowLeft, FaShoppingBag } from 'react-icons/fa'
 import KSHeader from '../components/KSHeader'
 import OTSOrderInlineForm from './admin/components/OTSOrderInlineForm'
 import api from '../lib/api'
@@ -12,6 +12,7 @@ const KSUserOTSPage = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [members, setMembers] = useState([])
+  const [merch, setMerch] = useState([])
   const [events, setEvents] = useState([])
   const [config, setConfig] = useState({
     hargaOtsPerMember: 40000,
@@ -30,20 +31,27 @@ const KSUserOTSPage = () => {
     const loadData = async () => {
       setLoading(true)
       try {
-        const [membersRes, eventsRes, configRes] = await Promise.all([
+        const [membersRes, eventsRes, configRes, merchRes] = await Promise.all([
           api.get('/members').catch(() => ({ data: { data: [] } })),
           api.get('/events').catch(() => ({ data: { data: [] } })),
           api.get('/config').catch(() => ({ data: { data: [] } })),
+          api.get('/merchandise').catch(() => ({ data: { data: [] } })),
         ])
 
         const cfgList = configRes.data?.data || []
         const getCfg = (key, fallback) => {
-          const c = cfgList.find(x => x.key === key)
-          return c ? c.value : fallback
+          if (Array.isArray(cfgList)) {
+            const c = cfgList.find(x => x.key === key)
+            return c ? c.value : fallback
+          } else if (typeof cfgList === 'object' && cfgList !== null) {
+            return cfgList[key] !== undefined ? cfgList[key] : fallback
+          }
+          return fallback
         }
 
         setMembers(membersRes.data?.data || [])
         setEvents(eventsRes.data?.data || [])
+        setMerch(merchRes.data?.data || [])
         setConfig({
           hargaOtsPerMember: Number(getCfg('harga_ots_per_member', '40000')) || 40000,
           hargaOtsGrup: Number(getCfg('harga_ots_grup', '80000')) || 80000,
@@ -89,40 +97,38 @@ const KSUserOTSPage = () => {
 
         {/* Hero Header Page */}
         <div className="bg-[var(--surface)] border border-[var(--border)] rounded-3xl shadow-xl p-5 sm:p-8 mb-6 overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl -translate-y-1/4 translate-x-1/4" />
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[var(--primary)] animate-pulse shrink-0" />
-              <span className="text-[10px] font-black text-[var(--primary)] uppercase tracking-widest">
+              <span className="text-[10px] font-black text-[var(--primary)] uppercase tracking-widest font-mono">
                 On The Spot · Venue
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] tracking-tight mb-2">
-              Order Cheki <span className="text-[var(--primary)]">OTS</span>
+            <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] tracking-tight mb-2 uppercase font-space">
+              Pemesanan Langsung di Venue (OTS)
             </h1>
-            <p className="text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-              Pilih event aktif, pilih member dan tipe cheki, lalu submit order. 
-              Order OTS kamu akan berstatus <strong className="text-amber-400">pending</strong> sampai 
-              admin di venue mengonfirmasi pembayaran & pencetakan foto.
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-2xl">
+              Pesan tiket 2-Shot Cheki & Official Merchandise langsung di lokasi panggung. 
+              Pesananmu otomatis tercatat di akun Fan ID dan siap divalidasi oleh kru di merchandise booth.
             </p>
           </div>
         </div>
 
-        {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* 3 Panduan Cepat Card */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-4 flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/20 text-[var(--primary)] flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-300 flex items-center justify-center shrink-0">
               <FaTicketAlt />
             </div>
             <div>
-              <p className="text-sm font-bold text-[var(--text-primary)]">Pilih Event Aktif</p>
+              <p className="text-sm font-bold text-[var(--text-primary)]">Pilih Tiket & Merch</p>
               <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">
-                Hanya event yang <strong>tanggalnya hari ini atau mendatang</strong> yang menerima order OTS.
+                Tersedia Cheki Regular, Wide 16:9, Cheki Grup, serta Official Merchandise resmi.
               </p>
             </div>
           </div>
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-4 flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0">
               <FaCalendarAlt />
             </div>
             <div>
@@ -133,7 +139,7 @@ const KSUserOTSPage = () => {
             </div>
           </div>
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-4 flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-400/20 text-purple-300 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0">
               <FaInfoCircle />
             </div>
             <div>
@@ -145,38 +151,29 @@ const KSUserOTSPage = () => {
           </div>
         </div>
 
-        {/* OTS FORM */}
+        {/* OTS FORM RENDERED CLEANLY */}
         <div className="scrollable-area relative">
-          {loading ? (
-            <div className="bg-[var(--surface)] rounded-3xl border border-[var(--border)] p-10 text-center text-[var(--text-secondary)]">
-              Memuat data form OTS...
-            </div>
-          ) : !config.regularChekiEnabled && !config.wideChekiEnabled && !config.chekiGrupEnabled ? (
-            <div className="bg-[var(--surface)] rounded-3xl border border-[var(--border)] p-10 text-center">
-              <FaInfoCircle className="text-[var(--primary)] mx-auto mb-3 text-2xl opacity-70" />
-              <p className="text-[var(--text-secondary)] text-sm font-semibold">
-                Saat ini belum ada tipe cheki yang tersedia untuk OTS. Silakan coba lagi nanti.
-              </p>
-            </div>
-          ) : (
-            <OTSOrderInlineForm
-              mode="user"
-              members={members}
-              events={events}
-              fanUser={fanUser}
-              hargaOtsPerMember={config.hargaOtsPerMember}
-              hargaOtsGrup={config.hargaOtsGrup}
-              hargaChekiGrupOts={config.hargaChekiGrupOts}
-              regularChekiEnabled={config.regularChekiEnabled}
-              wideChekiEnabled={config.wideChekiEnabled}
-              chekiGrupEnabled={config.chekiGrupEnabled}
-              paymentEnableCash={config.paymentEnableCash}
-              paymentEnableQris={config.paymentEnableQris}
-              paymentEnableTf={config.paymentEnableTf}
-              onClose={() => navigate('/profile')}
-              onSuccess={() => navigate('/profile')}
-            />
-          )}
+          <OTSOrderInlineForm
+            members={members}
+            merch={merch}
+            events={events}
+            mode="user"
+            fanUser={fanUser}
+            onClose={() => navigate(-1)}
+            onSuccess={() => {
+              kohiToast.success('Pesanan OTS berhasil dibuat! Silakan hubungi kru di venue untuk konfirmasi.')
+              navigate('/profile')
+            }}
+            hargaOtsPerMember={config.hargaOtsPerMember}
+            hargaOtsGrup={config.hargaOtsGrup}
+            hargaChekiGrupOts={config.hargaChekiGrupOts}
+            regularChekiEnabled={config.regularChekiEnabled}
+            wideChekiEnabled={config.wideChekiEnabled}
+            chekiGrupEnabled={config.chekiGrupEnabled}
+            paymentEnableCash={config.paymentEnableCash}
+            paymentEnableQris={config.paymentEnableQris}
+            paymentEnableTf={config.paymentEnableTf}
+          />
         </div>
       </main>
     </div>

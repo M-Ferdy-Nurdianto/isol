@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FaTools, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 import { useMaintenance } from '../context/MaintenanceContext'
@@ -40,7 +40,7 @@ const MaintenanceAdminBadge = () => {
         <button
           onClick={() => setIsMinimized(false)}
           title="Mode MT Aktif (Admin Preview). Klik untuk perbesar."
-          className="group flex items-center justify-center w-10 h-10 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/50 backdrop-blur-xl shadow-[0_4px_20px_rgba(245,158,11,0.35)] transition-all active:scale-95"
+          className="group flex items-center justify-center w-10 h-10 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/50 shadow-[0_4px_20px_rgba(245,158,11,0.35)] transition-all active:scale-95"
         >
           <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -49,7 +49,7 @@ const MaintenanceAdminBadge = () => {
           <FaTools className="text-sm group-hover:rotate-12 transition-transform duration-200" />
         </button>
       ) : (
-        <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-[var(--background)]/85 hover:bg-[var(--background)]/95 border border-amber-500/40 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.6),0_0_15px_rgba(245,158,11,0.2)] transition-all">
+        <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-[var(--background)] hover:bg-[var(--surface)] border border-amber-500/40 shadow-[0_8px_32px_rgba(0,0,0,0.6),0_0_15px_rgba(245,158,11,0.2)] transition-all">
           {/* Status Dot */}
           <div className="relative flex items-center justify-center">
             <span className="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-amber-400 opacity-75"></span>

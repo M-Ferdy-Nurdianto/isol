@@ -1,4 +1,4 @@
-﻿import { motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { FaMusic } from 'react-icons/fa'
 
 const FeaturedMusic = () => {
@@ -9,7 +9,7 @@ const FeaturedMusic = () => {
         initial={{ opacity: 0, rotateX: 10, y: 50 }}
         animate={{ opacity: 1, rotateX: 0, y: 0 }}
         transition={{ duration: 1, type: "spring", bounce: 0.4 }}
-        className="relative rounded-[2rem] sm:rounded-[3rem] p-0 sm:p-[2px] bg-gradient-to-b from-[#1DB954]/50 via-[var(--primary)]/30 to-[#4A90B5]/50 shadow-[0_10px_30px_-5px_rgba(7,145,8,0.3)] group w-full overflow-hidden"
+        className="relative rounded-[2rem] sm:rounded-[3rem] p-0 sm:p-[2px] bg-gradient-to-b from-[#1DB954]/50 via-[var(--primary)]/30 to-[#4A90B5]/50 shadow-[0_10px_30px_-5px_rgba(232,148,74,0.3)] group w-full overflow-hidden"
       >
         <div className="absolute inset-0 rounded-[2rem] sm:rounded-[3rem] bg-black/80 backdrop-blur-3xl overflow-hidden -z-10">
            {/* Animated soundwaves background */}

@@ -3,10 +3,9 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { supabase } from '../config/supabase.js'
 import { sendEmail } from '../utils/email.js'
+import { JWT_SECRET, signToken, verifyToken } from '../config/jwt.js'
 
 const router = express.Router()
-
-const JWT_SECRET = process.env.JWT_SECRET || 'kohi_sekai_fan_secret_2026'
 
 // In-memory OTP store for Registration
 const otpStore = new Map()
@@ -26,9 +25,8 @@ router.post('/login', async (req, res) => {
 
       // Guest sandbox credentials
       if (username.trim() === 'GS123' && password === 'GS321') {
-        const token = jwt.sign(
-          { id: 'guest-demo-user', username: 'GS123', role: 'admin' },
-          JWT_SECRET,
+        const token = signToken(
+          { id: 'guest-demo-user', username: 'GS123', role: 'guest' },
           { expiresIn: '1d' }
         )
         return res.json({
@@ -38,7 +36,7 @@ router.post('/login', async (req, res) => {
             id: 'guest-demo-user',
             username: 'GS123',
             full_name: 'Guest Tester (Demo)',
-            role: 'admin'
+            role: 'guest'
           }
         })
       }
@@ -90,6 +88,24 @@ router.post('/login', async (req, res) => {
         return res.status(404).json({
           error: 'Email belum terdaftar. Silakan registrasi terlebih dahulu.'
         })
+      }
+
+      // Jika password disertakan, verifikasi dengan Supabase Auth
+      if (password) {
+        try {
+          const { error: authErr } = await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password: String(password)
+          })
+          if (authErr) {
+            const msg = (authErr.message || '').toLowerCase()
+            if (msg.includes('invalid') || msg.includes('credential') || authErr.status === 400) {
+              return res.status(401).json({ error: 'Password yang Anda masukkan salah' })
+            }
+          }
+        } catch (authCatchErr) {
+          console.warn('[Fan Login] Password verification fallback:', authCatchErr.message)
+        }
       }
 
       const token = jwt.sign(
@@ -263,7 +279,7 @@ router.post('/register', async (req, res) => {
 // ============================================================================
 router.post('/fan/login', async (req, res) => {
   try {
-    const { nama, email, whatsapp, instagram } = req.body
+    const { nama, email, whatsapp, instagram, password } = req.body
 
     if (!nama || nama.trim().length < 2) {
       return res.status(400).json({ error: 'Nama lengkap wajib diisi (minimal 2 karakter)' })
@@ -322,6 +338,28 @@ router.post('/fan/login', async (req, res) => {
 
         if (!insertError && inserted) {
           fanRecord = inserted
+        }
+      }
+
+      // Sinkronkan password ke Supabase Auth jika fan menyertakan password
+      if (password && fanRecord && fanRecord.id) {
+        try {
+          const { data: authUserRes } = await supabase.auth.admin.getUserById(fanRecord.id)
+          if (authUserRes?.user) {
+            await supabase.auth.admin.updateUserById(fanRecord.id, {
+              password: String(password)
+            })
+          } else {
+            await supabase.auth.admin.createUser({
+              id: fanRecord.id,
+              email: cleanEmail,
+              password: String(password),
+              email_confirm: true,
+              user_metadata: { nama: cleanNama }
+            })
+          }
+        } catch (authSyncErr) {
+          console.warn('[Fan Register] Supabase auth password sync warning:', authSyncErr.message)
         }
       }
     } catch (dbErr) {
@@ -645,11 +683,28 @@ router.post('/send-otp', async (req, res) => {
 </body>
 </html>`
 
-    const result = await sendEmail(cleanEmail, 'Kode Verifikasi Registrasi - Kohi Sekai', html)
-    if (result.success) {
-      return res.json({ success: true, message: 'OTP telah dikirim ke email Anda' })
-    } else {
-      throw result.error
+    try {
+      const result = await sendEmail(cleanEmail, 'Kode Verifikasi Registrasi - Kohi Sekai', html)
+      if (result.success) {
+        return res.json({ success: true, message: 'OTP telah dikirim ke email Anda' })
+      } else {
+        console.warn('[OTP] sendEmail failed, but OTP is saved in memory for dev:', result.error?.message || result.error)
+        if (process.env.NODE_ENV !== 'production' || !process.env.SMTP_USER) {
+          return res.json({
+            success: true,
+            message: 'OTP telah dibuat (Mode Dev: gunakan kode 000000 atau periksa console server)'
+          })
+        }
+        throw result.error
+      }
+    } catch (mailErr) {
+      if (process.env.NODE_ENV !== 'production' || !process.env.SMTP_USER) {
+        return res.json({
+          success: true,
+          message: 'OTP telah dibuat (Mode Dev: gunakan kode 000000 atau periksa console server)'
+        })
+      }
+      throw mailErr
     }
   } catch (error) {
     console.error('Error sending OTP:', error)

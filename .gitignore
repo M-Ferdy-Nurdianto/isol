@@ -60,3 +60,8 @@ CLAUDE.md
 CONTRIBUTING.md
 SECURITY.md
 TODO.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo

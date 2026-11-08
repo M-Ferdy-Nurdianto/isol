@@ -600,6 +600,7 @@ router.post('/request-email', async (req, res) => {
 
     const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
     const resetUrl = `${frontendBaseUrl}/reset-password?token=${encodeURIComponent(resetToken)}&type=email_token`
+    console.log('[Reset Password] Link generated:', resetUrl)
 
     // Buat HTML email yang menarik sesuai tema Kohi Sekai (Warm Dark Coffee)
     const html = `

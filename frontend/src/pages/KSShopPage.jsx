@@ -14,7 +14,11 @@ import {
   FaArrowRight,
   FaCheckCircle,
   FaUserCheck,
-  FaInfoCircle
+  FaInfoCircle,
+  FaBox,
+  FaWhatsapp,
+  FaTimes,
+  FaShoppingBag
 } from 'react-icons/fa'
 import { kohiToast } from '../components/ui/KohiToast'
 import KSHeader from '../components/KSHeader'
@@ -32,6 +36,49 @@ const INDO_MONTHS = [
 
 const DAY_NAMES = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 
+const DEFAULT_OFFICIAL_MERCH = [
+  {
+    id: 'merch-tshirt-01',
+    nama: 'Kohi Sekai Official T-Shirt - Kawaii Metal Vol. 1',
+    deskripsi: 'Kaos katun combed 24s premium bertema Kawaii Metal dengan sablon plastisol halus tahan lama. Nyaman dipakai nonton live maupun daily outfit.',
+    harga: 175000,
+    stok: 25,
+    available: true,
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    gambar_url: '/images/members/placeholder.svg'
+  },
+  {
+    id: 'merch-lightstick-01',
+    nama: 'Official Lightstick - Neon Glow Stick 15 Colors',
+    deskripsi: 'Lightstick resmi Kohi Sekai dengan 15 pilihan warna cerah dan tali lanyard eksklusif. Siap temani momen seru chant idol di setiap event!',
+    harga: 150000,
+    stok: 40,
+    available: true,
+    sizes: [],
+    gambar_url: '/images/members/placeholder.svg'
+  },
+  {
+    id: 'merch-photocard-01',
+    nama: 'Exclusive Photocard Pack Vol. 1 (5 Cards)',
+    deskripsi: 'Set photocard holographic eksklusif isi 5 kartu menampilkan seluruh member idol Kohi Sekai lengkap dengan printed signature khusus.',
+    harga: 50000,
+    stok: 60,
+    available: true,
+    sizes: [],
+    gambar_url: '/images/members/placeholder.svg'
+  },
+  {
+    id: 'merch-acrylic-01',
+    nama: 'Kohi Sekai Idol Acrylic Standee',
+    deskripsi: 'Standee akrilik premium tebal 3mm tinggi 12cm dengan cetakan UV jernih dan base stand berlogo Kohi Sekai.',
+    harga: 65000,
+    stok: 35,
+    available: true,
+    sizes: [],
+    gambar_url: '/images/members/placeholder.svg'
+  }
+]
+
 const KSShopPage = () => {
   const navigate = useNavigate()
   const { fanUser, isLoggedIn, openAuthModal } = useFanAuth()
@@ -40,7 +87,11 @@ const KSShopPage = () => {
   const [events, setEvents] = useState([])
   const [members, setMembers] = useState([])
   const [config, setConfig] = useState(null)
+  const [merchandise, setMerchandise] = useState([])
+  const [selectedMerch, setSelectedMerch] = useState(null)
+  const [selectedSize, setSelectedSize] = useState('')
   const [loading, setLoading] = useState(true)
+  const [activeShopTab, setActiveShopTab] = useState('cheki') // 'cheki' | 'merch'
 
   // Calendar states
   const today = useMemo(() => new Date(), [])
@@ -103,10 +154,11 @@ const KSShopPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [eventsRes, membersRes, configRes] = await Promise.allSettled([
+        const [eventsRes, membersRes, configRes, merchRes] = await Promise.allSettled([
           api.get('/events'),
           api.get('/members'),
           api.get('/config'),
+          api.get('/merchandise'),
         ])
 
         let fetchedEvents = []
@@ -176,6 +228,12 @@ const KSShopPage = () => {
             }
           ]
         }
+
+        let fetchedMerch = []
+        if (merchRes.status === 'fulfilled' && merchRes.value.data?.success) {
+          fetchedMerch = merchRes.value.data.data || []
+        }
+        setMerchandise(fetchedMerch)
 
         setEvents(fetchedEvents)
         setMembers(fetchedMembers)
@@ -445,6 +503,19 @@ const KSShopPage = () => {
     }
   }
 
+  // Official Merchandise memo & WA Order Link
+  const displayMerch = useMemo(() => {
+    return merchandise.length > 0 ? merchandise : DEFAULT_OFFICIAL_MERCH
+  }, [merchandise])
+
+  const waMerchLink = useMemo(() => {
+    if (!selectedMerch) return '#'
+    const phone = config?.faq_section?.cta_link?.replace(/[^0-9]/g, '') || '6281234567890'
+    const fanInfo = isLoggedIn && fanUser?.nama ? `\n- Pemesan (Fan ID): ${fanUser.nama} (${fanUser.nomor_telepon || fanUser.whatsapp || ''})` : ''
+    const text = `Halo Admin Kohi Sekai, saya ingin memesan official merchandise:\n- Produk: ${selectedMerch.nama}${selectedSize ? `\n- Ukuran: ${selectedSize}` : ''}\n- Harga: Rp ${selectedMerch.harga?.toLocaleString('id-ID')}${fanInfo}\n\nMohon info ketersediaan stok & cara pembayarannya. Terima kasih!`
+    return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
+  }, [selectedMerch, selectedSize, config, isLoggedIn, fanUser])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -459,19 +530,19 @@ const KSShopPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary overflow-x-hidden">
+    <div className="min-h-screen bg-background bg-pattern-dots text-text-primary overflow-x-hidden relative">
       <KSHeader />
 
-      <main className="pt-24 sm:pt-28 pb-24">
+      <main className="pt-20 sm:pt-28 pb-16 sm:pb-24 relative z-10">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6">
 
           {/* === HERO TITLE === */}
-          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest mb-4">
-              <FaTicketAlt size={12} />
+          <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] sm:text-xs font-black uppercase tracking-wider mb-3">
+              <FaTicketAlt size={11} />
               <span>Jadwal & Tiket Cheki Resmi</span>
             </div>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-text-primary leading-none uppercase mb-4">
+            <h1 className="text-3xl sm:text-6xl md:text-7xl font-black tracking-tight text-text-primary leading-none uppercase mb-3">
               KOHI <span className="text-primary">TICKETS</span>
             </h1>
             <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
@@ -499,10 +570,46 @@ const KSShopPage = () => {
                 </button>
               )}
             </div>
+
+            {/* === SHOP CATEGORY SWITCHER TABS (CHEKI vs MERCH) === */}
+            <div className="mt-8 flex items-center justify-center">
+              <div className="p-1 rounded-2xl bg-surface border border-border inline-flex gap-1.5 shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => setActiveShopTab('cheki')}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all ${
+                    activeShopTab === 'cheki'
+                      ? 'bg-primary text-white shadow-md shadow-primary/25'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-background'
+                  }`}
+                >
+                  <FaTicketAlt size={13} />
+                  <span>Tiket Cheki & Event</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveShopTab('merch')}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all ${
+                    activeShopTab === 'merch'
+                      ? 'bg-teal-500 text-black shadow-md shadow-teal-500/25 font-black'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-background'
+                  }`}
+                >
+                  <FaBox size={13} />
+                  <span>Official Merch</span>
+                  <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-bold ${activeShopTab === 'merch' ? 'bg-black/20 text-black' : 'bg-background text-teal-400 border border-teal-500/30'}`}>
+                    {displayMerch.length}
+                  </span>
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* === SECTION 1: KALENDER BESAR (MONTHLY CALENDAR) === */}
-          <section id="monthly-calendar" className="mb-16 sm:mb-20">
+          {activeShopTab === 'cheki' && (
+            <>
+              {/* === SECTION 1: KALENDER BESAR (MONTHLY CALENDAR) === */}
+              <section id="monthly-calendar" className="mb-16 sm:mb-20">
             <div className="bg-surface border border-border rounded-3xl sm:rounded-[2.5rem] p-5 sm:p-8 md:p-10 shadow-xl relative overflow-hidden">
               {/* Calendar Decorative Ambient Glow */}
               <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-primary/4 blur-[120px] pointer-events-none" />
@@ -832,9 +939,9 @@ const KSShopPage = () => {
                         alt="Cheki Grup Kohi Sekai"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+                      <div className="absolute inset-0 bg-black/60" />
                       <div className="absolute top-4 left-4">
-                        <span className="px-3 py-1 rounded-full bg-gradient-to-r from-primary to-accent text-white text-[10px] font-black uppercase tracking-wider shadow-md">
+                        <span className="px-3 py-1 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-wider shadow-md">
                           <FaUsers className="inline mr-1.5" /> Limited · All Members
                         </span>
                       </div>
@@ -899,7 +1006,10 @@ const KSShopPage = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {/* =========================================================================
+                    MEMBER LINEUP - MANUAL RESPONSIVE: MOBILE (md:hidden) — 2 COLUMNS
+                    ========================================================================= */}
+                <div className="md:hidden grid grid-cols-2 gap-2.5">
                   {currentLineup.map((member, idx) => {
                     const memPriceObj = getMemberChekiPrice(member)
                     const memberPrice = memPriceObj ? Number(memPriceObj.price) : hargaMemberFallback
@@ -909,14 +1019,104 @@ const KSShopPage = () => {
 
                     return (
                       <motion.div
-                        key={member.id || member.member_id || idx}
+                        key={`mob-${member.id || member.member_id || idx}`}
+                        initial={{ opacity: 0, y: 15 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="group relative rounded-2xl overflow-hidden bg-surface border border-border flex flex-col justify-between"
+                      >
+                        <div className="relative aspect-[4/5] overflow-hidden bg-surface">
+                          {photoUrl ? (
+                            <img
+                              src={photoUrl}
+                              alt={member.nama_panggung}
+                              className="w-full h-full object-cover object-top"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                              <span className="text-3xl font-black text-primary/40">
+                                {member.nama_panggung?.charAt(0) || 'K'}
+                              </span>
+                            </div>
+                          )}
+
+                          <div className="absolute inset-x-0 bottom-0 h-12 bg-black/85" />
+
+                          <div className="absolute top-2 left-2">
+                            <span
+                              className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider text-white shadow-sm"
+                              style={{ backgroundColor: memberColor }}
+                            >
+                              {member.tagline || 'Kohi'}
+                            </span>
+                          </div>
+
+                          <div className="absolute bottom-1.5 left-2 right-2">
+                            <p className="text-[7px] font-black uppercase tracking-wider text-primary/80 truncate">
+                              {member.nama_kanji || 'コーヒー'}
+                            </p>
+                            <h4 className="text-xs font-black text-text-primary tracking-tight truncate leading-tight">
+                              {member.nama_panggung}
+                            </h4>
+                          </div>
+                        </div>
+
+                        {/* Card Footer Mobile - Compact */}
+                        <div className="p-2 space-y-1.5 border-t border-border">
+                          <div className="space-y-0.5">
+                            {regularChekiEnabled && (
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className="text-[8px] font-bold text-text-secondary uppercase">Regular</span>
+                                <span className="font-black text-text-primary text-[11px]">
+                                  Rp {memberPrice.toLocaleString('id-ID')}
+                                </span>
+                              </div>
+                            )}
+                            {wideChekiEnabled && (
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className="text-[8px] font-bold text-primary uppercase">Wide</span>
+                                <span className="font-black text-primary text-[11px]">
+                                  Rp {hargaWidePo.toLocaleString('id-ID')}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <button
+                            onClick={handleScrollToCalendar}
+                            className="w-full py-1.5 px-2 rounded-xl bg-primary/15 border border-primary/30 hover:bg-primary text-primary hover:text-white font-bold text-[9px] uppercase tracking-wider transition-all flex items-center justify-center gap-1 active:scale-95"
+                          >
+                            <span>Pilih Event</span>
+                            <FaArrowRight size={7} />
+                          </button>
+                        </div>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+
+                {/* =========================================================================
+                    MEMBER LINEUP - MANUAL RESPONSIVE: DESKTOP (hidden md:grid)
+                    ========================================================================= */}
+                <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {currentLineup.map((member, idx) => {
+                    const memPriceObj = getMemberChekiPrice(member)
+                    const memberPrice = memPriceObj ? Number(memPriceObj.price) : hargaMemberFallback
+                    const slotCount = memPriceObj?.slot_available
+                    const memberColor = member.color || 'var(--primary)'
+                    const photoUrl = member.shop_image_url || member.image_url ? getAssetPath(member.shop_image_url || member.image_url) : null
+
+                    return (
+                      <motion.div
+                        key={`desk-${member.id || member.member_id || idx}`}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: idx * 0.08 }}
                         className="group relative rounded-3xl overflow-hidden bg-surface border border-border hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col justify-between"
                       >
-                        <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-surface to-background">
+                        <div className="relative aspect-[3/4] overflow-hidden bg-surface">
                           {photoUrl ? (
                             <img
                               src={photoUrl}
@@ -931,7 +1131,7 @@ const KSShopPage = () => {
                             </div>
                           )}
 
-                          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
+                          <div className="absolute inset-x-0 bottom-0 h-16 bg-black/85" />
 
                           <div className="absolute top-3 left-3">
                             <span
@@ -998,6 +1198,236 @@ const KSShopPage = () => {
               </div>
               )}
             </section>
+            )}
+
+            {/* Shortcut Banner to Merch */}
+            <div className="mt-12 p-6 rounded-3xl bg-surface border border-teal-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-300 flex items-center justify-center text-xl shrink-0">
+                  <FaBox />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-text-primary uppercase">Cari Kaos, Lightstick, atau Standee?</h3>
+                  <p className="text-xs text-text-secondary mt-0.5">Lihat koleksi merchandise resmi Kohi Sekai sekarang.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveShopTab('merch')}
+                className="px-6 py-3 rounded-full bg-teal-500 text-black font-black text-xs uppercase tracking-wider shadow-md hover:bg-teal-400 transition shrink-0"
+              >
+                Buka Official Merch →
+              </button>
+            </div>
+            </>
+          )}
+
+          {/* === SECTION 4: OFFICIAL MERCHANDISE === */}
+          {activeShopTab === 'merch' && (
+          <section id="official-merchandise" className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/25 text-teal-400 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-2">
+                  <FaBox size={11} />
+                  <span>Official Merchandise</span>
+                </div>
+                <h2 className="text-2xl sm:text-4xl font-black text-text-primary tracking-tight uppercase">
+                  KOHI OFFICIAL MERCH
+                </h2>
+                <p className="text-xs sm:text-sm text-text-secondary mt-1">
+                  Koleksi merchandise resmi Kohi Sekai untuk melengkapi dukunganmu di setiap panggung.
+                </p>
+              </div>
+            </div>
+
+            {/* Mobile Merch Layout (md:hidden) — 2 Columns! */}
+            <div className="md:hidden grid grid-cols-2 gap-2.5">
+              {displayMerch.map((item, idx) => {
+                const isPreOrder = !item.stok || item.stok === 0
+                const isClosed = item.available === false
+                const itemImg = item.gambar_url ? getAssetPath(item.gambar_url) : null
+
+                return (
+                  <motion.div
+                    key={`mob-merch-${item.id || idx}`}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.05 }}
+                    onClick={() => {
+                      setSelectedMerch(item)
+                      setSelectedSize(item.sizes && item.sizes.length > 0 ? item.sizes[0] : '')
+                    }}
+                    className="group relative rounded-2xl overflow-hidden bg-surface border border-border flex flex-col justify-between cursor-pointer active:scale-95 transition-transform"
+                  >
+                    <div className="relative aspect-square overflow-hidden bg-background">
+                      {itemImg ? (
+                        <img
+                          src={itemImg}
+                          alt={item.nama}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null
+                            e.target.src = getAssetPath('/images/members/placeholder.svg')
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                          <FaBox className="text-3xl text-primary/40" />
+                        </div>
+                      )}
+
+                      {/* Status Badge */}
+                      <div className="absolute top-2 left-2">
+                        {isClosed ? (
+                          <span className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-zinc-700">
+                            Closed
+                          </span>
+                        ) : isPreOrder ? (
+                          <span className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider bg-accent/20 text-accent border border-accent/30">
+                            Pre-Order
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider bg-success/20 text-success border border-success/30">
+                            Tersedia
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 space-y-2 border-t border-border flex flex-col justify-between flex-1">
+                      <div>
+                        <h4 className="text-xs font-black text-text-primary uppercase tracking-tight line-clamp-1 leading-tight">
+                          {item.nama}
+                        </h4>
+                        <p className="text-xs font-black text-primary mt-1">
+                          Rp {Number(item.harga || 0).toLocaleString('id-ID')}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="w-full py-1.5 px-2 rounded-full bg-primary/20 border border-primary/40 hover:bg-primary text-primary hover:text-white font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-1"
+                      >
+                        <FaShoppingBag size={10} />
+                        <span>Detail & Pesan</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* Desktop Merch Layout (hidden md:grid md:grid-cols-3 lg:grid-cols-4) */}
+            <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {displayMerch.map((item, idx) => {
+                const isPreOrder = !item.stok || item.stok === 0
+                const isClosed = item.available === false
+                const itemImg = item.gambar_url ? getAssetPath(item.gambar_url) : null
+
+                return (
+                  <motion.div
+                    key={`desk-merch-${item.id || idx}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.06 }}
+                    onClick={() => {
+                      setSelectedMerch(item)
+                      setSelectedSize(item.sizes && item.sizes.length > 0 ? item.sizes[0] : '')
+                    }}
+                    className="group relative rounded-3xl overflow-hidden bg-surface border border-border hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col justify-between cursor-pointer"
+                  >
+                    <div className="relative aspect-square overflow-hidden bg-background">
+                      {itemImg ? (
+                        <img
+                          src={itemImg}
+                          alt={item.nama}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={(e) => {
+                            e.target.onerror = null
+                            e.target.src = getAssetPath('/images/members/placeholder.svg')
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                          <FaBox className="text-4xl text-primary/40" />
+                        </div>
+                      )}
+
+                      <div className="absolute top-3 left-3">
+                        {isClosed ? (
+                          <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-zinc-700">
+                            Closed
+                          </span>
+                        ) : isPreOrder ? (
+                          <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-accent/20 text-accent border border-accent/30">
+                            Pre-Order
+                          </span>
+                        ) : (
+                          <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-success/20 text-success border border-success/30">
+                            Tersedia ({item.stok} stok)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="p-5 space-y-3 border-t border-border flex flex-col justify-between flex-1">
+                      <div>
+                        <h4 className="text-sm font-black text-text-primary uppercase tracking-tight line-clamp-1">
+                          {item.nama}
+                        </h4>
+                        {item.deskripsi && (
+                          <p className="text-xs text-text-secondary line-clamp-2 mt-1 leading-relaxed">
+                            {item.deskripsi}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-3 pt-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] uppercase tracking-wider text-text-secondary font-bold">
+                            Harga Satuan
+                          </span>
+                          <span className="text-base font-black text-primary">
+                            Rp {Number(item.harga || 0).toLocaleString('id-ID')}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="w-full py-2.5 px-4 rounded-full bg-primary/20 border border-primary/40 hover:bg-primary text-primary hover:text-white font-bold text-xs uppercase tracking-wider shadow-sm transition-all flex items-center justify-center gap-2"
+                        >
+                          <FaShoppingBag size={12} />
+                          <span>Detail & Pesan</span>
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* Shortcut Banner back to Cheki Tickets */}
+            <div className="mt-12 p-6 rounded-3xl bg-surface border border-primary/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-primary/20 text-primary flex items-center justify-center text-xl shrink-0">
+                  <FaTicketAlt />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-text-primary uppercase">Mau Pesan Tiket 2-Shot Cheki?</h3>
+                  <p className="text-xs text-text-secondary mt-0.5">Pilih tanggal event dan foto polaroid bersama idolamu.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveShopTab('cheki')}
+                className="px-6 py-3 rounded-full bg-primary text-white font-black text-xs uppercase tracking-wider shadow-md hover:bg-primary-hover transition shrink-0"
+              >
+                Lihat Tiket Cheki →
+              </button>
+            </div>
+          </section>
           )}
 
 
@@ -1005,6 +1435,119 @@ const KSShopPage = () => {
       </main>
 
       <KSFooter />
+
+      {/* Merch Detail Modal (Kawaii Metal, Solid Color, Anti-Blur) */}
+      <AnimatePresence>
+        {selectedMerch && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
+            onClick={() => setSelectedMerch(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 15 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-surface border border-border rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-7 relative shadow-2xl"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedMerch(null)}
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-background border border-border flex items-center justify-center text-text-secondary hover:text-primary transition-colors"
+                aria-label="Tutup"
+              >
+                <FaTimes size={13} />
+              </button>
+
+              <div className="space-y-5">
+                {/* Image */}
+                <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-background border border-border relative">
+                  {selectedMerch.gambar_url ? (
+                    <img
+                      src={getAssetPath(selectedMerch.gambar_url)}
+                      alt={selectedMerch.nama}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null
+                        e.target.src = getAssetPath('/images/members/placeholder.svg')
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                      <FaBox className="text-5xl text-primary/40" />
+                    </div>
+                  )}
+
+                  <div className="absolute top-3 left-3">
+                    <span className="px-3 py-1 rounded-lg bg-primary text-white text-[10px] font-black uppercase tracking-wider">
+                      Official Merchandise
+                    </span>
+                  </div>
+                </div>
+
+                {/* Details */}
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-black text-text-primary uppercase tracking-tight">
+                    {selectedMerch.nama}
+                  </h3>
+                  <p className="text-xl font-black text-primary mt-1">
+                    Rp {Number(selectedMerch.harga || 0).toLocaleString('id-ID')}
+                  </p>
+                </div>
+
+                {selectedMerch.deskripsi && (
+                  <div className="p-3.5 rounded-xl bg-background border border-border">
+                    <p className="text-xs sm:text-sm text-text-secondary leading-relaxed whitespace-pre-line">
+                      {selectedMerch.deskripsi}
+                    </p>
+                  </div>
+                )}
+
+                {/* Sizes Selection */}
+                {selectedMerch.sizes && selectedMerch.sizes.length > 0 && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
+                      Pilih Ukuran:
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMerch.sizes.map((sz) => (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => setSelectedSize(sz)}
+                          className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
+                            selectedSize === sz
+                              ? 'bg-primary text-white shadow-md'
+                              : 'bg-background border border-border text-text-secondary hover:text-text-primary'
+                          }`}
+                        >
+                          {sz}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action button */}
+                <div className="pt-2">
+                  <a
+                    href={waMerchLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3.5 px-6 rounded-2xl bg-primary hover:bg-primary-hover text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all"
+                  >
+                    <FaWhatsapp size={16} />
+                    <span>Pesan via WhatsApp</span>
+                  </a>
+                  <p className="text-[10px] text-text-secondary text-center mt-2">
+                    Pesanan akan langsung terhubung ke WhatsApp Admin Official Kohi Sekai.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Global Modals for Fan Authentication & History */}
       <FanAuthModal />

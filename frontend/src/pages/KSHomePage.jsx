@@ -136,11 +136,12 @@ const KSHomePage = () => {
         <KSFAQSection 
           config={config}
           faqs={(() => {
-            if (!config.faq_items) return faqs;
+            if (Array.isArray(faqs) && faqs.length > 0) return faqs;
+            if (!config?.faq_items) return [];
             try {
               return typeof config.faq_items === 'string' ? JSON.parse(config.faq_items) : config.faq_items;
             } catch (e) {
-              return faqs;
+              return [];
             }
           })()} 
         />

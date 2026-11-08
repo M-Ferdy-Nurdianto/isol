@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { FaKey, FaEnvelope, FaCheckCircle, FaSpinner, FaArrowLeft, FaShieldAlt } from 'react-icons/fa'
-import Swal from 'sweetalert2'
+import { kohiToast } from '../components/ui/KohiToast'
+import { useFanAuth } from '../context/FanAuthContext'
 import api from '../lib/api'
 import { supabase } from '../lib/supabase'
 
 const ResetPasswordPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const { loginByEmail } = useFanAuth()
 
   // Parse URL params
   const searchParams = new URLSearchParams(location.search)
@@ -58,11 +60,17 @@ const ResetPasswordPage = () => {
         new_password: otpForm.newPassword
       })
       setSuccess(true)
-      Swal.fire({ icon: 'success', title: 'Password Berhasil Diubah!', text: res.data?.message || 'Silakan login dengan password baru.', confirmButtonColor: '#079108' }).then(() => navigate('/login'))
+      kohiToast.success(res.data?.message || 'Password Berhasil Diubah!')
+      try {
+        await loginByEmail(otpForm.identifier.trim())
+        navigate('/profile', { replace: true })
+      } catch (err) {
+        navigate('/login')
+      }
     } catch (err) {
       const errorMsg = err.response?.data?.error || err.message || 'Gagal mereset password'
       setError(errorMsg)
-      Swal.fire({ icon: 'error', title: 'Gagal', text: errorMsg })
+      kohiToast.error(errorMsg)
     } finally { setLoading(false) }
   }
 
@@ -75,14 +83,23 @@ const ResetPasswordPage = () => {
     setLoading(true)
     try {
       if (!supabase) throw new Error('Koneksi otentikasi tidak tersedia.')
+      const { data: { user } } = await supabase.auth.getUser()
       const { error: updateErr } = await supabase.auth.updateUser({ password: emailForm.newPassword })
       if (updateErr) throw updateErr
       setSuccess(true)
-      Swal.fire({ icon: 'success', title: 'Password Berhasil Diubah!', text: 'Silakan login dengan password baru.', confirmButtonColor: '#079108' }).then(() => navigate('/login'))
+      kohiToast.success('Password Berhasil Diubah!')
+      try {
+        if (user?.email) {
+          await loginByEmail(user.email)
+          navigate('/profile', { replace: true })
+          return
+        }
+      } catch (err) {}
+      navigate('/login')
     } catch (err) {
       const errorMsg = err.message || 'Gagal mengubah password dari link email.'
       setError(errorMsg)
-      Swal.fire({ icon: 'error', title: 'Gagal', text: errorMsg })
+      kohiToast.error(errorMsg)
     } finally { setLoading(false) }
   }
 
@@ -99,11 +116,19 @@ const ResetPasswordPage = () => {
         new_password: tokenForm.newPassword
       })
       setSuccess(true)
-      Swal.fire({ icon: 'success', title: 'Password Berhasil Diubah!', text: res.data?.message || 'Silakan login dengan password baru.', confirmButtonColor: '#079108' }).then(() => navigate('/login'))
+      kohiToast.success(res.data?.message || 'Password Berhasil Diubah!')
+      try {
+        if (res.data?.user?.email) {
+          await loginByEmail(res.data.user.email)
+          navigate('/profile', { replace: true })
+          return
+        }
+      } catch (err) {}
+      navigate('/login')
     } catch (err) {
       const errorMsg = err.response?.data?.error || err.message || 'Gagal memverifikasi link reset password.'
       setError(errorMsg)
-      Swal.fire({ icon: 'error', title: 'Gagal', text: errorMsg })
+      kohiToast.error(errorMsg)
     } finally { setLoading(false) }
   }
 

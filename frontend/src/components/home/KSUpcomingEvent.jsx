@@ -16,18 +16,18 @@ const KSUpcomingEvent = ({ events = [], config = {} }) => {
   }
 
   return (
-    <section className="py-20 sm:py-32 px-4 bg-background relative overflow-hidden">
-      <div className="container mx-auto max-w-7xl relative z-10 space-y-8">
+    <section className="py-10 sm:py-24 px-4 bg-surface/50 border-y border-white/5 bg-pattern-grid relative overflow-hidden">
+      <div className="container mx-auto max-w-7xl relative z-10 space-y-6 sm:space-y-8">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 border-b border-border pb-6"
+          className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 border-b border-border pb-4 sm:pb-6"
         >
           <div>
-            <p className="text-xs font-black tracking-[0.4em] text-primary uppercase mb-2">Upcoming Event</p>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight uppercase text-text-primary leading-none">
+            <p className="text-[10px] sm:text-xs font-black tracking-[0.35em] text-primary uppercase mb-1">Upcoming Event</p>
+            <h2 className="text-2xl sm:text-5xl md:text-6xl font-black tracking-tight uppercase text-text-primary leading-none">
               KOHI <span className="text-primary">STAGE</span>
             </h2>
           </div>

@@ -6,7 +6,7 @@ import { cachePublic } from '../middleware/cache.js'
 const router = express.Router()
 
 // GET: Fetch all FAQs
-router.get('/', cachePublic({ sMaxAge: 3600, maxAge: 120, staleWhileRevalidate: 300 }), async (req, res) => {
+router.get('/', cachePublic({ sMaxAge: 60, maxAge: 10, staleWhileRevalidate: 60 }), async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('faqs')

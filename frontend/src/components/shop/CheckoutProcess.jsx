@@ -1,4 +1,4 @@
-﻿import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   FaChevronRight, FaPlus, FaMinus, FaCamera, FaSpinner, 
   FaUniversity, FaRegCopy, FaCheckCircle, FaTrash, 
@@ -34,7 +34,7 @@ const InternalPaymentInfo = ({ payment, copyToClipboard, copied }) => (
 
       <div 
         onClick={() => copyToClipboard(payment?.rekening)}
-        className="flex items-center justify-between sm:justify-end gap-3 bg-white dark:bg-white/5 border border-emerald-100 dark:border-white/10 rounded-xl px-3 py-2 cursor-pointer hover:border-emerald-300 dark:hover:border-white/20 transition-all group shadow-sm"
+        className="flex items-center justify-between sm:justify-end gap-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 cursor-pointer hover:border-[var(--primary)] dark:hover:border-white/20 transition-all group shadow-sm"
       >
         <span className="text-sm sm:text-base font-mono font-black text-gray-900 dark:text-white tracking-wider">
           {payment?.rekening || '0902683273'}
@@ -48,8 +48,8 @@ const InternalPaymentInfo = ({ payment, copyToClipboard, copied }) => (
           aria-label="Salin nomor rekening"
           className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all shrink-0 ${
             copied 
-              ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/30' 
-              : 'bg-emerald-50 text-[var(--primary)] border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30 active:scale-95'
+              ? 'bg-[var(--primary)] text-white shadow-sm shadow-[var(--primary)]/30' 
+              : 'bg-[var(--primary)]/10 text-[var(--primary)] border border-[var(--primary)]/20 hover:bg-[var(--primary)]/20 active:scale-95'
           }`}
         >
           {copied ? <FaCheckCircle className="text-xs" /> : <FaRegCopy className="text-xs" />}
@@ -417,8 +417,8 @@ const CheckoutProcess = ({
                   aria-label="Salin nomor rekening"
                   className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-all active:scale-95 ${
                     copied
-                      ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/30'
-                      : 'bg-emerald-50 text-[var(--primary)] border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30'
+                      ? 'bg-[var(--primary)] text-white shadow-sm shadow-[var(--primary)]/30'
+                      : 'bg-[var(--primary)]/10 text-[var(--primary)] border border-[var(--primary)]/20 hover:bg-[var(--primary)]/20'
                   }`}
                 >
                   {copied ? (
@@ -589,7 +589,7 @@ const CheckoutProcess = ({
                     <button
                       type="button"
                       onClick={() => setShowPhotoModal(true)}
-                      className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20 hover:bg-emerald-100 transition-all"
+                      className="text-[10px] font-bold text-[var(--primary)] flex items-center gap-1 bg-[var(--primary)]/10 px-2 py-0.5 rounded-full border border-[var(--primary)]/20 hover:bg-[var(--primary)]/20 transition-all"
                     >
                       <FaCheckCircle className="text-[10px]" /> Terpilih â€” Lihat foto
                     </button>
@@ -605,8 +605,8 @@ const CheckoutProcess = ({
                   }
                   className={`relative rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden group h-28 flex items-center justify-center ${
                     activeFilePreview
-                      ? 'border-emerald-500 bg-emerald-50/30 dark:bg-emerald-500/5'
-                      : 'border-gray-200 dark:border-white/15 border-dashed hover:border-emerald-500 bg-gray-50 dark:bg-[var(--input-bg)]'
+                      ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                      : 'border-gray-200 dark:border-white/15 border-dashed hover:border-[var(--primary)] bg-gray-50 dark:bg-[var(--input-bg)]'
                   }`}
                 >
                   {activeFilePreview ? (
@@ -618,7 +618,7 @@ const CheckoutProcess = ({
                           e.stopPropagation()
                           setShowPhotoModal(true)
                         }}
-                        className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 border-emerald-500/40 shadow-md"
+                        className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 border-[var(--primary)]/40 shadow-md"
                       >
                         <img
                           src={activeFilePreview}
@@ -634,15 +634,15 @@ const CheckoutProcess = ({
                           Ketuk foto untuk lihat preview Â· Ketuk area ini untuk ganti
                         </p>
                       </div>
-                      <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-500/20 flex items-center justify-center border border-emerald-200 dark:border-emerald-500/30">
-                        <FaCheckCircle className="text-emerald-500 text-sm" />
+                      <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center border border-[var(--primary)]/20">
+                        <FaCheckCircle className="text-[var(--primary)] text-sm" />
                       </div>
                     </div>
                   ) : (
                     /* State: belum ada foto */
                     <div className="flex flex-row items-center gap-4 px-5 w-full">
-                      <div className="w-10 h-10 rounded-xl bg-white dark:bg-white/10 shadow-sm border border-gray-200 dark:border-white/10 flex items-center justify-center group-hover:scale-105 group-hover:border-emerald-200 transition-all flex-shrink-0">
-                        <FaCamera className="text-gray-400 group-hover:text-emerald-500 transition-colors text-lg" />
+                      <div className="w-10 h-10 rounded-xl bg-white dark:bg-white/10 shadow-sm border border-gray-200 dark:border-white/10 flex items-center justify-center group-hover:scale-105 group-hover:border-[var(--primary)]/40 transition-all flex-shrink-0">
+                        <FaCamera className="text-gray-400 group-hover:text-[var(--primary)] transition-colors text-lg" />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-gray-900 dark:text-white">
@@ -779,7 +779,7 @@ const CheckoutProcess = ({
                 <button
                   type="button"
                   onClick={() => setShowPhotoModal(false)}
-                  className="flex-1 py-3 rounded-2xl bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 transition-all"
+                  className="flex-1 py-3 rounded-2xl bg-[var(--primary)] text-[#1A1512] text-sm font-black hover:opacity-90 transition-all"
                 >
                   Sudah Benar
                 </button>

@@ -1,7 +1,7 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import { supabase } from '../config/supabase.js'
-import { authMiddleware } from '../middleware/auth.js'
+import { authMiddleware, requireAdmin } from '../middleware/auth.js'
 import ExcelJS from 'exceljs'
 
 const router = express.Router()
@@ -202,7 +202,7 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
 })
 
 // DELETE merch order (admin only)
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, requireAdmin, async (req, res) => {
   try {
     const { error } = await supabase
       .from('merch_orders')

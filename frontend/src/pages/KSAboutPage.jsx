@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaHeart, FaBirthdayCake, FaInstagram, FaTwitter, FaLock, FaArrowLeft } from 'react-icons/fa'
+import { FaHeart, FaBirthdayCake, FaInstagram, FaTwitter, FaLock, FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 import KSHeader from '../components/KSHeader'
 import KSFooter from '../components/KSFooter'
 import api from '../lib/api'
@@ -47,7 +47,7 @@ const GroupPhotoCarousel = ({ images }) => {
 
   const handleNext = () => setCurrentIndex((prev) => (prev + 1) % displayImages.length);
   const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
-  
+
   const handleDragEnd = (e, { offset }) => {
     const swipe = offset.x;
     if (swipe < -50) handleNext();
@@ -55,7 +55,7 @@ const GroupPhotoCarousel = ({ images }) => {
   };
 
   return (
-    <div 
+    <div
       className="group relative w-full sm:w-[480px] lg:w-[560px] aspect-video rounded-2xl overflow-hidden border border-border shadow-lg bg-surface"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -80,17 +80,17 @@ const GroupPhotoCarousel = ({ images }) => {
       {displayImages.length > 1 && (
         <>
           <div className="absolute inset-0 flex items-center justify-between p-4 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button onClick={handlePrev} className="pointer-events-auto w-10 h-10 rounded-full bg-background/80 text-text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors backdrop-blur-md">
+            <button onClick={handlePrev} className="pointer-events-auto w-10 h-10 rounded-full bg-background border border-border text-text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
               <FaArrowLeft size={12} />
             </button>
-            <button onClick={handleNext} className="pointer-events-auto w-10 h-10 rounded-full bg-background/80 text-text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors backdrop-blur-md transform rotate-180">
+            <button onClick={handleNext} className="pointer-events-auto w-10 h-10 rounded-full bg-background border border-border text-text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors transform rotate-180">
               <FaArrowLeft size={12} />
             </button>
           </div>
-          
+
           <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
             {displayImages.map((_, idx) => (
-              <button 
+              <button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
                 className={`w-2 h-2 rounded-full transition-all ${currentIndex === idx ? 'w-6 bg-primary' : 'bg-white/50 hover:bg-white'}`}
@@ -109,7 +109,7 @@ const MemberDetail = ({ member, members, onNavigate, onClose }) => {
   const name = isSecret ? '???' : (member.nama_panggung || 'Member');
   const imageUrl = member.image_url ? getAssetPath(member.image_url) : null;
   const currentIndex = members.findIndex(m => (m.id || m.member_id) === (member.id || member.member_id));
-  
+
   const handlePrev = (e) => {
     e.stopPropagation();
     const prevIdx = (currentIndex - 1 + members.length) % members.length;
@@ -144,7 +144,7 @@ const MemberDetail = ({ member, members, onNavigate, onClose }) => {
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-black/80" />
-      
+
       <motion.div
         initial={{ y: "100%", opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -180,9 +180,8 @@ const MemberDetail = ({ member, members, onNavigate, onClose }) => {
                 {isSecret && <FaLock size={56} className="text-zinc-600" />}
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent sm:hidden" />
           </div>
-          
+
           {/* Mobile Close X (Top Right corner of image) */}
           <button
             onClick={onClose}
@@ -237,17 +236,17 @@ const MemberDetail = ({ member, members, onNavigate, onClose }) => {
                 {(member.instagram || member.tiktok || member.twitter) && (
                   <div className="pt-2 flex flex-wrap gap-3">
                     {member.instagram && (
-                      <a href={`https://instagram.com/${member.instagram.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-background border border-border text-xs font-bold hover:border-primary hover:text-primary transition-colors min-h-[44px]">
+                      <a href={`https://instagram.com/${member.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-background border border-border text-xs font-bold hover:border-primary hover:text-primary transition-colors min-h-[44px]">
                         <FaInstagram size={14} /> {member.instagram}
                       </a>
                     )}
                     {member.tiktok && (
-                      <a href={`https://tiktok.com/${member.tiktok.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-background border border-border text-xs font-bold hover:border-primary hover:text-primary transition-colors min-h-[44px]">
+                      <a href={`https://tiktok.com/${member.tiktok.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-background border border-border text-xs font-bold hover:border-primary hover:text-primary transition-colors min-h-[44px]">
                         TikTok
                       </a>
                     )}
                     {member.twitter && (
-                      <a href={`https://x.com/${member.twitter.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-background border border-border text-xs font-bold hover:border-primary hover:text-primary transition-colors min-h-[44px]">
+                      <a href={`https://x.com/${member.twitter.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-background border border-border text-xs font-bold hover:border-primary hover:text-primary transition-colors min-h-[44px]">
                         <FaTwitter size={14} /> {member.twitter}
                       </a>
                     )}
@@ -272,47 +271,62 @@ const MemberDetail = ({ member, members, onNavigate, onClose }) => {
   )
 }
 
-// === Member Grid Card ===
+// === Member Grid Card (Clean Minimal Kawaii Metal) ===
 const MemberGridCard = ({ member, onClick, index }) => {
   const isSecret = member.is_secret
-  const name = isSecret ? '???' : (member.nama_panggung || 'Member')
+  const name = isSecret ? 'Secret Member' : (member.nama_panggung || 'Member')
   const imageUrl = member.image_url ? getAssetPath(member.image_url) : null
+  const tagline = isSecret ? 'Coming Soon' : (member.tagline || member.role || '')
 
   return (
-    <motion.button
-      initial={{ opacity: 0, y: 30 }}
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, delay: (index % 4) * 0.08 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.35, delay: index * 0.05 }}
       onClick={() => onClick(member)}
-      className="group text-left relative flex flex-col rounded-2xl sm:rounded-3xl overflow-hidden bg-surface border border-border transition-all duration-300 hover:-translate-y-2 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary/40"
+      className="group w-full text-left block rounded-2xl overflow-hidden bg-surface border border-white/10 hover:border-white/30 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
     >
-      {/* Photo area */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-background">
+      {/* Photo Frame */}
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-black/60">
         {imageUrl && !isSecret ? (
           <img
             src={imageUrl}
             alt={name}
             className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              e.target.onerror = null
+              e.target.src = getAssetPath('/images/members/placeholder.svg')
+            }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            {isSecret ? <FaLock size={40} className="text-zinc-600 opacity-40" /> : null}
+          <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-black/50 text-center">
+            {isSecret ? (
+              <FaLock size={20} className="text-zinc-500 mb-2" />
+            ) : (
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-black text-white bg-white/10 mb-2">
+                {name.charAt(0)}
+              </div>
+            )}
+            <span className="text-[10px] font-bold tracking-widest text-text-secondary uppercase">
+              {isSecret ? 'COMING SOON' : 'KOHI SEKAI'}
+            </span>
           </div>
         )}
       </div>
 
-      {/* Name area */}
-      <div className="p-4 sm:p-5">
-        <p className="text-[9px] font-black tracking-[0.3em] uppercase text-text-secondary/60 truncate">
-          {isSecret ? '???·???·???' : (member.nama_kanji || 'Kohi Sekai')}
-        </p>
-        <p className="text-base font-black text-text-primary tracking-tight mt-1 truncate">{name}</p>
-        <p className="text-xs text-text-secondary mt-0.5 truncate">
-          {isSecret ? '???' : (member.tagline || 'Member')}
-        </p>
+      {/* Minimal Info */}
+      <div className="p-3.5 sm:p-4 bg-surface">
+        <h3 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-primary transition-colors truncate">
+          {name}
+        </h3>
+        {tagline && (
+          <p className="text-xs text-text-secondary truncate mt-0.5">
+            {tagline}
+          </p>
+        )}
       </div>
-    </motion.button>
+    </motion.div>
   )
 }
 
@@ -341,7 +355,7 @@ const KSAboutPage = () => {
         if (configStr) {
           try {
             setAboutUs(JSON.parse(configStr))
-          } catch(e) {}
+          } catch (e) { }
         }
       }
     }).catch(console.error)
@@ -367,23 +381,19 @@ const KSAboutPage = () => {
 
       <main>
         {/* === GROUP STORY SECTION === */}
-        <section className="relative pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-primary/4 blur-[140px]" />
-            <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-accent/3 blur-[120px]" />
-          </div>
+        <section className="relative pt-24 sm:pt-40 pb-12 sm:pb-32 px-4 overflow-hidden bg-background bg-pattern-cross">
 
           <div className="container mx-auto max-w-7xl relative z-10">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16">
               {/* Text */}
               <div className="flex-1 w-full text-center lg:text-left">
                 <motion.div
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7 }}
+                  transition={{ duration: 0.6 }}
                 >
-                  <p className="text-xs font-black tracking-[0.5em] text-primary uppercase mb-4">About Us</p>
-                  <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter text-text-primary leading-none mb-6">
+                  <p className="text-[10px] sm:text-xs font-black tracking-[0.4em] text-primary uppercase mb-3">About Us</p>
+                  <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-text-primary leading-none mb-4 sm:mb-6">
                     {aboutUs.title ? (
                       <span dangerouslySetInnerHTML={{ __html: aboutUs.title.replace(/\n/g, '<br />') }} />
                     ) : (
@@ -394,7 +404,7 @@ const KSAboutPage = () => {
                     {aboutUs.subtitle || groupInfo?.nama_kanji || 'コーヒーの世界へようこそ'}
                   </p>
                   <p className="text-base sm:text-lg text-text-secondary leading-relaxed max-w-lg whitespace-pre-wrap">
-                    {aboutUs.description || groupInfo?.jikoshoukai || 
+                    {aboutUs.description || groupInfo?.jikoshoukai ||
                       'Kohi Sekai (コーヒー・世界) adalah grup idol Indonesia yang terinspirasi dari budaya kopi Jepang dan semangat idol modern. Nama ini berarti "Dunia Kopi" — tempat di mana tiga rasa yang berbeda berpadu menjadi satu harmoni yang kuat.\n\nSetiap member membawa karakter uniknya sendiri, seperti tiga varian kopi favorit yang tak tergantikan: Latte, Macchiato, dan Affogato.'
                     }
                   </p>
@@ -415,7 +425,7 @@ const KSAboutPage = () => {
         </section>
 
         {/* Milestones strip */}
-        <section className="py-12 px-4 bg-surface border-y border-border overflow-hidden">
+        <section className="py-12 px-4 bg-surface/60 border-y border-white/5 bg-pattern-grid overflow-hidden">
           <div className="container mx-auto max-w-7xl">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
               {[
@@ -443,9 +453,7 @@ const KSAboutPage = () => {
         </section>
 
         {/* === MEMBERS SECTION === */}
-        <section className="py-20 sm:py-32 px-4 bg-background relative overflow-hidden">
-          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-primary/4 blur-[140px] pointer-events-none" />
-
+        <section className="py-20 sm:py-32 px-4 bg-background bg-pattern-dots relative overflow-hidden">
           <div className="container mx-auto max-w-7xl flex flex-col items-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -463,21 +471,20 @@ const KSAboutPage = () => {
             </motion.div>
 
             {loading ? (
-              <div className="flex flex-wrap justify-center gap-4 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full max-w-4xl mx-auto">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)] lg:w-64 aspect-[3/4] rounded-2xl bg-surface animate-pulse" />
+                  <div key={i} className="w-full aspect-[4/5] rounded-2xl bg-surface animate-pulse" />
                 ))}
               </div>
             ) : (
-              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full max-w-4xl mx-auto">
                 {displayMembers.map((member, i) => (
-                  <div key={member.id || member.member_id || i} className="w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)] lg:w-64">
-                    <MemberGridCard
-                      member={member}
-                      index={i}
-                      onClick={setSelectedMember}
-                    />
-                  </div>
+                  <MemberGridCard
+                    key={member.id || member.member_id || i}
+                    member={member}
+                    index={i}
+                    onClick={setSelectedMember}
+                  />
                 ))}
               </div>
             )}

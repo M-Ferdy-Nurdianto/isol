@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react'
+import React, { useState } from 'react'
 import { FaUserPlus, FaUser, FaEnvelope, FaWhatsapp, FaInstagram, FaSpinner, FaEye, FaEyeSlash, FaChevronUp } from 'react-icons/fa'
 import { showToast } from '../../../lib/toast'
 import api from '../../../lib/api'
@@ -90,7 +90,7 @@ const UserOTSModal = ({ onRefresh, onDone }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Nama Lengkap */}
           <div>
-            <label className="text-xs font-bold text-[var(--text-secondary)] block mb-1.5 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-[var(--text-secondary)] mb-1.5 flex items-center gap-1.5">
               <FaUser className="text-[var(--primary)]" />
               Nama Lengkap <span className="text-[var(--danger)]">*</span>
             </label>
@@ -107,7 +107,7 @@ const UserOTSModal = ({ onRefresh, onDone }) => {
 
           {/* Email Aktif */}
           <div>
-            <label className="text-xs font-bold text-[var(--text-secondary)] block mb-1.5 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-[var(--text-secondary)] mb-1.5 flex items-center gap-1.5">
               <FaEnvelope className="text-[var(--primary)]" />
               Email Aktif <span className="text-[var(--text-secondary)] font-normal">(opsional)</span>
             </label>
@@ -126,7 +126,7 @@ const UserOTSModal = ({ onRefresh, onDone }) => {
 
           {/* Nomor WhatsApp */}
           <div>
-            <label className="text-xs font-bold text-[var(--text-secondary)] block mb-1.5 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-[var(--text-secondary)] mb-1.5 flex items-center gap-1.5">
               <FaWhatsapp className="text-[var(--primary)]" />
               Nomor WhatsApp
             </label>
@@ -142,7 +142,7 @@ const UserOTSModal = ({ onRefresh, onDone }) => {
 
           {/* Username Instagram */}
           <div>
-            <label className="text-xs font-bold text-[var(--text-secondary)] block mb-1.5 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-[var(--text-secondary)] mb-1.5 flex items-center gap-1.5">
               <FaInstagram className="text-[var(--primary)]" />
               Username Instagram
             </label>

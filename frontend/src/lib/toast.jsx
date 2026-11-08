@@ -1,4 +1,4 @@
-﻿import { toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import {
   FaCheckCircle,
   FaExclamationCircle,
@@ -21,7 +21,7 @@ import {
 const toastStyles = {
   success: {
     icon: <FaCheckCircle />,
-    color: '#079108'
+    color: '#E8944A'
   },
   error: {
     icon: <FaExclamationCircle />,
@@ -49,7 +49,7 @@ const toastStyles = {
   },
   download: {
     icon: <FaFileDownload />,
-    color: '#079108'
+    color: '#E8944A'
   }
 }
 

@@ -602,7 +602,7 @@ const KSProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-outfit overflow-hidden flex flex-col transition-colors duration-500 pb-20 md:pb-0">
+    <div className="min-h-screen bg-background bg-pattern-cross text-text-primary font-outfit overflow-hidden flex flex-col transition-colors duration-500 pb-20 md:pb-0">
       <KSHeader />
 
       <main className="flex-grow pt-8 sm:pt-24 pb-8 relative z-10 container mx-auto px-4 max-w-6xl">
@@ -629,7 +629,7 @@ const KSProfilePage = () => {
               <button 
                 onClick={() => bannerInputRef.current?.click()}
                 disabled={uploadingBanner}
-                className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-black/50 hover:bg-black/80 backdrop-blur-md text-white rounded-full font-bold text-xs md:text-sm transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-black/80 hover:bg-black text-white border border-white/20 rounded-full font-bold text-xs md:text-sm transition-all"
               >
                 {uploadingBanner ? <FaSpinner className="animate-spin" /> : <FaCamera />}
                 {uploadingBanner ? 'Mengunggah...' : 'Ganti Cover'}
@@ -647,7 +647,7 @@ const KSProfilePage = () => {
             <div className="absolute top-4 right-4 hidden md:block">
               <button 
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-black/40 hover:bg-danger text-white backdrop-blur-md rounded-full text-sm font-bold transition-colors shadow-lg"
+                className="flex items-center gap-2 px-4 py-2 bg-black/80 hover:bg-danger text-white border border-white/20 rounded-full text-sm font-bold transition-colors shadow-lg"
               >
                 <FaSignOutAlt /> Sign Out
               </button>

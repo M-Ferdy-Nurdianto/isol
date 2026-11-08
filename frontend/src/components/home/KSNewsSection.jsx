@@ -26,20 +26,18 @@ const KSNewsSection = ({ news = [], config = {} }) => {
   }
 
   return (
-    <section className="py-20 sm:py-32 px-4 bg-surface relative overflow-hidden">
-      <div className="absolute bottom-0 left-0 w-[400px] h-[300px] rounded-full bg-accent/5 blur-[100px] pointer-events-none" />
-
+    <section className="py-10 sm:py-20 px-4 bg-surface/50 border-y border-white/5 bg-pattern-grid relative overflow-hidden">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-10 text-left flex items-center justify-between"
+          className="mb-6 sm:mb-10 text-left flex items-center justify-between"
         >
           <div>
-            <p className="text-xs font-black tracking-[0.5em] text-accent uppercase mb-2">Update</p>
-            <h2 className="text-4xl sm:text-5xl font-black tracking-tighter text-text-primary leading-none uppercase">
+            <p className="text-[10px] sm:text-xs font-black tracking-[0.4em] text-accent uppercase mb-1.5">Update</p>
+            <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-text-primary leading-none uppercase">
               {title}
             </h2>
           </div>
@@ -78,7 +76,6 @@ const KSNewsSection = ({ news = [], config = {} }) => {
                       <FaBullhorn className="text-4xl text-white/20" />
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 </div>
                 <div className="p-5">
                   <h3 className="text-lg font-bold text-text-primary mb-2 line-clamp-2">{item.title}</h3>
@@ -109,7 +106,7 @@ const KSNewsSection = ({ news = [], config = {} }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedNews(null)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/90"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}

@@ -61,9 +61,9 @@ const KSFooter = ({ config: propConfig }) => {
   ]
 
   return (
-    <footer className="bg-surface border-t border-border pt-16 pb-10 px-4">
+    <footer className="bg-surface border-t border-border pt-8 sm:pt-14 pb-24 sm:pb-8 px-4">
       <div className="container mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-12">
           {/* Brand */}
           <div className="space-y-4">
             <div>
@@ -121,7 +121,7 @@ const KSFooter = ({ config: propConfig }) => {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-text-secondary/60 font-medium">
+        <div className="mt-6 sm:mt-10 pt-4 sm:pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-xs text-text-secondary/60 font-medium">
           <p>{config?.copyright_text || '© 2026 KOHI SEKAI. ALL RIGHTS RESERVED.'}</p>
           <p className="text-primary/60 font-black tracking-widest">コーヒーの世界</p>
         </div>

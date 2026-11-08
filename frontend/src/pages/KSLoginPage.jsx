@@ -41,10 +41,9 @@ const KSLoginPage = () => {
   // Redirect if logged in
   useEffect(() => {
     if (isLoggedIn) {
-      const from = location.state?.from || '/shop'
-      navigate(from, { replace: true })
+      navigate('/profile', { replace: true })
     }
-  }, [isLoggedIn, navigate, location])
+  }, [isLoggedIn, navigate])
 
   // Synchronized mode switch handlers
   const handleSwitchAuthMode = (mode) => {
@@ -190,11 +189,10 @@ const KSLoginPage = () => {
         throw new Error('Verifikasi Cloudflare Turnstile gagal. Silakan coba lagi.')
       }
 
-      const res = await loginByEmail(loginEmail)
+      const res = await loginByEmail(loginEmail, loginPassword)
       if (res?.success) {
         kohiToast.success(`Selamat datang kembali, ${res.user.nama || 'Fan Kohi Sekai'}!`)
-        const from = location.state?.from || '/shop'
-        navigate(from, { replace: true })
+        navigate('/profile', { replace: true })
       }
     } catch (err) {
       kohiToast.error(err.message || 'Gagal masuk. Pastikan email & password sudah benar.')
@@ -257,12 +255,12 @@ const KSLoginPage = () => {
         email: registerForm.email,
         whatsapp: registerForm.whatsapp,
         instagram: registerForm.instagram,
+        password: registerForm.password,
       })
 
       if (res?.success) {
         kohiToast.success(`Pendaftaran akun berhasil! Selamat datang, ${res.user.nama}!`)
-        const from = location.state?.from || '/shop'
-        navigate(from, { replace: true })
+        navigate('/profile', { replace: true })
       } else {
         throw new Error('Gagal memproses pendaftaran')
       }
@@ -304,7 +302,7 @@ const KSLoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary flex flex-col">
+    <div className="min-h-screen bg-background bg-pattern-dots text-text-primary flex flex-col">
       <KSHeader />
 
       <main className="flex-1 pt-24 sm:pt-32 pb-16 px-4 sm:px-6">

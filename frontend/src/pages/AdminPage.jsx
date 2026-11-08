@@ -823,7 +823,7 @@ const AdminPage = () => {
       <main className="flex-1 p-4 md:p-10 md:h-screen md:overflow-y-auto pb-24 md:pb-10 space-y-6">
         {/* GUEST SANDBOX NOTICE BANNER */}
         {isGuest && (
-          <div className="bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-transparent border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[0_0_20px_rgba(245,158,11,0.15)] animate-fade-in">
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[0_0_20px_rgba(245,158,11,0.15)] animate-fade-in">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
                 <FaShieldAlt className="text-base" />
@@ -885,6 +885,7 @@ const AdminPage = () => {
             onExportMerchExcel={handleExportMerchExcel}
             onExportMerchPdf={handleExportMerchPdf}
             members={members}
+            merch={merch}
             hargaOtsPerMember={hargaOtsPerMember}
             hargaOtsGrup={hargaOtsGrup}
             hargaChekiGrupOts={hargaChekiGrupOts}
@@ -1109,7 +1110,7 @@ const AdminPage = () => {
         <>
           {/* Overlay */}
           <div
-            className="md:hidden fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
+            className="md:hidden fixed inset-0 z-30 bg-black/85"
             onClick={() => setShowMoreDrawer(false)}
           />
           {/* Drawer */}

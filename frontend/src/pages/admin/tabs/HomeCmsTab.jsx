@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import api from '../../../lib/api'
 import { showToast } from '../../../lib/toast'
 import { getAssetPath } from '../../../lib/pathUtils'
@@ -85,7 +85,16 @@ const HomeCmsTab = () => {
       if (Array.isArray(parsedFaq) && parsedFaq.length > 0) {
         setFaqItems(parsedFaq)
       } else {
-        setFaqItems([{ q: '', a: '' }])
+        try {
+          const faqRes = await api.get('/faqs')
+          if (faqRes.data?.data && faqRes.data.data.length > 0) {
+            setFaqItems(faqRes.data.data.map(f => ({ q: f.tanya || f.q || '', a: f.jawab || f.a || '' })))
+          } else {
+            setFaqItems([{ q: '', a: '' }])
+          }
+        } catch {
+          setFaqItems([{ q: '', a: '' }])
+        }
       }
       const parsedCp = parseJson(configData.faq_cp)
       if (parsedCp) {

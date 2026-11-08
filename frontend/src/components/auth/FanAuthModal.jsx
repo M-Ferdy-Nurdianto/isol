@@ -86,7 +86,7 @@ const FanAuthModal = () => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={closeAuthModal}
-          className="absolute inset-0 bg-black/60"
+          className="absolute inset-0 bg-black/90"
         />
 
         {/* Modal Card */}
@@ -98,7 +98,7 @@ const FanAuthModal = () => {
           className="relative w-full max-w-md rounded-3xl bg-surface border border-border shadow-2xl overflow-hidden z-10"
         >
           {/* Header Accent Line */}
-          <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
+          <div className="h-1.5 w-full bg-primary" />
 
           {/* Close Button */}
           <button

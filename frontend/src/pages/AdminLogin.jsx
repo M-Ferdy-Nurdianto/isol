@@ -1,9 +1,9 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2'
+import { kohiToast } from '../components/ui/KohiToast'
 import api from '../lib/api'
 import { getAssetPath } from '../lib/pathUtils'
-import { FaSpinner, FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/fa'
+import { FaSpinner, FaSignInAlt, FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa'
 import { touchAdminSession } from '../lib/authSession'
 
 const AdminLogin = () => {
@@ -47,13 +47,7 @@ const AdminLogin = () => {
         }))
         touchAdminSession()
 
-        await Swal.fire({
-          icon: 'success',
-          title: 'Login Guest Berhasil!',
-          text: 'Selamat datang di Mode Tamu. Semua fitur dapat dicoba dengan aman tanpa mengubah database.',
-          confirmButtonColor: '#079108',
-          timer: 2200
-        })
+        kohiToast.success('Login Guest Berhasil! Selamat datang di Mode Tamu. Semua fitur dapat dicoba dengan aman tanpa mengubah database.')
         navigate('/admin')
         return
       } finally {
@@ -70,23 +64,12 @@ const AdminLogin = () => {
         localStorage.setItem('admin_user', JSON.stringify(response.data.user))
         touchAdminSession()
         
-        await Swal.fire({
-          icon: 'success',
-          title: 'Login Berhasil!',
-          text: `Selamat datang, ${response.data.user.full_name || response.data.user.username}`,
-          confirmButtonColor: '#079108',
-          timer: 2000
-        })
+        kohiToast.success(`Login Berhasil! Selamat datang, ${response.data.user.full_name || response.data.user.username}`)
         navigate('/admin')
       }
     } catch (error) {
       console.error('Login error:', error)
-      Swal.fire({
-        icon: 'error',
-        title: 'Login Gagal',
-        text: error.response?.data?.error || 'Username atau password salah',
-        confirmButtonColor: '#079108'
-      })
+      kohiToast.error(error.response?.data?.error || 'Username atau password salah')
     } finally {
       setLoading(false)
     }
@@ -104,14 +87,7 @@ const AdminLogin = () => {
     }))
     touchAdminSession()
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Masuk sebagai Guest (GS123)!',
-      text: 'Mode simulasi interaktif aktif. Data sensitif disensor dan database aman.',
-      confirmButtonColor: '#079108',
-      timer: 1800,
-      showConfirmButton: false
-    })
+    kohiToast.success('Masuk sebagai Guest (GS123)! Mode simulasi interaktif aktif. Data sensitif disensor dan database aman.')
     navigate('/admin')
   }
 
@@ -130,48 +106,47 @@ const AdminLogin = () => {
   }
 
   return (
-    <div className="admin-layout min-h-screen bg-[var(--background)] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Subtle Radial Glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[var(--primary)]/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-10 right-10 w-72 h-72 bg-[#00e5e5]/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="admin-layout min-h-screen bg-[var(--background)] text-[var(--text-primary)] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Subtle Warm Brand Ambient */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[var(--primary)]/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="relative bg-[#111726]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.6)] p-8 w-full max-w-md">
+      <div className="relative bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          {/* Logo without box/shape background - Clickable 3x for secret guest login */}
+          {/* Logo - Clickable 3x for secret guest login */}
           <div 
             onClick={handleLogoClick}
-            className="w-24 h-24 mx-auto mb-4 flex items-center justify-center cursor-pointer select-none transition-transform active:scale-95 group"
+            className="w-48 h-16 mx-auto mb-4 flex items-center justify-center cursor-pointer select-none transition-transform active:scale-95 group"
             title="Kohi Sekai"
           >
             <img 
-              src={getAssetPath('/images/logos/logo.svg')} 
+              src={getAssetPath('/images/logos/logo.png')} 
               alt="Kohi Sekai Logo" 
-              className="w-full h-full object-contain filter drop-shadow-[0_4px_12px_rgba(7,145,8,0.2)] group-hover:brightness-110 transition-all"
+              className="w-full h-full object-contain filter group-hover:brightness-110 transition-all"
             />
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-white uppercase">
+          <h1 className="text-2xl font-black tracking-tight text-[var(--text-primary)] uppercase">
             Login <span className="text-[var(--primary)]">Staff</span>
           </h1>
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mt-1">Kohi Sekai Portal</p>
+          <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mt-1">Kohi Sekai Portal</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
               Username
             </label>
             <input
               type="text"
               value={formData.username}
               onChange={(e) => setFormData({...formData, username: e.target.value})}
-              className="w-full px-4 py-3 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-[var(--text-secondary)]/60 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all text-sm"
+              className="w-full px-4 py-3 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all text-sm"
               placeholder="Enter username"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
               Password
             </label>
             <div className="relative">
@@ -179,14 +154,14 @@ const AdminLogin = () => {
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
-                className="w-full px-4 py-3 pr-12 bg-[#182032] border border-white/10 text-white rounded-xl placeholder-[var(--text-secondary)]/60 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all text-sm"
+                className="w-full px-4 py-3 pr-12 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all text-sm"
                 placeholder="Enter password"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                 tabIndex="-1"
               >
                 {showPassword ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
@@ -197,7 +172,7 @@ const AdminLogin = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[var(--primary)] text-white font-bold py-3.5 px-4 rounded-xl hover:bg-[var(--primary)]/85 transition-all shadow-[0_0_20px_rgba(7,145,8,0.3)] hover:shadow-[0_0_25px_rgba(7,145,8,0.5)] flex justify-center items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            className="w-full bg-[var(--primary)] text-[#1A1512] font-black py-3.5 px-4 rounded-xl hover:bg-[#F0A868] transition-all shadow-[0_4px_16px_rgba(232,148,74,0.25)] flex justify-center items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-2"
           >
             {loading ? (
               <>
@@ -216,9 +191,10 @@ const AdminLogin = () => {
         <div className="mt-6 text-center">
           <button
             onClick={() => navigate('/')}
-            className="text-zinc-400 hover:text-white font-medium text-xs transition-colors inline-flex items-center gap-1"
+            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium text-xs transition-colors inline-flex items-center gap-2"
           >
-            â† Kembali ke Home
+            <FaArrowLeft className="text-xs" />
+            <span>Kembali ke Beranda</span>
           </button>
         </div>
       </div>

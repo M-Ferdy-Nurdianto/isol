@@ -1,4 +1,4 @@
-﻿import jsPDF from 'jspdf'
+import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import Swal from 'sweetalert2'
 import { getValidAdminToken } from './authSession'
@@ -106,7 +106,7 @@ export const generateMerchPDF = async ({ api, statusFilter, searchQuery }) => {
     if (!orders || orders.length === 0) throw new Error('Tidak ada data untuk diexport.')
 
     const doc = new jsPDF()
-    doc.setFillColor(7, 145, 8)
+    doc.setFillColor(232, 148, 74)
     doc.rect(0, 0, 210, 24, 'F')
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(16)
@@ -158,7 +158,7 @@ export const generateMerchPDF = async ({ api, statusFilter, searchQuery }) => {
       head: [['#', 'Order #', 'Nama', 'Kontak', 'Items', 'Total', 'Status']],
       body: tableBody,
       theme: 'grid',
-      headStyles: { fillColor: [7, 145, 8], textColor: 255 },
+      headStyles: { fillColor: [232, 148, 74], textColor: 255 },
       styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
       columnStyles: { 0: { cellWidth: 10 }, 4: { cellWidth: 50 }, 5: { halign: 'right' } }
     })
@@ -313,7 +313,7 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
 
     const logoDataUrl = await loadLogoDataUrl()
     const doc = new jsPDF('p', 'mm', 'a4')
-    doc.setFillColor(7, 145, 8)
+    doc.setFillColor(232, 148, 74)
     doc.rect(0, 0, 210, 24, 'F')
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(13)
@@ -340,18 +340,18 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
       body: [[formatCurrency(totalRevenue), `${totalPolaroid} units`, `${otsOrders.length} orders`, `${poOrders.length} orders`]],
       theme: 'grid',
       styles: { fontSize: 9, halign: 'center' },
-      headStyles: { fillColor: [220, 252, 231], textColor: [22, 101, 52], fontStyle: 'bold' },
-      bodyStyles: { fillColor: [255, 255, 255], textColor: [22, 101, 52], fontStyle: 'bold' },
+      headStyles: { fillColor: [254, 243, 199], textColor: [180, 83, 9], fontStyle: 'bold' },
+      bodyStyles: { fillColor: [255, 255, 255], textColor: [180, 83, 9], fontStyle: 'bold' },
       columnStyles: {
-        0: { textColor: [21, 128, 61] },
-        1: { textColor: [22, 163, 74] },
-        2: { textColor: [5, 150, 105] },
-        3: { textColor: [16, 185, 129] }
+        0: { textColor: [217, 119, 6] },
+        1: { textColor: [232, 148, 74] },
+        2: { textColor: [245, 158, 11] },
+        3: { textColor: [217, 119, 6] }
       }
     })
 
     let currentY = doc.lastAutoTable.finalY + 8
-    doc.setFillColor(6, 95, 70)
+    doc.setFillColor(180, 83, 9)
     doc.rect(14, currentY, 182, 7, 'F')
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(10)
@@ -367,7 +367,7 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
       head: [['Member / Lineup', 'Total Qty', 'OTS Qty', 'PO Qty', 'Revenue']],
       body: memberBody.length ? memberBody : [['-', '-', '-', '-', '-']],
       theme: 'grid',
-      headStyles: { fillColor: [7, 145, 8], textColor: 255 },
+      headStyles: { fillColor: [232, 148, 74], textColor: 255 },
       styles: { fontSize: 9 },
       columnStyles: { 
         1: { halign: 'center', cellWidth: 20 },

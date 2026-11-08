@@ -46,7 +46,7 @@ export const FanAuthProvider = ({ children }) => {
   }, [fanUser])
 
   const login = async (userData) => {
-    const { nama, email, whatsapp, instagram } = userData
+    const { nama, email, whatsapp, instagram, password } = userData
 
     try {
       // Call backend API
@@ -55,6 +55,7 @@ export const FanAuthProvider = ({ children }) => {
         email: email.trim().toLowerCase(),
         whatsapp: whatsapp.trim(),
         instagram: instagram ? instagram.trim().replace(/^@/, '') : '',
+        password: password || undefined,
       })
 
       if (res.data?.success && res.data?.user) {
@@ -81,9 +82,12 @@ export const FanAuthProvider = ({ children }) => {
     return { success: true, user: localUser }
   }
 
-  const loginByEmail = async (emailInput) => {
+  const loginByEmail = async (emailInput, passwordInput) => {
     const cleanEmail = (emailInput || '').trim().toLowerCase()
-    const res = await api.post('/auth/login', { email: cleanEmail })
+    const payload = { email: cleanEmail }
+    if (passwordInput) payload.password = passwordInput
+
+    const res = await api.post('/auth/login', payload)
     if (res.data?.success && res.data?.user) {
       setFanUser(res.data.user)
       if (res.data.token) {

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FaRedo, FaInstagram, FaShieldAlt, FaClock } from 'react-icons/fa'
 import { getAssetPath } from '../lib/pathUtils'
@@ -69,39 +69,39 @@ const MaintenanceScreen = ({ message, estimatedEnd }) => {
         initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="relative z-10 w-full max-w-xl bg-[#111726]/90 backdrop-blur-2xl border border-white/15 rounded-[2rem] p-6 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.95)] text-center"
+        className="relative z-10 w-full max-w-xl bg-[#111726] border border-white/15 rounded-[2rem] p-6 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.95)] text-center"
       >
         {/* Top Accent Line */}
-        <div className="absolute -top-px left-1/2 -translate-x-1/2 w-48 h-[2px] bg-gradient-to-r from-transparent via-[var(--primary)] to-transparent shadow-[0_0_15px_#079108]" />
+        <div className="absolute -top-px left-1/2 -translate-x-1/2 w-48 h-[2px] bg-[var(--primary)] shadow-[0_0_15px_rgba(232,148,74,0.5)]" />
 
         {/* Brand Logo Container */}
         <div className="flex flex-col items-center mb-6">
           <div className="relative mb-5">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#161f33] border border-white/15 p-4 flex items-center justify-center shadow-[0_0_30px_rgba(7,145,8,0.25)] relative overflow-hidden group">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#161f33] border border-white/15 p-4 flex items-center justify-center shadow-[0_0_30px_rgba(232,148,74,0.2)] relative overflow-hidden group">
               <img
-                src={getAssetPath('/images/logos/logo.svg')}
+                src={getAssetPath('/images/logos/logo.png')}
                 alt="Kohi Sekai Logo"
-                className="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(7,145,8,0.6)] group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(232,148,74,0.4)] group-hover:scale-105 transition-transform duration-300"
                 onError={(e) => {
-                  e.target.src = getAssetPath('/images/logos/logo.svg')
+                  e.target.src = getAssetPath('/images/logos/logo.png')
                 }}
               />
             </div>
             {/* Pulsing Dot */}
             <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--primary)] opacity-80"></span>
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-[var(--primary)] border-2 border-[#111726] shadow-[0_0_10px_#079108]"></span>
+              <span className="relative inline-flex rounded-full h-4 w-4 bg-[var(--primary)] border-2 border-[#111726] shadow-[0_0_10px_rgba(232,148,74,0.5)]"></span>
             </span>
           </div>
 
           {/* Status Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--primary)]/15 border border-[var(--primary)]/40 text-[var(--primary)] text-xs font-bold uppercase tracking-widest mb-3 shadow-[0_0_12px_rgba(7,145,8,0.25)]">
-            <span className="w-2 h-2 rounded-full bg-[var(--primary)] animate-pulse shadow-[0_0_6px_#079108]"></span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--primary)]/15 border border-[var(--primary)]/40 text-[var(--primary)] text-xs font-bold uppercase tracking-widest mb-3 shadow-[0_0_12px_rgba(232,148,74,0.25)]">
+            <span className="w-2 h-2 rounded-full bg-[var(--primary)] animate-pulse shadow-[0_0_6px_rgba(232,148,74,0.6)]"></span>
             <span>Pemeliharaan Sistem</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-black tracking-tight uppercase text-white font-heading">
-            KOHI <span className="text-[var(--primary)] drop-shadow-[0_0_20px_rgba(7,145,8,0.4)]">SEKAI</span>
+            KOHI <span className="text-[var(--primary)] drop-shadow-[0_0_20px_rgba(232,148,74,0.4)]">SEKAI</span>
           </h1>
           <p className="text-[11px] sm:text-xs font-bold text-zinc-400 tracking-[0.25em] uppercase mt-1">
             ã‚³ãƒ’ãƒ»ã‚»ã‚«ã‚¤ â€¢ Under Maintenance
@@ -161,7 +161,7 @@ const MaintenanceScreen = ({ message, estimatedEnd }) => {
             href="https://instagram.com/kohisekai"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-white text-xs font-bold uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(7,145,8,0.35)]"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-[#1A1512] font-black text-xs uppercase tracking-wider transition-all active:scale-95 shadow-[0_0_20px_rgba(232,148,74,0.35)]"
           >
             <FaInstagram className="text-sm" />
             <span>Instagram Resmi</span>

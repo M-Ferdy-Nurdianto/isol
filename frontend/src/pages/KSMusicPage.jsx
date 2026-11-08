@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaMusic, FaSpotify, FaYoutube, FaPlay, FaExternalLinkAlt, FaTimes } from 'react-icons/fa'
 import KSHeader from '../components/KSHeader'
@@ -21,14 +21,14 @@ const PlayerModal = ({ track, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={onClose}></div>
+      <div className="absolute inset-0 bg-black/90" onClick={onClose}></div>
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         className="relative w-full max-w-4xl bg-[var(--surface)] rounded-2xl border border-white/10 overflow-hidden shadow-2xl"
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[var(--surface)]/80 backdrop-blur-xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[var(--surface)]">
           <div className="flex items-center gap-3">
             <FaYoutube className="text-red-500 text-xl" />
             <h3 className="font-bold text-white line-clamp-1">{track.title}</h3>
@@ -82,29 +82,24 @@ const KSMusicPage = () => {
 
       <main className="pt-20 sm:pt-24">
         {/* Hero */}
-        <section className="relative py-20 sm:py-32 px-4 overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full bg-primary/4 blur-[140px]" />
-            <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-accent/3 blur-[120px]" />
-          </div>
-
+        <section className="relative py-10 sm:py-32 px-4 overflow-hidden bg-background bg-pattern-grid">
           <div className="container mx-auto max-w-7xl relative z-10">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.6 }}
               className="text-center"
             >
-              <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-primary/10 mb-6">
+              <div className="inline-flex items-center justify-center w-14 h-14 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl bg-primary/10 mb-4 sm:mb-6">
                 <motion.div
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 >
-                  <FaMusic className="text-primary" size={36} />
+                  <FaMusic className="text-primary text-xl sm:text-4xl" />
                 </motion.div>
               </div>
-              <p className="text-xs font-black tracking-[0.5em] text-primary uppercase mb-3">Discography</p>
-              <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tighter text-text-primary leading-none mb-4">
+              <p className="text-[10px] sm:text-xs font-black tracking-[0.35em] text-primary uppercase mb-2 sm:mb-3">Discography</p>
+              <h1 className="text-3xl sm:text-7xl md:text-8xl font-black tracking-tight text-text-primary leading-none mb-3 sm:mb-4">
                 OUR<br /><span className="text-primary">MUSIC</span>
               </h1>
               <p className="text-base text-text-secondary max-w-md mx-auto leading-relaxed">
@@ -222,11 +217,11 @@ const KSMusicPage = () => {
                   >
                     <img src={track.thumbnail_url} alt={track.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-full bg-red-600/90 backdrop-blur flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                      <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
                         <FaPlay size={20} className="ml-1" />
                       </div>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/85 border-t border-white/10">
                       <p className="font-bold text-white line-clamp-1">{track.title}</p>
                     </div>
                   </motion.div>

@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import { 
   FaPlus, 
   FaEdit, 
@@ -111,6 +111,12 @@ const MembersTab = ({ members = [], onRefresh }) => {
   const [silhouettePreview, setSilhouettePreview] = useState('')
   const [silhouetteFile, setSilhouetteFile] = useState(null)
 
+  // Drag and drop states for photo uploads
+  const [isDraggingAvatar, setIsDraggingAvatar] = useState(false)
+  const [isDraggingShopAvatar, setIsDraggingShopAvatar] = useState(false)
+  const [isDraggingSilhouette, setIsDraggingSilhouette] = useState(false)
+  const [draggingGallerySlot, setDraggingGallerySlot] = useState(null)
+
   const [galleryFiles, setGalleryFiles] = useState([null, null, null])
   const [galleryPreviews, setGalleryPreviews] = useState(['', '', ''])
   const [saving, setSaving] = useState(false)
@@ -195,12 +201,43 @@ const MembersTab = ({ members = [], onRefresh }) => {
     setAvatarFile(null)
     setShopAvatarFile(null)
     setSilhouetteFile(null)
+    setIsDraggingAvatar(false)
+    setIsDraggingShopAvatar(false)
+    setIsDraggingSilhouette(false)
+    setDraggingGallerySlot(null)
   }
 
   // Upload handler for member profile picture
   const handleAvatarChange = (e) => {
     const file = e.target.files?.[0]
     if (file) {
+      setAvatarFile(file)
+      setAvatarPreview(URL.createObjectURL(file))
+    }
+  }
+
+  // Drag & drop handlers for Avatar / Banner
+  const handleAvatarDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  const handleAvatarDragEnter = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingAvatar(true)
+  }
+  const handleAvatarDragLeave = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.currentTarget.contains(e.relatedTarget)) return
+    setIsDraggingAvatar(false)
+  }
+  const handleAvatarDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingAvatar(false)
+    const file = e.dataTransfer?.files?.[0]
+    if (file && file.type.startsWith('image/')) {
       setAvatarFile(file)
       setAvatarPreview(URL.createObjectURL(file))
     }
@@ -215,6 +252,33 @@ const MembersTab = ({ members = [], onRefresh }) => {
     }
   }
 
+  // Drag & drop handlers for Shop Cheki Avatar
+  const handleShopAvatarDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  const handleShopAvatarDragEnter = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingShopAvatar(true)
+  }
+  const handleShopAvatarDragLeave = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.currentTarget.contains(e.relatedTarget)) return
+    setIsDraggingShopAvatar(false)
+  }
+  const handleShopAvatarDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingShopAvatar(false)
+    const file = e.dataTransfer?.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      setShopAvatarFile(file)
+      setShopAvatarPreview(URL.createObjectURL(file))
+    }
+  }
+
   // Upload handler for secret member silhouette teaser
   const handleSilhouetteChange = (e) => {
     const file = e.target.files?.[0]
@@ -224,9 +288,70 @@ const MembersTab = ({ members = [], onRefresh }) => {
     }
   }
 
+  // Drag & drop handlers for Silhouette Teaser
+  const handleSilhouetteDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  const handleSilhouetteDragEnter = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingSilhouette(true)
+  }
+  const handleSilhouetteDragLeave = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.currentTarget.contains(e.relatedTarget)) return
+    setIsDraggingSilhouette(false)
+  }
+  const handleSilhouetteDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingSilhouette(false)
+    const file = e.dataTransfer?.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      setSilhouetteFile(file)
+      setSilhouettePreview(URL.createObjectURL(file))
+    }
+  }
+
   const handleGalleryChange = (idx, e) => {
     const file = e.target.files?.[0]
     if (file) {
+      const newFiles = [...galleryFiles]
+      newFiles[idx] = file
+      setGalleryFiles(newFiles)
+
+      const newPreviews = [...galleryPreviews]
+      newPreviews[idx] = URL.createObjectURL(file)
+      setGalleryPreviews(newPreviews)
+    }
+  }
+
+  // Drag & drop handlers for Gallery slots
+  const handleGalleryDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  const handleGalleryDragEnter = (idx, e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDraggingGallerySlot(idx)
+  }
+  const handleGalleryDragLeave = (idx, e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.currentTarget.contains(e.relatedTarget)) return
+    if (draggingGallerySlot === idx) {
+      setDraggingGallerySlot(null)
+    }
+  }
+  const handleGalleryDrop = (idx, e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDraggingGallerySlot(null)
+    const file = e.dataTransfer?.files?.[0]
+    if (file && file.type.startsWith('image/')) {
       const newFiles = [...galleryFiles]
       newFiles[idx] = file
       setGalleryFiles(newFiles)
@@ -553,7 +678,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
               type="button"
               onClick={handleSaveMember}
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-[var(--text-primary)] text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-emerald-900/40 disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-[var(--text-primary)] text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-[var(--primary)]/20 disabled:opacity-50"
             >
               <FaSave /> {saving ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan' : 'Tambah Member')}
             </button>
@@ -561,10 +686,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
         </div>
 
         {isGroup && (
-          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 flex items-start gap-3 text-emerald-300 text-xs">
-            <FaInfoCircle className="mt-0.5 text-base shrink-0 text-emerald-400" />
+          <div className="bg-[var(--primary)]/10 border border-[var(--primary)]/30 rounded-2xl p-4 flex items-start gap-3 text-[var(--text-primary)] text-xs">
+            <FaInfoCircle className="mt-0.5 text-base shrink-0 text-[var(--primary)]" />
             <div>
-              <span className="font-bold block text-sm text-emerald-200 mb-0.5">Mode Pengaturan Entitas Grup (Kohi Sekai)</span>
+              <span className="font-bold block text-sm text-[var(--text-primary)] mb-0.5">Mode Pengaturan Entitas Grup (Kohi Sekai)</span>
               Foto profil ini digunakan sebagai <strong>Banner Utama</strong> di halaman Member publik (*Meet The Members*) dan foto Cheki Group di halaman Shop.
             </div>
           </div>
@@ -580,15 +705,32 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                   Foto {isGroup ? 'Banner / Cover Utama' : 'Profil Member'}
                 </label>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                  {isGroup ? '1200 Ã— 675 px (16:9)' : '800 Ã— 800 px (1:1)'}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                    {isGroup ? '1200 × 675 px (16:9)' : '800 × 800 px (1:1)'}
+                  </span>
+                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                    Drag & Drop Ready
+                  </span>
+                </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border border-[var(--border)] rounded-xl">
+              <div
+                onDragOver={handleAvatarDragOver}
+                onDragEnter={handleAvatarDragEnter}
+                onDragLeave={handleAvatarDragLeave}
+                onDrop={handleAvatarDrop}
+                className={`flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border-2 rounded-xl transition-all ${
+                  isDraggingAvatar 
+                    ? 'border-dashed border-[var(--primary)] bg-[var(--primary)]/10 ring-2 ring-[var(--primary)]/20' 
+                    : 'border-[var(--border)]'
+                }`}
+              >
                 <div
-                  className="relative w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border-2 cursor-pointer group shadow-xl shrink-0 bg-black/50"
-                  style={{ borderColor: formData.color }}
+                  className={`relative w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border-2 cursor-pointer group shadow-xl shrink-0 bg-black/50 transition-all ${
+                    isDraggingAvatar ? 'scale-105 border-[var(--primary)]' : ''
+                  }`}
+                  style={{ borderColor: isDraggingAvatar ? undefined : formData.color }}
                   onClick={() => avatarInputRef.current?.click()}
                 >
                   {avatarPreview ? (
@@ -607,20 +749,45 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       <span className="text-[10px]">Pilih Foto</span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5">
+
+                  {/* Normal hover overlay */}
+                  <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5 ${isDraggingAvatar ? 'hidden' : ''}`}>
                     <FaUpload /> Ganti Foto
                   </div>
+
+                  {/* Dragging active overlay */}
+                  {isDraggingAvatar && (
+                    <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-[var(--primary)] text-xs font-bold gap-1 z-20 pointer-events-none">
+                      <FaUpload className="text-2xl animate-bounce" />
+                      <span>Lepas di Sini</span>
+                    </div>
+                  )}
                 </div>
 
-                <div className="space-y-2 text-center sm:text-left">
-                  <p className="text-xs text-[var(--text-secondary)] font-medium">
-                    {avatarFile ? avatarFile.name : (formData.image_url ? 'Foto profil aktif' : 'Belum ada foto yang dipilih')}
-                  </p>
-                  <p className="text-[11px] text-[var(--text-secondary)]">
+                <div className="space-y-2 text-center sm:text-left flex-1">
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <p className="text-xs text-[var(--text-secondary)] font-medium">
+                      {avatarFile ? avatarFile.name : (formData.image_url ? 'Foto profil aktif' : 'Belum ada foto yang dipilih')}
+                    </p>
+                    {isDraggingAvatar && (
+                      <span className="px-2 py-0.5 rounded bg-[var(--primary)]/20 border border-[var(--primary)]/40 text-[var(--primary)] text-[10px] font-bold animate-pulse">
+                        Lepas untuk Unggah
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Manual Responsive Desktop / Mobile Hint */}
+                  <p className="hidden md:block text-[11px] text-[var(--text-secondary)]">
                     {isGroup 
-                      ? 'Format JPG, PNG, WEBP. Otomatis di-crop dan dikonversi ke WebP 16:9 (1200Ã—675 px).' 
-                      : 'Format JPG, PNG, WEBP. Otomatis di-crop 1:1 fokus wajah dan dikonversi ke WebP 800Ã—800 px.'}
+                      ? 'Drag & drop foto banner ke kotak ini atau klik untuk memilih file. Format JPG, PNG, WEBP (16:9, 1200×675 px).' 
+                      : 'Drag & drop foto ke kotak ini atau klik untuk memilih file. Format JPG, PNG, WEBP (1:1, 800×800 px).'}
                   </p>
+                  <p className="md:hidden text-[11px] text-[var(--text-secondary)]">
+                    {isGroup 
+                      ? 'Ketuk untuk memilih banner grup (16:9, 1200×675 px).' 
+                      : 'Ketuk untuk memilih foto profil idol (1:1, 800×800 px).'}
+                  </p>
+
                   <input
                     type="file"
                     ref={avatarInputRef}
@@ -628,13 +795,18 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     accept="image/*"
                     className="hidden"
                   />
-                  <button
-                    type="button"
-                    onClick={() => avatarInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--border)] hover:bg-[var(--primary)]/15 border border-[var(--border)] text-xs font-bold text-[var(--text-primary)] transition"
-                  >
-                    <FaUpload /> Unggah Foto Baru
-                  </button>
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => avatarInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--border)] hover:bg-[var(--primary)]/15 border border-[var(--border)] text-xs font-bold text-[var(--text-primary)] transition"
+                    >
+                      <FaUpload /> Unggah Foto Baru
+                    </button>
+                    <span className="hidden md:inline-block text-[10px] text-[var(--text-secondary)]">
+                      atau seret foto langsung ke area ini
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -646,19 +818,31 @@ const MembersTab = ({ members = [], onRefresh }) => {
                   Foto Pajangan Shop (Tiket Cheki)
                 </label>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-300 border border-teal-500/20">
-                    600 Ã— 800 px (3:4)
+                  <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-300 border border-teal-500/20">
+                    600 × 800 px (3:4)
                   </span>
-                  <span className="text-[10px] text-teal-400/90 font-bold bg-teal-500/10 px-2 py-0.5 rounded-full border border-teal-500/20">
+                  <span className="text-[10px] text-teal-400 font-bold bg-teal-500/10 px-2 py-0.5 rounded-full border border-teal-500/20">
                     Tampil di /shop
                   </span>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border border-[var(--border)] rounded-xl">
+              <div
+                onDragOver={handleShopAvatarDragOver}
+                onDragEnter={handleShopAvatarDragEnter}
+                onDragLeave={handleShopAvatarDragLeave}
+                onDrop={handleShopAvatarDrop}
+                className={`flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border-2 rounded-xl transition-all ${
+                  isDraggingShopAvatar 
+                    ? 'border-dashed border-teal-400 bg-teal-500/10 ring-2 ring-teal-500/20' 
+                    : 'border-[var(--border)]'
+                }`}
+              >
                 <div
-                  className="relative w-28 h-36 md:w-32 md:h-40 rounded-2xl overflow-hidden border-2 cursor-pointer group shadow-xl shrink-0 bg-black/50"
-                  style={{ borderColor: formData.color || '#2DD4BF' }}
+                  className={`relative w-28 h-36 md:w-32 md:h-40 rounded-2xl overflow-hidden border-2 cursor-pointer group shadow-xl shrink-0 bg-black/50 transition-all ${
+                    isDraggingShopAvatar ? 'scale-105 border-teal-400' : ''
+                  }`}
+                  style={{ borderColor: isDraggingShopAvatar ? undefined : (formData.color || '#2DD4BF') }}
                   onClick={() => shopAvatarInputRef.current?.click()}
                 >
                   {shopAvatarPreview ? (
@@ -677,21 +861,45 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       <span className="text-[10px]">Pilih Foto Shop</span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5 text-center p-2">
+
+                  {/* Normal hover overlay */}
+                  <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5 text-center p-2 ${isDraggingShopAvatar ? 'hidden' : ''}`}>
                     <FaUpload /> Ganti Foto Shop
                   </div>
+
+                  {/* Dragging active overlay */}
+                  {isDraggingShopAvatar && (
+                    <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-teal-300 text-xs font-bold gap-1 z-20 pointer-events-none">
+                      <FaUpload className="text-2xl animate-bounce" />
+                      <span>Lepas di Sini</span>
+                    </div>
+                  )}
+
                   <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-teal-300 rounded text-[9px] font-bold">
                     Tiket Cheki
                   </span>
                 </div>
 
-                <div className="space-y-2 text-center sm:text-left">
-                  <p className="text-xs text-[var(--text-secondary)] font-medium">
-                    {shopAvatarFile ? shopAvatarFile.name : (formData.shop_image_url ? 'Foto tiket shop aktif' : 'Belum ada foto khusus shop')}
+                <div className="space-y-2 text-center sm:text-left flex-1">
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <p className="text-xs text-[var(--text-secondary)] font-medium">
+                      {shopAvatarFile ? shopAvatarFile.name : (formData.shop_image_url ? 'Foto tiket shop aktif' : 'Belum ada foto khusus shop')}
+                    </p>
+                    {isDraggingShopAvatar && (
+                      <span className="px-2 py-0.5 rounded bg-teal-500/20 border border-teal-500/40 text-teal-300 text-[10px] font-bold animate-pulse">
+                        Lepas untuk Unggah
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Manual Responsive Desktop / Mobile Hint */}
+                  <p className="hidden md:block text-[11px] text-[var(--text-secondary)]">
+                    Foto idol vertikal untuk kartu <strong>Tiket Cheki 2-Shot</strong> di /shop. Drag & drop file ke sini atau klik tombol di bawah (rasio 3:4, 600×800 px).
                   </p>
-                  <p className="text-[11px] text-[var(--text-secondary)]">
-                    Foto idol vertikal untuk kartu <strong>Tiket Cheki 2-Shot</strong> di /shop. Otomatis di-crop 3:4 fokus badan & wajah.
+                  <p className="md:hidden text-[11px] text-[var(--text-secondary)]">
+                    Foto idol vertikal untuk kartu Tiket Cheki di /shop (3:4, 600×800 px).
                   </p>
+
                   <input
                     type="file"
                     ref={shopAvatarInputRef}
@@ -699,13 +907,18 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     accept="image/*"
                     className="hidden"
                   />
-                  <button
-                    type="button"
-                    onClick={() => shopAvatarInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/40 text-xs font-bold text-teal-200 transition"
-                  >
-                    <FaUpload /> Unggah Foto Shop Baru
-                  </button>
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => shopAvatarInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/40 text-xs font-bold text-teal-200 transition"
+                    >
+                      <FaUpload /> Unggah Foto Shop Baru
+                    </button>
+                    <span className="hidden md:inline-block text-[10px] text-[var(--text-secondary)]">
+                      atau seret foto langsung ke area ini
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -776,10 +989,19 @@ const MembersTab = ({ members = [], onRefresh }) => {
               <div className="grid grid-cols-3 gap-3">
                 {[0, 1, 2].map((idx) => {
                   const previewUrl = galleryPreviews[idx]
+                  const isDraggingThisSlot = draggingGallerySlot === idx
                   return (
                     <div
                       key={idx}
-                      className="relative aspect-[3/4] bg-[var(--background)] border border-[var(--border)] rounded-xl overflow-hidden flex flex-col items-center justify-center group shadow-md"
+                      onDragOver={handleGalleryDragOver}
+                      onDragEnter={(e) => handleGalleryDragEnter(idx, e)}
+                      onDragLeave={(e) => handleGalleryDragLeave(idx, e)}
+                      onDrop={(e) => handleGalleryDrop(idx, e)}
+                      className={`relative aspect-[3/4] bg-[var(--background)] border-2 rounded-xl overflow-hidden flex flex-col items-center justify-center group shadow-md transition-all ${
+                        isDraggingThisSlot
+                          ? 'border-dashed border-[var(--primary)] bg-[var(--primary)]/10 ring-2 ring-[var(--primary)]/20 scale-105'
+                          : 'border-[var(--border)]'
+                      }`}
                     >
                       {previewUrl ? (
                         <>
@@ -792,7 +1014,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                               e.target.src = getAssetPath('/images/members/placeholder.svg')
                             }}
                           />
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-opacity">
+                          <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-opacity ${isDraggingThisSlot ? 'hidden' : ''}`}>
                             <button
                               type="button"
                               onClick={() => galleryInputRefs[idx].current?.click()}
@@ -821,9 +1043,19 @@ const MembersTab = ({ members = [], onRefresh }) => {
                         >
                           <FaCamera className="text-xl mb-1 text-[var(--text-secondary)]" />
                           <span className="text-[10px] font-bold">Slot {idx + 1}</span>
-                          <span className="text-[8px] text-[var(--text-secondary)]">Klik untuk upload</span>
+                          <span className="hidden md:block text-[8px] text-[var(--text-secondary)]">Drag & drop / klik</span>
+                          <span className="md:hidden text-[8px] text-[var(--text-secondary)]">Ketuk upload</span>
                         </div>
                       )}
+
+                      {/* Dragging active overlay on this slot */}
+                      {isDraggingThisSlot && (
+                        <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-[var(--primary)] text-xs font-bold gap-1 z-20 pointer-events-none">
+                          <FaUpload className="text-xl animate-bounce" />
+                          <span className="text-[10px]">Lepas Foto</span>
+                        </div>
+                      )}
+
                       <input
                         type="file"
                         ref={galleryInputRefs[idx]}
@@ -993,9 +1225,21 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       </span>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border border-purple-500/20 rounded-xl">
+                    <div
+                      onDragOver={handleSilhouetteDragOver}
+                      onDragEnter={handleSilhouetteDragEnter}
+                      onDragLeave={handleSilhouetteDragLeave}
+                      onDrop={handleSilhouetteDrop}
+                      className={`flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border-2 rounded-xl transition-all ${
+                        isDraggingSilhouette
+                          ? 'border-dashed border-purple-400 bg-purple-900/30 ring-2 ring-purple-500/20'
+                          : 'border-purple-500/30'
+                      }`}
+                    >
                       <div
-                        className="relative w-28 h-36 md:w-32 md:h-40 rounded-2xl overflow-hidden border-2 border-dashed border-purple-400 cursor-pointer group shadow-xl shrink-0 bg-black/60"
+                        className={`relative w-28 h-36 md:w-32 md:h-40 rounded-2xl overflow-hidden border-2 border-dashed border-purple-400 cursor-pointer group shadow-xl shrink-0 bg-black/60 transition-all ${
+                          isDraggingSilhouette ? 'scale-105 border-purple-300' : ''
+                        }`}
                         onClick={() => silhouetteInputRef.current?.click()}
                       >
                         {silhouettePreview ? (
@@ -1014,21 +1258,42 @@ const MembersTab = ({ members = [], onRefresh }) => {
                             <span className="text-[10px] text-purple-300 font-bold">Pilih Foto Siluet</span>
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5 text-center p-2">
+                        <div className={`absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5 text-center p-2 ${isDraggingSilhouette ? 'hidden' : ''}`}>
                           <FaUpload /> Ganti Siluet
                         </div>
+
+                        {/* Dragging active overlay on silhouette */}
+                        {isDraggingSilhouette && (
+                          <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-purple-300 text-xs font-bold gap-1 z-20 pointer-events-none">
+                            <FaUpload className="text-2xl animate-bounce" />
+                            <span>Lepas di Sini</span>
+                          </div>
+                        )}
+
                         <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-purple-900/90 text-purple-200 rounded text-[9px] font-bold">
                           SILUET
                         </span>
                       </div>
 
-                      <div className="space-y-2 text-center sm:text-left">
-                        <p className="text-xs text-[var(--text-secondary)] font-medium">
-                          {silhouetteFile ? silhouetteFile.name : (formData.silhouette_image_url ? 'Foto siluet tersimpan' : 'Belum ada foto siluet khusus')}
+                      <div className="space-y-2 text-center sm:text-left flex-1">
+                        <div className="flex items-center justify-center sm:justify-start gap-2">
+                          <p className="text-xs text-[var(--text-secondary)] font-medium">
+                            {silhouetteFile ? silhouetteFile.name : (formData.silhouette_image_url ? 'Foto siluet tersimpan' : 'Belum ada foto siluet khusus')}
+                          </p>
+                          {isDraggingSilhouette && (
+                            <span className="px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-bold animate-pulse">
+                              Lepas untuk Unggah
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="hidden md:block text-[11px] text-[var(--text-secondary)]">
+                          Unggah foto siluet gelap berlatar transparan atau gelap untuk teaser idol. Drag & drop foto ke kotak ini atau klik tombol di bawah.
                         </p>
-                        <p className="text-[11px] text-[var(--text-secondary)]">
-                          Unggah foto siluet gelap berlatar transparan atau gelap untuk teaser teaser idol. Jika dikosongkan, sistem memakai siluet standar.
+                        <p className="md:hidden text-[11px] text-[var(--text-secondary)]">
+                          Ketuk tombol untuk memilih foto siluet teaser idol.
                         </p>
+
                         <input
                           type="file"
                           ref={silhouetteInputRef}
@@ -1036,13 +1301,18 @@ const MembersTab = ({ members = [], onRefresh }) => {
                           accept="image/*"
                           className="hidden"
                         />
-                        <button
-                          type="button"
-                          onClick={() => silhouetteInputRef.current?.click()}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-xs font-bold text-purple-200 transition"
-                        >
-                          <FaUpload /> Unggah Foto Siluet
-                        </button>
+                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => silhouetteInputRef.current?.click()}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-xs font-bold text-purple-200 transition"
+                          >
+                            <FaUpload /> Unggah Foto Siluet
+                          </button>
+                          <span className="hidden md:inline-block text-[10px] text-[var(--text-secondary)]">
+                            atau seret foto langsung ke area ini
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1169,12 +1439,11 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
       {/* Group Profile / Banner Section */}
       {groupEntity && (
-        <div className="relative overflow-hidden rounded-2xl border border-[var(--primary)]/30 bg-gradient-to-r from-[var(--surface)] via-[var(--background)] to-[var(--surface)] p-4 md:p-6 shadow-xl">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-2xl border border-[var(--primary)]/30 bg-[var(--surface)] p-4 md:p-6 shadow-xl">
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
             <div className="flex items-center gap-4">
-              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-emerald-400 shadow-md shrink-0 bg-black/40">
+              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-[var(--primary)] shadow-md shrink-0 bg-black/40">
                 <img
                   src={resolveMemberImage(groupEntity.image_url, 'group', 'Kohi Sekai')}
                   alt="Kohi Sekai Group"
@@ -1187,7 +1456,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
               </div>
 
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold tracking-wider uppercase mb-1.5 border border-emerald-500/30">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--primary)]/20 text-[var(--primary)] text-[10px] font-bold tracking-wider uppercase mb-1.5 border border-[var(--primary)]/30">
                   <FaUsers className="text-xs" /> Profil & Banner Grup
                 </div>
                 <h3 className="text-lg md:text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">
@@ -1207,7 +1476,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
             <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
               <button
                 onClick={() => handleOpenEditor(groupEntity)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold uppercase tracking-wider transition"
+                className="flex items-center gap-2 px-4 py-2.5 bg-[var(--primary)]/20 hover:bg-[var(--primary)]/30 text-[var(--text-primary)] border border-[var(--primary)]/40 rounded-xl text-xs font-bold uppercase tracking-wider transition"
               >
                 <FaEdit /> Edit Banner & Grup
               </button>
@@ -1321,7 +1590,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <h4 className="font-bold text-base text-[var(--text-primary)] truncate group-hover:text-emerald-300 transition-colors">
+                          <h4 className="font-bold text-base text-[var(--text-primary)] truncate group-hover:text-[var(--primary)] transition-colors">
                             {member.nama_panggung}
                           </h4>
                           {member.is_secret && (
@@ -1421,7 +1690,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => handleOpenEditor(member)}
-                      className="p-2 bg-[var(--border)] hover:bg-emerald-600/20 hover:text-emerald-300 text-[var(--text-secondary)] border border-[var(--border)] rounded-lg text-xs transition"
+                      className="p-2 bg-[var(--border)] hover:bg-[var(--primary)]/20 hover:text-[var(--primary)] text-[var(--text-secondary)] border border-[var(--border)] rounded-lg text-xs transition"
                       title="Edit Member"
                     >
                       <FaEdit />

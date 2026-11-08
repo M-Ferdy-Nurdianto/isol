@@ -48,5 +48,5 @@ INSERT INTO public.config (key, value) VALUES
     ('social_section', '{"title": "Connect With Us", "description": "Ikuti perjalanan kami dan jangan lewatkan momen seru bersama Kohi Sekai di sosial media.", "links": [{"name": "Instagram", "username": "@kohisekai", "description": "Foto keseharian dan update instan", "link": "https://instagram.com/kohisekai", "icon": "instagram"}, {"name": "TikTok", "username": "@kohisekai", "description": "Video pendek seru dari member", "link": "https://tiktok.com/@kohisekai", "icon": "tiktok"}, {"name": "YouTube", "username": "Kohi Sekai", "description": "Vlog, behind the scenes, & MV", "link": "https://youtube.com/@kohisekai", "icon": "youtube"}]}'),
     ('faq_section', '{"title": "FAQ", "description": "Pertanyaan yang sering diajukan", "cta_text": "Masih punya pertanyaan?", "cta_link": "https://wa.me/6281234567890"}'),
     ('footer_settings', '{"brand_description": "Indonesian Japanese-Style Idol Group membawa aroma kehangatan dan energi ceria untuk semua penggemar.", "copyright_text": "© 2026 Kohi Sekai. All rights reserved."}'),
-    ('group_photo', '{"url": "/images/members/placeholder.svg"}')
+    ('group_photo', '{"url": "/images/members/group.webp"}')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;

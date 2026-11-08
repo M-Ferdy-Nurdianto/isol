@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaFilePdf, FaFileExcel, FaCalendarAlt, FaTicketAlt, FaLayerGroup, FaTimes, FaCheck, FaDownload } from 'react-icons/fa'
 import CustomSelect from '../pages/admin/components/CustomSelect'
@@ -37,7 +37,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            className="absolute inset-0 bg-black/90"
           />
 
           <motion.div
@@ -76,7 +76,7 @@ const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
                     onClick={() => setFormat('excel')}
                     className={`relative p-3.5 rounded-xl border flex flex-col items-center gap-2 transition-all ${
                       format === 'excel'
-                        ? 'border-[var(--primary)] bg-[var(--primary)]/15 text-[#22c55e] shadow-[0_0_15px_rgba(7,145,8,0.25)]'
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/15 text-[var(--primary)] shadow-[0_0_15px_rgba(232,148,74,0.25)]'
                         : 'border-white/10 bg-[#161f33] text-zinc-400 hover:border-white/20 hover:text-zinc-200'
                     }`}
                   >

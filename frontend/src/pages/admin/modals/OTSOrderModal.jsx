@@ -1,17 +1,49 @@
-﻿import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Swal from 'sweetalert2'
 import { FaTimes } from 'react-icons/fa'
 import api from '../../../lib/api'
 import { formatMemberName } from '../../../lib/memberUtils'
 import CustomSelect from '../components/CustomSelect'
 
-const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember = 25000, hargaOtsGrup = 30000 }) => {
+const OTSOrderModal = ({ members, events = [], onClose, onSuccess, hargaOtsPerMember = 25000, hargaOtsGrup = 30000 }) => {
+  const validEvents = useMemo(() => {
+    if (!events || events.length === 0) return []
+    const months = { 'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5, 'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11 }
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const upcoming = events.filter(event => {
+      if (event.is_past) return false
+      const eventDate = new Date(event.tahun, months[event.bulan] || 0, event.tanggal)
+      return eventDate >= today
+    })
+
+    if (upcoming.length > 0) {
+      return upcoming.sort((a, b) => {
+        const da = new Date(a.tahun, months[a.bulan] || 0, a.tanggal)
+        const db = new Date(b.tahun, months[b.bulan] || 0, b.tanggal)
+        return da - db
+      })
+    }
+
+    const nonPast = events.filter(e => !e.is_past)
+    if (nonPast.length > 0) return nonPast
+
+    return events
+  }, [events])
+
   const [formData, setFormData] = useState({
     nama_lengkap: '',
-    event_id: '',
+    event_id: validEvents.length > 0 ? validEvents[0].id : '',
     payment_method: 'Cash',
     items: []
   })
+
+  useEffect(() => {
+    if (!formData.event_id && validEvents.length > 0) {
+      setFormData(prev => ({ ...prev, event_id: validEvents[0].id }))
+    }
+  }, [validEvents, formData.event_id])
   const [submitting, setSubmitting] = useState(false)
 
   const addItem = (member) => {
@@ -90,17 +122,9 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess, hargaOtsPerMember 
               <div>
                 <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">Pilih Event *</label>
                 <CustomSelect
-                  options={events.filter(event => {
-                    if (event.is_special) return false;
-                    if (event.is_past) return false;
-                    const months = { 'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5, 'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11 };
-                    const eventDate = new Date(event.tahun, months[event.bulan] || 0, event.tanggal);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    return eventDate >= today;
-                  }).map(event => ({
+                  options={validEvents.map(event => ({
                     value: event.id,
-                    label: `${event.nama} - ${event.tanggal} ${event.bulan} ${event.tahun}`
+                    label: `${event.nama} - ${event.tanggal} ${event.bulan} ${event.tahun}${event.is_special ? ' · [Special]' : ''}`
                   }))}
                   value={formData.event_id}
                   onChange={(e) => setFormData({...formData, event_id: e.target.value})}

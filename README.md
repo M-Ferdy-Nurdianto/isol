@@ -59,7 +59,8 @@ Kohi Sekai is a fullstack web platform engineered for idol fan communities, feat
 
 ### Prerequisites
 - Node.js version 18 or later
-- npm or yarn
+- pnpm (recommended: `npm install -g pnpm`)
+- Node.js version 18 or later
 - Supabase project with PostgreSQL database and Storage buckets initialized
 
 ### Installation
@@ -72,7 +73,7 @@ cd KohiSekaiCMS
 
 2. Install all dependencies across all workspaces (`root`, `frontend`, `backend`, `api`):
 ```bash
-ppnpm install:all
+pnpm run install:all
 ```
 
 3. Configure environment variables:

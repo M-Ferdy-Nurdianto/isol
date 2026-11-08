@@ -1,15 +1,17 @@
 import express from 'express'
 import multer from 'multer'
 import sharp from 'sharp'
+import crypto from 'crypto'
 import { uploadToSupabaseStorage } from '../config/googleDrive.js'
+import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
 
-// Configure multer for memory storage
+// Configure multer for memory storage (max 10MB)
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit (before compression)
+    fileSize: 10 * 1024 * 1024, // 10MB limit (before compression)
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
@@ -24,7 +26,7 @@ const upload = multer({
 const handleMulterError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'File too large. Max 50MB allowed.' })
+      return res.status(400).json({ error: 'Ukuran file terlalu besar. Maksimal 10MB.' })
     }
     return res.status(400).json({ error: `Upload error: ${err.message}` })
   } else if (err) {
@@ -95,8 +97,8 @@ router.post('/payment-proof', upload.single('file'), handleMulterError, async (r
   }
 })
 
-// POST: Upload merch image to Supabase Storage with auto-compression
-router.post('/merch-image', upload.single('file'), handleMulterError, async (req, res) => {
+// POST: Upload merch image to Supabase Storage with auto-compression (Admin)
+router.post('/merch-image', authMiddleware, upload.single('file'), handleMulterError, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'No file uploaded.' })
@@ -138,8 +140,8 @@ router.post('/merch-image', upload.single('file'), handleMulterError, async (req
   }
 })
 
-// POST: Upload member avatar or gallery image to Supabase Storage with auto-compression
-router.post('/member-image', upload.single('file'), handleMulterError, async (req, res) => {
+// POST: Upload member avatar or gallery image to Supabase Storage with auto-compression (Admin)
+router.post('/member-image', authMiddleware, upload.single('file'), handleMulterError, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'No file uploaded.' })
@@ -200,8 +202,8 @@ router.post('/member-image', upload.single('file'), handleMulterError, async (re
   }
 })
 
-// POST: Upload fan user avatar or banner to Supabase Storage with auto-compression
-router.post('/fan-image', upload.single('file'), handleMulterError, async (req, res) => {
+// POST: Upload fan user avatar or banner to Supabase Storage with auto-compression (Authenticated)
+router.post('/fan-image', authMiddleware, upload.single('file'), handleMulterError, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'No file uploaded.' })
@@ -249,8 +251,8 @@ router.post('/fan-image', upload.single('file'), handleMulterError, async (req, 
   }
 })
 
-// POST: Upload music cover to Supabase Storage with auto-compression
-router.post('/music-cover', upload.single('file'), handleMulterError, async (req, res) => {
+// POST: Upload music cover to Supabase Storage with auto-compression (Admin)
+router.post('/music-cover', authMiddleware, upload.single('file'), handleMulterError, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'No file uploaded.' })
@@ -282,8 +284,8 @@ router.post('/music-cover', upload.single('file'), handleMulterError, async (req
   }
 })
 
-// POST: Upload QRIS image to Supabase Storage
-router.post('/qris-image', upload.single('file'), handleMulterError, async (req, res) => {
+// POST: Upload QRIS image to Supabase Storage (Admin)
+router.post('/qris-image', authMiddleware, upload.single('file'), handleMulterError, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'No file uploaded.' })

@@ -1,7 +1,7 @@
 import express from 'express'
-import jwt from 'jsonwebtoken'
 import { supabase } from '../config/supabase.js'
-import { authMiddleware } from '../middleware/auth.js'
+import { authMiddleware, requireAdmin } from '../middleware/auth.js'
+import { verifyToken } from '../config/jwt.js'
 import ExcelJS from 'exceljs'
 import { deletePaymentProofFiles } from '../utils/storageCleaner.js'
 import { verifyTurnstileToken } from '../utils/turnstile.js'
@@ -112,8 +112,8 @@ router.post('/', async (req, res) => {
     const token = req.headers.authorization?.split(' ')[1]
     if (token) {
       try {
-        jwt.verify(token, process.env.JWT_SECRET)
-        isAdmin = true
+        const decoded = verifyToken(token)
+        isAdmin = decoded?.role === 'admin'
       } catch {
         isAdmin = false
       }
@@ -280,17 +280,21 @@ router.post('/ots', authMiddleware, async (req, res) => {
   try {
     const { event_id, nama_lengkap, whatsapp, email, instagram, items, payment_method, user_id } = req.body
 
-    // ── 1. Baca config toggles & harga ────────────────────────────────
-    const getConfig = async (key, fallback = null) => {
-      const { data } = await supabase.from('config').select('value').eq('key', key).maybeSingle()
-      return data ? data.value : fallback
-    }
-    const regularChekiEnabled = (await getConfig('regular_cheki_enabled', 'true')) !== 'false'
-    const wideChekiEnabled    = (await getConfig('wide_cheki_enabled', 'true'))    !== 'false'
-    const chekiGrupEnabled    = (await getConfig('cheki_grup_enabled', 'false')) === 'true' // default OFF
-    const hargaOtsRegular     = Number(await getConfig('harga_ots_per_member', '40000')) || 40000
-    const hargaOtsWide        = Number(await getConfig('harga_ots_grup', '80000'))        || 80000
-    const hargaOtsChekiGrup   = Number(await getConfig('harga_cheki_grup_ots', '170000')) || 170000
+    // ── 1. Batch baca config toggles & harga (1 batch DB query) ──────
+    const { data: configs } = await supabase
+      .from('config')
+      .select('key, value')
+      .in('key', [
+        'regular_cheki_enabled', 'wide_cheki_enabled', 'cheki_grup_enabled',
+        'harga_ots_per_member', 'harga_ots_grup', 'harga_cheki_grup_ots'
+      ])
+    const cfgMap = new Map((configs || []).map(c => [c.key, c.value]))
+    const regularChekiEnabled = cfgMap.get('regular_cheki_enabled') !== 'false'
+    const wideChekiEnabled    = cfgMap.get('wide_cheki_enabled')    !== 'false'
+    const chekiGrupEnabled    = cfgMap.get('cheki_grup_enabled')    === 'true'
+    const hargaOtsRegular     = Number(cfgMap.get('harga_ots_per_member')) || 40000
+    const hargaOtsWide        = Number(cfgMap.get('harga_ots_grup'))        || 80000
+    const hargaOtsChekiGrup   = Number(cfgMap.get('harga_cheki_grup_ots')) || 170000
 
     // ── 2. Validasi event ─────────────────────────────────────────────
     if (!event_id) {
@@ -317,7 +321,34 @@ router.post('/ots', authMiddleware, async (req, res) => {
       let itemName = ''
       let memberIdDb = null
 
-      if (type === 'grup' || itm.member_id === 'grup' || itm.member_id === 'group') {
+      if (type === 'merch' || itm.cheki_type === 'merch' || itm.item_type === 'merch' || itm.merchandise_id) {
+        pricePerUnit = Math.max(0, parseInt(itm.price, 10) || 0)
+        itemName = itm.name || 'Official Merchandise'
+        memberIdDb = null
+
+        if (itm.merchandise_id && UUID_REGEX.test(itm.merchandise_id)) {
+          const { data: merchData } = await supabase
+            .from('merchandise')
+            .select('id, nama, harga, stok')
+            .eq('id', itm.merchandise_id)
+            .maybeSingle()
+
+          if (merchData) {
+            pricePerUnit = Number(merchData.harga) || pricePerUnit
+            if (!itm.name) itemName = merchData.nama
+            if (merchData.stok > 0) {
+              const newStok = Math.max(0, merchData.stok - qty)
+              await supabase
+                .from('merchandise')
+                .update({ stok: newStok })
+                .eq('id', merchData.id)
+            }
+          }
+        }
+        if (itm.size && !itemName.toLowerCase().includes(String(itm.size).toLowerCase())) {
+          itemName = `${itemName} (${itm.size})`
+        }
+      } else if (type === 'grup' || itm.member_id === 'grup' || itm.member_id === 'group') {
         if (!chekiGrupEnabled) {
           return res.status(400).json({ error: 'Cheki Grup (Semua Member) saat ini tidak tersedia.' })
         }
@@ -350,7 +381,7 @@ router.post('/ots', authMiddleware, async (req, res) => {
       total_harga += pricePerUnit * qty
       cleanedItems.push({
         member_id: memberIdDb,
-        cheki_type: type === 'grup' || type === 'wide' || type === 'regular' ? type : 'regular',
+        cheki_type: type === 'merch' || itm.merchandise_id ? 'merch' : (type === 'grup' || type === 'wide' || type === 'regular' ? type : 'regular'),
         item_name: itemName,
         price: pricePerUnit,
         quantity: qty
@@ -395,7 +426,6 @@ router.post('/ots', authMiddleware, async (req, res) => {
 // POST: Create OTS (On The Spot) order by LOGGED IN FAN USER
 router.post('/ots-user', async (req, res) => {
   try {
-    const JWT_SECRET = process.env.JWT_SECRET || 'kohi_sekai_fan_secret_2026'
     const { event_id, items, payment_method, user_id: bodyUserId } = req.body
 
     // ── 1. Verifikasi fan token (MANDATORY) ─────────────────────────────
@@ -405,7 +435,7 @@ router.post('/ots-user', async (req, res) => {
     }
     let decoded
     try {
-      decoded = jwt.verify(token, JWT_SECRET)
+      decoded = verifyToken(token)
     } catch {
       return res.status(401).json({ error: 'Sesi login tidak valid. Silakan login ulang.' })
     }
@@ -428,18 +458,21 @@ router.post('/ots-user', async (req, res) => {
       return res.status(404).json({ error: 'Akun fan tidak ditemukan di database.' })
     }
 
-    // ── 3. Baca CONFIG toggles dan harga ────────────────────────────────
-    const getConfig = async (key, fallback = null) => {
-      const { data } = await supabase.from('config').select('value').eq('key', key).maybeSingle()
-      return data ? data.value : fallback
-    }
-
-    const regularChekiEnabled = (await getConfig('regular_cheki_enabled', 'true')) !== 'false'
-    const wideChekiEnabled    = (await getConfig('wide_cheki_enabled', 'true')) !== 'false'
-    const chekiGrupEnabled    = (await getConfig('cheki_grup_enabled', 'false')) === 'true' // default OFF
-    const hargaOtsRegular     = Number(await getConfig('harga_ots_per_member', '40000')) || 40000
-    const hargaOtsWide        = Number(await getConfig('harga_ots_grup', '80000')) || 80000
-    const hargaOtsChekiGrup   = Number(await getConfig('harga_cheki_grup_ots', '150000')) || 150000
+    // ── 3. Batch baca CONFIG toggles dan harga (1 query) ────────────────
+    const { data: configs } = await supabase
+      .from('config')
+      .select('key, value')
+      .in('key', [
+        'regular_cheki_enabled', 'wide_cheki_enabled', 'cheki_grup_enabled',
+        'harga_ots_per_member', 'harga_ots_grup', 'harga_cheki_grup_ots'
+      ])
+    const cfgMap = new Map((configs || []).map(c => [c.key, c.value]))
+    const regularChekiEnabled = cfgMap.get('regular_cheki_enabled') !== 'false'
+    const wideChekiEnabled    = cfgMap.get('wide_cheki_enabled')    !== 'false'
+    const chekiGrupEnabled    = cfgMap.get('cheki_grup_enabled')    === 'true'
+    const hargaOtsRegular     = Number(cfgMap.get('harga_ots_per_member')) || 40000
+    const hargaOtsWide        = Number(cfgMap.get('harga_ots_grup'))        || 80000
+    const hargaOtsChekiGrup   = Number(cfgMap.get('harga_cheki_grup_ots')) || 150000
 
     // ── 4. Validasi event harus AKTIF ───────────────────────────────────
     if (!event_id) return res.status(400).json({ error: 'Event ID wajib dipilih' })
@@ -449,8 +482,8 @@ router.post('/ots-user', async (req, res) => {
       .eq('id', event_id)
       .maybeSingle()
     if (evErr || !eventData) return res.status(400).json({ error: 'Event tidak valid / tidak ditemukan' })
-    if (eventData.is_past || eventData.is_special) {
-      return res.status(400).json({ error: 'Event ini tidak menerima order OTS.' })
+    if (eventData.is_past) {
+      return res.status(400).json({ error: 'Event ini sudah selesai, tidak menerima order OTS.' })
     }
     // Cek tanggal event >= hari ini
     const months = { 'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5, 'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11 }
@@ -475,7 +508,34 @@ router.post('/ots-user', async (req, res) => {
       let itemName = ''
       let memberIdDb = null
 
-      if (type === 'grup') {
+      if (type === 'merch' || itm.cheki_type === 'merch' || itm.item_type === 'merch' || itm.merchandise_id) {
+        pricePerUnit = Math.max(0, parseInt(itm.price, 10) || 0)
+        itemName = itm.name || 'Official Merchandise'
+        memberIdDb = null
+
+        if (itm.merchandise_id && UUID_REGEX.test(itm.merchandise_id)) {
+          const { data: merchData } = await supabase
+            .from('merchandise')
+            .select('id, nama, harga, stok')
+            .eq('id', itm.merchandise_id)
+            .maybeSingle()
+
+          if (merchData) {
+            pricePerUnit = Number(merchData.harga) || pricePerUnit
+            if (!itm.name) itemName = merchData.nama
+            if (merchData.stok > 0) {
+              const newStok = Math.max(0, merchData.stok - qty)
+              await supabase
+                .from('merchandise')
+                .update({ stok: newStok })
+                .eq('id', merchData.id)
+            }
+          }
+        }
+        if (itm.size && !itemName.toLowerCase().includes(String(itm.size).toLowerCase())) {
+          itemName = `${itemName} (${itm.size})`
+        }
+      } else if (type === 'grup') {
         // ── Validasi Cheki Grup ──
         if (!chekiGrupEnabled) {
           return res.status(400).json({ error: 'Cheki Grup (Semua Member) saat ini tidak tersedia.' })
@@ -510,7 +570,7 @@ router.post('/ots-user', async (req, res) => {
       total_harga += pricePerUnit * qty
       cleanedItems.push({
         member_id: memberIdDb,
-        cheki_type: type,
+        cheki_type: type === 'merch' || itm.merchandise_id ? 'merch' : type,
         item_name: itemName,
         price: pricePerUnit,
         quantity: qty
@@ -882,8 +942,8 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
   }
 })
 
-// DELETE: Delete order
-router.delete('/:id', authMiddleware, async (req, res) => {
+// DELETE: Delete order (Admin only)
+router.delete('/:id', authMiddleware, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params
 
@@ -901,8 +961,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   }
 })
 
-// DELETE: Bulk delete orders with filters (Clean DB + Purge Storage Files)
-router.post('/bulk-delete', authMiddleware, async (req, res) => {
+// DELETE: Bulk delete orders with filters (Clean DB + Purge Storage Files) (Admin only)
+router.post('/bulk-delete', authMiddleware, requireAdmin, async (req, res) => {
   try {
     const { deleteType, eventId, weeks, months } = req.body
 
@@ -973,8 +1033,8 @@ router.post('/bulk-delete', authMiddleware, async (req, res) => {
   }
 })
 
-// POST: Purge old payment proof images (> 1 month / 30 days) from Supabase Storage
-router.post('/purge-old-payments', authMiddleware, async (req, res) => {
+// POST: Purge old payment proof images (> 1 month / 30 days) from Supabase Storage (Admin only)
+router.post('/purge-old-payments', authMiddleware, requireAdmin, async (req, res) => {
   try {
     const oneMonthAgo = new Date()
     oneMonthAgo.setDate(oneMonthAgo.getDate() - 30)

@@ -1,4 +1,4 @@
-﻿import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { FaDownload, FaChevronLeft, FaExclamationTriangle, FaWhatsapp } from 'react-icons/fa'
 import { toPng } from 'html-to-image'
 
@@ -41,7 +41,7 @@ const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false }
   if (!data) return null
 
   // Special theme color logic
-  const accentColor = data.isSpecial ? (data.themeColor || '#FF6B9D') : '#079108'
+  const accentColor = data.isSpecial ? (data.themeColor || '#FF6B9D') : '#E8944A'
   const isMerch = data.orderNumber?.startsWith('MERCH')
 
   // Styles for the typewriter/receipt look

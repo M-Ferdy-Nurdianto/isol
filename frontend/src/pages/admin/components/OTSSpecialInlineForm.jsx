@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
 import { FaTimes, FaPlus, FaMinus, FaUsers, FaChevronUp, FaChevronDown } from 'react-icons/fa'
 import api from '../../../lib/api'
@@ -553,7 +553,7 @@ const OTSSpecialInlineForm = ({
         </div>
 
         {/* Mobile Sticky Floating Cart Bar */}
-        <div className="lg:hidden fixed bottom-16 left-0 right-0 z-40 bg-[var(--surface)] border-t border-pink-500/30 p-3 backdrop-blur-xl shadow-2xl">
+        <div className="lg:hidden fixed bottom-16 left-0 right-0 z-40 bg-[var(--surface)] border-t border-pink-500/30 p-3 shadow-2xl">
           {cartExpanded && (
             <div className="mb-3 pb-3 border-b border-[var(--border)]">
               <div className="flex items-center justify-between mb-2">

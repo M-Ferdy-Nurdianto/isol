@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 setlocal enabledelayedexpansion
 
 echo ==============================================
@@ -6,7 +7,7 @@ echo       Starting Kohi Sekai Local Dev
 echo ==============================================
 echo.
 
-echo [1/4] Checking Dependencies...
+echo [1/5] Checking Dependencies...
 if not exist "node_modules\" (
     echo Installing root dependencies...
     call pnpm install
@@ -23,9 +24,63 @@ if not exist "backend\node_modules\" (
     call pnpm install
     cd ..
 )
+if not exist "api\node_modules\" (
+    echo Installing api dependencies...
+    cd api
+    call pnpm install
+    cd ..
+)
 
 echo.
 echo [2/5] Checking Docker Status...
+set "DOCKER_FOUND=0"
+where docker >nul 2>&1
+if %errorlevel% equ 0 set "DOCKER_FOUND=1"
+if exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" set "DOCKER_FOUND=1"
+
+if "%DOCKER_FOUND%"=="1" goto docker_check_daemon
+
+echo [PERINGATAN] Docker Desktop belum terpasang di komputer ini.
+echo Memulai proses download dan instalasi Docker Desktop secara otomatis...
+echo Mohon setujui jika jendela konfirmasi Administrator - UAC - muncul.
+echo.
+
+where winget >nul 2>&1
+if %errorlevel% equ 0 goto install_via_winget
+
+echo [INFO] Mengunduh installer Docker Desktop via curl...
+curl.exe -L -# -o "%TEMP%\DockerDesktopInstaller.exe" "https://desktop.docker.com/win/main/amd64/Docker%%20Desktop%%20Installer.exe"
+if %errorlevel% neq 0 (
+    echo [ERROR] Gagal mengunduh installer Docker.
+    goto check_docker_installed
+)
+echo [INFO] Menjalankan installer Docker Desktop...
+start /wait "" "%TEMP%\DockerDesktopInstaller.exe" install
+goto check_docker_installed
+
+:install_via_winget
+echo [INFO] Menginstal via winget...
+winget install -e --id Docker.DockerDesktop --accept-package-agreements --accept-source-agreements
+
+:check_docker_installed
+
+echo.
+echo [INFO] Pengecekan setelah instalasi...
+if not exist "C:\Program Files\Docker\Docker\Docker Desktop.exe" (
+    where docker >nul 2>&1
+    if %errorlevel% neq 0 (
+        echo [ERROR] Docker belum berhasil terpasang atau instalasi dibatalkan.
+        echo Silakan unduh manual dari: https://www.docker.com/products/docker-desktop/
+        pause
+        exit /b 1
+    )
+)
+echo Instalasi Docker Desktop selesai.
+echo CATATAN: Untuk instalasi baru, Anda mungkin perlu me-restart PC agar WSL 2 dan Docker Engine aktif.
+echo.
+
+:docker_check_daemon
+
 docker info >nul 2>&1
 if %errorlevel% neq 0 (
     echo Docker daemon is not running. Starting Docker Desktop...

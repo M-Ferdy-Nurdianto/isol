@@ -15,6 +15,10 @@ import merchandiseRoutes from '../backend/routes/merchandise.js'
 import merchOrdersRoutes from '../backend/routes/merchOrders.js'
 import chekiPricesRoutes from '../backend/routes/chekiPrices.js'
 import usersRoutes from '../backend/routes/users.js'
+import passwordResetRoutes from '../backend/routes/passwordReset.js'
+import musicRoutes from '../backend/routes/music.js'
+import leaderboardRoutes from '../backend/routes/leaderboard.js'
+import newsRoutes from '../backend/routes/news.js'
 import { supabase } from '../backend/config/supabase.js'
 
 const app = express()
@@ -155,6 +159,10 @@ app.use('/api/merchandise', merchandiseRoutes)
 app.use('/api/merch-orders', merchOrdersRoutes)
 app.use('/api/cheki-prices', chekiPricesRoutes)
 app.use('/api/users', usersRoutes)
+app.use('/api/password-reset', useLimiter(authLimiter), passwordResetRoutes)
+app.use('/api/music', musicRoutes)
+app.use('/api/leaderboard', leaderboardRoutes)
+app.use('/api/news', newsRoutes)
 
 // Health check & Keep Alive
 app.get('/api/health', async (req, res) => {

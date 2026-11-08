@@ -42,6 +42,7 @@ const OrdersTab = ({
   onExportMerchExcel,
   onExportMerchPdf,
   members = [],
+  merch = [],
   hargaOtsPerMember = 25000,
   hargaOtsGrup = 30000,
   hargaChekiGrupOts = 0,
@@ -106,7 +107,9 @@ const OrdersTab = ({
       {showInlineOTS && (
         <OTSOrderInlineForm
           members={members}
+          merch={merch}
           events={events}
+          defaultEventId={eventFilter && eventFilter !== 'all' ? eventFilter : ''}
           mode="admin"
           onClose={() => {
             setShowInlineOTS(false)
@@ -155,8 +158,6 @@ const OrdersTab = ({
             </button>
           ))}
         </div>
-        {/* Right fade gradient hint for horizontal scrolling */}
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--surface)] to-transparent pointer-events-none rounded-r-2xl" />
       </div>
 
       {/* Status Legend */}
@@ -316,7 +317,7 @@ const OrdersTab = ({
                   if (format === 'excel') await onExportMerchExcel()
                   else if (format === 'pdf') await onExportMerchPdf()
                 }}
-                className="bg-emerald-600 text-[var(--text-primary)] px-4 py-2 rounded-xl font-bold hover:bg-emerald-700 flex items-center gap-2 text-xs transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                className="bg-amber-600 text-[var(--text-primary)] px-4 py-2 rounded-xl font-bold hover:bg-amber-700 flex items-center gap-2 text-xs transition-all shadow-[0_0_15px_rgba(245,158,11,0.3)]"
               >
                 <FaFileExcel /> Export Merch
               </button>

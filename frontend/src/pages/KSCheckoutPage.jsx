@@ -215,18 +215,6 @@ const KSCheckoutPage = () => {
     }
   }, [isGroupEnabled, ticketType, filteredMembers, selectedMember])
 
-  // Auto-select first available chekiVariant when toggles change
-  useEffect(() => {
-    if (chekiVariant === 'regular' && !isRegularEnabled) {
-      if (wideChekiEnabled) setChekiVariant('wide')
-      else if (customOptions.length > 0) setChekiVariant(customOptions[0].label)
-    }
-    if (chekiVariant === 'wide' && !wideChekiEnabled) {
-      if (isRegularEnabled) setChekiVariant('regular')
-      else if (customOptions.length > 0) setChekiVariant(customOptions[0].label)
-    }
-  }, [isRegularEnabled, wideChekiEnabled, chekiVariant, customOptions])
-
   // Custom Price Options & Config prices
   const customOptions = useMemo(() => {
     if (!config?.cheki_custom_options) return []
@@ -239,6 +227,18 @@ const KSCheckoutPage = () => {
       return []
     }
   }, [config])
+
+  // Auto-select first available chekiVariant when toggles change
+  useEffect(() => {
+    if (chekiVariant === 'regular' && !isRegularEnabled) {
+      if (wideChekiEnabled) setChekiVariant('wide')
+      else if (customOptions.length > 0) setChekiVariant(customOptions[0].label)
+    }
+    if (chekiVariant === 'wide' && !wideChekiEnabled) {
+      if (isRegularEnabled) setChekiVariant('regular')
+      else if (customOptions.length > 0) setChekiVariant(customOptions[0].label)
+    }
+  }, [isRegularEnabled, wideChekiEnabled, chekiVariant, customOptions])
 
   // Pricelist: Regular 40k, Wide PO 70k, Cheki Grup PO (default 150k OFF)
   const regularPrice = config?.harga_cheki_per_member ? Number(config.harga_cheki_per_member) : 40000
@@ -507,7 +507,7 @@ const KSCheckoutPage = () => {
     : (selectedMember?.shop_image_url || selectedMember?.image_url || '/images/members/placeholder.svg')
 
   return (
-    <div className="min-h-screen bg-background text-text-primary selection:bg-primary/30">
+    <div className="min-h-screen bg-background bg-pattern-dots text-text-primary selection:bg-primary/30">
       <KSHeader />
 
       <main className="pt-24 sm:pt-28 pb-32 lg:pb-24">
@@ -814,7 +814,7 @@ const KSCheckoutPage = () => {
                                   e.target.src = getAssetPath('/images/members/placeholder.svg')
                                 }}
                               />
-                              <div className="absolute inset-x-0 bottom-0 pt-8 pb-3 px-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent text-left">
+                              <div className="absolute inset-x-0 bottom-0 py-2.5 px-3 bg-black/85 text-left border-t border-white/10">
                                 <span className="text-xs font-black uppercase text-white tracking-wide block truncate">
                                   {m.nama_panggung}
                                 </span>

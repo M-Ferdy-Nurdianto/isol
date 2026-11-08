@@ -32,10 +32,10 @@ const ICON_MAP = {
 }
 
 const ICON_COLOR = {
-  success: '#22c55e',
+  success: '#E8944A',
   error: '#ef4444',
   info: '#60a5fa',
-  cart: '#079108',
+  cart: '#E8944A',
   merch: '#a78bfa',
 }
 
@@ -52,10 +52,10 @@ const ToastCard = ({ t, isDark, onDismiss }) => {
       exit={{ opacity: 0, y: -20, scale: 0.85 }}
       transition={{ type: 'spring', stiffness: 500, damping: 32 }}
       onClick={onDismiss}
-      className={`pointer-events-auto flex items-center gap-2.5 px-4 sm:px-5 py-3 rounded-full shadow-2xl border select-none cursor-pointer backdrop-blur-xl ${
+      className={`pointer-events-auto flex items-center gap-2.5 px-4 sm:px-5 py-3 rounded-full shadow-2xl border select-none cursor-pointer ${
         isDark
-          ? 'bg-[#111726]/95 border-white/10 text-white shadow-black/50'
-          : 'bg-white/95 border-gray-200/80 text-gray-900 shadow-xl'
+          ? 'bg-[#111726] border-white/10 text-white shadow-black/50'
+          : 'bg-white border-gray-200 text-gray-900 shadow-xl'
       }`}
       style={{ maxWidth: '90vw' }}
     >

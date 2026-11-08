@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['images/logos/logo-placeholder.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'android-chrome-192x192.png', 'android-chrome-512x512.png', 'images/logos/logo.png', 'images/logos/logo.svg'],
       manifest: {
         name: 'Kohi Sekai Official',
         short_name: 'KS Official',
@@ -19,15 +19,15 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: 'images/logos/logo-placeholder.svg',
+            src: 'android-chrome-192x192.png',
             sizes: '192x192',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any maskable'
           },
           {
-            src: 'images/logos/logo-placeholder.svg',
+            src: 'android-chrome-512x512.png',
             sizes: '512x512',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any maskable'
           }
         ]

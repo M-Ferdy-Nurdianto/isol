@@ -13,6 +13,7 @@ import authRoutes from './routes/auth.js'
 import uploadRoutes from './routes/upload.js'
 import merchandiseRoutes from './routes/merchandise.js'
 import merchOrdersRoutes from './routes/merchOrders.js'
+import chekiPricesRoutes from './routes/chekiPrices.js'
 import userRoutes from './routes/users.js'
 import passwordResetRoutes from './routes/passwordReset.js'
 import musicRoutes from './routes/music.js'
@@ -129,8 +130,8 @@ if (rateLimitEnabled) {
   app.use(speedLimiter)
   app.use(generalLimiter)
 }
-app.use(express.json({ limit: '50mb' }))
-app.use(express.urlencoded({ extended: true, limit: '50mb' }))
+app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
 // Routes
 app.use('/api/auth', useLimiter(authLimiter), authRoutes)
@@ -142,8 +143,9 @@ app.use('/api/faqs', faqRoutes)
 app.use('/api/upload', useLimiter(uploadLimiter), uploadRoutes)
 app.use('/api/merchandise', merchandiseRoutes)
 app.use('/api/merch-orders', merchOrdersRoutes)
+app.use('/api/cheki-prices', chekiPricesRoutes)
 app.use('/api/users', userRoutes)
-app.use('/api/password-reset', passwordResetRoutes)
+app.use('/api/password-reset', useLimiter(authLimiter), passwordResetRoutes)
 app.use('/api/music', musicRoutes)
 app.use('/api/leaderboard', leaderboardRoutes)
 app.use('/api/news', newsRoutes)
@@ -151,7 +153,7 @@ app.use('/api/news', newsRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Refresh Breeze API Running' })
+  res.json({ status: 'OK', message: 'Kohi Sekai API Running' })
 })
 
 // Error handling

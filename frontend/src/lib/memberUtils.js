@@ -42,9 +42,9 @@ export const memberData = {
         gradient: 'from-red-600 to-rose-800',
     },
     'group': {
-        color: '#079108',
+        color: '#E8944A',
         name: 'Group',
-        gradient: 'from-green-500 to-emerald-600',
+        gradient: 'from-amber-500 to-orange-600',
     }
 }
 
@@ -61,8 +61,8 @@ export const getMemberColor = (memberOrName) => {
         return getMemberColor(memberOrName.nama_panggung)
     }
     const clean = sanitizeName(memberOrName)
-    if (clean === 'aca') return memberData['acaa']?.color || '#079108'
-    return memberData[clean]?.color || '#079108'
+    if (clean === 'aca') return memberData['acaa']?.color || '#E8944A'
+    return memberData[clean]?.color || '#E8944A'
 }
 
 // Get member data by name

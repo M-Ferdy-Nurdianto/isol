@@ -3,32 +3,49 @@ import { motion } from 'framer-motion'
 const GroupPhotoSection = ({ config }) => {
   if (!config?.url) return null
 
+  const overlayText = config.overlay_text || 'KOHI SEKAI'
+  const overlayDesc = config.overlay_desc || ''
+
   return (
-    <section className="py-12 sm:py-20 px-4 bg-background">
-      <div className="container mx-auto max-w-7xl">
+    <section className="py-6 sm:py-8 px-4 bg-surface/40 border-y border-white/5 bg-pattern-diagonal relative">
+      <div className="container mx-auto max-w-3xl">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="relative rounded-3xl overflow-hidden aspect-video shadow-2xl border border-white/5 group cursor-pointer"
+          transition={{ duration: 0.4 }}
+          className="group relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-video border border-white/10 hover:border-white/30 transition-all duration-300 bg-surface"
         >
-          <img 
-            src={config.url} 
-            alt="Kohi Sekai Group" 
-            className="w-full h-full object-cover"
+          {/* Group Photo */}
+          <img
+            src={config.url}
+            alt="Kohi Sekai Group"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          {/* Base gradient overlay (thicker at the bottom-left for text readability) */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/20 to-transparent transition-opacity duration-500 group-hover:opacity-0" />
-          
-          {/* Text Container at bottom-left */}
-          <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10 md:p-12 transition-opacity duration-500 group-hover:opacity-0">
-            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white uppercase tracking-wider drop-shadow-lg max-w-3xl leading-tight">
-              {config.overlay_text || 'KOHI SEKAI'}
+
+          {/* Clean Solid Dark Overlay */}
+          <div className="absolute inset-0 bg-black/40" />
+
+          {/* Mobile Text (md:hidden) */}
+          <div className="md:hidden absolute inset-0 flex flex-col justify-end p-3.5">
+            <h2 className="text-base font-black text-white uppercase tracking-wider">
+              {overlayText}
             </h2>
-            {config.overlay_desc && (
-              <p className="mt-2 sm:mt-4 text-sm sm:text-base md:text-lg text-white/90 font-medium drop-shadow-md max-w-2xl leading-relaxed">
-                {config.overlay_desc}
+            {overlayDesc && (
+              <p className="mt-0.5 text-xs text-white/80 line-clamp-2 leading-relaxed">
+                {overlayDesc}
+              </p>
+            )}
+          </div>
+
+          {/* Desktop Text (hidden md:flex) */}
+          <div className="hidden md:flex absolute inset-0 flex-col justify-end p-5">
+            <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider">
+              {overlayText}
+            </h2>
+            {overlayDesc && (
+              <p className="mt-1 text-xs sm:text-sm text-white/80 max-w-md line-clamp-2 leading-relaxed">
+                {overlayDesc}
               </p>
             )}
           </div>

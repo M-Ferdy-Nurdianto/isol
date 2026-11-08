@@ -67,6 +67,26 @@ router.patch('/', authMiddleware, async (req, res) => {
 
     await Promise.all(promises)
 
+    // Sync to faqs table if faq_items was updated
+    if (updates.faq_items) {
+      try {
+        const parsed = typeof updates.faq_items === 'string' ? JSON.parse(updates.faq_items) : updates.faq_items
+        if (Array.isArray(parsed)) {
+          await supabase.from('faqs').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+          if (parsed.length > 0) {
+            const rows = parsed.map((item, idx) => ({
+              tanya: item.q || item.pertanyaan || item.tanya || '',
+              jawab: item.a || item.jawaban || item.jawab || '',
+              urutan: idx + 1
+            }))
+            await supabase.from('faqs').insert(rows)
+          }
+        }
+      } catch (syncErr) {
+        console.warn('Sync faqs table warning:', syncErr.message)
+      }
+    }
+
     res.json({ success: true, message: 'Config updated' })
   } catch (error) {
     console.error('Error updating config:', error)

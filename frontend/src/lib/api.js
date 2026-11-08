@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { showToast } from './toast'
 import { isGuestMode, maskOrderForGuest, maskMerchOrderForGuest, generateGuestMockResponse } from './guestMock'
-import { getValidAdminToken, touchAdminSession } from './authSession'
+import { getValidAdminToken, touchAdminSession, logoutAdminSession } from './authSession'
 
 // In production (Vercel), use the API URL from environment variable
 // In development, use localhost
@@ -76,6 +76,8 @@ api.interceptors.request.use(
 
 const rateLimitToastId = 'rate-limit-toast'
 
+let isRedirectingToLogin = false
+
 api.interceptors.response.use(
   (response) => {
     // GUEST MODE DATA MASKING:
@@ -101,6 +103,27 @@ api.interceptors.response.use(
   },
   (error) => {
     const status = error?.response?.status
+    const reqUrl = error?.config?.url || ''
+
+    // 401 Unauthorized Session Handling:
+    // Do NOT redirect if the failed request was the login attempt itself!
+    if (status === 401 && !reqUrl.includes('/auth/login')) {
+      const hadAdminToken = typeof localStorage !== 'undefined' && Boolean(localStorage.getItem('admin_token'))
+      if (hadAdminToken) {
+        logoutAdminSession()
+        if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
+          if (!isRedirectingToLogin) {
+            isRedirectingToLogin = true
+            showToast.warning('Sesi admin telah berakhir. Silakan login kembali.', 'Sesi Berakhir')
+            setTimeout(() => {
+              window.location.href = '/admin/login'
+              isRedirectingToLogin = false
+            }, 800)
+          }
+        }
+      }
+    }
+
     if (status === 429) {
       const message = error?.response?.data?.error || 'Terlalu banyak permintaan. Silakan tunggu sebentar lalu coba lagi.'
       showToast.error(message, 'Rate Limit')

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react'
+import React, { useState } from 'react'
 import Swal from 'sweetalert2'
 import { FaTimes, FaTrash } from 'react-icons/fa'
 import CustomSelect from '../components/CustomSelect'
@@ -53,7 +53,7 @@ const BulkDeleteModal = ({ events, onClose, onConfirm }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in">
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 animate-fade-in">
       <div className="bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl">
         <div className="sticky top-0 bg-[var(--background)] border-b border-[var(--border)] p-5 z-10">
           <div className="flex justify-between items-center">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaCrown, FaMedal, FaStar, FaTrophy, FaCalendarAlt, FaUserFriends } from 'react-icons/fa'
+import { Link } from 'react-router-dom'
+import { FaCrown, FaMedal, FaStar, FaTrophy, FaCalendarAlt, FaUserFriends, FaHeart } from 'react-icons/fa'
 import api from '../../lib/api'
 
 const getInitials = (name) => {
@@ -10,15 +11,15 @@ const getInitials = (name) => {
   return name.slice(0, 2).toUpperCase()
 }
 
-// ── Podium configs (1st / 2nd / 3rd) — warm brown-harmonic palette ──────────
+// ── Podium configs (1st / 2nd / 3rd) — solid metal palette ──────────
 const PODIUM = [
   // index 0 = rank 1st (center, tallest)
   {
     rankLabel: '1ST',
     icon: <FaCrown className="text-2xl" style={{ color: '#F5C842', filter: 'drop-shadow(0 0 8px rgba(245,200,66,0.7))' }} />,
-    avatarRing: 'from-yellow-300 via-amber-400 to-yellow-600',
+    avatarRing: 'border-2 border-amber-400 bg-amber-400/20',
     badgeText: 'text-amber-900',
-    badgeBg: 'from-yellow-400 to-amber-500',
+    badgeBg: 'bg-amber-400',
     scoreBg: 'bg-amber-500/15 border-amber-400/40 text-amber-300',
     cardBg: 'bg-[var(--surface)]',
     cardBorder: 'border-amber-400/50',
@@ -30,9 +31,9 @@ const PODIUM = [
   {
     rankLabel: '2ND',
     icon: <FaMedal className="text-xl" style={{ color: '#C0A882', filter: 'drop-shadow(0 0 6px rgba(192,168,130,0.5))' }} />,
-    avatarRing: 'from-stone-300 via-amber-200 to-stone-400',
+    avatarRing: 'border-2 border-stone-300 bg-stone-300/20',
     badgeText: 'text-stone-900',
-    badgeBg: 'from-stone-300 to-stone-400',
+    badgeBg: 'bg-stone-300',
     scoreBg: 'bg-stone-400/15 border-stone-300/40 text-stone-300',
     cardBg: 'bg-[var(--surface)]',
     cardBorder: 'border-stone-400/30',
@@ -44,9 +45,9 @@ const PODIUM = [
   {
     rankLabel: '3RD',
     icon: <FaMedal className="text-xl" style={{ color: '#CD7F32', filter: 'drop-shadow(0 0 6px rgba(205,127,50,0.5))' }} />,
-    avatarRing: 'from-amber-600 via-orange-700 to-amber-900',
+    avatarRing: 'border-2 border-amber-600 bg-amber-600/20',
     badgeText: 'text-amber-100',
-    badgeBg: 'from-amber-700 to-orange-800',
+    badgeBg: 'bg-amber-700',
     scoreBg: 'bg-amber-700/15 border-amber-600/40 text-amber-400',
     cardBg: 'bg-[var(--surface)]',
     cardBorder: 'border-amber-700/30',
@@ -104,97 +105,102 @@ const KSLeaderboard = ({ members = [] }) => {
   const rest = leaderboard.slice(3)
 
   return (
-    <section className="py-20 px-4 bg-[var(--background)] relative overflow-hidden">
-      {/* Ambient glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[var(--primary)]/5 blur-[140px] pointer-events-none" />
-      <div className="absolute top-1/3 left-1/4 w-[350px] h-[350px] rounded-full bg-[var(--accent)]/5 blur-[120px] pointer-events-none" />
-
+    <section className="py-10 sm:py-20 px-4 bg-[var(--background)] bg-pattern-cross relative overflow-hidden">
       <div className="container mx-auto max-w-4xl relative z-10">
 
         {/* ── Header ── */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-6 sm:mb-10"
         >
-          <p className="text-xs font-black tracking-[0.5em] text-[var(--accent)] uppercase mb-3 flex items-center justify-center gap-2">
+          <p className="text-[10px] sm:text-xs font-black tracking-[0.4em] text-[var(--accent)] uppercase mb-2 flex items-center justify-center gap-1.5">
             <FaTrophy /> Top Fans Ranking
           </p>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter text-[var(--text-primary)] uppercase">
+          <h2 className="text-2xl sm:text-5xl font-black tracking-tight text-[var(--text-primary)] uppercase">
             WALL OF <span className="text-[var(--accent)]">FAME</span>
           </h2>
-          <p className="text-sm text-[var(--text-secondary)] mt-4 max-w-lg mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-2 sm:mt-3 max-w-lg mx-auto leading-relaxed px-2">
             Terima kasih atas dukungan luar biasa kalian. Berikut adalah para penggemar paling berdedikasi!
           </p>
         </motion.div>
 
-        {/* ── Filters ── */}
+        {/* ── Filters Hub ── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-col md:flex-row gap-5 items-center justify-center mb-12"
+          className="w-full max-w-2xl mx-auto mb-6 sm:mb-10"
         >
-          {/* Member filter */}
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] font-black tracking-widest text-[var(--text-secondary)] uppercase">Pilih Kategori:</span>
-            <div className="flex flex-wrap justify-center bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1.5 gap-1 shadow-md max-w-sm md:max-w-none">
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-2.5 sm:p-3 shadow-xl flex flex-col gap-2.5">
+            {/* Category / Member Filter */}
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide justify-start sm:justify-center">
               <button
                 type="button"
                 onClick={() => setMemberId('all')}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
-                  isAllMembers
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${isAllMembers
                     ? 'bg-[var(--accent)] text-white shadow-md'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border)]'
-                }`}
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'
+                  }`}
               >
-                <FaUserFriends /> All Members
+                <FaUserFriends className="text-xs" />
+                <span>All Members</span>
               </button>
-              {members.map(m => {
+
+              {members.filter(m => !m.is_secret).map(m => {
                 const idVal = m.id || m.member_id
                 const isSelected = memberId === idVal
+                const mKey = (m.member_id || m.nama_panggung || '').toLowerCase()
+                const dotColor = m.color || (mKey.includes('latte') ? '#EC4899' : mKey.includes('macchiato') ? '#14B8A6' : mKey.includes('affogato') ? '#F59E0B' : '#EC4899')
+
                 return (
                   <button
                     type="button"
                     key={idVal}
                     onClick={() => setMemberId(idVal)}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
-                      isSelected
-                        ? 'bg-[var(--accent)] text-white shadow-md'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border)]'
-                    }`}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${isSelected
+                        ? 'bg-white/10 text-white border border-white/25 shadow-md'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 border border-transparent'
+                      }`}
                   >
-                    {m.nama_panggung}
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: dotColor, boxShadow: isSelected ? `0 0 8px ${dotColor}` : 'none' }}
+                    />
+                    <span>{m.nama_panggung}</span>
                   </button>
                 )
               })}
             </div>
-          </div>
 
-          {/* Period filter */}
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] font-black tracking-widest text-[var(--text-secondary)] uppercase">Pilih Waktu:</span>
-            <div className="flex flex-wrap justify-center bg-[var(--surface)] border border-[var(--border)] rounded-xl p-1.5 gap-1 shadow-md">
+            {/* Divider */}
+            <div className="h-px bg-[var(--border)] w-full opacity-60" />
+
+            {/* Period Filter */}
+            <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto pt-0.5 sm:pt-0 scrollbar-hide justify-start sm:justify-center">
               {[
                 { id: 'all', label: 'All Time' },
                 { id: 'tahun', label: 'Tahun Ini' },
                 { id: 'bulan', label: 'Bulan Ini' },
                 { id: 'minggu', label: 'Minggu Ini' },
-              ].map(p => (
-                <button
-                  type="button"
-                  key={p.id}
-                  onClick={() => setPeriod(p.id)}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
-                    period === p.id
-                      ? 'bg-[var(--primary)] text-white shadow-md'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border)]'
-                  }`}
-                >
-                  <FaCalendarAlt size={10} /> {p.label}
-                </button>
-              ))}
+              ].map(p => {
+                const isPeriodActive = period === p.id
+                return (
+                  <button
+                    type="button"
+                    key={p.id}
+                    onClick={() => setPeriod(p.id)}
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all shrink-0 ${isPeriodActive
+                        ? 'bg-[var(--primary)] text-white shadow-md'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'
+                      }`}
+                  >
+                    <FaCalendarAlt size={10} className={isPeriodActive ? 'text-white' : 'text-[var(--text-secondary)]'} />
+                    <span>{p.label}</span>
+                  </button>
+                )
+              })}
             </div>
           </div>
         </motion.div>
@@ -216,18 +222,66 @@ const KSLeaderboard = ({ members = [] }) => {
               </motion.div>
             )}
 
-            {/* Empty */}
+            {/* Empty State */}
             {!loading && leaderboard.length === 0 && (
               <motion.div
                 key="empty"
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="flex flex-col items-center justify-center text-center p-12 border border-dashed border-[var(--border)] rounded-3xl bg-[var(--surface)]"
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.3 }}
+                className="relative flex flex-col items-center justify-center text-center p-8 sm:p-12 rounded-3xl bg-[var(--surface)] border border-[var(--border)] shadow-xl overflow-hidden"
               >
-                <FaStar className="text-4xl text-[var(--border)] mb-4" />
-                <p className="text-[var(--text-secondary)] font-bold">Belum ada data untuk periode/kategori ini.</p>
-                <p className="text-xs text-[var(--text-secondary)]/60 mt-1">Jadilah yang pertama mendukung!</p>
+                {/* Floating Trophy Emblem */}
+                <div className="relative inline-flex items-center justify-center mb-5">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center shadow-[0_0_24px_rgba(245,158,11,0.15)]">
+                    <FaTrophy className="text-3xl sm:text-4xl text-amber-400" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 px-2.5 py-0.5 rounded-full bg-amber-400 text-stone-950 text-[10px] font-black uppercase tracking-wider shadow-md">
+                    #1
+                  </div>
+                </div>
+
+                {/* Status Pill */}
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-bold uppercase tracking-wider mb-3">
+                  <FaCrown size={12} className="text-amber-400" />
+                  <span>Tahta Supporter Masih Terbuka</span>
+                </div>
+
+                {/* Heading */}
+                <h3 className="text-xl sm:text-2xl font-black text-[var(--text-primary)] uppercase tracking-tight mb-2">
+                  Jadilah Fan Nomor 1 di Sini!
+                </h3>
+
+                {/* Description */}
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-md mx-auto leading-relaxed mb-6">
+                  Belum ada catatan supporter untuk kategori dan periode ini. Ambil tahta pertamamu dan ukir namamu di puncak Wall of Fame Kohi Sekai!
+                </p>
+
+                {/* Direct CTA */}
+                <Link
+                  to="/shop"
+                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-[var(--primary)]/25 transition-all hover:scale-105 active:scale-95"
+                >
+                  <FaHeart className="text-sm" />
+                  <span>Dukung & Pesan Cheki Sekarang</span>
+                </Link>
+
+                {/* Micro Perks / Incentives */}
+                <div className="mt-8 pt-6 border-t border-[var(--border)] w-full max-w-lg flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-[11px] font-bold text-[var(--text-secondary)]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <span>Peringkat Realtime</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
+                    <span>Digital Receipt Eksklusif</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
+                    <span>Apresiasi Resmi Member</span>
+                  </div>
+                </div>
               </motion.div>
             )}
 
@@ -242,11 +296,11 @@ const KSLeaderboard = ({ members = [] }) => {
               >
 
                 {/* ── PODIUM TOP 3 ── */}
-                <div className="relative rounded-3xl bg-[var(--surface)] border border-[var(--primary)]/20 shadow-xl overflow-hidden p-6 sm:p-8">
-                  {/* subtle top shine */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-[var(--primary)]/40 to-transparent" />
+                <div className="relative rounded-2xl sm:rounded-3xl bg-[var(--surface)] border border-[var(--primary)]/20 shadow-xl overflow-hidden p-3 sm:p-8">
+                  {/* subtle top line */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-[var(--primary)]/30" />
 
-                  <div className="flex items-end justify-center gap-3 sm:gap-5">
+                  <div className="flex items-end justify-center gap-2 sm:gap-5">
                     {RENDER_ORDER.map(rankIdx => {
                       const fan = top3[rankIdx]
                       const cfg = PODIUM[rankIdx]
@@ -256,9 +310,9 @@ const KSLeaderboard = ({ members = [] }) => {
                         return (
                           <div
                             key={`placeholder-${rankIdx}`}
-                            className={`flex flex-col items-center justify-between w-[28%] sm:w-48 min-h-[180px] sm:min-h-[210px] p-4 rounded-2xl border border-dashed border-[var(--border)] opacity-30 ${cfg.zIndex}`}
+                            className={`flex flex-col items-center justify-between w-[31%] sm:w-48 min-h-[160px] sm:min-h-[210px] p-2 sm:p-4 rounded-xl sm:rounded-2xl border border-dashed border-[var(--border)] opacity-30 ${cfg.zIndex}`}
                           >
-                            <div className="text-[var(--text-secondary)] text-xs font-bold mt-4">{cfg.rankLabel}</div>
+                            <div className="text-[var(--text-secondary)] text-[10px] sm:text-xs font-bold mt-4">{cfg.rankLabel}</div>
                           </div>
                         )
                       }
@@ -268,48 +322,48 @@ const KSLeaderboard = ({ members = [] }) => {
                       return (
                         <motion.div
                           key={fan.name}
-                          initial={{ opacity: 0, y: 30 }}
+                          initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: rankIdx * 0.08, duration: 0.45 }}
+                          transition={{ delay: rankIdx * 0.08, duration: 0.4 }}
                           className={`
                             flex flex-col items-center
-                            w-[28%] sm:w-48
-                            min-h-[180px] sm:min-h-[220px]
-                            p-3 sm:p-5
-                            rounded-2xl border
+                            w-[31%] sm:w-48
+                            min-h-[160px] sm:min-h-[220px]
+                            p-2 sm:p-5
+                            rounded-xl sm:rounded-2xl border
                             ${cfg.cardBg} ${cfg.cardBorder} ${cfg.cardGlow} ${cfg.offset} ${cfg.zIndex}
                             transition-transform duration-300 hover:-translate-y-1
                           `}
                         >
                           {/* Medal icon */}
-                          <div className="mb-2 mt-1">{cfg.icon}</div>
+                          <div className="mb-1.5 sm:mb-2 mt-0.5 sm:mt-1 scale-90 sm:scale-100">{cfg.icon}</div>
 
                           {/* Avatar */}
-                          <div className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-full p-[2.5px] bg-gradient-to-tr ${cfg.avatarRing} shadow-md mb-2.5 shrink-0`}>
-                            <div className="w-full h-full rounded-full bg-[var(--background)] flex items-center justify-center font-black text-sm sm:text-base text-[var(--text-primary)]">
+                          <div className={`relative w-11 h-11 sm:w-16 sm:h-16 rounded-full p-[2px] ${cfg.avatarRing} shadow-md mb-2 shrink-0`}>
+                            <div className="w-full h-full rounded-full bg-[var(--background)] flex items-center justify-center font-black text-xs sm:text-base text-[var(--text-primary)]">
                               {getInitials(fan.name)}
                             </div>
                             {/* Rank badge on avatar */}
-                            <div className={`absolute -bottom-1 -right-1 bg-gradient-to-r ${cfg.badgeBg} ${cfg.badgeText} px-1.5 py-0.5 rounded-full text-[9px] font-black shadow-md`}>
+                            <div className={`absolute -bottom-1 -right-1 ${cfg.badgeBg} ${cfg.badgeText} px-1.5 py-0.2 rounded-full text-[8px] sm:text-[9px] font-black shadow-md`}>
                               {cfg.rankLabel}
                             </div>
                           </div>
 
                           {/* Name */}
-                          <h4 className="text-xs sm:text-sm font-black text-[var(--text-primary)] text-center w-full truncate px-1 leading-tight">
+                          <h4 className="text-[10px] sm:text-sm font-black text-[var(--text-primary)] text-center w-full truncate px-0.5 leading-tight">
                             {fan.name}
                           </h4>
 
                           {/* Favorite member badge (All Members mode) */}
                           {isAllMembers && fan.memberName && (
-                            <span className="text-[9px] sm:text-[10px] font-bold text-[var(--accent)] bg-[var(--accent)]/10 border border-[var(--accent)]/20 px-2 py-0.5 rounded-full mt-1 truncate max-w-full">
-                              ♥ {fan.memberName}
+                            <span className="text-[8px] sm:text-[10px] font-bold text-[var(--accent)] bg-[var(--accent)]/10 border border-[var(--accent)]/20 px-1.5 py-0.5 rounded-full mt-1 truncate max-w-full inline-flex items-center gap-1">
+                              <FaHeart className="text-[7px]" /> {fan.memberName}
                             </span>
                           )}
 
                           {/* Cheki score */}
-                          <div className={`mt-auto pt-2 px-3 py-1 rounded-full border text-[10px] sm:text-xs font-black flex items-center gap-1 ${cfg.scoreBg}`}>
-                            <FaStar size={9} className="text-yellow-400 shrink-0" />
+                          <div className={`mt-auto pt-1.5 sm:pt-2 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border text-[9px] sm:text-xs font-black flex items-center gap-1 ${cfg.scoreBg}`}>
+                            <FaStar size={8} className="text-yellow-400 shrink-0" />
                             <span>{chekiValue} Cheki</span>
                           </div>
                         </motion.div>
@@ -364,8 +418,8 @@ const KSLeaderboard = ({ members = [] }) => {
                                   {fan.name}
                                 </span>
                                 {isAllMembers && fan.memberName && (
-                                  <span className="text-[10px] font-semibold text-[var(--accent)] truncate block">
-                                    ♥ {fan.memberName}
+                                  <span className="text-[10px] font-semibold text-[var(--accent)] truncate flex items-center gap-1">
+                                    <FaHeart className="text-[7px]" /> {fan.memberName}
                                   </span>
                                 )}
                               </div>
@@ -379,11 +433,6 @@ const KSLeaderboard = ({ members = [] }) => {
                           )
                         })}
                       </div>
-
-                      {/* Bottom fade hint */}
-                      {rest.length > 3 && (
-                        <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[var(--surface)] to-transparent pointer-events-none rounded-b-3xl" />
-                      )}
                     </div>
                   </div>
                 )}

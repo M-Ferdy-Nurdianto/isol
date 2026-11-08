@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import { FaTimes } from 'react-icons/fa'
 import api from '../../../lib/api'
@@ -103,7 +103,7 @@ const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 animate-fade-in">
       <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col text-[var(--text-primary)]">
         <div className="p-4 border-b border-[var(--border)] flex justify-between items-center bg-[var(--background)] text-[var(--text-primary)]">
           <h3 className="text-base font-bold uppercase tracking-wider">{editingEvent ? 'Edit Event' : 'Tambah Event Baru'}</h3>
