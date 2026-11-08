@@ -165,9 +165,3 @@ const CustomSelect = ({
 }
 
 export default CustomSelect
-}
-
-export default CustomSelect
-}
-
-export default CustomSelect
