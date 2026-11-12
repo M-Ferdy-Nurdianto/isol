@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
 import {
   FaShieldAlt,
@@ -264,7 +264,7 @@ const UserSecuritySection = ({ user, onActionSuccess }) => {
                           ? 'bg-[var(--success)]'
                           : item.type === 'failed' || item.type === 'warning'
                           ? 'bg-[var(--danger)]'
-                          : 'bg-blue-400'
+                          : 'bg-[var(--primary)]'
                       }`}
                     />
                     <span>{item.label}</span>

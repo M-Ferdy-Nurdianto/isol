@@ -32,6 +32,7 @@ import { useFanAuth } from '../context/FanAuthContext'
 import { kohiToast } from '../components/ui/KohiToast'
 import api from '../lib/api'
 import { getAssetPath } from '../lib/pathUtils'
+import ImageUploadDropzone from '../components/ui/ImageUploadDropzone'
 
 const KSCheckoutPage = () => {
   const { eventId } = useParams()
@@ -112,9 +113,9 @@ const KSCheckoutPage = () => {
       const idStr = String(m.id || m.member_id || '').toLowerCase()
       const nameStr = String(m.nama_panggung || '').toLowerCase()
       if (
-        idStr === 'group' || 
-        idStr === 'kohisekai' || 
-        nameStr.includes('kohi sekai') || 
+        idStr === 'group' ||
+        idStr === 'kohisekai' ||
+        nameStr.includes('kohi sekai') ||
         nameStr.includes('group cheki')
       ) {
         return false
@@ -186,8 +187,8 @@ const KSCheckoutPage = () => {
           setAllMembers(fetchedMembers)
 
           if (memberId) {
-            const m = fetchedMembers.find(m => 
-              String(m.id).toLowerCase() === String(memberId).toLowerCase() || 
+            const m = fetchedMembers.find(m =>
+              String(m.id).toLowerCase() === String(memberId).toLowerCase() ||
               String(m.member_id).toLowerCase() === String(memberId).toLowerCase()
             )
             setSelectedMember(m || fetchedMembers[0] || null)
@@ -502,8 +503,8 @@ const KSCheckoutPage = () => {
     )
   }
 
-  const activeSelectedPhoto = ticketType === 'group' 
-    ? '/images/members/placeholder.svg' 
+  const activeSelectedPhoto = ticketType === 'group'
+    ? '/images/members/placeholder.svg'
     : (selectedMember?.shop_image_url || selectedMember?.image_url || '/images/members/placeholder.svg')
 
   return (
@@ -755,11 +756,10 @@ const KSCheckoutPage = () => {
                           className="group text-left flex flex-col cursor-pointer focus:outline-none"
                         >
                           <div
-                            className={`relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-surface border transition-all duration-300 flex flex-col items-center justify-center p-4 ${
-                              ticketType === 'group'
+                            className={`relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-surface border transition-all duration-300 flex flex-col items-center justify-center p-4 ${ticketType === 'group'
                                 ? 'border-primary ring-2 ring-primary/40 shadow-lg scale-[1.02]'
                                 : 'border-border opacity-75 hover:opacity-100 hover:border-text-secondary/50 hover:-translate-y-1'
-                            }`}
+                              }`}
                           >
                             {ticketType === 'group' && (
                               <div className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center shadow-md z-10">
@@ -792,11 +792,10 @@ const KSCheckoutPage = () => {
                             className="group text-left flex flex-col cursor-pointer focus:outline-none"
                           >
                             <div
-                              className={`relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-surface border transition-all duration-300 ${
-                                isSelected
+                              className={`relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-surface border transition-all duration-300 ${isSelected
                                   ? 'border-primary ring-2 ring-primary/40 shadow-lg scale-[1.02]'
                                   : 'border-border opacity-75 hover:opacity-100 hover:border-text-secondary/50 hover:-translate-y-1'
-                              }`}
+                                }`}
                             >
                               {/* Selected Checkmark Badge in Top Right */}
                               {isSelected && (
@@ -897,44 +896,42 @@ const KSCheckoutPage = () => {
                           <>
                             {/* Regular Cheki — hide if disabled by admin */}
                             {isRegularEnabled && (
-                            <label
-                              onClick={() => setChekiVariant('regular')}
-                              className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${
-                                chekiVariant === 'regular'
-                                  ? 'bg-primary/10 border-primary text-text-primary font-bold'
-                                  : 'bg-background border-border text-text-secondary hover:border-text-secondary/40'
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <input type="radio" name="chekiVariant" value="regular" checked={chekiVariant === 'regular'} onChange={() => setChekiVariant('regular')} className="accent-primary w-4 h-4 cursor-pointer" />
-                                <div>
-                                  <span className="text-xs font-black uppercase text-text-primary block">Regular Cheki</span>
-                                  <span className="text-[10px] text-text-secondary block font-normal">Ukuran Standar · Priority Line (PO) / Regular Line (OTS)</span>
+                              <label
+                                onClick={() => setChekiVariant('regular')}
+                                className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${chekiVariant === 'regular'
+                                    ? 'bg-primary/10 border-primary text-text-primary font-bold'
+                                    : 'bg-background border-border text-text-secondary hover:border-text-secondary/40'
+                                  }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <input type="radio" name="chekiVariant" value="regular" checked={chekiVariant === 'regular'} onChange={() => setChekiVariant('regular')} className="accent-primary w-4 h-4 cursor-pointer" />
+                                  <div>
+                                    <span className="text-xs font-black uppercase text-text-primary block">Regular Cheki</span>
+                                    <span className="text-[10px] text-text-secondary block font-normal">Ukuran Standar · Priority Line (PO) / Regular Line (OTS)</span>
+                                  </div>
                                 </div>
-                              </div>
-                              <span className="text-xs font-bold text-text-primary font-mono">Rp {regularPrice.toLocaleString('id-ID')}</span>
-                            </label>
+                                <span className="text-xs font-bold text-text-primary font-mono">Rp {regularPrice.toLocaleString('id-ID')}</span>
+                              </label>
                             )}
 
                             {/* Wide Cheki 16:9 PER MEMBER — hide if disabled by admin */}
                             {wideChekiEnabled && (
-                            <label
-                              onClick={() => setChekiVariant('wide')}
-                              className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${
-                                chekiVariant === 'wide'
-                                  ? 'bg-primary/10 border-primary text-text-primary font-bold'
-                                  : 'bg-background border-border text-text-secondary hover:border-text-secondary/40'
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <input type="radio" name="chekiVariant" value="wide" checked={chekiVariant === 'wide'} onChange={() => setChekiVariant('wide')} className="accent-primary w-4 h-4 cursor-pointer" />
-                                <div>
-                                  <span className="text-xs font-black uppercase text-text-primary block">Wide Cheki (Polaroid 16:9)</span>
-                                  <span className="text-[10px] text-text-secondary block font-normal">Format lebar 16:9 · 1x foto dengan member pilihan · VIP Line</span>
+                              <label
+                                onClick={() => setChekiVariant('wide')}
+                                className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${chekiVariant === 'wide'
+                                    ? 'bg-primary/10 border-primary text-text-primary font-bold'
+                                    : 'bg-background border-border text-text-secondary hover:border-text-secondary/40'
+                                  }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <input type="radio" name="chekiVariant" value="wide" checked={chekiVariant === 'wide'} onChange={() => setChekiVariant('wide')} className="accent-primary w-4 h-4 cursor-pointer" />
+                                  <div>
+                                    <span className="text-xs font-black uppercase text-text-primary block">Wide Cheki (Polaroid 16:9)</span>
+                                    <span className="text-[10px] text-text-secondary block font-normal">Format lebar 16:9 · 1x foto dengan member pilihan · VIP Line</span>
+                                  </div>
                                 </div>
-                              </div>
-                              <span className="text-xs font-bold text-text-primary font-mono">Rp {widePrice.toLocaleString('id-ID')}</span>
-                            </label>
+                                <span className="text-xs font-bold text-text-primary font-mono">Rp {widePrice.toLocaleString('id-ID')}</span>
+                              </label>
                             )}
 
                             {/* Custom options added by Admin */}
@@ -942,11 +939,10 @@ const KSCheckoutPage = () => {
                               <label
                                 key={opt.id}
                                 onClick={() => setChekiVariant(opt.label)}
-                                className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${
-                                  chekiVariant === opt.label
+                                className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${chekiVariant === opt.label
                                     ? 'bg-primary/10 border-primary text-text-primary font-bold'
                                     : 'bg-background border-border text-text-secondary hover:border-text-secondary/40'
-                                }`}
+                                  }`}
                               >
                                 <div className="flex items-center gap-3">
                                   <input
@@ -979,11 +975,10 @@ const KSCheckoutPage = () => {
 
                         <label
                           onClick={() => setSesiMode('2SHT')}
-                          className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${
-                            sesiMode === '2SHT'
+                          className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${sesiMode === '2SHT'
                               ? 'bg-primary/10 border-primary text-text-primary font-bold'
                               : 'bg-background border-border text-text-secondary hover:border-text-secondary/40'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center gap-3">
                             <input
@@ -1003,11 +998,10 @@ const KSCheckoutPage = () => {
 
                         <label
                           onClick={() => setSesiMode('1SHT')}
-                          className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${
-                            sesiMode === '1SHT'
+                          className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-center justify-between min-h-[56px] ${sesiMode === '1SHT'
                               ? 'bg-primary/10 border-primary text-text-primary font-bold'
                               : 'bg-background border-border text-text-secondary hover:border-text-secondary/40'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center gap-3">
                             <input
@@ -1085,11 +1079,10 @@ const KSCheckoutPage = () => {
                           <button
                             type="button"
                             onClick={() => setPaymentMethodSelected('tf')}
-                            className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 min-h-[46px] ${
-                              paymentMethodSelected === 'tf'
+                            className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 min-h-[46px] ${paymentMethodSelected === 'tf'
                                 ? 'bg-primary/10 border-primary text-text-primary font-bold'
                                 : 'bg-background border-border text-text-secondary hover:border-text-secondary/40'
-                            }`}
+                              }`}
                           >
                             <FaCreditCard size={16} />
                             <span className="text-xs uppercase font-black">Transfer Bank</span>
@@ -1098,11 +1091,10 @@ const KSCheckoutPage = () => {
                           <button
                             type="button"
                             onClick={() => setPaymentMethodSelected('qris')}
-                            className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 min-h-[46px] ${
-                              paymentMethodSelected === 'qris'
+                            className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 min-h-[46px] ${paymentMethodSelected === 'qris'
                                 ? 'bg-primary/10 border-primary text-text-primary font-bold'
                                 : 'bg-background border-border text-text-secondary hover:border-text-secondary/40'
-                            }`}
+                              }`}
                           >
                             <FaQrcode size={16} />
                             <span className="text-xs uppercase font-black">Scan QRIS</span>
@@ -1168,53 +1160,18 @@ const KSCheckoutPage = () => {
                         <label className="block text-xs font-black uppercase tracking-wider text-text-secondary">
                           Unggah Bukti Transfer / Pembayaran <span className="text-danger">*</span>
                         </label>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileChange}
-                          className="hidden"
+                        <ImageUploadDropzone
+                          previewUrl={filePreview}
+                          onImageChange={(compressedWebpFile, blobUrl) => {
+                            setFile(compressedWebpFile)
+                            setFilePreview(blobUrl)
+                          }}
+                          onRemove={() => {
+                            setFile(null)
+                            setFilePreview(null)
+                          }}
+                          hint="Drag & drop foto bukti transfer (JPG, PNG, WebP) ke sini. Auto-kompres WebP."
                         />
-
-                        {filePreview ? (
-                          <div className="p-4 rounded-2xl border border-border bg-background flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-3 truncate">
-                              <img
-                                src={filePreview}
-                                alt="Bukti Transfer"
-                                className="w-14 h-14 object-cover rounded-xl border border-border"
-                              />
-                              <div className="truncate">
-                                <span className="text-xs font-bold truncate text-text-primary block">{file?.name}</span>
-                                <span className="text-[10px] text-text-secondary block">
-                                  {(file?.size / 1024).toFixed(1)} KB · Siap diunggah
-                                </span>
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => fileInputRef.current?.click()}
-                              className="text-xs font-bold text-primary hover:underline shrink-0"
-                            >
-                              Ganti File
-                            </button>
-                          </div>
-                        ) : (
-                          <div
-                            onClick={() => fileInputRef.current?.click()}
-                            className="border-2 border-dashed border-border hover:border-primary rounded-2xl p-6 text-center cursor-pointer transition-colors bg-background flex flex-col items-center justify-center space-y-2 group"
-                          >
-                            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                              <FaUpload size={18} />
-                            </div>
-                            <span className="text-xs font-bold text-text-primary block">
-                              Klik untuk upload foto bukti transfer
-                            </span>
-                            <span className="text-[10px] text-text-secondary block">
-                              Format didukung: JPG, PNG, WebP (Maks 10MB)
-                            </span>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>

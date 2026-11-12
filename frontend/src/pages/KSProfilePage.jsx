@@ -8,7 +8,8 @@ import {
   FaUser, FaEnvelope, FaWhatsapp, FaInstagram, FaSignOutAlt, 
   FaHistory, FaTicketAlt, FaCheck, FaHourglassHalf, FaExternalLinkAlt, 
   FaReceipt, FaCamera, FaSpinner, FaEdit, FaSave, FaTimes, FaShoppingBag,
-  FaCheckCircle, FaCopy, FaCalendarAlt, FaQrcode, FaDownload, FaCrown, FaTrophy
+  FaCheckCircle, FaCopy, FaCalendarAlt, FaQrcode, FaDownload, FaCrown, FaTrophy,
+  FaBox, FaTruck, FaStore, FaMapMarkerAlt
 } from 'react-icons/fa'
 import { useFanAuth } from '../context/FanAuthContext'
 import KSHeader from '../components/KSHeader'
@@ -21,6 +22,7 @@ const KSProfilePage = () => {
   const { fanUser, isLoggedIn, logout, updateProfile } = useFanAuth()
   
   const [orders, setOrders] = useState([])
+  const [merchOrders, setMerchOrders] = useState([])
   const [fanTitles, setFanTitles] = useState([])
   const [showTitlesModal, setShowTitlesModal] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -34,7 +36,28 @@ const KSProfilePage = () => {
   const [copiedId, setCopiedId] = useState(null)
   const [downloadingOrderId, setDownloadingOrderId] = useState(null)
   const [downloadingOrder, setDownloadingOrder] = useState(null)
+  const [confirmingMerchOrder, setConfirmingMerchOrder] = useState(null)
+  const [confirmingMerchLoading, setConfirmingMerchLoading] = useState(false)
   const receiptDownloadRef = useRef(null)
+
+  const handleConfirmMerchReceived = async () => {
+    if (!confirmingMerchOrder) return
+    setConfirmingMerchLoading(true)
+    try {
+      const res = await api.patch(`/merch-orders/${confirmingMerchOrder.id}/confirm-received`)
+      if (res.data?.success && res.data?.data) {
+        setMerchOrders(prev => prev.map(m => (m.id === confirmingMerchOrder.id ? res.data.data : m)))
+        kohiToast.success('Terima kasih! Pesanan merchandise telah dikonfirmasi diterima.')
+        setConfirmingMerchOrder(null)
+      } else {
+        throw new Error(res.data?.error || 'Gagal mengonfirmasi pesanan')
+      }
+    } catch (err) {
+      kohiToast.error(err.response?.data?.error || err.message || 'Gagal mengonfirmasi pesanan')
+    } finally {
+      setConfirmingMerchLoading(false)
+    }
+  }
 
   const groupedTitles = groupTitlesByPeriod(fanTitles)
 
@@ -99,20 +122,26 @@ const KSProfilePage = () => {
   }, [isLoggedIn, navigate])
 
   useEffect(() => {
-    if (fanUser?.email) {
+    if (fanUser?.email || fanUser?.id || fanUser?.whatsapp) {
       setLoading(true)
-      api.get(`/auth/fan/orders?email=${encodeURIComponent(fanUser.email)}${fanUser?.id ? `&user_id=${fanUser.id}` : ""}`)
-        .then(res => {
-          if (res.data?.success) {
-            setOrders(res.data.data || [])
-          }
+      const email = fanUser.email ? encodeURIComponent(fanUser.email) : ''
+      const userId = fanUser.id ? `&user_id=${fanUser.id}` : ''
+      const wa = fanUser.whatsapp ? `&whatsapp=${encodeURIComponent(fanUser.whatsapp)}` : ''
+
+      Promise.all([
+        api.get(`/auth/fan/orders?email=${email}${userId}`).catch(() => ({ data: { success: false } })),
+        api.get(`/merch-orders/fan-orders?email=${email}${userId}${wa}`).catch(() => ({ data: { success: false } }))
+      ])
+        .then(([ticketRes, merchRes]) => {
+          if (ticketRes.data?.success) setOrders(ticketRes.data.data || [])
+          if (merchRes.data?.success) setMerchOrders(merchRes.data.data || [])
         })
         .catch(err => {
           console.error('Error fetching order history:', err)
         })
         .finally(() => setLoading(false))
     }
-  }, [fanUser?.email])
+  }, [fanUser?.email, fanUser?.id])
 
   useEffect(() => {
     if (fanUser?.nama || fanUser?.email) {
@@ -359,25 +388,31 @@ const KSProfilePage = () => {
             </h2>
           </div>
 
-          {/* Filter PO vs OTS */}
-          <div className="flex items-center gap-1.5 p-1 bg-background border border-border rounded-2xl self-start sm:self-auto text-xs font-bold">
+          {/* Filter PO vs OTS vs Merch */}
+          <div className="flex items-center gap-1.5 p-1 bg-background border border-border rounded-2xl self-start sm:self-auto text-xs font-bold overflow-x-auto max-w-full">
             <button
               onClick={() => setOrderTypeFilter('all')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs ${orderTypeFilter === 'all' ? 'bg-primary text-white' : 'text-text-secondary hover:text-text-primary'}`}
+              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs shrink-0 ${orderTypeFilter === 'all' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
             >
-              Semua ({orders.length})
+              Semua Tiket ({orders.length})
             </button>
             <button
               onClick={() => setOrderTypeFilter('po')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs ${orderTypeFilter === 'po' ? 'bg-primary text-white' : 'text-text-secondary hover:text-text-primary'}`}
+              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs shrink-0 ${orderTypeFilter === 'po' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
             >
               PO Online ({poCount})
             </button>
             <button
               onClick={() => setOrderTypeFilter('ots')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs ${orderTypeFilter === 'ots' ? 'bg-primary text-white' : 'text-text-secondary hover:text-text-primary'}`}
+              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs shrink-0 ${orderTypeFilter === 'ots' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
             >
               OTS Venue ({otsCount})
+            </button>
+            <button
+              onClick={() => setOrderTypeFilter('merch')}
+              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs shrink-0 ${orderTypeFilter === 'merch' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+            >
+              Merchandise ({merchOrders.length})
             </button>
           </div>
         </div>
@@ -387,8 +422,192 @@ const KSProfilePage = () => {
           {loading ? (
             <div className="h-48 flex flex-col items-center justify-center gap-3">
               <div className="w-9 h-9 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-              <p className="text-xs text-text-secondary uppercase tracking-widest font-black">Memuat riwayat tiket...</p>
+              <p className="text-xs text-text-secondary uppercase tracking-widest font-black">Memuat riwayat...</p>
             </div>
+          ) : orderTypeFilter === 'merch' ? (
+            /* MERCHANDISE ORDERS LIST */
+            merchOrders.length === 0 ? (
+              <div className="h-full min-h-[320px] flex flex-col items-center justify-center text-center px-4 py-8">
+                <div className="w-20 h-20 bg-background border border-border rounded-3xl flex items-center justify-center text-primary mb-4">
+                  <FaBox className="text-3xl" />
+                </div>
+                <h3 className="text-lg font-black text-text-primary mb-2 uppercase tracking-wide">
+                  Belum Ada Pesanan Merchandise
+                </h3>
+                <p className="text-text-secondary text-xs max-w-sm mb-6 leading-relaxed">
+                  Kamu belum memiliki transaksi pemesanan merchandise. Kunjungi katalog Official Merch untuk mengoleksi item Kohi Sekai!
+                </p>
+                <button 
+                  onClick={() => navigate('/shop')}
+                  className="px-6 py-2.5 bg-primary text-white text-xs font-black uppercase tracking-wider rounded-full hover:bg-primary-hover transition-all shadow-md"
+                >
+                  Lihat Official Merch
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {merchOrders.map((ord, idx) => {
+                  const isCompleted = ord.status === 'completed'
+                  const isShipped = ord.status === 'shipped'
+                  const isPacking = ord.status === 'packing'
+                  const isPaid = ord.status === 'paid' || ord.status === 'checked'
+                  const isPending = ord.status === 'pending'
+                  const isCancelled = ord.status === 'cancelled'
+                  const isShipping = ord.delivery_method === 'shipping'
+                  const canUserConfirm = isShipped || (!isShipping && (isPaid || isPacking || isShipped))
+
+                  const statusLabel = isCompleted
+                    ? 'Selesai / Diterima'
+                    : isShipped
+                    ? 'Sudah Dikirim'
+                    : isPacking
+                    ? 'Dikemas'
+                    : isPaid
+                    ? 'Lunas'
+                    : isPending
+                    ? 'Menunggu Verifikasi'
+                    : 'Dibatalkan'
+
+                  // Semantic Status Colors Only: Emerald (Success/Paid/Completed), Amber (Pending/Process), Red (Cancelled)
+                  const statusBadgeClass = (isCompleted || isPaid)
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : (isShipped || isPacking || isPending)
+                    ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                    : 'bg-red-500/15 text-red-400 border border-red-500/30'
+
+                  return (
+                    <div
+                      key={ord.id || idx}
+                      className="relative group bg-surface border border-border hover:border-border/80 rounded-2xl p-5 shadow-lg transition-all duration-200 overflow-hidden space-y-3"
+                    >
+                      {/* Subtle neutral top divider */}
+                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-border" />
+
+                      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-background text-text-secondary border border-border">
+                            <FaBox size={10} /> Merchandise
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-background text-text-secondary border border-border">
+                            {isShipping ? <FaTruck size={10} /> : <FaStore size={10} />}
+                            {isShipping ? 'Dikirim' : 'Ambil di Event'}
+                          </span>
+                          <button
+                            onClick={() => handleCopyOrderNumber(ord.order_number)}
+                            className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-text-primary hover:text-primary transition-colors px-2 py-0.5 rounded-md hover:bg-background"
+                            title="Klik untuk salin"
+                          >
+                            <span>#{ord.order_number}</span>
+                            <FaCopy size={11} className={copiedId === ord.order_number ? 'text-primary' : 'opacity-40'} />
+                          </button>
+                        </div>
+
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${statusBadgeClass}`}>
+                          {statusLabel}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1.5 py-1">
+                        {(ord.merch_order_items || []).map((it, i) => (
+                          <div key={i} className="flex justify-between items-center text-xs">
+                            <span className="font-bold text-text-primary">
+                              {it.quantity}x {it.item_name} {it.size ? `(${it.size})` : ''}
+                            </span>
+                            <span className="font-mono text-text-secondary">
+                              Rp {((it.harga || 0) * (it.quantity || 1)).toLocaleString('id-ID')}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Shipping Address & Tracking Info */}
+                      {isShipping && ord.shipping_address && (
+                        <div className="text-[11px] text-text-secondary bg-background p-3 rounded-xl border border-border space-y-1">
+                          <div className="flex items-center gap-1.5 font-bold text-text-primary">
+                            <FaMapMarkerAlt size={11} className="text-primary shrink-0" />
+                            <span>Alamat Pengiriman:</span>
+                          </div>
+                          <p className="leading-relaxed">
+                            {ord.shipping_address}
+                            {ord.shipping_city ? `, ${ord.shipping_city}` : ''}
+                            {ord.shipping_postal_code ? ` (${ord.shipping_postal_code})` : ''}
+                          </p>
+                        </div>
+                      )}
+
+                      {(ord.shipping_courier || ord.tracking_number) && (
+                        <div className="text-[11px] bg-background border border-border p-3 rounded-xl flex flex-wrap items-center justify-between gap-2">
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-text-secondary block">
+                              Info Pengiriman / Resi
+                            </span>
+                            <p className="text-xs font-bold text-text-primary">
+                              {ord.shipping_courier ? `${ord.shipping_courier}` : 'Ekspedisi'}
+                              {ord.tracking_number ? ` — ${ord.tracking_number}` : ''}
+                            </p>
+                          </div>
+                          {ord.tracking_number && (
+                            <button
+                              type="button"
+                              onClick={() => handleCopyOrderNumber(ord.tracking_number)}
+                              className="px-2.5 py-1 rounded-lg bg-surface border border-border hover:border-primary text-xs font-bold text-text-primary flex items-center gap-1.5"
+                            >
+                              <FaCopy size={10} className="text-primary" />
+                              <span>{copiedId === ord.tracking_number ? 'Disalin' : 'Salin Resi'}</span>
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      {ord.catatan && (
+                        <p className="text-[11px] text-text-secondary bg-background p-2.5 rounded-xl border border-border">
+                          <strong className="text-text-primary">Catatan:</strong> {ord.catatan}
+                        </p>
+                      )}
+
+                      {isCompleted && ord.confirmed_by && (
+                        <p className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5">
+                          <FaCheckCircle size={11} />
+                          <span>
+                            {ord.confirmed_by === 'admin'
+                              ? 'Pesanan diselesaikan oleh Admin'
+                              : 'Barang dikonfirmasi telah diterima oleh Kamu'}
+                          </span>
+                        </p>
+                      )}
+
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border">
+                        <span className="text-xs font-bold text-text-secondary">
+                          Total Bayar: <strong className="text-base font-black text-primary font-mono">Rp {(ord.total_harga || 0).toLocaleString('id-ID')}</strong>
+                        </span>
+                        <div className="flex items-center gap-3">
+                          {ord.payment_proof_url && (
+                            <a
+                              href={ord.payment_proof_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-primary hover:underline flex items-center gap-1 font-bold"
+                            >
+                              <FaReceipt size={11} /> Bukti Bayar
+                            </a>
+                          )}
+                          {canUserConfirm && !isCancelled && (
+                            <button
+                              type="button"
+                              onClick={() => setConfirmingMerchOrder(ord)}
+                              className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-black font-black text-xs flex items-center gap-1.5 transition-all active:scale-95"
+                            >
+                              <FaCheck size={11} />
+                              <span>Konfirmasi Barang Sampai</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )
           ) : filteredOrders.length === 0 ? (
             <div className="h-full min-h-[320px] flex flex-col items-center justify-center text-center px-4 py-8">
               <div className="w-20 h-20 bg-background border border-border rounded-3xl flex items-center justify-center text-primary mb-4">
@@ -428,32 +647,28 @@ const KSProfilePage = () => {
                     key={order.id || idx}
                     className="relative group bg-surface border border-border hover:border-primary/50 rounded-2xl p-5 shadow-lg transition-all duration-200 overflow-hidden"
                   >
-                    {/* Solid status indicator bar on top */}
-                    <div className={`absolute top-0 left-0 right-0 h-[2px] ${
-                      isPaid ? 'bg-emerald-500' :
-                      isPending ? 'bg-amber-500' :
-                      'bg-zinc-600'
-                    }`} />
+                    {/* Subtle neutral top divider */}
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-border" />
 
                     {/* Top Row: PO/OTS badge, order number, and status */}
                     <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-border">
                       <div className="flex items-center gap-2 flex-wrap">
                         {isOts ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/15 text-purple-400 border border-purple-500/30">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-background text-text-secondary border border-border">
                             <FaQrcode size={10} /> OTS Venue
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-teal-500/15 text-teal-300 border border-teal-500/30">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-background text-text-secondary border border-border">
                             <FaTicketAlt size={10} /> Pre-Order (PO)
                           </span>
                         )}
                         {isOts && (order.created_by === 'admin' || !order.created_by) ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-background text-text-secondary border border-border">
                             Admin Input
                           </span>
                         ) : null}
                         {isOts && order.created_by === 'customer' ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-background text-text-secondary border border-border">
                             Order Sendiri
                           </span>
                         ) : null}
@@ -468,10 +683,10 @@ const KSProfilePage = () => {
                         </button>
                       </div>
 
-                      {/* Status Pill */}
+                      {/* Status Pill - Semantic colors only: Green (Paid/Selesai), Yellow (Pending), Red (Dibatalkan) */}
                       <div>
                         {isCompleted ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-primary/15 text-primary border border-primary/30">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                             <FaCheck size={11} /> Selesai
                           </span>
                         ) : isPaid ? (
@@ -967,6 +1182,60 @@ const KSProfilePage = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Konfirmasi Barang Sampai (Merch) */}
+      {confirmingMerchOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85">
+          <div className="w-full max-w-md bg-surface border border-border rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                <FaCheckCircle size={20} />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-text-primary uppercase tracking-tight">
+                  Konfirmasi Barang Sampai
+                </h3>
+                <p className="text-xs text-text-secondary font-mono">
+                  #{confirmingMerchOrder.order_number}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-text-secondary leading-relaxed">
+              Pastikan pesanan merchandise kamu sudah diterima dalam kondisi baik. Setelah dikonfirmasi, status pesanan akan diubah menjadi <strong className="text-emerald-400">Selesai</strong> dan tidak dapat diubah kembali.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                disabled={confirmingMerchLoading}
+                onClick={() => setConfirmingMerchOrder(null)}
+                className="px-4 py-2 rounded-xl bg-background border border-border text-xs font-bold text-text-secondary hover:text-text-primary transition-all disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                disabled={confirmingMerchLoading}
+                onClick={handleConfirmMerchReceived}
+                className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-black text-xs font-black flex items-center gap-1.5 transition-all disabled:opacity-50"
+              >
+                {confirmingMerchLoading ? (
+                  <>
+                    <FaSpinner className="animate-spin" size={12} />
+                    <span>Memproses...</span>
+                  </>
+                ) : (
+                  <>
+                    <FaCheck size={12} />
+                    <span>Ya, Sudah Diterima</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

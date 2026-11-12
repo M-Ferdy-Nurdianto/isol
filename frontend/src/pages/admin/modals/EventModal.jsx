@@ -23,19 +23,19 @@ const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
         lineup: existingLineup,
         is_special: editingEvent.is_special || false,
         theme_name: editingEvent.theme_name || '',
-        theme_color: editingEvent.theme_color || '#FF6B9D'
+        theme_color: editingEvent.theme_color || '#A855F7'
       }
     }
     return {
       nama: '', tanggal: '', bulan: '', tahun: new Date().getFullYear(),
       lokasi: '', event_time: '', cheki_time: '', is_past: false,
-      is_special: false, theme_name: '', theme_color: '#FF6B9D', lineup: []
+      is_special: false, theme_name: '', theme_color: '#A855F7', lineup: []
     }
   })
   const [submitting, setSubmitting] = useState(false)
 
   const presetColors = [
-    '#FF6B9D', '#EF4444', '#F97316', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6'
+    '#A855F7', '#9333EA', '#7E22CE', '#C084FC', '#6B21A8'
   ]
 
   const currentYear = new Date().getFullYear()
@@ -121,7 +121,7 @@ const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
           <button
             type="button"
             onClick={() => setEventType('special')}
-            className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 ${eventType === 'special' ? 'border-pink-500 text-pink-400 bg-pink-500/10' : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+            className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 ${eventType === 'special' ? 'border-purple-500 text-purple-400 bg-purple-500/10' : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
           >
             Event Spesial
           </button>
@@ -207,13 +207,13 @@ const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
           )}
 
           {eventType === 'special' && (
-            <div className="bg-pink-500/10 border border-pink-500/20 rounded-xl p-3.5 space-y-2.5">
+            <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-3.5 space-y-2.5">
               <input
                 type="text"
                 placeholder="Nama Tema (e.g. Valentine Edition)"
                 value={formData.theme_name}
                 onChange={(e) => setFormData({...formData, theme_name: e.target.value})}
-                className="w-full px-3.5 py-2 bg-[var(--background)] border border-pink-500/30 text-[var(--text-primary)] rounded-xl text-xs focus:outline-none focus:border-pink-500"
+                className="w-full px-3.5 py-2 bg-[var(--background)] border border-purple-500/30 text-[var(--text-primary)] rounded-xl text-xs focus:outline-none focus:border-purple-500"
                 required
               />
               <div className="flex items-center gap-1.5 pt-1">
@@ -228,7 +228,7 @@ const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
                   />
                 ))}
               </div>
-              <p className="text-[11px] text-pink-400 font-medium">Event spesial hanya tersedia untuk Pre-Order</p>
+              <p className="text-[11px] text-purple-400 font-medium">Event spesial hanya tersedia untuk Pre-Order</p>
             </div>
           )}
 
@@ -259,7 +259,7 @@ const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
             <button
               type="submit"
               disabled={submitting}
-              className={`flex-1 text-[var(--text-primary)] px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-50 transition-all shadow-[0_0_15px_rgba(232, 148, 74,0.3)] ${eventType === 'special' ? 'bg-pink-500 hover:bg-pink-600' : 'bg-[var(--primary)] hover:bg-[var(--primary)]/85'}`}
+              className={`flex-1 text-[var(--text-primary)] px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-50 transition-all shadow-[0_0_15px_rgba(232, 148, 74,0.3)] ${eventType === 'special' ? 'bg-purple-500 hover:bg-purple-600' : 'bg-[var(--primary)] hover:bg-[var(--primary)]/85'}`}
             >
               {submitting ? 'Menyimpan...' : 'Simpan Event'}
             </button>

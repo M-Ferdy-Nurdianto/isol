@@ -1,20 +1,35 @@
 import { motion } from 'framer-motion'
-import { FaInstagram, FaTiktok, FaYoutube, FaTwitter, FaSpotify, FaWhatsapp } from 'react-icons/fa'
-import * as Icons from 'react-icons/fa'
+import { FaInstagram, FaTiktok, FaYoutube, FaSpotify, FaWhatsapp } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
 
-const PLATFORM_DATA = {
-  Instagram: { icon: 'FaInstagram', color: '#E1306C', desc: 'Foto & update harian' },
-  TikTok: { icon: 'FaTiktok', color: '#010101', desc: 'Video & behind the scenes' },
-  YouTube: { icon: 'FaYoutube', color: '#FF0000', desc: 'MV & konten eksklusif' },
-  Twitter: { icon: 'FaTwitter', color: '#1DA1F2', desc: 'Update cepat & interaksi' },
-  WhatsApp: { icon: 'FaWhatsapp', color: '#25D366', desc: 'Hubungi kami' },
-  Spotify: { icon: 'FaSpotify', color: '#1DB954', desc: 'Dengarkan lagu kami' }
+const getSocialMeta = (platformRaw = '') => {
+  const p = platformRaw.trim().toLowerCase()
+  if (p.includes('insta')) {
+    return { name: 'Instagram', Icon: FaInstagram, desc: 'Foto & update harian' }
+  }
+  if (p.includes('tik')) {
+    return { name: 'TikTok', Icon: FaTiktok, desc: 'Video & behind the scenes' }
+  }
+  if (p.includes('you') || p.includes('yt')) {
+    return { name: 'YouTube', Icon: FaYoutube, desc: 'MV & konten eksklusif' }
+  }
+  if (p === 'x' || p.includes('twit')) {
+    return { name: 'X', Icon: FaXTwitter, desc: 'Update cepat & interaksi' }
+  }
+  if (p.includes('spot')) {
+    return { name: 'Spotify', Icon: FaSpotify, desc: 'Dengarkan lagu kami' }
+  }
+  if (p.includes('what') || p.includes('wa')) {
+    return { name: 'WhatsApp', Icon: FaWhatsapp, desc: 'Hubungi kami' }
+  }
+  return { name: platformRaw, Icon: FaInstagram, desc: 'Media sosial resmi' }
 }
 
 const defaultSocials = [
   { platform: 'Instagram', url: 'https://instagram.com/kohisekai' },
   { platform: 'TikTok', url: 'https://tiktok.com/@kohisekai' },
   { platform: 'YouTube', url: 'https://youtube.com/@KohiSekai' },
+  { platform: 'X', url: 'https://x.com/kohisekai' },
 ]
 
 const KSSocialSection = ({ config = {} }) => {
@@ -32,22 +47,25 @@ const KSSocialSection = ({ config = {} }) => {
   }
 
   const socials = rawSocials.map(s => {
-    const data = PLATFORM_DATA[s.platform] || PLATFORM_DATA.Instagram
+    const meta = getSocialMeta(s.platform)
     const href = (s.url && s.url.trim() !== '') ? s.url : 'https://www.instagram.com/kohisekai/'
-    // extract handle from url: e.g. https://instagram.com/johndoe -> @johndoe
-    let handle = '@'
+    let handle = '@kohisekai'
     try {
-      const parts = new URL(href).pathname.split('/')
-      handle = '@' + (parts[parts.length - 1] || parts[parts.length - 2] || 'kohisekai')
-    } catch(e) { handle = '@kohisekai' }
+      const parts = new URL(href).pathname.split('/').filter(Boolean)
+      if (parts.length > 0) {
+        const last = parts[parts.length - 1]
+        handle = last.startsWith('@') ? last : `@${last}`
+      }
+    } catch(e) {
+      handle = '@kohisekai'
+    }
     
     return {
-      name: s.platform,
-      href: href,
+      name: meta.name,
+      href,
       handle,
-      icon: data.icon,
-      color: data.color,
-      desc: data.desc
+      Icon: meta.Icon,
+      desc: meta.desc
     }
   })
 
@@ -69,14 +87,14 @@ const KSSocialSection = ({ config = {} }) => {
         </motion.div>
 
         {/* =========================================================================
-            MOBILE LAYOUT (md:hidden) — SEBARIS 3 (grid-cols-3)
+            MOBILE LAYOUT (md:hidden) — 2x2 GRID (grid-cols-2)
             ========================================================================= */}
-        <div className="md:hidden grid grid-cols-3 gap-2">
+        <div className="md:hidden grid grid-cols-2 gap-3">
           {socials.map((s, i) => {
-            const Icon = Icons[s.icon] || Icons.FaLink
+            const Icon = s.Icon
             return (
               <motion.a
-                key={`mobile-${s.name}`}
+                key={`mobile-${s.name}-${i}`}
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -84,33 +102,27 @@ const KSSocialSection = ({ config = {} }) => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: i * 0.05 }}
-                className="group relative flex flex-col items-start p-2.5 rounded-2xl bg-surface border border-border overflow-hidden active:scale-95 transition-transform"
+                className="group relative flex flex-col items-start p-3.5 rounded-2xl bg-surface border border-border overflow-hidden active:scale-95 transition-all hover:border-primary/40"
               >
                 {/* BG icon watermark */}
-                <div
-                  className="absolute -bottom-2 -right-2 text-[42px] opacity-[0.05] pointer-events-none"
-                  style={{ color: s.color || 'var(--primary)' }}
-                >
+                <div className="absolute -bottom-2 -right-2 text-[44px] text-primary opacity-[0.04] pointer-events-none group-hover:opacity-[0.08] transition-opacity">
                   <Icon />
                 </div>
 
-                <div className="relative z-10 flex flex-col gap-1.5 w-full flex-1">
+                <div className="relative z-10 flex flex-col gap-2 w-full flex-1">
                   {/* Icon */}
-                  <div
-                    className="w-8 h-8 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-sm"
-                    style={{ backgroundColor: s.color || 'var(--primary)' }}
-                  >
-                    <Icon size={16} />
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-primary/15 text-primary border border-primary/25 shadow-sm group-hover:bg-primary group-hover:text-white transition-colors duration-200">
+                    <Icon size={18} />
                   </div>
 
                   {/* Text */}
                   <div className="min-w-0 w-full">
                     <h3 className="text-xs font-black text-text-primary leading-tight truncate">{s.name}</h3>
-                    <p className="text-[9px] font-bold text-primary truncate leading-tight mt-0.5">{s.handle || s.username}</p>
+                    <p className="text-[10px] font-bold text-primary truncate leading-tight mt-0.5">{s.handle}</p>
                   </div>
 
-                  <p className="text-[8px] text-text-secondary leading-tight line-clamp-2 mt-0.5">
-                    {s.desc || s.description}
+                  <p className="text-[9px] text-text-secondary leading-tight line-clamp-2">
+                    {s.desc}
                   </p>
                 </div>
               </motion.a>
@@ -119,14 +131,14 @@ const KSSocialSection = ({ config = {} }) => {
         </div>
 
         {/* =========================================================================
-            DESKTOP LAYOUT (hidden md:grid md:grid-cols-3)
+            DESKTOP LAYOUT (hidden md:grid) — SEBARIS 1x4 (grid-cols-4)
             ========================================================================= */}
-        <div className="hidden md:grid md:grid-cols-3 gap-6">
+        <div className="hidden md:grid md:grid-cols-4 gap-5">
           {socials.map((s, i) => {
-            const Icon = Icons[s.icon] || Icons.FaLink
+            const Icon = s.Icon
             return (
               <motion.a
-                key={`desktop-${s.name}`}
+                key={`desktop-${s.name}-${i}`}
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -134,30 +146,27 @@ const KSSocialSection = ({ config = {} }) => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.4, delay: i * 0.07 }}
-                whileHover={{ y: -6, scale: 1.02 }}
-                className="group relative flex flex-col items-start p-6 rounded-3xl bg-surface border border-border hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 overflow-hidden"
+                whileHover={{ y: -4, scale: 1.01 }}
+                className="group relative flex flex-col items-start p-6 rounded-3xl bg-surface border border-border hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 overflow-hidden"
               >
                 {/* BG icon watermark */}
-                <div className="absolute -bottom-4 -right-4 text-[80px] opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-300" style={{ color: s.color || 'var(--primary)' }}>
+                <div className="absolute -bottom-4 -right-4 text-[76px] text-primary opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-300 pointer-events-none">
                   <Icon />
                 </div>
 
-                <div className="relative z-10 flex flex-col gap-3 flex-1">
+                <div className="relative z-10 flex flex-col gap-3 flex-1 w-full">
                   {/* Icon */}
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-md"
-                    style={{ backgroundColor: s.color || 'var(--primary)' }}
-                  >
-                    <Icon size={20} />
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-primary/15 text-primary border border-primary/25 shadow-sm group-hover:bg-primary group-hover:text-white transition-colors duration-200">
+                    <Icon size={22} />
                   </div>
 
                   {/* Text */}
                   <div>
-                    <h3 className="text-sm font-black text-text-primary mt-0.5">{s.name}</h3>
-                    <p className="text-[10px] font-bold text-primary mt-0.5">{s.handle || s.username}</p>
+                    <h3 className="text-sm font-black text-text-primary">{s.name}</h3>
+                    <p className="text-xs font-bold text-primary mt-0.5">{s.handle}</p>
                   </div>
 
-                  <p className="text-xs text-text-secondary leading-relaxed">{s.desc || s.description}</p>
+                  <p className="text-xs text-text-secondary leading-relaxed">{s.desc}</p>
                 </div>
               </motion.a>
             )

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react'
+import React, { useState } from 'react'
 import { FaPlus, FaEdit, FaTrash, FaArrowLeft, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaUsers } from 'react-icons/fa'
 import api from '../../../lib/api'
 import { formatMemberName } from '../../../lib/memberUtils'
@@ -8,12 +8,12 @@ import CustomSelect from '../components/CustomSelect'
 const monthList = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
 const monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
 const monthOptions = monthShort.map((m, i) => ({ value: monthList[i], label: m }))
-const presetColors = ['#FF6B9D', '#EF4444', '#F97316', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6']
+const presetColors = ['#A855F7', '#9333EA', '#7E22CE', '#C084FC', '#6B21A8']
 
 const emptyForm = {
   nama: '', tanggal: '', bulan: '', tahun: new Date().getFullYear(),
   lokasi: '', event_time: '', cheki_time: '', is_past: false,
-  is_special: false, theme_name: '', theme_color: '#FF6B9D', lineup: []
+  is_special: false, theme_name: '', theme_color: '#A855F7', lineup: []
 }
 
 const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) => {
@@ -73,7 +73,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
       lineup: existingLineup,
       is_special: event.is_special || false,
       theme_name: event.theme_name || '',
-      theme_color: event.theme_color || '#FF6B9D'
+      theme_color: event.theme_color || '#A855F7'
     })
     setView('form')
   }
@@ -174,7 +174,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
           <button
             type="button"
             onClick={() => setEventType('special')}
-            className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all ${eventType === 'special' ? 'bg-pink-500 text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
+            className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all ${eventType === 'special' ? 'bg-purple-500 text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
           >
             Event Spesial
           </button>
@@ -262,15 +262,15 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
             )}
 
             {eventType === 'special' && (
-              <div className="bg-pink-500/10 border border-pink-500/20 rounded-xl p-4 space-y-3">
+              <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4 space-y-3">
                 <div>
-                  <label className="block text-xs text-pink-300 mb-1.5">Nama tema</label>
+                  <label className="block text-xs text-purple-300 mb-1.5">Nama tema</label>
                   <input
                     type="text"
                     placeholder="Valentine Edition"
                     value={formData.theme_name}
                     onChange={(e) => setFormData({ ...formData, theme_name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-pink-500/30 text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-pink-500"
+                    className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-purple-500/30 text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-purple-500"
                     required
                   />
                 </div>
@@ -286,7 +286,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                     />
                   ))}
                 </div>
-                <p className="text-[11px] text-pink-400">Event spesial hanya tersedia untuk Pre-Order.</p>
+                <p className="text-[11px] text-purple-400">Event spesial hanya tersedia untuk Pre-Order.</p>
               </div>
             )}
           </div>
@@ -332,7 +332,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
             <button
               type="submit"
               disabled={submitting}
-              className={`flex-1 text-[var(--text-primary)] px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-50 transition-all shadow-[0_2px_10px_rgba(232,148,74,0.25)] ${eventType === 'special' ? 'bg-pink-500 hover:bg-pink-600' : 'bg-[var(--primary)] hover:bg-[var(--primary)]/85'}`}
+              className={`flex-1 text-[var(--text-primary)] px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-50 transition-all shadow-[0_2px_10px_rgba(232,148,74,0.25)] ${eventType === 'special' ? 'bg-purple-500 hover:bg-purple-600' : 'bg-[var(--primary)] hover:bg-[var(--primary)]/85'}`}
             >
               {submitting ? 'Menyimpan...' : 'Simpan Event'}
             </button>
@@ -395,7 +395,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                       {event.is_special && (
                         <span
                           className="px-2 py-0.5 rounded-full text-[var(--text-primary)] text-[10px] font-bold"
-                          style={{ backgroundColor: event.theme_color || '#FF6B9D' }}
+                          style={{ backgroundColor: event.theme_color || '#A855F7' }}
                         >
                           {event.theme_name || 'Special'}
                         </span>
@@ -513,7 +513,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                           {event.is_special && (
                             <span
                               className="px-2.5 py-0.5 rounded-full text-[var(--text-primary)] text-[10px] font-bold shadow-sm"
-                              style={{ backgroundColor: event.theme_color || '#FF6B9D' }}
+                              style={{ backgroundColor: event.theme_color || '#A855F7' }}
                             >
                               {event.theme_name || 'Special'}
                             </span>
@@ -525,7 +525,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                         {event.tanggal} {event.bulan} {event.tahun}
                       </td>
                       <td className="px-4 py-3.5 text-xs text-[var(--text-secondary)]">{event.lokasi}</td>
-                      <td className="px-4 py-3.5 text-xs text-[#00e5e5] font-bold">{visibleLineupCount} member</td>
+                      <td className="px-4 py-3.5 text-xs text-[var(--primary)] font-bold">{visibleLineupCount} member</td>
                       <td className="px-4 py-3.5 text-center">
                         {pastByDate ? (
                           <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-[var(--border)] text-[var(--text-secondary)] border border-[var(--border)]">

@@ -57,11 +57,11 @@ const KSUserOTSPage = () => {
           hargaOtsGrup: Number(getCfg('harga_ots_grup', '80000')) || 80000,
           hargaChekiGrupOts: Number(getCfg('harga_cheki_grup_ots', '150000')) || 150000,
           regularChekiEnabled: getCfg('regular_cheki_enabled', 'true') !== 'false',
-          wideChekiEnabled:    getCfg('wide_cheki_enabled', 'false') === 'true',
-          chekiGrupEnabled:    getCfg('cheki_grup_enabled', 'false') === 'true',
-          paymentEnableCash:   getCfg('payment_enable_cash', 'true') !== 'false',
-          paymentEnableQris:   getCfg('payment_enable_qris', 'true') !== 'false',
-          paymentEnableTf:     getCfg('payment_enable_tf', 'false') === 'true',
+          wideChekiEnabled: getCfg('wide_cheki_enabled', 'false') === 'true',
+          chekiGrupEnabled: getCfg('cheki_grup_enabled', 'false') === 'true',
+          paymentEnableCash: getCfg('payment_enable_cash', 'true') !== 'false',
+          paymentEnableQris: getCfg('payment_enable_qris', 'true') !== 'false',
+          paymentEnableTf: getCfg('payment_enable_tf', 'false') === 'true',
         })
       } catch (err) {
         console.error('[KSUserOTS] Gagal muat data:', err)
@@ -108,7 +108,7 @@ const KSUserOTSPage = () => {
               Pemesanan Langsung di Venue (OTS)
             </h1>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-2xl">
-              Pesan tiket 2-Shot Cheki & Official Merchandise langsung di lokasi panggung. 
+              Pesan tiket 2-Shot Cheki & Official Merchandise langsung di lokasi panggung.
               Pesananmu otomatis tercatat di akun Fan ID dan siap divalidasi oleh kru di merchandise booth.
             </p>
           </div>
@@ -117,7 +117,7 @@ const KSUserOTSPage = () => {
         {/* 3 Panduan Cepat Card */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-4 flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-300 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/15 text-[var(--primary)] flex items-center justify-center shrink-0">
               <FaTicketAlt />
             </div>
             <div>
@@ -139,7 +139,7 @@ const KSUserOTSPage = () => {
             </div>
           </div>
           <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-4 flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/15 text-[var(--primary)] flex items-center justify-center shrink-0">
               <FaInfoCircle />
             </div>
             <div>

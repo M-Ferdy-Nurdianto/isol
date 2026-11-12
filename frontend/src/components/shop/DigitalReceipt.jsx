@@ -41,7 +41,7 @@ const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false }
   if (!data) return null
 
   // Special theme color logic
-  const accentColor = data.isSpecial ? (data.themeColor || '#FF6B9D') : '#E8944A'
+  const accentColor = data.isSpecial ? (data.themeColor || '#A855F7') : '#E8944A'
   const isMerch = data.orderNumber?.startsWith('MERCH')
 
   // Styles for the typewriter/receipt look

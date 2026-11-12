@@ -294,7 +294,7 @@ const CheckoutProcess = ({
                 href="https://whatsapp.com/channel/0029VbDVjJzDJ6GwgUQ9cP32"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white py-3.5 px-6 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 shadow-lg shadow-emerald-600/20 hover:scale-[1.02] active:scale-[0.98] transition-all group border border-emerald-400/30"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 px-6 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.98] transition-all group border border-emerald-400/30"
               >
                 <FaWhatsapp className="text-xl text-emerald-200 group-hover:scale-110 transition-transform" />
                 <span>Gabung Channel WhatsApp</span>
@@ -310,18 +310,18 @@ const CheckoutProcess = ({
                 href="https://instagram.com/kohisekai"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-500 hover:to-orange-400 text-white py-3.5 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="w-full bg-[var(--surface)] hover:bg-[var(--border)] border border-[var(--primary)]/40 text-[var(--primary)] py-3.5 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 shadow-lg active:scale-[0.98] transition-all"
               >
                 <FaInstagram className="text-lg" /> Post Nota ke IG Story
               </a>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
-                Tag <span className="text-emerald-600">@kohisekai</span> dan Oshimu bagikan momen seru kamu!
+                Tag <span className="text-[var(--primary)]">@kohisekai</span> dan Oshimu bagikan momen seru kamu!
               </p>
             </div>
           </div>
         </div>
 
-        <button type="button" onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-emerald-600 font-black uppercase tracking-widest text-[10px] hover:tracking-[0.2em] transition-all flex items-center gap-2 mx-auto group pt-1 pb-2">
+        <button type="button" onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-[var(--primary)] font-black uppercase tracking-widest text-[10px] hover:tracking-[0.2em] transition-all flex items-center gap-2 mx-auto group pt-1 pb-2">
           Lanjut ke Shop <FaChevronRight className="text-[8px] group-hover:translate-x-1 transition-transform" />
         </button>
       </motion.div>

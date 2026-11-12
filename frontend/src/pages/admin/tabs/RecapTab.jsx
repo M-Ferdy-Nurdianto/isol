@@ -198,8 +198,8 @@ const RecapTab = ({ orders, events, recapEventFilter, setRecapEventFilter }) => 
             <div className="text-xs font-semibold text-[var(--text-secondary)] mb-1">Total Cheki Tercetak</div>
             <div className="text-3xl font-black text-[var(--text-primary)] tracking-tight">{totalPolaroidRecap} <span className="text-base font-semibold text-[var(--text-secondary)]">pcs</span></div>
           </div>
-          <div className="hidden sm:flex w-12 h-12 rounded-xl bg-pink-500/10 items-center justify-center shrink-0">
-            <svg className="w-6 h-6 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="hidden sm:flex w-12 h-12 rounded-xl bg-[var(--primary)]/10 items-center justify-center shrink-0">
+            <svg className="w-6 h-6 text-[var(--primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
               <circle cx="12" cy="13" r="3.5" strokeWidth={1.8} />
             </svg>

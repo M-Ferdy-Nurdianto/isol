@@ -1,6 +1,6 @@
 # Kohi Sekai - Idol Merchandise & Cheki Ecommerce Platform
 
-Kohi Sekai is a fullstack web platform engineered for idol fan communities, featuring a high-conversion Cheki and merchandise shop, digital collectible receipts, and a comprehensive Admin Command Center. Built with a signature **Kawaii Metal** design aesthetic (glassmorphism, vibrant accents, and clean contrast).
+Kohi Sekai is a fullstack web platform engineered for idol fan communities, featuring a high-conversion Cheki and merchandise shop, digital collectible receipts, and a comprehensive Admin Command Center. Built with a signature **Deep Coffee Metal** aesthetic (solid dark coffee tones, warm amber highlights, monochromatic discipline, anti-blur, and sharp contrast).
 
 ---
 

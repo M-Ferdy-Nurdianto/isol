@@ -152,7 +152,7 @@ const KSLeaderboard = ({ members = [] }) => {
                 const idVal = m.id || m.member_id
                 const isSelected = memberId === idVal
                 const mKey = (m.member_id || m.nama_panggung || '').toLowerCase()
-                const dotColor = m.color || (mKey.includes('latte') ? '#EC4899' : mKey.includes('macchiato') ? '#14B8A6' : mKey.includes('affogato') ? '#F59E0B' : '#EC4899')
+                const dotColor = m.color || '#E8944A'
 
                 return (
                   <button
@@ -270,15 +270,15 @@ const KSLeaderboard = ({ members = [] }) => {
                 {/* Micro Perks / Incentives */}
                 <div className="mt-8 pt-6 border-t border-[var(--border)] w-full max-w-lg flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-[11px] font-bold text-[var(--text-secondary)]">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />
                     <span>Peringkat Realtime</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />
                     <span>Digital Receipt Eksklusif</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />
                     <span>Apresiasi Resmi Member</span>
                   </div>
                 </div>

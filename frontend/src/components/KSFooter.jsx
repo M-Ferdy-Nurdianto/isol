@@ -61,7 +61,7 @@ const KSFooter = ({ config: propConfig }) => {
   ]
 
   return (
-    <footer className="bg-surface border-t border-border pt-8 sm:pt-14 pb-24 sm:pb-8 px-4">
+    <footer className="bg-[#2E2520] dark:bg-[#2E2520] border-t border-border pt-8 sm:pt-14 pb-24 sm:pb-8 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-12">
           {/* Brand */}
@@ -94,7 +94,7 @@ const KSFooter = ({ config: propConfig }) => {
           {/* Social */}
           <div className="space-y-4">
             <h4 className="text-xs font-black tracking-[0.3em] text-text-secondary uppercase">Ikuti Kami</h4>
-            <div className="grid grid-cols-3 gap-x-8 gap-y-6 w-max">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4 w-max">
               {displaySocials.map(({ platform, url }) => {
                 const Icon = getPlatformIcon(platform)
                 let label = platform

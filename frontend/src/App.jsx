@@ -10,6 +10,7 @@ const KSHomePage = lazy(() => import('./pages/KSHomePage'))
 const KSAboutPage = lazy(() => import('./pages/KSAboutPage'))
 const KSShopPage = lazy(() => import('./pages/KSShopPage'))
 const KSCheckoutPage = lazy(() => import('./pages/KSCheckoutPage'))
+const KSMerchCheckoutPage = lazy(() => import('./pages/KSMerchCheckoutPage'))
 const KSMusicPage = lazy(() => import('./pages/KSMusicPage'))
 const KSLoginPage = lazy(() => import('./pages/KSLoginPage'))
 const KSProfilePage = lazy(() => import('./pages/KSProfilePage'))
@@ -22,6 +23,8 @@ const AdminLogin = lazy(() => import('./pages/AdminLogin'))
 
 import { ThemeProvider } from './context/ThemeContext'
 import { FlyToCartProvider } from './context/FlyToCartContext'
+import { MerchCartProvider } from './context/MerchCartContext'
+import MerchCartDrawer from './components/cart/MerchCartDrawer'
 import { FanAuthProvider } from './context/FanAuthContext'
 import { MaintenanceProvider, useMaintenance } from './context/MaintenanceContext'
 import MaintenanceScreen from './components/MaintenanceScreen'
@@ -59,42 +62,47 @@ function App() {
       <MaintenanceProvider>
         <FanAuthProvider>
           <FlyToCartProvider>
-            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <MaintenanceAdminBadge />
-              <RBToastContainer />
-              <ToastContainer
-                position="bottom-center"
-                autoClose={1500}
-                hideProgressBar={true}
-                newestOnTop={true}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="dark"
-                transition={Zoom}
-                toastStyle={{ backgroundColor: 'transparent', boxShadow: 'none', padding: 0 }}
-              />
-              <Suspense fallback={<LoadingSpinner />}>
-                <Routes>
-                  {/* Kohi Sekai Public Routes */}
-                  <Route path="/" element={<MaintenanceGuard><KSHomePage /></MaintenanceGuard>} />
-                  <Route path="/about" element={<MaintenanceGuard><KSAboutPage /></MaintenanceGuard>} />
-                  <Route path="/shop" element={<MaintenanceGuard><KSShopPage /></MaintenanceGuard>} />
-                  <Route path="/checkout/:eventId" element={<MaintenanceGuard><KSCheckoutPage /></MaintenanceGuard>} />
-                  <Route path="/music" element={<MaintenanceGuard><KSMusicPage /></MaintenanceGuard>} />
-                  <Route path="/login" element={<KSLoginPage />} />
-                  <Route path="/profile" element={<MaintenanceGuard><KSProfilePage /></MaintenanceGuard>} />
-                  <Route path="/ots" element={<MaintenanceGuard><KSUserOTSPage /></MaintenanceGuard>} />
-                  <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <MerchCartProvider>
+              <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <MaintenanceAdminBadge />
+                <MerchCartDrawer />
+                <RBToastContainer />
+                <ToastContainer
+                  position="bottom-center"
+                  autoClose={1500}
+                  hideProgressBar={true}
+                  newestOnTop={true}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="dark"
+                  transition={Zoom}
+                  toastStyle={{ backgroundColor: 'transparent', boxShadow: 'none', padding: 0 }}
+                />
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Routes>
+                    {/* Kohi Sekai Public Routes */}
+                    <Route path="/" element={<MaintenanceGuard><KSHomePage /></MaintenanceGuard>} />
+                    <Route path="/about" element={<MaintenanceGuard><KSAboutPage /></MaintenanceGuard>} />
+                    <Route path="/shop" element={<MaintenanceGuard><KSShopPage /></MaintenanceGuard>} />
+                    <Route path="/checkout/merch" element={<MaintenanceGuard><KSMerchCheckoutPage /></MaintenanceGuard>} />
+                    <Route path="/merch-checkout" element={<MaintenanceGuard><KSMerchCheckoutPage /></MaintenanceGuard>} />
+                    <Route path="/checkout/:eventId" element={<MaintenanceGuard><KSCheckoutPage /></MaintenanceGuard>} />
+                    <Route path="/music" element={<MaintenanceGuard><KSMusicPage /></MaintenanceGuard>} />
+                    <Route path="/login" element={<KSLoginPage />} />
+                    <Route path="/profile" element={<MaintenanceGuard><KSProfilePage /></MaintenanceGuard>} />
+                    <Route path="/ots" element={<MaintenanceGuard><KSUserOTSPage /></MaintenanceGuard>} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-                  {/* Admin Portal Routes */}
-                  <Route path="/admin/login" element={<AdminLogin />} />
-                  <Route path="/admin" element={<AdminPage />} />
-                </Routes>
-              </Suspense>
-            </Router>
+                    {/* Admin Portal Routes */}
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route path="/admin" element={<AdminPage />} />
+                  </Routes>
+                </Suspense>
+              </Router>
+            </MerchCartProvider>
           </FlyToCartProvider>
         </FanAuthProvider>
       </MaintenanceProvider>

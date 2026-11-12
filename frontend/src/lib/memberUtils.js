@@ -3,48 +3,39 @@
 export const memberData = {
     'yanyee': {
         color: '#F97316',
-        name: 'YanYee',
-        gradient: 'from-orange-400 to-amber-500',
+        name: 'YanYee'
     },
     'sinta': {
         color: '#10B981',
-        name: 'Sinta',
-        gradient: 'from-green-400 to-emerald-500',
+        name: 'Sinta'
     },
     'cissi': {
         color: '#FBBF24',
-        name: 'Cissi',
-        gradient: 'from-amber-400 to-yellow-500',
+        name: 'Cissi'
     },
     'channie': {
         color: '#6D28D9',
-        name: 'Channie',
-        gradient: 'from-purple-600 to-indigo-600',
+        name: 'Channie'
     },
     'acaa': {
         color: '#3B82F6',
-        name: 'Acaa',
-        gradient: 'from-blue-500 to-blue-600',
+        name: 'Acaa'
     },
     'cally': {
         color: '#2DD4BF',
-        name: 'Cally',
-        gradient: 'from-teal-400 to-cyan-500',
+        name: 'Cally'
     },
     'piya': {
         color: '#F472B6',
-        name: 'Piya',
-        gradient: 'from-pink-400 to-rose-500',
+        name: 'Piya'
     },
     'rara': {
         color: '#9e1527',
-        name: 'Rara',
-        gradient: 'from-red-600 to-rose-800',
+        name: 'Rara'
     },
     'group': {
         color: '#E8944A',
-        name: 'Group',
-        gradient: 'from-amber-500 to-orange-600',
+        name: 'Group'
     }
 }
 

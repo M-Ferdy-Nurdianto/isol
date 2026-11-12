@@ -11,7 +11,7 @@
 :root {
   --primary: #F0A868;
   --secondary: #F5E6D3;
-  --accent: #FF6B9D;
+  --accent: #A855F7; /* Purple for Special Event / Stage / Cheki */
   --background: #FFF9F2;
   --surface: #FAF2E8;
   --text-primary: #2B2420;
@@ -25,7 +25,7 @@
 .dark, .admin-layout {
   --primary: #E8944A;
   --secondary: #3A2E24;
-  --accent: #FF85AC;
+  --accent: #A855F7; /* Purple for Special Event / Stage / Cheki */
   --background: #1A1512;
   --surface: #241E19;
   --text-primary: #F5E6D3;

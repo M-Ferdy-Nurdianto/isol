@@ -38,7 +38,11 @@ import {
   FaSync,
   FaMusic,
   FaUserFriends,
-  FaHome
+  FaHome,
+  FaBell,
+  FaChevronDown,
+  FaChevronUp,
+  FaTicketAlt
 } from 'react-icons/fa'
 
 const AdminPage = () => {
@@ -103,7 +107,7 @@ const AdminPage = () => {
   const [merchOrders, setMerchOrders] = useState([])
   const [showMerchForm, setShowMerchForm] = useState(false)
   const [editingMerch, setEditingMerch] = useState(null)
-  const [merchForm, setMerchForm] = useState({ nama: '', deskripsi: '', harga: '', stok: '', available: true, sizes: [], size_chart_urls: [] })
+  const [merchForm, setMerchForm] = useState({ nama: '', deskripsi: '', harga: '', stok: '', available: true, sizes: [], size_chart_urls: [], kategori: 'baju' })
   const [merchImageFile, setMerchImageFile] = useState(null)
   const [merchImagePreview, setMerchImagePreview] = useState('')
   const [merchSizeChartFiles, setMerchSizeChartFiles] = useState([null])
@@ -116,6 +120,9 @@ const AdminPage = () => {
   const [merchOrderStatusFilter, setMerchOrderStatusFilter] = useState('all')
   const [merchOrderSearch, setMerchOrderSearch] = useState('')
   const [loadingMerchOrders, setLoadingMerchOrders] = useState(false)
+  const [pendingChekiOrders, setPendingChekiOrders] = useState([])
+  const [pendingMerchOrders, setPendingMerchOrders] = useState([])
+  const [notifBoxOpen, setNotifBoxOpen] = useState(false)
 
   useEffect(() => {
     checkAuth()
@@ -125,21 +132,42 @@ const AdminPage = () => {
     document.body.classList.add('dark-theme')
 
     let subscription = null
+    let merchSubscription = null
     if (supabase) {
       subscription = supabase
         .channel('public:orders')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
           fetchOrders()
+          fetchPendingNotifications()
           if (payload.eventType === 'INSERT' && payload.new.created_by === 'customer') {
-            showToast.info(payload.new.nama_lengkap, 'Order Baru!')
+            showToast.info(payload.new.nama_lengkap, 'Order Cheki Baru!')
+          }
+        })
+        .subscribe()
+
+      merchSubscription = supabase
+        .channel('public:merch_orders')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'merch_orders' }, (payload) => {
+          fetchMerchOrders()
+          fetchPendingNotifications()
+          if (payload.eventType === 'INSERT') {
+            showToast.info(payload.new.nama_lengkap || payload.new.order_number, 'Order Merch Baru!')
           }
         })
         .subscribe()
     }
 
+    const notifInterval = setInterval(() => {
+      fetchPendingNotifications()
+    }, 30000)
+
     return () => {
+      clearInterval(notifInterval)
       if (supabase && subscription) {
         supabase.removeChannel(subscription)
+      }
+      if (supabase && merchSubscription) {
+        supabase.removeChannel(merchSubscription)
       }
       const savedTheme = localStorage.getItem('ks-theme')
       if (savedTheme === 'light') {
@@ -188,6 +216,23 @@ const AdminPage = () => {
     fetchConfig()
     fetchMerch()
     fetchMerchOrders()
+    fetchPendingNotifications()
+  }
+
+  const fetchPendingNotifications = async () => {
+    try {
+      const [chekiRes, merchRes] = await Promise.all([
+        api.get('/orders', { params: { status: 'pending' } }).catch(() => ({ data: { data: [] } })),
+        api.get('/merch-orders', { params: { status: 'pending' } }).catch(() => ({ data: { data: [] } }))
+      ])
+      const rawCheki = chekiRes.data?.data || []
+      const pureUserCheki = rawCheki.filter(o => o.created_by !== 'admin')
+      const pureUserMerch = merchRes.data?.data || []
+      setPendingChekiOrders(pureUserCheki)
+      setPendingMerchOrders(pureUserMerch)
+    } catch (error) {
+      console.error('Error fetching pending notifications:', error)
+    }
   }
 
   const buildOrderParams = () => {
@@ -347,6 +392,7 @@ const AdminPage = () => {
       await api.patch(`/orders/${orderId}/status`, { status })
       showToast.success('Status updated!')
       fetchOrders()
+      fetchPendingNotifications()
     } catch (error) {
       Swal.fire({ icon: 'error', title: 'Gagal Update Status', text: error.response?.data?.error || error.message })
     }
@@ -370,6 +416,7 @@ const AdminPage = () => {
       await api.delete(`/orders/${orderId}`)
       Swal.fire('Deleted!', 'Order telah dihapus.', 'success')
       fetchOrders()
+      fetchPendingNotifications()
     } catch (error) {
       Swal.fire('Error!', error.message, 'error')
     }
@@ -554,7 +601,8 @@ const AdminPage = () => {
         stok: item.stok ?? '',
         available: item.available,
         sizes: item.sizes || [],
-        size_chart_urls: item.size_chart_urls || []
+        size_chart_urls: item.size_chart_urls || [],
+        kategori: item.kategori || 'baju'
       })
       setMerchHargaRaw(String(item.harga))
       setMerchImagePreview(item.gambar_url || '')
@@ -564,7 +612,7 @@ const AdminPage = () => {
       ])
     } else {
       setEditingMerch(null)
-      setMerchForm({ nama: '', deskripsi: '', harga: '', stok: '', available: true, sizes: [], size_chart_urls: [] })
+      setMerchForm({ nama: '', deskripsi: '', harga: '', stok: '', available: true, sizes: [], size_chart_urls: [], kategori: 'baju' })
       setMerchHargaRaw('')
       setMerchImagePreview('')
       setAvailableSizes('')
@@ -669,8 +717,9 @@ const AdminPage = () => {
         stok: merchForm.stok !== '' ? parseInt(merchForm.stok, 10) : 0,
         gambar_url: gambar_url || null,
         available: merchForm.available,
-        sizes: availableSizes.split(',').map(s => s.trim()).filter(s => s !== ''),
-        size_chart_urls: size_chart_urls.filter(url => url !== null)
+        kategori: merchForm.kategori || 'baju',
+        sizes: merchForm.kategori === 'aksesoris' ? [] : availableSizes.split(',').map(s => s.trim()).filter(s => s !== ''),
+        size_chart_urls: merchForm.kategori === 'aksesoris' ? [] : size_chart_urls.filter(url => url !== null)
       }
 
       if (editingMerch) {
@@ -724,12 +773,29 @@ const AdminPage = () => {
     }
   }
 
-  const handleMerchOrderStatusChange = async (orderId, newStatus) => {
+  const handleMerchOrderStatusChange = async (orderId, newStatus, trackingData = {}) => {
     try {
-      await api.patch(`/merch-orders/${orderId}/status`, { status: newStatus })
+      const existingOrder = merchOrders.find(m => m.id === orderId)
+      if (newStatus === 'completed' && existingOrder && existingOrder.status !== 'completed') {
+        const confirmResult = await Swal.fire({
+          title: 'Konfirmasi Selesai oleh Admin?',
+          text: 'User belum mengonfirmasi penerimaan barang. Pastikan pesanan benar-benar sudah diterima sebelum menandai Selesai.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#10b981',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'Ya, Tandai Selesai',
+          cancelButtonText: 'Batal'
+        })
+        if (!confirmResult.isConfirmed) return
+      }
+
+      await api.patch(`/merch-orders/${orderId}/status`, { status: newStatus, ...trackingData })
+      showToast.success('Status order merch diperbarui!')
       fetchMerchOrders()
+      fetchPendingNotifications()
     } catch (error) {
-      Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Gagal update status' })
+      Swal.fire({ icon: 'error', title: 'Gagal!', text: error.response?.data?.error || 'Gagal update status' })
     }
   }
 
@@ -749,6 +815,7 @@ const AdminPage = () => {
       await api.delete(`/merch-orders/${id}`)
       Swal.fire({ icon: 'success', title: 'Berhasil!', timer: 1500, showConfirmButton: false })
       fetchMerchOrders()
+      fetchPendingNotifications()
     } catch (error) {
       Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Gagal menghapus' })
     }
@@ -821,6 +888,193 @@ const AdminPage = () => {
 
       {/* MAIN CONTENT */}
       <main className="flex-1 p-4 md:p-10 md:h-screen md:overflow-y-auto pb-24 md:pb-10 space-y-6">
+        {/* TOP-RIGHT ADMIN NOTIFICATION BOX (Unconfirmed User Orders) */}
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+          <div className="md:hidden flex items-center justify-between">
+            <div>
+              <h1 className="text-base font-black text-[var(--text-primary)] tracking-tight uppercase">
+                KOHI<span className="text-[var(--primary)]">SEKAI</span>
+              </h1>
+              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">Admin Panel</p>
+            </div>
+          </div>
+
+          <div className="hidden md:block" />
+
+          {/* Notification Box */}
+          <div className="relative w-full md:w-auto md:min-w-[340px] md:max-w-md z-30">
+            <div className={`rounded-2xl border p-3.5 shadow-xl transition-colors ${
+              (pendingChekiOrders.length + pendingMerchOrders.length) > 0
+                ? 'bg-[var(--surface)] border-amber-500/50'
+                : 'bg-[var(--surface)] border-[var(--border)]'
+            }`}>
+              <div className="flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => setNotifBoxOpen(prev => !prev)}
+                  className="flex items-center gap-2.5 text-left flex-1 min-w-0"
+                >
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
+                    (pendingChekiOrders.length + pendingMerchOrders.length) > 0
+                      ? 'bg-amber-500/15 text-amber-400 border-amber-500/40'
+                      : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]'
+                  }`}>
+                    <FaBell className={(pendingChekiOrders.length + pendingMerchOrders.length) > 0 ? 'animate-pulse' : ''} size={14} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-[var(--text-primary)] truncate">
+                        Notifikasi Order Baru
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                        (pendingChekiOrders.length + pendingMerchOrders.length) > 0
+                          ? 'bg-amber-500 text-black'
+                          : 'bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]'
+                      }`}>
+                        {pendingChekiOrders.length + pendingMerchOrders.length}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[var(--text-secondary)] truncate">
+                      {(pendingChekiOrders.length + pendingMerchOrders.length) > 0
+                        ? 'Order user belum dikonfirmasi admin'
+                        : 'Semua order user sudah diproses'}
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setNotifBoxOpen(prev => !prev)}
+                  className="p-2 rounded-lg bg-[var(--background)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  title={notifBoxOpen ? 'Tutup detail' : 'Lihat detail'}
+                >
+                  {notifBoxOpen ? <FaChevronUp size={11} /> : <FaChevronDown size={11} />}
+                </button>
+              </div>
+
+              {/* Quick Summary Pills */}
+              <div className="flex items-center gap-2 mt-2.5 pt-2.5 border-t border-[var(--border)]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('orders')
+                    setOrderSubTab('po')
+                    setStatusFilter('pending')
+                    setNotifBoxOpen(false)
+                  }}
+                  className={`flex-1 flex items-center justify-between px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition-colors ${
+                    pendingChekiOrders.length > 0
+                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
+                      : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <FaTicketAlt size={10} /> Cheki
+                  </span>
+                  <span className="font-mono font-black">{pendingChekiOrders.length}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('orders')
+                    setOrderSubTab('merch')
+                    setMerchOrderStatusFilter('pending')
+                    fetchMerchOrders()
+                    setNotifBoxOpen(false)
+                  }}
+                  className={`flex-1 flex items-center justify-between px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition-colors ${
+                    pendingMerchOrders.length > 0
+                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
+                      : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <FaBox size={10} /> Merch
+                  </span>
+                  <span className="font-mono font-black">{pendingMerchOrders.length}</span>
+                </button>
+              </div>
+
+              {/* Expanded List of Unconfirmed User Orders */}
+              {notifBoxOpen && (
+                <div className="mt-2.5 pt-2.5 border-t border-[var(--border)] max-h-64 overflow-y-auto custom-scrollbar space-y-2">
+                  {(pendingChekiOrders.length + pendingMerchOrders.length) === 0 ? (
+                    <p className="text-center py-4 text-xs text-[var(--text-secondary)]">
+                      Tidak ada order pending dari user.
+                    </p>
+                  ) : (
+                    <>
+                      {pendingChekiOrders.slice(0, 5).map(ord => (
+                        <button
+                          key={`cheki-${ord.id}`}
+                          type="button"
+                          onClick={() => {
+                            setActiveTab('orders')
+                            setOrderSubTab(ord.is_ots ? 'ots' : 'po')
+                            setStatusFilter('pending')
+                            setNotifBoxOpen(false)
+                          }}
+                          className="w-full text-left p-2.5 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-amber-500/50 transition-colors flex items-center justify-between gap-2"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                                Cheki
+                              </span>
+                              <span className="text-xs font-bold text-[var(--text-primary)] truncate">
+                                {ord.nama_lengkap || ord.order_number}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5">
+                              #{ord.order_number} · {ord.payment_proof_url ? 'Ada Bukti Bayar' : 'Belum Upload Bukti'}
+                            </p>
+                          </div>
+                          <span className="text-xs font-black text-amber-400 shrink-0">
+                            Rp {Number(ord.total_harga || 0).toLocaleString('id-ID')}
+                          </span>
+                        </button>
+                      ))}
+
+                      {pendingMerchOrders.slice(0, 5).map(ord => (
+                        <button
+                          key={`merch-${ord.id}`}
+                          type="button"
+                          onClick={() => {
+                            setActiveTab('orders')
+                            setOrderSubTab('merch')
+                            setMerchOrderStatusFilter('pending')
+                            fetchMerchOrders()
+                            setNotifBoxOpen(false)
+                          }}
+                          className="w-full text-left p-2.5 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-amber-500/50 transition-colors flex items-center justify-between gap-2"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                                Merch
+                              </span>
+                              <span className="text-xs font-bold text-[var(--text-primary)] truncate">
+                                {ord.nama_lengkap || ord.whatsapp}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5">
+                              #{ord.order_number} · {ord.delivery_method === 'shipping' ? 'Dikirim' : 'Ambil di Event'}
+                            </p>
+                          </div>
+                          <span className="text-xs font-black text-amber-400 shrink-0">
+                            Rp {Number(ord.total_harga || 0).toLocaleString('id-ID')}
+                          </span>
+                        </button>
+                      ))}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* GUEST SANDBOX NOTICE BANNER */}
         {isGuest && (
           <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[0_0_20px_rgba(245,158,11,0.15)] animate-fade-in">

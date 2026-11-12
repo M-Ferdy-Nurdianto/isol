@@ -6,7 +6,7 @@ import CustomSelect from './CustomSelect'
 const StatusBadge = ({ status }) => {
   const map = {
     pending:   { label: 'Unchecked', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
-    checked:   { label: 'Checked',   cls: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' },
+    checked:   { label: 'Checked',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
     completed: { label: 'Completed', cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
   }
   const s = map[status] || { label: status, cls: 'bg-[var(--border)] text-[var(--text-secondary)] border-[var(--border)]' }
@@ -20,7 +20,7 @@ const StatusBadge = ({ status }) => {
 // ─── Mobile Card ───────────────────────────────────────────────────────────────
 const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
   const isSpecial = order.events?.type === 'special' || !!order.events?.theme_color
-  const themeColor = isSpecial ? order.events?.theme_color : null
+  const themeColor = isSpecial ? (order.events?.theme_color || '#A855F7') : null
 
   const borderStyle = themeColor
     ? { borderLeftColor: themeColor, borderLeftWidth: '3px' }
@@ -38,15 +38,11 @@ const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
   // Determine source for OTS orders
   const otsSourceBadge = order.is_ots
     ? (order.created_by === 'customer'
-        ? { label: 'OTS - User', cls: 'bg-sky-500/10 text-sky-300 border-sky-500/20' }
-        : { label: 'OTS - Admin', cls: 'bg-amber-500/10 text-amber-300 border-amber-500/20' })
+        ? { label: 'OTS - User', cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' }
+        : { label: 'OTS - Admin', cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' })
     : null
   const paymentBadge = order.is_ots
-    ? (paymentMethod === 'QR'
-        ? { label: 'QRIS', cls: 'bg-purple-500/10 text-purple-300 border-purple-500/20' }
-        : paymentMethod === 'Transfer'
-        ? { label: 'Transfer', cls: 'bg-slate-500/10 text-slate-300 border-slate-500/20' }
-        : { label: 'Cash', cls: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' })
+    ? { label: paymentMethod === 'QR' ? 'QRIS' : paymentMethod, cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' }
     : null
 
   return (
@@ -72,7 +68,7 @@ const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
             {order.nama_lengkap}
           </div>
           {contactLine && (
-            <div className="text-[11px] text-cyan-400 mt-0.5">{contactLine}</div>
+            <div className="text-[11px] text-[var(--text-secondary)] mt-0.5">{contactLine}</div>
           )}
         </div>
 
@@ -87,7 +83,7 @@ const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
               href={order.payment_proof_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[10px] text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded-lg font-bold transition hover:bg-cyan-500/20"
+              className="inline-flex items-center gap-1 text-[10px] text-[var(--primary)] bg-[var(--background)] border border-[var(--border)] px-2 py-0.5 rounded-lg font-bold transition hover:bg-[var(--surface)]"
             >
               <FaImage className="text-[9px]" /> Bukti
             </a>
@@ -234,23 +230,17 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView,
             ) : (
               data.map((order) => {
                 const isSpecial = order.events?.type === 'special' || !!order.events?.theme_color
-                const themeColor = isSpecial ? order.events?.theme_color : null
+                const themeColor = isSpecial ? (order.events?.theme_color || '#A855F7') : null
 
                 // Source & payment badge logic
                 const paymentMethod = order.payment_proof_url?.startsWith('data:') || order.payment_proof_url?.startsWith('http')
                   ? 'Cash'
                   : (order.payment_proof_url || 'Cash')
                 const otsSrcBadge = order.is_ots
-                  ? (order.created_by === 'customer'
-                      ? { label: 'OTS - User', cls: 'bg-sky-500/10 text-sky-300 border-sky-500/20' }
-                      : { label: 'OTS - Admin', cls: 'bg-amber-500/10 text-amber-300 border-amber-500/20' })
+                  ? { label: order.created_by === 'customer' ? 'OTS - User' : 'OTS - Admin', cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' }
                   : null
                 const otsPayBadge = order.is_ots
-                  ? (paymentMethod === 'QR'
-                      ? { label: 'QRIS', cls: 'bg-purple-500/10 text-purple-300 border-purple-500/20' }
-                      : paymentMethod === 'Transfer'
-                      ? { label: 'Transfer', cls: 'bg-slate-500/10 text-slate-300 border-slate-500/20' }
-                      : { label: 'Cash', cls: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' })
+                  ? { label: paymentMethod === 'QR' ? 'QRIS' : paymentMethod, cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' }
                   : null
 
                 return (
@@ -274,7 +264,7 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView,
                     </td>
                     <td className="px-4 py-3.5">
                       <div className="font-bold text-[var(--text-primary)]">{order.nama_lengkap}</div>
-                      <div className="text-xs text-cyan-400 font-medium mt-0.5">
+                      <div className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">
                         {order.whatsapp && order.whatsapp !== '-' ? `WA: ${order.whatsapp}` : order.instagram && order.instagram !== '-' ? `IG: ${order.instagram}` : ''}
                       </div>
                       {otsSrcBadge && (
@@ -306,7 +296,7 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView,
                           href={order.payment_proof_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:underline bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20 font-medium transition-colors"
+                          className="inline-flex items-center gap-1.5 text-xs text-[var(--primary)] hover:underline bg-[var(--background)] px-2.5 py-1 rounded-lg border border-[var(--border)] font-medium transition-colors"
                         >
                           <FaImage /> Lihat Bukti
                         </a>

@@ -143,7 +143,7 @@ const OTSSpecialInlineForm = ({
         icon: 'warning',
         title: 'Pilih Event Spesial',
         text: 'Silakan pilih event spesial yang aktif terlebih dahulu.',
-        confirmButtonColor: '#ec4899'
+        confirmButtonColor: '#a855f7'
       })
       return
     }
@@ -152,7 +152,7 @@ const OTSSpecialInlineForm = ({
         icon: 'warning',
         title: 'Nama Pembeli Diperlukan',
         text: 'Pilih akun fan atau ketik nama pembeli terlebih dahulu.',
-        confirmButtonColor: '#ec4899'
+        confirmButtonColor: '#a855f7'
       })
       return
     }
@@ -161,7 +161,7 @@ const OTSSpecialInlineForm = ({
         icon: 'warning',
         title: 'Belum Ada Item',
         text: 'Pilih minimal satu tiket cheki dari lineup member.',
-        confirmButtonColor: '#ec4899'
+        confirmButtonColor: '#a855f7'
       })
       return
     }
@@ -193,7 +193,7 @@ const OTSSpecialInlineForm = ({
         icon: 'error',
         title: 'Gagal',
         text: error.response?.data?.error || error.message,
-        confirmButtonColor: '#ec4899'
+        confirmButtonColor: '#a855f7'
       })
     } finally {
       setSubmitting(false)
@@ -218,7 +218,7 @@ const OTSSpecialInlineForm = ({
         <div key={idx} className="flex justify-between items-center bg-[var(--surface)] border border-[var(--border)] px-2.5 py-1.5 rounded-lg text-xs">
           <div className="truncate max-w-[140px]">
             <div className="text-[var(--text-primary)] font-semibold truncate">{item.name}</div>
-            <div className="text-[10px] text-pink-400">Rp {item.price.toLocaleString('id-ID')}</div>
+            <div className="text-[10px] text-purple-400">Rp {item.price.toLocaleString('id-ID')}</div>
           </div>
           <div className="flex items-center gap-1.5">
             <button type="button" onClick={() => updateQuantity(idx, -1)} className="w-6 h-6 flex items-center justify-center bg-[var(--border)] hover:bg-[var(--primary)]/15 text-[var(--text-secondary)] rounded">
@@ -239,29 +239,29 @@ const OTSSpecialInlineForm = ({
 
   // Lineup Grid
   const MemberGrid = () => (
-    <div className="bg-[var(--background)] border border-pink-500/20 p-4 rounded-xl flex flex-col gap-3">
+    <div className="bg-[var(--background)] border border-purple-500/20 p-4 rounded-xl flex flex-col gap-3">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h4 className="font-bold text-xs text-pink-200 flex items-center gap-2">
-          <FaUsers className="text-pink-400" /> Lineup Member Spesial ({activeLineupMembers.length})
+        <h4 className="font-bold text-xs text-purple-200 flex items-center gap-2">
+          <FaUsers className="text-purple-400" /> Lineup Member Spesial ({activeLineupMembers.length})
         </h4>
         <div className="flex items-center gap-2">
           {selectedEvent?.theme_name && (
             <span
               className="px-2 py-0.5 rounded-md text-[10px] font-bold text-[var(--text-primary)] shadow-sm"
-              style={{ backgroundColor: selectedEvent.theme_color || '#ec4899' }}
+              style={{ backgroundColor: selectedEvent.theme_color || '#a855f7' }}
             >
               {selectedEvent.theme_name}
             </span>
           )}
-          <span className="text-[11px] text-pink-300 font-mono font-bold bg-pink-500/10 px-2 py-0.5 rounded-lg border border-pink-500/20">
+          <span className="text-[11px] text-purple-300 font-mono font-bold bg-purple-500/10 px-2 py-0.5 rounded-lg border border-purple-500/20">
             Rp {specialOtsPrice.toLocaleString('id-ID')} / Tiket
           </span>
         </div>
       </div>
 
       {activeLineupMembers.length === 0 ? (
-        <div className="p-6 rounded-xl bg-pink-500/5 border border-pink-500/10 text-center text-[var(--text-secondary)] text-xs space-y-1">
-          <p className="font-semibold text-pink-300">Belum ada lineup member untuk event ini.</p>
+        <div className="p-6 rounded-xl bg-purple-500/5 border border-purple-500/10 text-center text-[var(--text-secondary)] text-xs space-y-1">
+          <p className="font-semibold text-purple-300">Belum ada lineup member untuk event ini.</p>
           <p className="text-[11px]">Silakan buka tab Events dan tambahkan member ke dalam lineup event spesial ini.</p>
         </div>
       ) : (
@@ -278,26 +278,26 @@ const OTSSpecialInlineForm = ({
                 onClick={() => addItem(member)}
                 className={`relative p-3 rounded-xl border transition-all text-left flex flex-col justify-between min-h-[84px] group ${
                   selectedCount > 0
-                    ? 'bg-pink-500/15 border-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.3)] ring-1 ring-pink-400/50'
-                    : 'bg-[var(--background)] border-[var(--border)] hover:border-pink-500/60 hover:bg-pink-500/5'
+                    ? 'bg-purple-500/15 border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)] ring-1 ring-purple-400/50'
+                    : 'bg-[var(--background)] border-[var(--border)] hover:border-purple-500/60 hover:bg-purple-500/5'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-xs font-bold text-[var(--text-primary)] truncate group-hover:text-pink-100">
+                    <span className="text-xs font-bold text-[var(--text-primary)] truncate group-hover:text-purple-100">
                       {formatMemberName(member.nama_panggung)}
                     </span>
                     {selectedCount > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-md bg-pink-500 text-[var(--text-primary)] text-[10px] font-black shrink-0 shadow-[0_0_8px_rgba(236,72,153,0.6)]">
+                      <span className="px-1.5 py-0.5 rounded-md bg-purple-500 text-[var(--text-primary)] text-[10px] font-black shrink-0 shadow-[0_0_8px_rgba(168,85,247,0.6)]">
                         {selectedCount}x
                       </span>
                     )}
                   </div>
                   <span className="text-[10px] text-[var(--text-secondary)] block mt-0.5">Tiket Cheki Spesial</span>
                 </div>
-                <div className="text-[11px] font-bold text-pink-400 mt-2 flex items-center justify-between">
+                <div className="text-[11px] font-bold text-purple-400 mt-2 flex items-center justify-between">
                   <span>Rp {price.toLocaleString('id-ID')}</span>
-                  <span className="text-[9px] text-[var(--text-secondary)] group-hover:text-pink-300 font-normal">+ Tambah</span>
+                  <span className="text-[9px] text-[var(--text-secondary)] group-hover:text-purple-300 font-normal">+ Tambah</span>
                 </div>
               </button>
             )
@@ -310,10 +310,10 @@ const OTSSpecialInlineForm = ({
   // Jika tidak ada event spesial yang fitur OTS-nya diaktifkan
   if (validSpecialEvents.length === 0) {
     return (
-      <div className="bg-[var(--surface)] border border-pink-500/30 rounded-2xl p-6 shadow-xl animate-fade-in relative space-y-4">
+      <div className="bg-[var(--surface)] border border-purple-500/30 rounded-2xl p-6 shadow-xl animate-fade-in relative space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse shadow-[0_0_8px_#ec4899] shrink-0"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_#a855f7] shrink-0"></span>
             <h3 className="text-lg font-black text-[var(--text-primary)]">Order OTS Event Spesial</h3>
           </div>
           <button
@@ -326,10 +326,10 @@ const OTSSpecialInlineForm = ({
           </button>
         </div>
 
-        <div className="bg-pink-500/10 border border-pink-500/20 p-5 rounded-xl text-center space-y-2">
-          <p className="text-sm font-bold text-pink-300">Belum Ada Event Spesial dengan OTS Aktif</p>
+        <div className="bg-purple-500/10 border border-purple-500/20 p-5 rounded-xl text-center space-y-2">
+          <p className="text-sm font-bold text-purple-300">Belum Ada Event Spesial dengan OTS Aktif</p>
           <p className="text-xs text-[var(--text-secondary)] max-w-md mx-auto">
-            Order OTS spesial harus diaktifkan secara manual. Buka menu <strong className="text-[var(--text-primary)]">Events</strong> &gt; Edit Event Spesial &gt; Centang checkbox <strong className="text-pink-300">"Aktifkan Order OTS Spesial"</strong> di bagian bawah form.
+            Order OTS spesial harus diaktifkan secara manual. Buka menu <strong className="text-[var(--text-primary)]">Events</strong> &gt; Edit Event Spesial &gt; Centang checkbox <strong className="text-purple-300">"Aktifkan Order OTS Spesial"</strong> di bagian bawah form.
           </p>
         </div>
       </div>
@@ -337,16 +337,16 @@ const OTSSpecialInlineForm = ({
   }
 
   return (
-    <div className="bg-[var(--surface)] border border-pink-500/30 rounded-2xl p-5 md:p-6 shadow-[0_12px_36px_rgba(0,0,0,0.6)] animate-fade-in relative pb-24 md:pb-6">
+    <div className="bg-[var(--surface)] border border-purple-500/30 rounded-2xl p-5 md:p-6 shadow-[0_12px_36px_rgba(0,0,0,0.6)] animate-fade-in relative pb-24 md:pb-6">
       {/* Header */}
       <div className="pb-4 mb-5 border-b border-[var(--border)]">
         {/* Mobile Header */}
         <div className="md:hidden flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse shadow-[0_0_8px_#ec4899] shrink-0"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_#a855f7] shrink-0"></span>
             <h3 className="text-base font-black text-[var(--text-primary)] truncate">Order OTS Spesial</h3>
             {totalQty > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30 text-xs font-bold font-mono shrink-0">
+              <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 text-xs font-bold font-mono shrink-0">
                 {totalQty} items
               </span>
             )}
@@ -365,9 +365,9 @@ const OTSSpecialInlineForm = ({
         <div className="hidden md:flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse shadow-[0_0_8px_#ec4899] shrink-0"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_#a855f7] shrink-0"></span>
               <h3 className="text-lg font-black text-[var(--text-primary)]">
-                Form Order OTS Spesial <span className="text-pink-400 font-mono text-sm">(Lineup Khusus)</span>
+                Form Order OTS Spesial <span className="text-purple-400 font-mono text-sm">(Lineup Khusus)</span>
               </h3>
             </div>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">
@@ -391,7 +391,7 @@ const OTSSpecialInlineForm = ({
         <div className="lg:hidden space-y-4">
           <div>
             <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
-              Event Spesial <span className="text-pink-400">*</span>
+              Event Spesial <span className="text-purple-400">*</span>
             </label>
             <CustomSelect
               options={eventOptions}
@@ -404,7 +404,7 @@ const OTSSpecialInlineForm = ({
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-bold text-[var(--text-secondary)]">
-                Akun / Nama Pembeli <span className="text-pink-400">*</span>
+                Akun / Nama Pembeli <span className="text-purple-400">*</span>
               </label>
               <span className="text-[10px] text-[var(--text-secondary)]">Cari ID/Nama</span>
             </div>
@@ -429,7 +429,7 @@ const OTSSpecialInlineForm = ({
                 onClick={() => setFormData({ ...formData, payment_method: 'Cash' })}
                 className={`py-2 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 ${
                   formData.payment_method === 'Cash'
-                    ? 'bg-pink-500 text-[var(--text-primary)] border-pink-400 shadow-[0_0_12px_rgba(236,72,153,0.4)]'
+                    ? 'bg-purple-500 text-[var(--text-primary)] border-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.4)]'
                     : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--border)]'
                 }`}
               >
@@ -440,7 +440,7 @@ const OTSSpecialInlineForm = ({
                 onClick={() => setFormData({ ...formData, payment_method: 'QR Code' })}
                 className={`py-2 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 ${
                   formData.payment_method === 'QR Code'
-                    ? 'bg-pink-500 text-[var(--text-primary)] border-pink-400 shadow-[0_0_12px_rgba(236,72,153,0.4)]'
+                    ? 'bg-purple-500 text-[var(--text-primary)] border-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.4)]'
                     : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--border)]'
                 }`}
               >
@@ -456,7 +456,7 @@ const OTSSpecialInlineForm = ({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
-                  Event Spesial <span className="text-pink-400">*</span>
+                  Event Spesial <span className="text-purple-400">*</span>
                 </label>
                 <CustomSelect
                   options={eventOptions}
@@ -469,7 +469,7 @@ const OTSSpecialInlineForm = ({
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-bold text-[var(--text-secondary)]">
-                    Akun / Nama Pembeli <span className="text-pink-400">*</span>
+                    Akun / Nama Pembeli <span className="text-purple-400">*</span>
                   </label>
                   <span className="text-[10px] text-[var(--text-secondary)]">Cari ID/Nama</span>
                 </div>
@@ -493,7 +493,7 @@ const OTSSpecialInlineForm = ({
             <div className="space-y-3">
               <h4 className="font-bold text-xs text-[var(--text-primary)] uppercase tracking-wider flex items-center justify-between pb-2 border-b border-[var(--border)]">
                 <span>Ringkasan Order</span>
-                <span className="text-pink-400 font-mono">{totalQty} Tiket</span>
+                <span className="text-purple-400 font-mono">{totalQty} Tiket</span>
               </h4>
 
               {formData.items.length === 0 ? (
@@ -512,7 +512,7 @@ const OTSSpecialInlineForm = ({
                     onClick={() => setFormData({ ...formData, payment_method: 'Cash' })}
                     className={`py-2 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 ${
                       formData.payment_method === 'Cash'
-                        ? 'bg-pink-500 text-[var(--text-primary)] border-pink-400 shadow-[0_0_12px_rgba(236,72,153,0.4)]'
+                        ? 'bg-purple-500 text-[var(--text-primary)] border-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.4)]'
                         : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--border)]'
                     }`}
                   >
@@ -523,7 +523,7 @@ const OTSSpecialInlineForm = ({
                     onClick={() => setFormData({ ...formData, payment_method: 'QR Code' })}
                     className={`py-2 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 ${
                       formData.payment_method === 'QR Code'
-                        ? 'bg-pink-500 text-[var(--text-primary)] border-pink-400 shadow-[0_0_12px_rgba(236,72,153,0.4)]'
+                        ? 'bg-purple-500 text-[var(--text-primary)] border-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.4)]'
                         : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--border)]'
                     }`}
                   >
@@ -536,7 +536,7 @@ const OTSSpecialInlineForm = ({
             <div className="pt-4 border-t border-[var(--border)] space-y-3 mt-4">
               <div className="flex justify-between items-baseline">
                 <span className="text-xs text-[var(--text-secondary)]">Total Tagihan</span>
-                <span className="text-lg font-black text-pink-400 font-mono">
+                <span className="text-lg font-black text-purple-400 font-mono">
                   Rp {totalPrice.toLocaleString('id-ID')}
                 </span>
               </div>
@@ -544,7 +544,7 @@ const OTSSpecialInlineForm = ({
               <button
                 type="submit"
                 disabled={submitting || formData.items.length === 0}
-                className="w-full py-3 rounded-xl font-bold text-xs text-[var(--text-primary)] bg-pink-500 hover:bg-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-[0_0_20px_rgba(236,72,153,0.4)] active:scale-95"
+                className="w-full py-3 rounded-xl font-bold text-xs text-[var(--text-primary)] bg-purple-500 hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-[0_0_20px_rgba(168,85,247,0.4)] active:scale-95"
               >
                 {submitting ? 'Memproses Order...' : 'Simpan Order OTS Spesial'}
               </button>
@@ -553,7 +553,7 @@ const OTSSpecialInlineForm = ({
         </div>
 
         {/* Mobile Sticky Floating Cart Bar */}
-        <div className="lg:hidden fixed bottom-16 left-0 right-0 z-40 bg-[var(--surface)] border-t border-pink-500/30 p-3 shadow-2xl">
+        <div className="lg:hidden fixed bottom-16 left-0 right-0 z-40 bg-[var(--surface)] border-t border-purple-500/30 p-3 shadow-2xl">
           {cartExpanded && (
             <div className="mb-3 pb-3 border-b border-[var(--border)]">
               <div className="flex items-center justify-between mb-2">
@@ -576,14 +576,14 @@ const OTSSpecialInlineForm = ({
               onClick={() => setCartExpanded(prev => !prev)}
               className="flex items-center gap-2 text-left"
             >
-              <div className="w-9 h-9 rounded-xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-pink-400 text-xs font-bold">
+              <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 text-xs font-bold">
                 {totalQty}
               </div>
               <div>
                 <div className="text-[10px] text-[var(--text-secondary)] flex items-center gap-1">
                   Total {cartExpanded ? <FaChevronDown className="text-[8px]" /> : <FaChevronUp className="text-[8px]" />}
                 </div>
-                <div className="text-sm font-black text-pink-400 font-mono">
+                <div className="text-sm font-black text-purple-400 font-mono">
                   Rp {totalPrice.toLocaleString('id-ID')}
                 </div>
               </div>
@@ -592,7 +592,7 @@ const OTSSpecialInlineForm = ({
             <button
               type="submit"
               disabled={submitting || formData.items.length === 0}
-              className="px-5 py-2.5 rounded-xl font-bold text-xs text-[var(--text-primary)] bg-pink-500 hover:bg-pink-600 disabled:opacity-50 transition shadow-[0_0_15px_rgba(236,72,153,0.4)] active:scale-95"
+              className="px-5 py-2.5 rounded-xl font-bold text-xs text-[var(--text-primary)] bg-purple-500 hover:bg-purple-600 disabled:opacity-50 transition shadow-[0_0_15px_rgba(168,85,247,0.4)] active:scale-95"
             >
               {submitting ? 'Menyimpan...' : 'Simpan Order OTS'}
             </button>

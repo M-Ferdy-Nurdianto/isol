@@ -1,4 +1,4 @@
-﻿import React from 'react'
+import React from 'react'
 import { FaDownload, FaTimes, FaEye } from 'react-icons/fa'
 import { showToast } from '../../../lib/toast'
 
@@ -214,8 +214,8 @@ const OrderDetailModal = ({ isOpen = false, order, events = [], onClose }) => {
             <div>
               <p className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Tipe Order</p>
               <p className="font-semibold text-xs mt-0.5">
-                <span className={`px-2 py-0.5 rounded-md font-bold ${order.is_ots ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20' : 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/20'}`}>
-                  {order.is_ots ? 'OTS' : 'Pre-Order'}
+                <span className="px-2 py-0.5 rounded-md font-bold bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]">
+                  {order.is_ots ? 'OTS Venue' : 'Pre-Order (PO)'}
                 </span>
               </p>
             </div>

@@ -3,6 +3,7 @@ import { FaSave, FaTrash, FaWrench, FaQrcode, FaUniversity, FaUpload, FaTimes, F
 import { motion, AnimatePresence } from 'framer-motion'
 import api from '../../../lib/api'
 import { showToast } from '../../../lib/toast'
+import ImageUploadDropzone from '../../../components/ui/ImageUploadDropzone'
 
 const fmt = (val) => {
   if (val === undefined || val === null || val === '') return ''
@@ -17,9 +18,8 @@ const Toggle = ({ checked, onChange, disabled }) => (
     type="button"
     disabled={disabled}
     onClick={onChange}
-    className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-300 focus:outline-none disabled:opacity-40 ${
-      checked ? 'bg-[var(--primary)] shadow-[0_0_10px_rgba(232,148,74,0.35)]' : 'bg-[var(--border)]'
-    }`}
+    className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-300 focus:outline-none disabled:opacity-40 ${checked ? 'bg-[var(--primary)] shadow-[0_0_10px_rgba(232,148,74,0.35)]' : 'bg-[var(--border)]'
+      }`}
   >
     <span className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition duration-300 ${checked ? 'translate-x-7' : 'translate-x-0'}`} />
   </button>
@@ -64,35 +64,35 @@ const SettingsTab = ({
   // Simulation (only active types)
   // Wide Cheki sekarang = per member (3x seperti Regular, bukan "semua member")
   // Cheki Grup = foto semua member = 1x (jika enabled)
-  const numPoMember     = num(hargaPerMember)
-  const numPoWide       = num(hargaGrup)
-  const numPoGrupCheki  = num(hargaChekiGrupPo)
-  const numOtsMember    = num(hargaOtsPerMember)
-  const numOtsWide      = num(hargaOtsGrup)
+  const numPoMember = num(hargaPerMember)
+  const numPoWide = num(hargaGrup)
+  const numPoGrupCheki = num(hargaChekiGrupPo)
+  const numOtsMember = num(hargaOtsPerMember)
+  const numOtsWide = num(hargaOtsGrup)
   const numOtsGrupCheki = num(hargaChekiGrupOts)
-  const simPoTotal  = (regularChekiEnabled ? numPoMember * 3 : 0)
-                     + (wideChekiEnabled ? numPoWide * 3 : 0)
-                     + (chekiGrupEnabled ? numPoGrupCheki : 0)
+  const simPoTotal = (regularChekiEnabled ? numPoMember * 3 : 0)
+    + (wideChekiEnabled ? numPoWide * 3 : 0)
+    + (chekiGrupEnabled ? numPoGrupCheki : 0)
   const simOtsTotal = (regularChekiEnabled ? numOtsMember * 3 : 0)
-                     + (wideChekiEnabled ? numOtsWide * 3 : 0)
-                     + (chekiGrupEnabled ? numOtsGrupCheki : 0)
+    + (wideChekiEnabled ? numOtsWide * 3 : 0)
+    + (chekiGrupEnabled ? numOtsGrupCheki : 0)
   const diffRegular = numOtsMember - numPoMember
-  const diffWide    = numOtsWide - numPoWide
-  const diffGrup    = numOtsGrupCheki - numPoGrupCheki
+  const diffWide = numOtsWide - numPoWide
+  const diffGrup = numOtsGrupCheki - numPoGrupCheki
 
   // ── Save handlers ──────────────────────────────────────────────────────────
   const saveHarga = () => {
     updateConfig({
       harga_cheki_per_member: String(num(hargaPerMember)),
-      harga_cheki_grup:         String(num(hargaGrup)),
-      harga_ots_per_member:     String(num(hargaOtsPerMember)),
-      harga_ots_grup:           String(num(hargaOtsGrup)),
-      wide_cheki_enabled:     wideChekiEnabled     ? 'true' : 'false',
-      regular_cheki_enabled:   regularChekiEnabled  ? 'true' : 'false',
-      cheki_custom_options:    JSON.stringify(chekiCustomOptions),
-      cheki_grup_enabled:     chekiGrupEnabled   ? 'true' : 'false',
-      harga_cheki_grup_po:     String(num(hargaChekiGrupPo)),
-      harga_cheki_grup_ots:    String(num(hargaChekiGrupOts)),
+      harga_cheki_grup: String(num(hargaGrup)),
+      harga_ots_per_member: String(num(hargaOtsPerMember)),
+      harga_ots_grup: String(num(hargaOtsGrup)),
+      wide_cheki_enabled: wideChekiEnabled ? 'true' : 'false',
+      regular_cheki_enabled: regularChekiEnabled ? 'true' : 'false',
+      cheki_custom_options: JSON.stringify(chekiCustomOptions),
+      cheki_grup_enabled: chekiGrupEnabled ? 'true' : 'false',
+      harga_cheki_grup_po: String(num(hargaChekiGrupPo)),
+      harga_cheki_grup_ots: String(num(hargaChekiGrupOts)),
     })
   }
 
@@ -102,14 +102,14 @@ const SettingsTab = ({
       return
     }
     updateConfig({
-      payment_enable_tf:           paymentEnableTf  ? 'true' : 'false',
-      payment_enable_qris:         paymentEnableQris ? 'true' : 'false',
-      payment_qris_image_url:      paymentQrisImageUrl || '',
-      payment_qris_merchant_name:  paymentQrisMerchantName || '',
-      payment_bank:                paymentBank || '',
-      payment_rekening:            paymentRekening || '',
-      payment_atas_nama:           paymentAtasNama || '',
-      payment_method:              paymentMethod || 'Manual TF',
+      payment_enable_tf: paymentEnableTf ? 'true' : 'false',
+      payment_enable_qris: paymentEnableQris ? 'true' : 'false',
+      payment_qris_image_url: paymentQrisImageUrl || '',
+      payment_qris_merchant_name: paymentQrisMerchantName || '',
+      payment_bank: paymentBank || '',
+      payment_rekening: paymentRekening || '',
+      payment_atas_nama: paymentAtasNama || '',
+      payment_method: paymentMethod || 'Manual TF',
     })
   }
 
@@ -152,7 +152,7 @@ const SettingsTab = ({
     const label = newOptLabel.trim()
     const price = num(newOptPrice)
     if (!label) { showToast.error('Nama opsi wajib diisi'); return }
-    if (!price)  { showToast.error('Harga wajib diisi'); return }
+    if (!price) { showToast.error('Harga wajib diisi'); return }
     const newOpt = { id: `custom_${Date.now()}`, label, price }
     setChekiCustomOptions(prev => [...prev, newOpt])
     setNewOptLabel(''); setNewOptPrice('')
@@ -172,9 +172,8 @@ const SettingsTab = ({
 
   const SaveBtn = ({ onClick, label = 'Simpan', small }) => (
     <button type="button" onClick={onClick} disabled={configLoading}
-      className={`bg-[var(--primary)] text-white font-bold uppercase tracking-wider rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95 hover:bg-[var(--primary)]/85 ${
-        small ? 'py-2 px-4 text-xs' : 'w-full py-3.5 text-xs justify-center'
-      }`}>
+      className={`bg-[var(--primary)] text-white font-bold uppercase tracking-wider rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 active:scale-95 hover:bg-[var(--primary)]/85 ${small ? 'py-2 px-4 text-xs' : 'w-full py-3.5 text-xs justify-center'
+        }`}>
       <FaSave className="text-sm shrink-0" />
       {configLoading ? 'Menyimpan...' : label}
     </button>
@@ -469,25 +468,34 @@ const SettingsTab = ({
                 <input type="text" value={paymentQrisMerchantName} onChange={e => setPaymentQrisMerchantName(e.target.value)} disabled={!paymentEnableQris} placeholder="Kohi Sekai Official" className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-[var(--text-secondary)] mb-2">Gambar QR Code</label>
-                {(qrisPreview || paymentQrisImageUrl) ? (
-                  <div className="relative w-full aspect-square max-w-[160px] mx-auto mb-3 rounded-xl overflow-hidden border border-[var(--border)] bg-white">
-                    <img src={qrisPreview || paymentQrisImageUrl} alt="QRIS" className="w-full h-full object-contain p-2" />
-                    <button type="button" onClick={() => { setQrisPreview(''); setPaymentQrisImageUrl('') }}
-                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[var(--danger)]/80 text-white flex items-center justify-center text-xs hover:bg-[var(--danger)] transition">
-                      <FaTimes />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="w-full aspect-square max-w-[160px] mx-auto mb-3 rounded-xl border-2 border-dashed border-[var(--border)] flex flex-col items-center justify-center gap-2 text-[var(--text-secondary)]">
-                    <FaQrcode className="text-3xl opacity-40" /><span className="text-xs">Belum ada QR</span>
-                  </div>
-                )}
-                <input type="file" ref={qrisFileRef} accept="image/*" onChange={handleQrisFileChange} className="hidden" />
-                <button type="button" onClick={() => qrisFileRef.current?.click()} disabled={!paymentEnableQris || qrisUploading}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--primary)]/10 hover:bg-[var(--primary)]/20 border border-[var(--primary)]/30 text-[var(--primary)] text-xs font-bold transition disabled:opacity-40">
-                  <FaUpload /> {qrisUploading ? 'Mengupload...' : 'Upload Gambar QR'}
-                </button>
+                <ImageUploadDropzone
+                  label="Gambar QR Code *"
+                  previewUrl={qrisPreview || paymentQrisImageUrl}
+                  onImageChange={async (compressedWebpFile, blobUrl) => {
+                    try {
+                      setQrisUploading(true)
+                      setQrisPreview(blobUrl)
+                      const fd = new FormData()
+                      fd.append('file', compressedWebpFile)
+                      const res = await api.post('/upload/qris-image', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+                      const url = res.data?.data?.url
+                      setPaymentQrisImageUrl(url)
+                      showToast.success('Gambar QRIS berhasil diupload')
+                    } catch (err) {
+                      showToast.error(err.response?.data?.error || 'Gagal upload QRIS')
+                      setQrisPreview(paymentQrisImageUrl || '')
+                    } finally {
+                      setQrisUploading(false)
+                    }
+                  }}
+                  onRemove={() => {
+                    setQrisPreview('')
+                    setPaymentQrisImageUrl('')
+                  }}
+                  disabled={!paymentEnableQris || qrisUploading}
+                  hint="Drag & drop QRIS (Auto WebP). Klik kotak untuk perbesar."
+                  compact={true}
+                />
               </div>
             </div>
           </div>

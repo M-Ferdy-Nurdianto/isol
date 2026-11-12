@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
-import { FaHome, FaUsers, FaTicketAlt, FaMusic, FaUser, FaSun, FaMoon } from 'react-icons/fa'
+import { FaHome, FaUsers, FaTicketAlt, FaMusic, FaUser, FaSun, FaMoon, FaShoppingBag } from 'react-icons/fa'
 import { useTheme } from '../context/ThemeContext'
 import { useFanAuth } from '../context/FanAuthContext'
+import { useMerchCart } from '../context/MerchCartContext'
 import FanAuthModal from './auth/FanAuthModal'
 import FanOrderHistoryModal from './auth/FanOrderHistoryModal'
 
@@ -9,6 +10,7 @@ const KSHeader = () => {
   const location = useLocation()
   const { theme, toggleTheme } = useTheme()
   const { isLoggedIn } = useFanAuth()
+  const { openCart, totalItems } = useMerchCart()
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -85,8 +87,25 @@ const KSHeader = () => {
               })}
             </div>
 
-            {/* Actions: Theme Toggle & Fan Profile */}
+            {/* Actions: Theme Toggle, Cart & Fan Profile */}
             <div className="flex items-center gap-2.5 flex-shrink-0">
+              {/* Cart Button */}
+              <button
+                type="button"
+                data-cart-icon
+                onClick={openCart}
+                className="relative w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border bg-[#F2E8DC] dark:bg-[#1A1512] border-[#E2D4C3] dark:border-[#352A21] text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
+                aria-label="Keranjang Belanja"
+                title="Buka Keranjang"
+              >
+                <FaShoppingBag size={13} />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#E8944A] text-white text-[9px] font-mono font-black flex items-center justify-center shadow-md animate-pulse">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
@@ -155,6 +174,28 @@ const KSHeader = () => {
           </button>
         </nav>
       </div>
+
+      {/* =========================================================================
+          MOBILE FLOATING CART BUTTON (md:hidden)
+          Muncul melayang di atas bottom navbar saat ada item di cart atau di halaman shop
+          ========================================================================= */}
+      {totalItems > 0 && (
+        <div className="md:hidden fixed bottom-20 right-4 z-40">
+          <button
+            type="button"
+            data-cart-icon
+            onClick={openCart}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#E8944A] text-white shadow-2xl shadow-black/80 font-black text-xs uppercase tracking-wider active:scale-95 transition-transform border border-white/20"
+            aria-label="Buka Keranjang"
+          >
+            <FaShoppingBag size={13} />
+            <span>Keranjang</span>
+            <span className="w-5 h-5 rounded-full bg-black/30 text-white text-[10px] font-mono font-black flex items-center justify-center">
+              {totalItems}
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Global Modals for Fan Authentication & Order History */}
       <FanAuthModal />

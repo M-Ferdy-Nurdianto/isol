@@ -105,13 +105,36 @@ router.post('/', async (req, res) => {
       }
     }
 
-    const { nama_lengkap, whatsapp, instagram, catatan, items, payment_proof_url } = req.body
+    const {
+      nama_lengkap,
+      whatsapp,
+      instagram,
+      catatan,
+      items,
+      payment_proof_url,
+      user_id,
+      email,
+      delivery_method,
+      shipping_address,
+      shipping_city,
+      shipping_postal_code
+    } = req.body
 
     if (!whatsapp) {
       return res.status(400).json({ error: 'No. WhatsApp wajib diisi' })
     }
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'Tidak ada item di keranjang' })
+    }
+
+    const normalizedDeliveryMethod = delivery_method === 'shipping' ? 'shipping' : 'pickup_event'
+    if (normalizedDeliveryMethod === 'shipping') {
+      if (!shipping_address || String(shipping_address).trim().length < 5) {
+        return res.status(400).json({ error: 'Alamat lengkap pengiriman wajib diisi minimal 5 karakter' })
+      }
+      if (!shipping_city || String(shipping_city).trim().length < 2) {
+        return res.status(400).json({ error: 'Kota / Kabupaten tujuan pengiriman wajib diisi' })
+      }
     }
 
     const orderNumber = `MERCH${Date.now()}`
@@ -127,6 +150,10 @@ router.post('/', async (req, res) => {
         catatan: catatan || null,
         total_harga,
         payment_proof_url: payment_proof_url || null,
+        delivery_method: normalizedDeliveryMethod,
+        shipping_address: normalizedDeliveryMethod === 'shipping' ? String(shipping_address).trim() : null,
+        shipping_city: normalizedDeliveryMethod === 'shipping' ? String(shipping_city).trim() : null,
+        shipping_postal_code: normalizedDeliveryMethod === 'shipping' && shipping_postal_code ? String(shipping_postal_code).trim() : null,
         status: 'pending'
       })
       .select()
@@ -176,27 +203,127 @@ router.post('/', async (req, res) => {
   }
 })
 
-// PATCH update merch order status (admin only)
-router.patch('/:id/status', authMiddleware, async (req, res) => {
+// PATCH update merch order status & shipping tracking (admin only)
+router.patch('/:id/status', authMiddleware, requireAdmin, async (req, res) => {
   try {
-    const { status } = req.body
+    const { status, shipping_courier, tracking_number } = req.body
 
-    let nextStatus = status === 'checked' ? 'paid' : status
-  const validStatuses = ['pending', 'paid', 'completed', 'cancelled']
+    const nextStatus = status === 'checked' ? 'paid' : status
+    const validStatuses = ['pending', 'paid', 'checked', 'packing', 'shipped', 'completed', 'cancelled']
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Status tidak valid' })
     }
 
+    const updatePayload = {
+      status: nextStatus
+    }
+
+    if (shipping_courier !== undefined) {
+      updatePayload.shipping_courier = shipping_courier ? String(shipping_courier).trim() : null
+    }
+    if (tracking_number !== undefined) {
+      updatePayload.tracking_number = tracking_number ? String(tracking_number).trim() : null
+    }
+    if (nextStatus === 'shipped') {
+      updatePayload.shipped_at = new Date().toISOString()
+    }
+    if (nextStatus === 'completed') {
+      updatePayload.confirmed_by = 'admin'
+      updatePayload.confirmed_at = new Date().toISOString()
+    } else {
+      updatePayload.confirmed_by = null
+      updatePayload.confirmed_at = null
+    }
+
     const { data, error } = await supabase
       .from('merch_orders')
-      .update({ status: nextStatus || status })
+      .update(updatePayload)
       .eq('id', req.params.id)
-      .select()
+      .select(`
+        *,
+        merch_order_items (
+          id,
+          item_name,
+          harga,
+          quantity,
+          merchandise_id,
+          size
+        )
+      `)
       .single()
 
     if (error) throw error
     res.json({ success: true, data })
   } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// PATCH fan confirms merch order received (safe user self-confirmation)
+router.patch('/:id/confirm-received', authMiddleware, async (req, res) => {
+  try {
+    const { data: existingOrder, error: fetchError } = await supabase
+      .from('merch_orders')
+      .select('*')
+      .eq('id', req.params.id)
+      .single()
+
+    if (fetchError || !existingOrder) {
+      return res.status(404).json({ error: 'Pesanan merchandise tidak ditemukan' })
+    }
+
+    const isOwnerById = existingOrder.user_id && req.user?.id && String(existingOrder.user_id) === String(req.user.id)
+    const isOwnerByEmail = existingOrder.email && req.user?.email && existingOrder.email.toLowerCase() === req.user.email.toLowerCase()
+    const isAdminUser = req.user?.role === 'admin'
+
+    if (!isOwnerById && !isOwnerByEmail && !isAdminUser) {
+      return res.status(403).json({ error: 'Anda tidak memiliki akses untuk mengonfirmasi pesanan ini' })
+    }
+
+    if (existingOrder.status === 'completed') {
+      return res.status(400).json({ error: 'Pesanan ini sudah dikonfirmasi selesai sebelumnya' })
+    }
+    if (existingOrder.status === 'pending' || existingOrder.status === 'cancelled') {
+      return res.status(400).json({ error: 'Pesanan belum diproses atau telah dibatalkan' })
+    }
+
+    const allowedForShipping = ['shipped']
+    const allowedForPickup = ['paid', 'packing', 'shipped']
+    const allowedStatuses = existingOrder.delivery_method === 'shipping' ? allowedForShipping : allowedForPickup
+
+    if (!allowedStatuses.includes(existingOrder.status)) {
+      return res.status(400).json({
+        error: existingOrder.delivery_method === 'shipping'
+          ? 'Pesanan hanya dapat dikonfirmasi setelah status Sudah Dikirim'
+          : 'Pesanan belum siap dikonfirmasi selesai'
+      })
+    }
+
+    const { data, error } = await supabase
+      .from('merch_orders')
+      .update({
+        status: 'completed',
+        confirmed_by: isAdminUser && !isOwnerById && !isOwnerByEmail ? 'admin' : 'customer',
+        confirmed_at: new Date().toISOString()
+      })
+      .eq('id', req.params.id)
+      .select(`
+        *,
+        merch_order_items (
+          id,
+          item_name,
+          harga,
+          quantity,
+          merchandise_id,
+          size
+        )
+      `)
+      .single()
+
+    if (error) throw error
+    res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error confirming merch order receipt:', error)
     res.status(500).json({ error: error.message })
   }
 })
@@ -285,7 +412,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
         const size = item.size || 'No Size'
         const qty = item.quantity
         const price = item.harga
-        
+
         // Track per product
         if (!itemSummary[name]) {
           itemSummary[name] = { total: 0, revenue: 0, sizes: {} }
@@ -360,15 +487,15 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
     subHeader.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF555555' } }
     worksheet.mergeCells(`A${subHeader.number}:H${subHeader.number}`)
     subHeader.alignment = { horizontal: 'center' }
-    
+
     // Summary Rows
     Object.keys(itemSummary).forEach(name => {
       const product = itemSummary[name]
-      
+
       // Main Product Row
       const productRow = worksheet.addRow([
-        name, '', '', '', '', '', '', '', 
-        product.total, 
+        name, '', '', '', '', '', '', '',
+        product.total,
         product.revenue
       ])
       worksheet.mergeCells(`A${productRow.number}:H${productRow.number}`)
@@ -381,8 +508,8 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
       // Size Breakdown Rows (The "size M: L: XL:" sub-items)
       Object.entries(product.sizes).sort().forEach(([size, qty]) => {
         const sizeRow = worksheet.addRow([
-          `   • Ukuran ${size}`, '', '', '', '', '', '', '', 
-          qty, 
+          `   • Ukuran ${size}`, '', '', '', '', '', '', '',
+          qty,
           '' // Price not needed for sub-item usually
         ])
         worksheet.mergeCells(`A${sizeRow.number}:H${sizeRow.number}`)

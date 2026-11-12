@@ -32,17 +32,18 @@ const ICON_MAP = {
 }
 
 const ICON_COLOR = {
-  success: '#22c55e',
-  error: '#ef4444',
-  info: '#60a5fa',
+  success: '#6FAE73',
+  error: '#D65656',
+  warning: '#E5A93C',
+  info: 'var(--primary)',
   cart: 'var(--primary)',
-  merch: '#a78bfa',
+  merch: 'var(--primary)',
 }
 
 // ── Single Toast Pill Component (forwardRef wrapped to fix motion ref warning) ──
 const ToastCard = forwardRef(({ t, isDark, onDismiss }, ref) => {
   const IconComp = ICON_MAP[t.type] || FaInfoCircle
-  const iconColor = ICON_COLOR[t.type] || '#60a5fa'
+  const iconColor = ICON_COLOR[t.type] || 'var(--primary)'
 
   return (
     <motion.div

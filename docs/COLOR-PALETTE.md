@@ -1,62 +1,56 @@
-# Kohi Sekai — Color Palette
+# Kohi Sekai — Color Palette & Anti-Rainbow Specification
 
-Design tokens warna resmi untuk seluruh UI Kohi Sekai. Semua styling wajib pakai token ini (CSS variables), JANGAN hardcode hex color langsung di komponen.
+Dokumen ini adalah **Source of Truth** untuk seluruh styling warna antarmuka pengguna (UI) Kohi Sekai. Semua komponen dan styling wajib menggunakan design token resmi di bawah ini (CSS variables), **DILARANG** hardcode hex atau menambahkan warna pelangi tanpa alasan status fungsional.
 
-## Light Mode
+---
+
+## 1. Design Tokens Utama (Deep Coffee Metal)
+
 | Token | Hex | Kegunaan |
 |---|---|---|
-| --primary | #F0A868 | Warna utama brand (button, aksen, highlight) |
-| --secondary | #F5E6D3 | Warna sekunder (background section, card muted) |
-| --accent | #FF6B9D | Aksen tambahan (badge, notifikasi, hover state) |
-| --background | #FFF9F2 | Background utama halaman |
-| --surface | #FDF8F2 | Background card/komponen |
-| --text-primary | #2B2420 | Teks utama |
-| --text-secondary | #6B5D4F | Teks sekunder/caption |
-| --border | #E8D9C5 | Garis pembatas/divider |
-| --success | #7BC47F | Status berhasil |
-| --danger | #E85D5D | Status error/gagal |
+| `--background` | `#1A1512` | Background utama — Espresso tua gelap |
+| `--surface` | `#241E19` | Background card / container — Coklat gelap solid |
+| `--border` | `#3A2E24` | Garis pembatas / divider netral |
+| `--primary` | `#E8944A` | Warna utama brand (tombol aksi aktif, highlight, aksen hangat) |
+| `--text-primary` | `#F5E6D3` | Teks utama — Krem terang |
+| `--text-secondary` | `#B0A599` | Teks sekunder / caption — Coklat muda muted |
 
-## Dark Mode (Admin Panel menggunakan skema ini)
-| Token | Hex | Kegunaan |
-|---|---|---|
-| --primary | #E8944A | Warna utama brand — coklat/amber hangat |
-| --secondary | #3A2E24 | Warna sekunder — espresso gelap |
-| --accent | #FF85AC | Aksen tambahan — pink lembut |
-| --background | #1A1512 | Background utama — espresso tua |
-| --surface | #241E19 | Background card/komponen — coklat gelap |
-| --text-primary | #F5E6D3 | Teks utama — krem terang |
-| --text-secondary | #B0A599 | Teks sekunder/caption — coklat muda |
-| --border | #3A2E24 | Garis pembatas/divider |
-| --success | #6FAE73 | Status berhasil |
-| --danger | #D65656 | Status error/gagal |
+---
 
-## Aturan Wajib
-- Semua warna diakses lewat CSS variable/token di atas, tidak boleh hardcode hex baru di komponen.
-- Tidak menggunakan efek glassmorphism (blur/transparansi kaca) — semua elemen pakai warna solid.
-- Kalau butuh warna baru (belum ada di tabel ini), tambahkan dulu ke file ini sebelum dipakai di kode, lalu update tabel + implementasi CSS variable-nya.
-- **DILARANG** hardcode warna lama seperti `#079108` (hijau lama), `#111726`, `#182032` di komponen baru maupun komponen yang direfactor. Ganti ke `var(--primary)` / token resmi.
+## 2. Warna Semantik Status (Hanya Jika Sangat Penting)
 
-## Aturan Aksen Visual
-- DILARANG menggunakan garis/border gradient warna di sisi manapun (kiri, kanan, atas, bawah) pada card, section, atau komponen apapun di seluruh proyek.
-- Semua border/divider wajib solid 1 warna dari design token (--border, --primary, dll), tidak boleh gradient dua warna dalam satu garis.
-- Penekanan visual pada card penting dilakukan lewat kombinasi background --surface, ukuran, atau spacing — bukan garis aksen warna-warni.
-- Icon dalam satu grup/section yang sejenis (misal 3 info card jadwal event) wajib pakai 1 warna icon yang sama, tidak boleh berbeda-beda warna tanpa makna status yang jelas.
+Penggunaan warna lain di luar palet kopi di atas **DIKURANGI SECARA KETAT** dan **HANYA DIGUNAKAN UNTUK STATUS FUNGSIONAL**:
 
-## Catatan Admin Panel
-Admin panel (`/admin`) menggunakan skema **Dark Mode (Deep Coffee)** secara tetap via class `.admin-layout` di CSS.
-Semua komponen di dalam admin — termasuk tabel user, form OTS, modal detail — wajib menggunakan CSS variable di atas, bukan hardcode hex.
+| Status | Token / Class | Hex | Kegunaan & Contoh |
+|---|---|---|---|
+| **Sukses / Lunas** | `--success` / `emerald-400` | `#6FAE73` | Status Paid, Lunas, Selesai, Terverifikasi, Barang Sampai. |
+| **Pending / Proses** | `--warning` / `amber-300` | `#E5A93C` | Status Pending, Menunggu Verifikasi, Menunggu Pembayaran. |
+| **Danger / Hapus** | `--danger` / `red-400` | `#D65656` | Tombol Hapus, Status Dibatalkan, Status Gagal, Tanda Wajib (`*`). |
+| **Special Only** | `--accent` / `purple-400` / `purple-500` | `#A855F7` | **KHUSUS & EKSKLUSIF** untuk Special Stage, Special Event, Cheki Spesial. Dilarang untuk hal reguler, dan dilarang memakai pink untuk spesial. |
 
-| Komponen | Warna yang benar | Warna LAMA (dilarang) |
-|---|---|---|
-| Tombol primary / CTA | `var(--primary)` | `#079108` |
-| Background card/panel | `var(--surface)` | `#111726` |
-| Background input | `var(--background)` | `#182032` |
-| Teks utama | `var(--text-primary)` | `text-white` hardcode |
-| Teks sekunder | `var(--text-secondary)` | `text-zinc-400` |
-| Border/divider | `var(--border)` | `border-white/10` |
-| Highlight/badge | `var(--primary)/15` (opacity) | `#079108/20` |
+> [!IMPORTANT]
+> **ATURAN ANTI WARNA-WARNI & IDENTITAS SPESIAL**:
+> Selain 3 status fungsional di atas (Merah, Hijau, Kuning), 1 warna eksklusif Special (Ungu `#A855F7`), dan 1 aksen brand (Amber `--primary`), **DILARANG** menggunakan warna pelangi seperti:
+> - **Ungu / Purple**: DILARANG untuk elemen reguler non-spesial (seperti OTS Venue reguler, QRIS, secret member). Ungu HANYA dan EKSKLUSIF untuk Special.
+> - **Pink / Magenta**: DILARANG KERAS di seluruh web (jangan gunakan untuk Special, gunakan Ungu).
+> - **Biru / Sky / Cyan**: Dilarang untuk badge PO, Order Sendiri, Kurir, Bukti Bayar, atau teks kontak.
+> - **Teal / Mint**: Dilarang untuk tab Merchandise atau badge pakaian.
+> 
+> Semua badge dan label non-status (seperti *OTS Venue*, *Pre-Order*, *Admin Input*, *Order Sendiri*, *Merchandise*, *Apparel*, *Aksesoris*) **WAJIB** menggunakan warna netral:
+> `bg-[var(--surface)]` / `bg-[var(--background)]`, border `var(--border)`, dan teks netral `var(--text-secondary)`.
 
-## Form OTS (Registrasi Akun Fan On-The-Spot)
-- Form ditampilkan **inline di halaman** (bukan popup modal) — bisa di-toggle dengan tombol "Register OTS".
-- Password tidak perlu diisi manual — digenerate otomatis dan dikirim via OTP ke email fan.
-- Warna form mengikuti design token dark mode di atas (`var(--primary)` = coklat/amber, bukan hijau).
+---
+
+## 3. Aturan Solid Color & Anti-Blur
+
+1. **Dilarang Gradient**:
+   - Seluruh elemen (tombol, card, container, teks, dan border) **DILARANG** menggunakan `bg-gradient-*` atau `linear-gradient(...)`.
+   - Wajib menggunakan warna solid flat yang tegas.
+2. **Dilarang Background Blur (Glassmorphism)**:
+   - Dilarang menggunakan `backdrop-blur-*` atau `backdrop-filter: blur(...)`.
+   - Gunakan solid background yang bersih (misal overlay modal menggunakan `bg-black/90` solid).
+3. **Dilarang Garis Aksen Berwarna di Card**:
+   - Dilarang memberi garis/border warna-warni pada tepi atas/sisi card (misal `h-[2px] bg-emerald-500` atau `bg-purple-500`).
+   - Gunakan garis netral `bg-border` atau biarkan card memiliki border solid menyeluruh yang seragam.
+4. **Tab Konsisten (Satu Warna Brand)**:
+   - Tombol tab aktif (misal All, OTS, PO, Merch) semuanya menggunakan warna brand yang sama (`bg-[var(--primary)] text-white`), tidak boleh setiap tab memiliki warna berbeda.

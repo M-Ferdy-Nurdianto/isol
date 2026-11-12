@@ -55,13 +55,13 @@ router.post('/payment-proof', upload.single('file'), handleMulterError, async (r
       mimetype: req.file.mimetype
     })
 
-    // Compress image using sharp
+    // Compress image using sharp to WebP
     const compressedBuffer = await sharp(req.file.buffer)
       .resize(1920, 1920, { // Max 1920x1920, maintain aspect ratio
         fit: 'inside',
         withoutEnlargement: true
       })
-      .jpeg({ quality: 80, progressive: true }) // Convert to JPEG with 80% quality
+      .webp({ quality: 85 })
       .toBuffer()
 
     console.log('[Upload] Compressed:', {
@@ -70,11 +70,12 @@ router.post('/payment-proof', upload.single('file'), handleMulterError, async (r
       reduction: `${(((req.file.size - compressedBuffer.length) / req.file.size) * 100).toFixed(1)}%`
     })
 
-    const fileName = `payment_${Date.now()}_${req.file.originalname.replace(/\.[^/.]+$/, '')}.jpg`
+    const sanitizedName = req.file.originalname.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()
+    const fileName = `payment_${Date.now()}_${sanitizedName}.webp`
     const result = await uploadToSupabaseStorage(
       compressedBuffer,
       fileName,
-      'image/jpeg'
+      'image/webp'
     )
 
     res.json({
@@ -210,10 +211,10 @@ router.post('/fan-image', authMiddleware, upload.single('file'), handleMulterErr
     }
 
     const type = req.query.type === 'banner' ? 'banner' : 'avatar'
-    
+
     // Auto-crop and convert to WebP
     let sharpPipeline = sharp(req.file.buffer)
-    
+
     if (type === 'banner') {
       // 16:9 Banner (e.g. 1200x675)
       sharpPipeline = sharpPipeline.resize(1200, 675, {
@@ -227,7 +228,7 @@ router.post('/fan-image', authMiddleware, upload.single('file'), handleMulterErr
         position: 'center'
       })
     }
-    
+
     const compressedBuffer = await sharpPipeline
       .webp({ quality: 85 })
       .toBuffer()
@@ -271,7 +272,7 @@ router.post('/music-cover', authMiddleware, upload.single('file'), handleMulterE
       compressedBuffer,
       fileName,
       'image/webp',
-      'media' 
+      'media'
     )
 
     res.json({
@@ -293,14 +294,14 @@ router.post('/qris-image', authMiddleware, upload.single('file'), handleMulterEr
 
     const compressedBuffer = await sharp(req.file.buffer)
       .resize(600, 600, { fit: 'inside', withoutEnlargement: true })
-      .png({ quality: 90 })
+      .webp({ quality: 90 })
       .toBuffer()
 
-    const fileName = `qris/qris_${Date.now()}.png`
+    const fileName = `qris/qris_${Date.now()}.webp`
     const result = await uploadToSupabaseStorage(
       compressedBuffer,
       fileName,
-      'image/png',
+      'image/webp',
       'media'
     )
 

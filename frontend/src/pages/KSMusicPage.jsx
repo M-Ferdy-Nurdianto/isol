@@ -12,7 +12,11 @@ const extractYouTubeID = (url) => {
 }
 
 const getSpotifyEmbedUrl = (url) => {
-  return url.replace('open.spotify.com/', 'open.spotify.com/embed/')
+  let embed = url.replace('open.spotify.com/', 'open.spotify.com/embed/')
+  if (!embed.includes('theme=0')) {
+    embed += (embed.includes('?') ? '&' : '?') + 'utm_source=generator&theme=0'
+  }
+  return embed
 }
 
 
@@ -149,6 +153,7 @@ const KSMusicPage = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.4, delay: i * 0.1 }}
+                    className="rounded-2xl p-1 bg-surface border border-border shadow-xl hover:border-primary/40 transition-all overflow-hidden"
                   >
                     <iframe 
                       style={{ borderRadius: '12px' }} 

@@ -818,10 +818,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
                   Foto Pajangan Shop (Tiket Cheki)
                 </label>
                 <div className="flex items-center gap-1.5">
-                  <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-300 border border-teal-500/20">
+                  <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]">
                     600 × 800 px (3:4)
                   </span>
-                  <span className="text-[10px] text-teal-400 font-bold bg-teal-500/10 px-2 py-0.5 rounded-full border border-teal-500/20">
+                  <span className="text-[10px] text-[var(--primary)] font-bold bg-[var(--primary)]/10 px-2 py-0.5 rounded-full border border-[var(--primary)]/20">
                     Tampil di /shop
                   </span>
                 </div>
@@ -834,15 +834,15 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 onDrop={handleShopAvatarDrop}
                 className={`flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border-2 rounded-xl transition-all ${
                   isDraggingShopAvatar 
-                    ? 'border-dashed border-teal-400 bg-teal-500/10 ring-2 ring-teal-500/20' 
+                    ? 'border-dashed border-[var(--primary)] bg-[var(--primary)]/10 ring-2 ring-[var(--primary)]/20' 
                     : 'border-[var(--border)]'
                 }`}
               >
                 <div
                   className={`relative w-28 h-36 md:w-32 md:h-40 rounded-2xl overflow-hidden border-2 cursor-pointer group shadow-xl shrink-0 bg-black/50 transition-all ${
-                    isDraggingShopAvatar ? 'scale-105 border-teal-400' : ''
+                    isDraggingShopAvatar ? 'scale-105 border-[var(--primary)]' : ''
                   }`}
-                  style={{ borderColor: isDraggingShopAvatar ? undefined : (formData.color || '#2DD4BF') }}
+                  style={{ borderColor: isDraggingShopAvatar ? undefined : (formData.color || 'var(--border)') }}
                   onClick={() => shopAvatarInputRef.current?.click()}
                 >
                   {shopAvatarPreview ? (
@@ -857,7 +857,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-[var(--text-secondary)] p-2 text-center">
-                      <FaCamera className="text-3xl mb-1 text-teal-400/60" />
+                      <FaCamera className="text-3xl mb-1 text-[var(--primary)]/60" />
                       <span className="text-[10px]">Pilih Foto Shop</span>
                     </div>
                   )}
@@ -869,13 +869,13 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
                   {/* Dragging active overlay */}
                   {isDraggingShopAvatar && (
-                    <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-teal-300 text-xs font-bold gap-1 z-20 pointer-events-none">
+                    <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-[var(--primary)] text-xs font-bold gap-1 z-20 pointer-events-none">
                       <FaUpload className="text-2xl animate-bounce" />
                       <span>Lepas di Sini</span>
                     </div>
                   )}
 
-                  <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-teal-300 rounded text-[9px] font-bold">
+                  <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-[var(--primary)] rounded text-[9px] font-bold">
                     Tiket Cheki
                   </span>
                 </div>
@@ -886,7 +886,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       {shopAvatarFile ? shopAvatarFile.name : (formData.shop_image_url ? 'Foto tiket shop aktif' : 'Belum ada foto khusus shop')}
                     </p>
                     {isDraggingShopAvatar && (
-                      <span className="px-2 py-0.5 rounded bg-teal-500/20 border border-teal-500/40 text-teal-300 text-[10px] font-bold animate-pulse">
+                      <span className="px-2 py-0.5 rounded bg-[var(--primary)]/20 border border-[var(--primary)]/40 text-[var(--primary)] text-[10px] font-bold animate-pulse">
                         Lepas untuk Unggah
                       </span>
                     )}
@@ -911,7 +911,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     <button
                       type="button"
                       onClick={() => shopAvatarInputRef.current?.click()}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/40 text-xs font-bold text-teal-200 transition"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)]/20 hover:bg-[var(--primary)]/30 border border-[var(--primary)]/40 text-xs font-bold text-[var(--primary)] transition"
                     >
                       <FaUpload /> Unggah Foto Shop Baru
                     </button>
@@ -1081,7 +1081,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
-                    Nama Panggung <span className="text-pink-500">*</span>
+                    Nama Panggung <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -1095,7 +1095,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
                 <div>
                   <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
-                    Member ID / Slug <span className="text-pink-500">*</span>
+                    Member ID / Slug <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -1182,10 +1182,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
             {/* Secret / Teaser Member Card */}
             {!isGroup && (
-              <div className="bg-[var(--surface)] border border-purple-500/30 rounded-2xl p-5 shadow-lg space-y-4">
+              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
                   <div className="flex items-center gap-2">
-                    <FaUserSecret className="text-purple-400 text-base" />
+                    <FaUserSecret className="text-[var(--primary)] text-base" />
                     <div>
                       <h3 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
                         Mode Secret / Siluet Teaser Member
@@ -1201,7 +1201,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       type="button"
                       onClick={() => setFormData({ ...formData, is_secret: !formData.is_secret })}
                       className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        formData.is_secret ? 'bg-purple-600' : 'bg-zinc-700'
+                        formData.is_secret ? 'bg-[var(--primary)]' : 'bg-zinc-700'
                       }`}
                     >
                       <span
@@ -1210,7 +1210,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                         }`}
                       />
                     </button>
-                    <span className={`text-xs font-bold ${formData.is_secret ? 'text-purple-300' : 'text-[var(--text-secondary)]'}`}>
+                    <span className={`text-xs font-bold ${formData.is_secret ? 'text-[var(--primary)]' : 'text-[var(--text-secondary)]'}`}>
                       {formData.is_secret ? 'SECRET AKTIF' : 'NORMAL'}
                     </span>
                   </div>
@@ -1218,8 +1218,8 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
                 {formData.is_secret && (
                   <div className="space-y-3 pt-1">
-                    <div className="p-3 bg-purple-950/30 border border-purple-500/20 rounded-xl text-[11px] text-purple-200 flex items-start gap-2">
-                      <FaEyeSlash className="text-purple-400 shrink-0 mt-0.5 text-xs" />
+                    <div className="p-3 bg-[var(--background)] border border-[var(--border)] rounded-xl text-[11px] text-[var(--text-secondary)] flex items-start gap-2">
+                      <FaEyeSlash className="text-[var(--primary)] shrink-0 mt-0.5 text-xs" />
                       <span>
                         Ketika aktif: Foto di <strong>Hero Beranda, Toko Shop Cheki, dan Daftar Member</strong> akan otomatis digantikan oleh <strong>Foto Siluet</strong> ini. Nama panggung di panggung Hero akan otomatis disamarkan sebagai <strong>"???"</strong> hingga Anda menonaktifkan status secret ini.
                       </span>
@@ -1232,13 +1232,13 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       onDrop={handleSilhouetteDrop}
                       className={`flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border-2 rounded-xl transition-all ${
                         isDraggingSilhouette
-                          ? 'border-dashed border-purple-400 bg-purple-900/30 ring-2 ring-purple-500/20'
-                          : 'border-purple-500/30'
+                          ? 'border-dashed border-[var(--primary)] bg-[var(--primary)]/10 ring-2 ring-[var(--primary)]/20'
+                          : 'border-[var(--border)]'
                       }`}
                     >
                       <div
-                        className={`relative w-28 h-36 md:w-32 md:h-40 rounded-2xl overflow-hidden border-2 border-dashed border-purple-400 cursor-pointer group shadow-xl shrink-0 bg-black/60 transition-all ${
-                          isDraggingSilhouette ? 'scale-105 border-purple-300' : ''
+                        className={`relative w-28 h-36 md:w-32 md:h-40 rounded-2xl overflow-hidden border-2 border-dashed border-[var(--border)] cursor-pointer group shadow-xl shrink-0 bg-black/60 transition-all ${
+                          isDraggingSilhouette ? 'scale-105 border-[var(--primary)]' : ''
                         }`}
                         onClick={() => silhouetteInputRef.current?.click()}
                       >
@@ -1254,8 +1254,8 @@ const MembersTab = ({ members = [], onRefresh }) => {
                           />
                         ) : (
                           <div className="w-full h-full flex flex-col items-center justify-center text-[var(--text-secondary)] p-2 text-center">
-                            <FaQuestion className="text-3xl mb-1 text-purple-400/80" />
-                            <span className="text-[10px] text-purple-300 font-bold">Pilih Foto Siluet</span>
+                            <FaQuestion className="text-3xl mb-1 text-[var(--primary)]/80" />
+                            <span className="text-[10px] text-[var(--primary)] font-bold">Pilih Foto Siluet</span>
                           </div>
                         )}
                         <div className={`absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5 text-center p-2 ${isDraggingSilhouette ? 'hidden' : ''}`}>
@@ -1264,13 +1264,13 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
                         {/* Dragging active overlay on silhouette */}
                         {isDraggingSilhouette && (
-                          <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-purple-300 text-xs font-bold gap-1 z-20 pointer-events-none">
+                          <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-[var(--primary)] text-xs font-bold gap-1 z-20 pointer-events-none">
                             <FaUpload className="text-2xl animate-bounce" />
                             <span>Lepas di Sini</span>
                           </div>
                         )}
 
-                        <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-purple-900/90 text-purple-200 rounded text-[9px] font-bold">
+                        <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-[var(--text-secondary)] rounded text-[9px] font-bold">
                           SILUET
                         </span>
                       </div>
@@ -1281,7 +1281,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                             {silhouetteFile ? silhouetteFile.name : (formData.silhouette_image_url ? 'Foto siluet tersimpan' : 'Belum ada foto siluet khusus')}
                           </p>
                           {isDraggingSilhouette && (
-                            <span className="px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-bold animate-pulse">
+                            <span className="px-2 py-0.5 rounded bg-[var(--primary)]/20 border border-[var(--primary)]/40 text-[var(--primary)] text-[10px] font-bold animate-pulse">
                               Lepas untuk Unggah
                             </span>
                           )}
@@ -1305,7 +1305,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                           <button
                             type="button"
                             onClick={() => silhouetteInputRef.current?.click()}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-xs font-bold text-purple-200 transition"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)]/20 hover:bg-[var(--primary)]/30 border border-[var(--primary)]/40 text-xs font-bold text-[var(--primary)] transition"
                           >
                             <FaUpload /> Unggah Foto Siluet
                           </button>
@@ -1569,7 +1569,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
                       {/* Foto Pajangan Shop */}
                       <div
-                        className="relative w-14 h-20 rounded-xl overflow-hidden border border-teal-500/40 shrink-0 shadow-md bg-[var(--surface)] group/shop"
+                        className="relative w-14 h-20 rounded-xl overflow-hidden border border-[var(--primary)]/40 shrink-0 shadow-md bg-[var(--surface)] group/shop"
                         title="Foto Pajangan Shop (Tiket Cheki)"
                       >
                         <img
@@ -1581,7 +1581,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                             e.target.src = resolveMemberShopImage('', member.member_id, member.nama_panggung)
                           }}
                         />
-                        <span className="absolute bottom-0 inset-x-0 bg-black/75 text-[8px] font-bold text-center text-teal-300 py-0.5">
+                        <span className="absolute bottom-0 inset-x-0 bg-black/75 text-[8px] font-bold text-center text-[var(--primary)] py-0.5">
                           SHOP
                         </span>
                       </div>
@@ -1594,7 +1594,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                             {member.nama_panggung}
                           </h4>
                           {member.is_secret && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[9px] font-black uppercase tracking-wider shrink-0">
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)] text-[9px] font-black uppercase tracking-wider shrink-0">
                               <FaUserSecret className="text-[10px]" /> SECRET
                             </span>
                           )}

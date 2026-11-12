@@ -10,46 +10,46 @@ import {
   FaFileDownload
 } from 'react-icons/fa'
 
-// Palet warna minimalis sesuai tema admin Kohi Sekai:
-// - success  -> #079108 (hijau brand)
-// - error    -> #f76464 (merah status)
-// - info     -> #00e5e5 (cyan status checked)
-// - warning  -> #f59e0b (amber)
-// - delete   -> #f76464 (merah hapus)
-// - auth     -> #f0efec (netral login/logout)
-// - download -> #079108 (hijau brand)
+// Palet warna minimalis sesuai tema Kohi Sekai:
+// - success  -> #6FAE73 (hijau sukses)
+// - error    -> #D65656 (merah status)
+// - info     -> #E8944A (amber brand)
+// - warning  -> #E5A93C (kuning pending)
+// - delete   -> #D65656 (merah hapus)
+// - auth     -> #F5E6D3 (netral login/logout)
+// - download -> #6FAE73 (hijau sukses)
 const toastStyles = {
   success: {
     icon: <FaCheckCircle />,
-    color: '#E8944A'
+    color: '#6FAE73'
   },
   error: {
     icon: <FaExclamationCircle />,
-    color: '#f76464'
+    color: '#D65656'
   },
   info: {
     icon: <FaInfoCircle />,
-    color: '#00e5e5'
+    color: '#E8944A'
   },
   warning: {
     icon: <FaExclamationTriangle />,
-    color: '#f59e0b'
+    color: '#E5A93C'
   },
   delete: {
     icon: <FaTrash />,
-    color: '#f76464'
+    color: '#D65656'
   },
   auth: {
     icon: <FaSignInAlt />,
-    color: '#f0efec'
+    color: '#F5E6D3'
   },
   logout: {
     icon: <FaSignOutAlt />,
-    color: '#f0efec'
+    color: '#F5E6D3'
   },
   download: {
     icon: <FaFileDownload />,
-    color: '#E8944A'
+    color: '#6FAE73'
   }
 }
 

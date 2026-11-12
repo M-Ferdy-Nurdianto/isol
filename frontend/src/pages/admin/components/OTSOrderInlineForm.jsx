@@ -405,15 +405,15 @@ const OTSOrderInlineForm = ({
                 Rp {item.price.toLocaleString('id-ID')}
               </span>
               {item.cheki_type === 'merch' ? (
-                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-[var(--primary)]/20 text-[var(--primary)] border border-[var(--primary)]/30">
                   Merch
                 </span>
               ) : item.cheki_type === 'wide' ? (
-                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-[var(--primary)]/20 text-[var(--primary)] border border-[var(--primary)]/30">
                   Wide
                 </span>
               ) : item.cheki_type === 'grup' ? (
-                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-[var(--primary)]/20 text-[var(--primary)] border border-[var(--primary)]/30">
                   Grup
                 </span>
               ) : (
@@ -475,7 +475,7 @@ const OTSOrderInlineForm = ({
 
           return (
             <div className="space-y-1.5 pb-2 mb-1 border-b border-[var(--border)]">
-              <div className="flex items-center justify-between text-[10px] font-bold text-purple-400/90 px-1">
+              <div className="flex items-center justify-between text-[10px] font-bold text-[var(--primary)] px-1">
                 <span>Cheki Grup (Semua Member)</span>
                 <span>1x foto semua member</span>
               </div>
@@ -484,22 +484,22 @@ const OTSOrderInlineForm = ({
                 onClick={() => addItem(groupMember || { id: 'grup' }, 'grup')}
                 className={`w-full p-3 rounded-xl border transition-all text-left flex items-center justify-between relative overflow-hidden group ${
                   selectedCount > 0
-                    ? 'bg-purple-500/15 border-purple-400 text-[var(--text-primary)] shadow-[0_0_15px_rgba(192,132,252,0.2)] ring-1 ring-purple-400/40'
-                    : 'bg-[var(--background)] border-[var(--border)] hover:border-purple-400/60 hover:bg-purple-500/10'
+                    ? 'bg-[var(--primary)]/15 border-[var(--primary)] text-[var(--text-primary)] shadow-sm ring-1 ring-[var(--primary)]/40'
+                    : 'bg-[var(--background)] border-[var(--border)] hover:border-[var(--primary)]/60 hover:bg-[var(--primary)]/10'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-all shrink-0 ${
                     selectedCount > 0
-                      ? 'bg-purple-400 text-white border-purple-400 font-black'
-                      : 'bg-purple-400/20 text-purple-300 border-purple-400/40 group-hover:bg-purple-400 group-hover:text-white'
+                      ? 'bg-[var(--primary)] text-white border-[var(--primary)] font-black'
+                      : 'bg-[var(--primary)]/20 text-[var(--primary)] border-[var(--primary)]/40 group-hover:bg-[var(--primary)] group-hover:text-white'
                   }`}>
                     <FaUsers className="text-base" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-black text-[var(--text-primary)] tracking-wide">Cheki Grup — Semua Member</span>
-                      <span className="px-2 py-0.5 rounded-md bg-purple-400/15 text-purple-300 text-[10px] font-bold border border-purple-400/30">
+                      <span className="px-2 py-0.5 rounded-md bg-[var(--primary)]/15 text-[var(--primary)] text-[10px] font-bold border border-[var(--primary)]/30">
                         Semua member
                       </span>
                     </div>
@@ -510,14 +510,14 @@ const OTSOrderInlineForm = ({
                 <div className="flex items-center gap-3 shrink-0">
                   <div className="text-right hidden sm:block">
                     <span className="text-[10px] text-[var(--text-secondary)] block font-medium">Tarif OTS</span>
-                    <span className="text-sm font-black text-purple-300">Rp {grupPrice.toLocaleString('id-ID')}</span>
+                    <span className="text-sm font-black text-[var(--primary)]">Rp {grupPrice.toLocaleString('id-ID')}</span>
                   </div>
                   {selectedCount > 0 ? (
-                    <span className="px-2.5 py-1 rounded-lg bg-purple-400 text-white text-xs font-black">
+                    <span className="px-2.5 py-1 rounded-lg bg-[var(--primary)] text-white text-xs font-black">
                       {selectedCount}x
                     </span>
                   ) : (
-                    <span className="w-7 h-7 rounded-lg bg-[var(--border)] border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] group-hover:text-purple-300 group-hover:bg-purple-400/15 text-xs">
+                    <span className="w-7 h-7 rounded-lg bg-[var(--border)] border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] group-hover:text-[var(--primary)] group-hover:bg-[var(--primary)]/15 text-xs">
                       <FaPlus />
                     </span>
                   )}
@@ -645,7 +645,7 @@ const OTSOrderInlineForm = ({
     <div className="bg-[var(--background)] border border-[var(--border)] p-4 rounded-xl flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <h4 className="font-bold text-xs text-[var(--text-secondary)] flex items-center gap-2">
-          <FaShoppingBag className="text-teal-400" /> Official Merchandise ({displayMerch.length})
+          <FaShoppingBag className="text-[var(--primary)]" /> Official Merchandise ({displayMerch.length})
         </h4>
         <span className="text-[10px] text-[var(--text-secondary)] font-mono">
           Ready Stock di Venue
@@ -673,8 +673,8 @@ const OTSOrderInlineForm = ({
                 key={item.id}
                 className={`p-3 rounded-xl border transition-all flex flex-col justify-between gap-2.5 ${
                   count > 0
-                    ? 'bg-teal-500/10 border-teal-500/70 shadow-[0_0_12px_rgba(20,184,166,0.15)] ring-1 ring-teal-500/30'
-                    : 'bg-[var(--surface)] border-[var(--border)] hover:border-teal-500/40'
+                    ? 'bg-[var(--primary)]/10 border-[var(--primary)]/70 shadow-sm ring-1 ring-[var(--primary)]/30'
+                    : 'bg-[var(--surface)] border-[var(--border)] hover:border-[var(--primary)]/40'
                 }`}
               >
                 <div className="flex gap-2.5 items-start">
@@ -689,7 +689,7 @@ const OTSOrderInlineForm = ({
                       }}
                     />
                     {count > 0 && (
-                      <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-teal-500 text-black text-[9px] font-black shadow">
+                      <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-[var(--primary)] text-white text-[9px] font-black shadow">
                         {count}x
                       </span>
                     )}
@@ -699,7 +699,7 @@ const OTSOrderInlineForm = ({
                       {item.nama}
                     </span>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <span className="text-xs font-black text-teal-400 font-mono">
+                      <span className="text-xs font-black text-[var(--primary)] font-mono">
                         Rp {price.toLocaleString('id-ID')}
                       </span>
                       {stockCount > 0 ? (
@@ -731,8 +731,8 @@ const OTSOrderInlineForm = ({
                             onClick={() => setSelectedMerchSizes(prev => ({ ...prev, [item.id]: sz }))}
                             className={`px-2 py-0.5 rounded text-[10px] font-bold border transition ${
                               isSizeActive
-                                ? 'bg-teal-500 text-black border-teal-400 font-black'
-                                : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-teal-400/50'
+                                ? 'bg-[var(--primary)] text-white border-[var(--primary)] font-black'
+                                : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/50'
                             }`}
                           >
                             {sz}
@@ -752,8 +752,8 @@ const OTSOrderInlineForm = ({
                     isOutOfStock
                       ? 'bg-neutral-800 border-neutral-700 text-neutral-500 cursor-not-allowed'
                       : count > 0
-                        ? 'bg-teal-500 text-black border-teal-400 shadow-[0_2px_8px_rgba(20,184,166,0.3)]'
-                        : 'bg-[var(--background)] hover:bg-teal-500/15 text-[var(--text-primary)] border-[var(--border)] hover:border-teal-400/50'
+                        ? 'bg-[var(--primary)] text-white border-[var(--primary)] shadow-sm'
+                        : 'bg-[var(--background)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] border-[var(--border)] hover:border-[var(--primary)]/50'
                   }`}
                 >
                   <FaPlus className="text-[10px]" />
@@ -776,7 +776,7 @@ const OTSOrderInlineForm = ({
           onClick={() => setActiveCategory('cheki')}
           className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
             activeCategory === 'cheki'
-              ? 'bg-[var(--primary)] text-[var(--text-primary)] shadow-sm'
+              ? 'bg-[var(--primary)] text-white shadow-sm'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)]'
           }`}
         >
@@ -792,7 +792,7 @@ const OTSOrderInlineForm = ({
           onClick={() => setActiveCategory('merch')}
           className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
             activeCategory === 'merch'
-              ? 'bg-teal-500 text-black shadow-sm font-black'
+              ? 'bg-[var(--primary)] text-white shadow-sm font-black'
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)]'
           }`}
         >
