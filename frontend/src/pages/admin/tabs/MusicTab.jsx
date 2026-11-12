@@ -49,7 +49,16 @@ const SortableMusicCard = ({ item, openForm, handleDelete }) => {
         </div>
       </div>
       <div className="p-5">
-        <h3 className="text-lg font-bold text-[var(--text-primary)] truncate">{item.title}</h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-lg font-bold text-[var(--text-primary)] truncate">{item.title}</h3>
+          {item.theme_color && (
+            <span
+              className="w-3.5 h-3.5 rounded-full border border-white/20 shrink-0"
+              style={{ backgroundColor: item.theme_color }}
+              title={`Warna Custom: ${item.theme_color}`}
+            />
+          )}
+        </div>
         <div className="flex gap-2 mt-5">
           <button onClick={() => openForm(item)} className="flex-1 bg-[var(--border)] hover:bg-[var(--border)] text-[var(--text-primary)] px-3 py-2 rounded-lg text-sm font-bold flex justify-center items-center gap-2 border border-[var(--border)] transition-colors">
             <FaEdit /> Edit
@@ -74,6 +83,7 @@ const MusicTab = () => {
     title: '',
     link: '',
     thumbnail_url: '',
+    theme_color: '',
     status: 'published',
     order: 0
   })
@@ -215,6 +225,7 @@ const MusicTab = () => {
         title: item.title,
         link: item.link,
         thumbnail_url: item.thumbnail_url || '',
+        theme_color: item.theme_color || '',
         order: item.order || 0
       })
       setCoverPreview(item.platform === 'spotify' ? (item.thumbnail_url || '') : '')
@@ -225,6 +236,7 @@ const MusicTab = () => {
         title: '',
         link: '',
         thumbnail_url: '',
+        theme_color: '',
         order: music.length
       })
       setCoverPreview('')
@@ -469,14 +481,103 @@ const MusicTab = () => {
               )}
 
               {formData.platform === 'spotify' && (
-                <div className="space-y-2">
-                  <label className="block text-sm font-bold text-[var(--text-secondary)]">Cover Artwork (Opsional)</label>
-                  <DragDropImageUpload
-                    onImageChange={handleCoverChange}
-                    previewUrl={coverPreview}
-                    onRemove={() => { setCoverFile(null); setCoverPreview(''); setFormData(p => ({...p, thumbnail_url: ''})) }}
-                  />
-                </div>
+                <>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-bold text-[var(--text-secondary)]">Cover Artwork (Opsional)</label>
+                    <DragDropImageUpload
+                      onImageChange={handleCoverChange}
+                      previewUrl={coverPreview}
+                      onRemove={() => { setCoverFile(null); setCoverPreview(''); setFormData(p => ({...p, thumbnail_url: ''})) }}
+                    />
+                  </div>
+
+                  <div className="space-y-3 bg-[var(--background)] border border-[var(--border)] p-4 rounded-xl">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <label className="block text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
+                          Warna Card / Player (Opsional)
+                        </label>
+                        <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
+                          Sesuaikan warna card musik sesuka admin. Kosongkan untuk mengikuti warna asli dari link Spotify.
+                        </p>
+                      </div>
+                      {formData.theme_color && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, theme_color: '' })}
+                          className="text-[11px] text-red-400 hover:text-red-300 font-bold transition"
+                        >
+                          Reset ke Asli Spotify
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Preset Colors */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, theme_color: '' })}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                          !formData.theme_color
+                            ? 'bg-[#1DB954]/20 border-[#1DB954] text-[#1DB954] shadow-sm'
+                            : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                        }`}
+                      >
+                        Asli Spotify (Default)
+                      </button>
+
+                      {[
+                        { name: 'Dark Mode', color: '#121212' },
+                        { name: 'Deep Espresso', color: '#1A1512' },
+                        { name: 'Dark Coffee', color: '#241E19' },
+                        { name: 'Warm Amber', color: '#E8944A' },
+                        { name: 'Ungu Spesial', color: '#A855F7' },
+                        { name: 'Spotify Green', color: '#1DB954' },
+                      ].map(preset => (
+                        <button
+                          key={preset.color}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, theme_color: preset.color })}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                            formData.theme_color === preset.color
+                              ? 'ring-2 ring-offset-2 ring-offset-[var(--surface)] ring-[var(--primary)] text-white'
+                              : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                          }`}
+                          style={formData.theme_color === preset.color ? { backgroundColor: preset.color, borderColor: preset.color } : {}}
+                        >
+                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: preset.color }} />
+                          <span>{preset.name}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Custom Hex Picker */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <label className="text-xs text-[var(--text-secondary)] font-medium">Atau custom:</label>
+                      <input
+                        type="color"
+                        value={formData.theme_color || '#1A1512'}
+                        onChange={e => setFormData({ ...formData, theme_color: e.target.value })}
+                        className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0"
+                        title="Pilih warna custom"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Hex (#...)"
+                        value={formData.theme_color || ''}
+                        onChange={e => setFormData({ ...formData, theme_color: e.target.value })}
+                        className="px-3 py-1.5 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] rounded-lg text-xs font-mono w-28 focus:outline-none focus:border-[var(--primary)]"
+                      />
+                      {formData.theme_color && (
+                        <div
+                          className="w-6 h-6 rounded-md border border-white/20 shrink-0"
+                          style={{ backgroundColor: formData.theme_color }}
+                          title="Preview Warna"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="pt-4 flex justify-end gap-3 border-t border-[var(--border)]">

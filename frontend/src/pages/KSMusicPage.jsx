@@ -11,10 +11,14 @@ const extractYouTubeID = (url) => {
   return (match && match[7].length === 11) ? match[7] : false
 }
 
-const getSpotifyEmbedUrl = (url) => {
+const getSpotifyEmbedUrl = (url, themeColor) => {
   let embed = url.replace('open.spotify.com/', 'open.spotify.com/embed/')
-  if (!embed.includes('theme=0')) {
-    embed += (embed.includes('?') ? '&' : '?') + 'utm_source=generator&theme=0'
+  if (themeColor === '#121212' || themeColor === '#000000') {
+    if (!embed.includes('theme=0')) {
+      embed += (embed.includes('?') ? '&' : '?') + 'utm_source=generator&theme=0'
+    }
+  } else if (!themeColor) {
+    embed = embed.replace('&theme=0', '').replace('?theme=0', '')
   }
   return embed
 }
@@ -153,11 +157,15 @@ const KSMusicPage = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.4, delay: i * 0.1 }}
-                    className="rounded-2xl p-1 bg-surface border border-border shadow-xl hover:border-primary/40 transition-all overflow-hidden"
+                    className="relative rounded-2xl p-1 shadow-xl transition-all overflow-hidden border"
+                    style={{
+                      backgroundColor: track.theme_color || 'var(--surface)',
+                      borderColor: track.theme_color ? `${track.theme_color}60` : 'var(--border)'
+                    }}
                   >
                     <iframe 
                       style={{ borderRadius: '12px' }} 
-                      src={getSpotifyEmbedUrl(track.link)} 
+                      src={getSpotifyEmbedUrl(track.link, track.theme_color)} 
                       width="100%" 
                       height="152" 
                       frameBorder="0" 
@@ -165,6 +173,18 @@ const KSMusicPage = () => {
                       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
                       loading="lazy"
                     ></iframe>
+
+                    {/* Jika admin memilih custom warna selain hitam/asli, beri lapisan tint elegan */}
+                    {track.theme_color && track.theme_color !== '#121212' && track.theme_color !== '#000000' && (
+                      <div
+                        className="absolute inset-1 pointer-events-none rounded-[12px]"
+                        style={{
+                          backgroundColor: track.theme_color,
+                          mixBlendMode: 'color',
+                          opacity: 0.65
+                        }}
+                      />
+                    )}
                   </motion.div>
                 ))}
               </div>

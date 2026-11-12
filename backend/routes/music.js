@@ -26,11 +26,11 @@ router.get('/', cachePublic({ sMaxAge: 3600, maxAge: 120, staleWhileRevalidate: 
 // POST: Create music item (admin only)
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { platform, title, link, thumbnail_url, order } = req.body
+    const { platform, title, link, thumbnail_url, order, theme_color, description } = req.body
 
     const { data, error } = await supabase
       .from('music_items')
-      .insert({ platform, title, link, thumbnail_url, order, status: 'published' })
+      .insert({ platform, title, link, thumbnail_url, order, status: 'published', theme_color: theme_color || null, description: description || null })
       .select()
       .single()
 
