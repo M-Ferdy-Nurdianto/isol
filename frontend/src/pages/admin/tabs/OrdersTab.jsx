@@ -66,6 +66,17 @@ const OrdersTab = ({
   const otsOrders = orders.filter(o => o.is_ots && !isSpecialOrder(o))
   const poOrders = orders.filter(o => !o.is_ots && !isSpecialOrder(o))
 
+  const hasActiveFilter = statusFilter !== 'all' || eventFilter !== 'all' || dateFilter !== 'all' || !!searchQuery
+
+  const handleResetFilters = () => {
+    setStatusFilter('all')
+    setEventFilter('all')
+    setDateFilter('all')
+    if (setDateFrom) setDateFrom('')
+    if (setDateTo) setDateTo('')
+    setSearchQuery('')
+  }
+
   const [showExportModal, setShowExportModal] = useState(false)
   const [showInlineOTS, setShowInlineOTS] = useState(false)
   const [editingShippingOrder, setEditingShippingOrder] = useState(null)
@@ -259,13 +270,30 @@ const OrdersTab = ({
           </div>
         )}
 
-        <div className="flex gap-3 justify-end border-t border-[var(--border)] pt-4 flex-wrap">
-          <button
-            onClick={() => setShowExportModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[var(--border)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] rounded-xl transition-all text-xs font-bold border border-[var(--border)] active:scale-95"
-          >
-            <FaFileExcel /> Export Data
-          </button>
+        <div className="flex gap-3 justify-between items-center border-t border-[var(--border)] pt-4 flex-wrap">
+          {hasActiveFilter ? (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[var(--text-secondary)]">Filter aktif:</span>
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--danger)]/15 hover:bg-[var(--danger)]/25 text-[var(--danger)] border border-[var(--danger)]/30 rounded-lg text-xs font-bold transition-all"
+              >
+                <FaTimes className="text-[10px]" /> Reset Semua Filter
+              </button>
+            </div>
+          ) : (
+            <div />
+          )}
+
+          <div className="flex gap-3 items-center">
+            <button
+              onClick={() => setShowExportModal(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-[var(--border)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] rounded-xl transition-all text-xs font-bold border border-[var(--border)] active:scale-95"
+            >
+              <FaFileExcel /> Export Data
+            </button>
+          </div>
         </div>
       </div>
 
@@ -372,6 +400,19 @@ const OrdersTab = ({
               className="min-w-[160px]"
             />
             <button onClick={onFetchMerchOrders} className="bg-[var(--primary)] text-[var(--text-primary)] px-4 py-2 rounded-xl font-bold text-xs hover:bg-[var(--primary)]/85">Cari</button>
+            {(merchOrderStatusFilter !== 'all' || !!merchOrderSearch) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMerchOrderStatusFilter('all')
+                  setMerchOrderSearch('')
+                  setTimeout(() => onFetchMerchOrders && onFetchMerchOrders(), 10)
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 bg-[var(--danger)]/15 hover:bg-[var(--danger)]/25 text-[var(--danger)] border border-[var(--danger)]/30 rounded-xl text-xs font-bold transition-all"
+              >
+                <FaTimes className="text-[10px]" /> Reset
+              </button>
+            )}
           </div>
           <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden">
             <div className="overflow-x-auto custom-scrollbar">

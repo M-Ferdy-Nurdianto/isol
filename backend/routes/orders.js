@@ -32,7 +32,11 @@ router.get('/', authMiddleware, async (req, res) => {
 
     // Filter by status
     if (status && status !== 'all') {
-      query = query.eq('status', status)
+      if (status === 'checked') {
+        query = query.in('status', ['checked', 'paid', 'approved'])
+      } else {
+        query = query.eq('status', status)
+      }
     }
 
     // Filter by OTS
@@ -619,14 +623,14 @@ router.patch('/:id/status', authMiddleware, async (req, res) => {
     const { id } = req.params
     const { status } = req.body
 
-    let nextStatus = status === 'checked' ? 'paid' : status
-  if (!['pending', 'paid', 'completed'].includes(nextStatus)) {
+    let nextStatus = status
+    if (!['pending', 'checked', 'completed', 'paid', 'approved', 'cancelled'].includes(nextStatus)) {
       return res.status(400).json({ error: 'Invalid status' })
     }
 
     const { data, error } = await supabase
       .from('orders')
-      .update({ status: nextStatus || status })
+      .update({ status: nextStatus })
       .eq('id', id)
       .select()
       .single()

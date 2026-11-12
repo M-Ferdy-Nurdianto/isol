@@ -7,6 +7,8 @@ const StatusBadge = ({ status }) => {
   const map = {
     pending:   { label: 'Unchecked', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
     checked:   { label: 'Checked',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
+    paid:      { label: 'Checked',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
+    approved:  { label: 'Checked',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
     completed: { label: 'Completed', cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
   }
   const s = map[status] || { label: status, cls: 'bg-[var(--border)] text-[var(--text-secondary)] border-[var(--border)]' }
@@ -132,7 +134,7 @@ const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
 
         <div className="flex items-center gap-1.5 shrink-0">
           <CustomSelect
-            value={order.status}
+            value={order.status === 'paid' || order.status === 'approved' ? 'checked' : order.status}
             onChange={(e) => onStatusChange(order.id, e.target.value)}
             variant="status"
             options={[
@@ -317,7 +319,7 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView,
                     </td>
                     <td className="px-4 py-3.5">
                       <CustomSelect
-                        value={order.status}
+                        value={order.status === 'paid' || order.status === 'approved' ? 'checked' : order.status}
                         onChange={(e) => onStatusChange(order.id, e.target.value)}
                         variant="status"
                         options={[

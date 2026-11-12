@@ -199,8 +199,17 @@ const AdminPage = () => {
     localStorage.setItem('admin_active_tab', activeTab)
     if (activeTab === 'orders') {
       fetchOrders()
+      if (orderSubTab === 'merch') {
+        fetchMerchOrders()
+      }
     }
   }, [statusFilter, otsFilter, eventFilter, dateFilter, dateFrom, dateTo, searchQuery, activeTab, orderSubTab])
+
+  useEffect(() => {
+    if (activeTab === 'orders' && orderSubTab === 'merch') {
+      fetchMerchOrders()
+    }
+  }, [merchOrderStatusFilter])
 
   useEffect(() => {
     localStorage.setItem('admin_order_subtab', orderSubTab)
@@ -880,7 +889,15 @@ const AdminPage = () => {
             ].map(item => (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  setActiveTab(item.id)
+                  if (item.id === 'orders') {
+                    setStatusFilter('all')
+                    setEventFilter('all')
+                    setDateFilter('all')
+                    setSearchQuery('')
+                  }
+                }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
                   activeTab === item.id 
                     ? 'bg-[var(--primary)] text-[var(--text-primary)] shadow-[0_0_12px_rgba(232,148,74,0.35)] translate-x-1' 
@@ -1370,7 +1387,16 @@ const AdminPage = () => {
             {bottomNavItems.map(item => (
               <button
                 key={item.id}
-                onClick={() => { setActiveTab(item.id); setShowMoreDrawer(false) }}
+                onClick={() => {
+                  setActiveTab(item.id)
+                  setShowMoreDrawer(false)
+                  if (item.id === 'orders') {
+                    setStatusFilter('all')
+                    setEventFilter('all')
+                    setDateFilter('all')
+                    setSearchQuery('')
+                  }
+                }}
                 className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-all ${
                   activeTab === item.id
                     ? 'text-[var(--primary)]'
@@ -1415,7 +1441,16 @@ const AdminPage = () => {
               {moreItems.map(item => (
                 <button
                   key={item.id}
-                  onClick={() => { setActiveTab(item.id); setShowMoreDrawer(false) }}
+                  onClick={() => {
+                  setActiveTab(item.id)
+                  setShowMoreDrawer(false)
+                  if (item.id === 'orders') {
+                    setStatusFilter('all')
+                    setEventFilter('all')
+                    setDateFilter('all')
+                    setSearchQuery('')
+                  }
+                }}
                   className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all ${
                     activeTab === item.id
                       ? 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/40'

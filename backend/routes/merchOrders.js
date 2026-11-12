@@ -31,7 +31,11 @@ router.get('/', authMiddleware, async (req, res) => {
       .order('created_at', { ascending: false })
 
     if (status && status !== 'all') {
-      query = query.eq('status', status)
+      if (status === 'checked' || status === 'paid') {
+        query = query.in('status', ['paid', 'checked'])
+      } else {
+        query = query.eq('status', status)
+      }
     }
 
     if (search) {
@@ -361,7 +365,13 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
       `)
       .order('created_at', { ascending: false })
 
-    if (status && status !== 'all') query = query.eq('status', status)
+    if (status && status !== 'all') {
+      if (status === 'checked' || status === 'paid') {
+        query = query.in('status', ['paid', 'checked'])
+      } else {
+        query = query.eq('status', status)
+      }
+    }
     if (search) query = query.or(`nama_lengkap.ilike.%${search}%,whatsapp.ilike.%${search}%,order_number.ilike.%${search}%`)
     if (dateFrom) query = query.gte('created_at', dateFrom)
     if (dateTo) query = query.lte('created_at', dateTo)
