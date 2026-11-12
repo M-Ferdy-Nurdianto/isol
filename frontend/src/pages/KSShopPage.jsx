@@ -55,88 +55,88 @@ const DEFAULT_OFFICIAL_MERCH = [
     nama: 'Official Jersey Kohi Sekai 2026 - Metal Edition',
     deskripsi: 'Jersey dry-fit eksklusif edisi 2026 dengan nomor punggung dan corak Kawaii Metal khas Kohi Sekai. Bahan adem, ringan, dan nyaman dipakai saat live show.',
     harga: 210000,
-    stok: 30,
+    stok: 35,
     available: true,
     sizes: ['S', 'M', 'L', 'XL', 'XXL', '3XL'],
     kategori: 'baju',
-    gambar_url: '/images/members/placeholder.svg'
+    gambar_url: '/images/merch/jersey.svg'
   },
   {
     id: 'merch-tshirt-01',
     nama: 'Kohi Sekai Official T-Shirt - Kawaii Metal Vol. 1',
     deskripsi: 'Kaos katun combed 24s premium bertema Kawaii Metal dengan sablon plastisol halus tahan lama. Nyaman dipakai nonton live maupun daily outfit.',
     harga: 175000,
-    stok: 25,
+    stok: 40,
     available: true,
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     kategori: 'baju',
-    gambar_url: '/images/members/placeholder.svg'
+    gambar_url: '/images/merch/tshirt.svg'
   },
   {
     id: 'merch-lanyard-01',
     nama: 'Official Member Lanyard & PVC Card Case',
     deskripsi: 'Tali lanyard tebal 2cm dengan stopper kokoh, pengait metal, dan holder kartu transparan berlogo Kohi Sekai. Cocok untuk tiket dan ID card konser.',
     harga: 45000,
-    stok: 50,
+    stok: 60,
     available: true,
-    sizes: [],
+    sizes: ['Standard'],
     kategori: 'aksesoris',
-    gambar_url: '/images/members/placeholder.svg'
+    gambar_url: '/images/merch/lanyard.svg'
   },
   {
     id: 'merch-ganci-01',
     nama: 'Gantungan Kunci Akrilik 2-Sisi (Ganci Idol)',
     deskripsi: 'Gantungan kunci akrilik tebal 4mm dua sisi dengan klip gantungan bintang metal. Desain chibi imut dan logo resmi Kohi Sekai.',
     harga: 30000,
-    stok: 75,
+    stok: 80,
     available: true,
-    sizes: [],
+    sizes: ['Standard'],
     kategori: 'aksesoris',
-    gambar_url: '/images/members/placeholder.svg'
+    gambar_url: '/images/merch/ganci.svg'
   },
   {
     id: 'merch-totebag-01',
     nama: 'Official Canvas Totebag - Kawaii Metal Edition',
     deskripsi: 'Totebag bahan canvas premium tebal dilengkapi resleting utama dan saku dalam. Muat lightstick, binder photocard, dan merchandise favoritmu.',
     harga: 85000,
-    stok: 40,
+    stok: 45,
     available: true,
-    sizes: [],
+    sizes: ['All Size'],
     kategori: 'aksesoris',
-    gambar_url: '/images/members/placeholder.svg'
+    gambar_url: '/images/merch/totebag.svg'
   },
   {
     id: 'merch-lightstick-01',
     nama: 'Official Lightstick - Neon Glow Stick 15 Colors',
     deskripsi: 'Lightstick resmi Kohi Sekai dengan 15 pilihan warna cerah dan tali lanyard eksklusif. Siap temani momen seru chant idol di setiap event!',
     harga: 150000,
-    stok: 40,
+    stok: 35,
     available: true,
-    sizes: [],
+    sizes: ['Standard'],
     kategori: 'aksesoris',
-    gambar_url: '/images/members/placeholder.svg'
+    gambar_url: '/images/merch/lightstick.svg'
   },
   {
     id: 'merch-photocard-01',
     nama: 'Exclusive Photocard Pack Vol. 1 (5 Cards)',
     deskripsi: 'Set photocard holographic eksklusif isi 5 kartu menampilkan seluruh member idol Kohi Sekai lengkap dengan printed signature khusus.',
     harga: 50000,
-    stok: 60,
+    stok: 70,
     available: true,
-    sizes: [],
+    sizes: ['1 Pack (5 Cards)'],
     kategori: 'aksesoris',
-    gambar_url: '/images/members/placeholder.svg'
+    gambar_url: '/images/merch/photocard.svg'
   },
   {
     id: 'merch-acrylic-01',
     nama: 'Kohi Sekai Idol Acrylic Standee',
     deskripsi: 'Standee akrilik premium tebal 3mm tinggi 12cm dengan cetakan UV jernih dan base stand berlogo Kohi Sekai.',
     harga: 65000,
-    stok: 35,
+    stok: 50,
     available: true,
-    sizes: [],
+    sizes: ['Standard'],
     kategori: 'aksesoris',
-    gambar_url: '/images/members/placeholder.svg'
+    gambar_url: '/images/merch/standee.svg'
   }
 ]
 
@@ -1356,10 +1356,10 @@ const KSShopPage = () => {
                           <img
                             src={itemImg}
                             alt={item.nama}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain p-3"
                             onError={(e) => {
                               e.target.onerror = null
-                              e.target.src = getAssetPath('/images/members/placeholder.svg')
+                              e.target.src = getAssetPath('/images/merch/jersey.svg')
                             }}
                           />
                         ) : (
@@ -1431,10 +1431,10 @@ const KSShopPage = () => {
                           <img
                             src={itemImg}
                             alt={item.nama}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
                             onError={(e) => {
                               e.target.onerror = null
-                              e.target.src = getAssetPath('/images/members/placeholder.svg')
+                              e.target.src = getAssetPath('/images/merch/jersey.svg')
                             }}
                           />
                         ) : (
@@ -1584,12 +1584,12 @@ const KSShopPage = () => {
                 {/* Product Image */}
                 <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-[#1A1512] border border-[#3A2E24]">
                   <img
-                    src={selectedMerch.gambar_url ? getAssetPath(selectedMerch.gambar_url) : getAssetPath('/images/members/placeholder.svg')}
+                    src={selectedMerch.gambar_url ? getAssetPath(selectedMerch.gambar_url) : getAssetPath('/images/merch/jersey.svg')}
                     alt={selectedMerch.nama}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain p-4"
                     onError={(e) => {
                       e.target.onerror = null
-                      e.target.src = getAssetPath('/images/members/placeholder.svg')
+                      e.target.src = getAssetPath('/images/merch/jersey.svg')
                     }}
                   />
                   <div className="absolute top-2.5 left-2.5">
@@ -1749,12 +1749,12 @@ const KSShopPage = () => {
                 <div className="col-span-5 bg-[#1A1512] border-r border-[#3A2E24] p-7 flex flex-col items-center justify-center relative">
                   <div className="relative w-full aspect-square rounded-2xl overflow-hidden border border-[#3A2E24] bg-[#241E19]">
                     <img
-                      src={selectedMerch.gambar_url ? getAssetPath(selectedMerch.gambar_url) : getAssetPath('/images/members/placeholder.svg')}
+                      src={selectedMerch.gambar_url ? getAssetPath(selectedMerch.gambar_url) : getAssetPath('/images/merch/jersey.svg')}
                       alt={selectedMerch.nama}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain p-6 hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.target.onerror = null
-                        e.target.src = getAssetPath('/images/members/placeholder.svg')
+                        e.target.src = getAssetPath('/images/merch/jersey.svg')
                       }}
                     />
                     <div className="absolute top-3 left-3">

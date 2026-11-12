@@ -61,7 +61,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: 'Tolong kirim sebelum weekend ya min, mau dipakai pas live.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
       items: [
         { prod: jersey, size: 'L', qty: 1 },
@@ -78,7 +78,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: 'Packaging aman jangan sampai terlipat atau basah.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 95 * 60 * 1000).toISOString(),
       items: [
         { prod: tshirt, size: 'XL', qty: 1 },
@@ -95,7 +95,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: 'Nanti saya ambil di booth merch Kohi Sunday Festival.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 150 * 60 * 1000).toISOString(),
       items: [
         { prod: lightstick, size: 'Standard', qty: 1 },
@@ -112,7 +112,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: null,
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 210 * 60 * 1000).toISOString(),
       items: [
         { prod: totebag, size: 'Standard', qty: 1 },
@@ -131,7 +131,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: 'Ambil saat sesi 2-shot siang.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 5 * 3600 * 1000).toISOString(),
       items: [
         { prod: jersey, size: 'M', qty: 1 }
@@ -147,7 +147,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: 'Sudah transfer via BCA, bukti terlampir.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 9 * 3600 * 1000).toISOString(),
       items: [
         { prod: lightstick, size: 'Standard', qty: 1 },
@@ -164,7 +164,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: null,
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
       items: [
         { prod: tshirt, size: 'L', qty: 1 },
@@ -181,7 +181,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: 'Tolong jangan sampai photocard-nya lecek ya.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 19 * 3600 * 1000).toISOString(),
       items: [
         { prod: photocard, size: '5 Cards', qty: 2 },
@@ -200,7 +200,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: 'JNE Reguler',
       tracking_number: null,
       catatan: 'Sedang disiapkan staf gudang Kohi Sekai.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 26 * 3600 * 1000).toISOString(),
       items: [
         { prod: jersey, size: 'XL', qty: 1 },
@@ -217,7 +217,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: 'Barang sudah disiapkan di paperbag untuk booth venue.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 32 * 3600 * 1000).toISOString(),
       items: [
         { prod: totebag, size: 'Standard', qty: 1 },
@@ -234,7 +234,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: 'J&T Express',
       tracking_number: null,
       catatan: null,
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 38 * 3600 * 1000).toISOString(),
       items: [
         { prod: tshirt, size: 'M', qty: 1 },
@@ -253,7 +253,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: 'JNE Reguler',
       tracking_number: 'JNE9023481239ID',
       catatan: 'Paket telah di-drop ke kurir JNE.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
       shipped_at: new Date(Date.now() - 20 * 3600 * 1000).toISOString(),
       items: [
@@ -270,7 +270,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: 'J&T Express',
       tracking_number: 'JT88392019482',
       catatan: null,
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 56 * 3600 * 1000).toISOString(),
       shipped_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
       items: [
@@ -288,7 +288,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: 'SiCepat REG',
       tracking_number: '004291847120',
       catatan: 'Estimasi tiba 2-3 hari kerja.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 65 * 3600 * 1000).toISOString(),
       shipped_at: new Date(Date.now() - 28 * 3600 * 1000).toISOString(),
       items: [
@@ -306,7 +306,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: 'JNE YES',
       tracking_number: 'JNE9182374610ID',
       catatan: 'Paket YES Prioritas.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       created_at: new Date(Date.now() - 74 * 3600 * 1000).toISOString(),
       shipped_at: new Date(Date.now() - 32 * 3600 * 1000).toISOString(),
       items: [
@@ -326,7 +326,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: 'Sudah diambil dan dicek langsung di booth event.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       confirmed_by: 'customer',
       confirmed_at: new Date(Date.now() - 85 * 3600 * 1000).toISOString(),
       created_at: new Date(Date.now() - 100 * 3600 * 1000).toISOString(),
@@ -346,7 +346,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: 'SiCepat REG',
       tracking_number: '003948192031',
       catatan: 'Barang sudah diterima dengan aman.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       confirmed_by: 'customer',
       confirmed_at: new Date(Date.now() - 60 * 3600 * 1000).toISOString(),
       created_at: new Date(Date.now() - 120 * 3600 * 1000).toISOString(),
@@ -366,7 +366,7 @@ async function seedCompleteMerchOrders() {
       shipping_courier: null,
       tracking_number: null,
       catatan: 'Dikonfirmasi selesai oleh admin di venue.',
-      payment_proof_url: '/images/members/placeholder.svg',
+      payment_proof_url: '/images/merch/qris_proof.svg',
       confirmed_by: 'admin',
       confirmed_at: new Date(Date.now() - 40 * 3600 * 1000).toISOString(),
       created_at: new Date(Date.now() - 140 * 3600 * 1000).toISOString(),

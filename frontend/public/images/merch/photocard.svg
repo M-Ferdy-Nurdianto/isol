@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <rect width="500" height="500" rx="32" fill="#1A1512"/>
+  <rect x="10" y="10" width="480" height="480" rx="24" fill="#241E19" stroke="#3A2E24" stroke-width="3"/>
+  
+  <!-- Back Card (Layer 3 - Rotated Left) -->
+  <g transform="rotate(-12 250 250)">
+    <rect x="170" y="100" width="160" height="250" rx="14" fill="#14100D" stroke="#3A2E24" stroke-width="2.5"/>
+    <rect x="180" y="112" width="140" height="226" rx="10" fill="#241E19"/>
+    <circle cx="250" cy="200" r="30" fill="#1A1512" stroke="#3A2E24" stroke-width="2"/>
+    <text x="250" y="270" font-family="system-ui, sans-serif" font-size="12" font-weight="900" fill="#B0A599" text-anchor="middle">VOL. 01</text>
+  </g>
+  
+  <!-- Middle Card (Layer 2 - Rotated Right) -->
+  <g transform="rotate(10 250 250)">
+    <rect x="170" y="100" width="160" height="250" rx="14" fill="#181310" stroke="#E8944A" stroke-width="2"/>
+    <rect x="180" y="112" width="140" height="226" rx="10" fill="#241E19"/>
+    <circle cx="250" cy="200" r="30" fill="#1A1512" stroke="#E8944A" stroke-width="2"/>
+    <text x="250" y="270" font-family="system-ui, sans-serif" font-size="12" font-weight="900" fill="#E8944A" text-anchor="middle">LIMITED</text>
+  </g>
+
+  <!-- Front Main Card (Layer 1 - Center) -->
+  <g transform="translate(0, 5)">
+    <rect x="170" y="95" width="160" height="255" rx="16" fill="#161210" stroke="#E8944A" stroke-width="3"/>
+    
+    <!-- Inner Holographic Border -->
+    <rect x="180" y="105" width="140" height="235" rx="12" fill="#241E19" stroke="#3A2E24" stroke-width="1.5"/>
+    
+    <!-- Top Header -->
+    <rect x="180" y="105" width="140" height="28" rx="8" fill="#E8944A"/>
+    <text x="250" y="123" font-family="system-ui, sans-serif" font-size="10" font-weight="900" fill="#1A1512" text-anchor="middle" letter-spacing="2">KOHI SEKAI IDOL</text>
+    
+    <!-- Photo Area Inside Card -->
+    <rect x="190" y="140" width="120" height="140" rx="8" fill="#1A1512" stroke="#3A2E24" stroke-width="1.5"/>
+    
+    <!-- Idol Character Chibi Silhouette Portrait -->
+    <circle cx="250" cy="190" r="32" fill="#2A221C" stroke="#E8944A" stroke-width="2"/>
+    <!-- Head with Twin Tails -->
+    <path d="M 235 185 C 235 170 265 170 265 185 C 265 200 235 200 235 185 Z" fill="#F5E6D3"/>
+    <path d="M 230 178 C 220 185 215 205 218 215 C 222 210 225 200 228 190 Z" fill="#E8944A"/>
+    <path d="M 270 178 C 280 185 285 205 282 215 C 278 210 275 200 272 190 Z" fill="#E8944A"/>
+    <!-- Idol Mic -->
+    <circle cx="250" cy="210" r="4" fill="#B0A599"/>
+    
+    <!-- Printed Signature / Foil Stamp -->
+    <path d="M 205 265 Q 230 255 250 268 T 295 260" fill="none" stroke="#E8944A" stroke-width="2.5" stroke-linecap="round"/>
+    
+    <!-- Card Info Footer -->
+    <text x="250" y="300" font-family="system-ui, sans-serif" font-size="11" font-weight="900" fill="#F5E6D3" text-anchor="middle" letter-spacing="1">SPECIAL EDITION</text>
+    <text x="250" y="318" font-family="system-ui, sans-serif" font-size="8.5" font-weight="700" fill="#B0A599" text-anchor="middle">5 CARDS IN PACK</text>
+    <text x="250" y="332" font-family="system-ui, sans-serif" font-size="8" font-weight="900" fill="#E8944A" text-anchor="middle">HOLOGRAPHIC FOIL</text>
+  </g>
+
+  <!-- Pack Banner / Spec -->
+  <rect x="175" y="420" width="150" height="26" rx="13" fill="#E8944A"/>
+  <text x="250" y="437" font-family="system-ui, sans-serif" font-size="11" font-weight="900" fill="#1A1512" text-anchor="middle" letter-spacing="1">1 PACK / 5 CARDS</text>
+</svg>

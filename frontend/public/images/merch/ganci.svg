@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <rect width="500" height="500" rx="32" fill="#1A1512"/>
+  <rect x="10" y="10" width="480" height="480" rx="24" fill="#241E19" stroke="#3A2E24" stroke-width="3"/>
+  
+  <!-- Keychain Ring & Star Clasp -->
+  <!-- Star Shaped Clasp (Gold/Silver) -->
+  <path d="M 250 55 L 260 80 L 288 82 L 265 100 L 273 126 L 250 110 L 227 126 L 235 100 L 212 82 L 240 80 Z" fill="#8C7A6B" stroke="#F5E6D3" stroke-width="2.5"/>
+  <circle cx="250" cy="90" r="12" fill="#241E19"/>
+  
+  <!-- Connecting Links / Jump Rings -->
+  <circle cx="250" cy="138" r="8" fill="none" stroke="#B0A599" stroke-width="3"/>
+  <circle cx="250" cy="158" r="8" fill="none" stroke="#B0A599" stroke-width="3"/>
+  
+  <!-- Acrylic Charm Outer Transparent Border (Double line effect) -->
+  <path d="M 150 185 C 150 175 350 175 350 185 L 340 370 C 340 430 160 430 160 370 Z" fill="#3A2E24" opacity="0.4" stroke="#E8944A" stroke-width="2.5"/>
+  
+  <!-- Coffee Cup Acrylic Charm Body -->
+  <path d="M 160 195 L 340 195 L 330 365 C 330 415 170 415 170 365 Z" fill="#161210" stroke="#3A2E24" stroke-width="2"/>
+  
+  <!-- Cup Handle -->
+  <path d="M 335 230 C 390 230 390 320 330 320" fill="none" stroke="#E8944A" stroke-width="12" stroke-linecap="round"/>
+  
+  <!-- Cup Rim (Latte Foam Effect) -->
+  <ellipse cx="250" cy="195" rx="88" ry="16" fill="#241E19" stroke="#E8944A" stroke-width="3"/>
+  
+  <!-- Inner Artwork: Chibi Mascot Face / Idol Coffee Art -->
+  <circle cx="250" cy="275" r="55" fill="#241E19" stroke="#3A2E24" stroke-width="2"/>
+  
+  <!-- Cute Mascot Eyes & Smile -->
+  <ellipse cx="230" cy="265" rx="5" ry="7" fill="#F5E6D3"/>
+  <ellipse cx="270" cy="265" rx="5" ry="7" fill="#F5E6D3"/>
+  <!-- Cheeks -->
+  <circle cx="222" cy="275" r="5" fill="#E8944A" opacity="0.8"/>
+  <circle cx="278" cy="275" r="5" fill="#E8944A" opacity="0.8"/>
+  <!-- Smile -->
+  <path d="M 242 280 Q 250 288 258 280" fill="none" stroke="#F5E6D3" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Headband / Cat Ears Idol Silhouette -->
+  <path d="M 220 235 L 210 215 L 232 225 Z" fill="#E8944A"/>
+  <path d="M 280 235 L 290 215 L 268 225 Z" fill="#E8944A"/>
+
+  <!-- Charm Text -->
+  <text x="250" y="360" font-family="system-ui, sans-serif" font-size="14" font-weight="900" fill="#E8944A" text-anchor="middle" letter-spacing="2">KOHI SEKAI</text>
+  <text x="250" y="380" font-family="system-ui, sans-serif" font-size="9" font-weight="700" fill="#B0A599" text-anchor="middle" letter-spacing="1">AKRILIK 2-SISI 4MM</text>
+  
+  <!-- Bottom Spec Tag -->
+  <rect x="180" y="440" width="140" height="22" rx="11" fill="#E8944A"/>
+  <text x="250" y="455" font-family="system-ui, sans-serif" font-size="10" font-weight="900" fill="#1A1512" text-anchor="middle" letter-spacing="1">OFFICIAL KEYCHAIN</text>
+</svg>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <rect width="500" height="500" rx="32" fill="#1A1512"/>
+  <rect x="10" y="10" width="480" height="480" rx="24" fill="#241E19" stroke="#3A2E24" stroke-width="3"/>
+  
+  <!-- T-Shirt Silhouette -->
+  <!-- Left Sleeve -->
+  <path d="M 160 115 L 75 185 L 115 235 L 170 190 Z" fill="#181310" stroke="#3A2E24" stroke-width="2.5"/>
+  <!-- Right Sleeve -->
+  <path d="M 340 115 L 425 185 L 385 235 L 330 190 Z" fill="#181310" stroke="#3A2E24" stroke-width="2.5"/>
+  <!-- Torso -->
+  <path d="M 160 115 L 205 115 C 215 135 285 135 295 115 L 340 115 L 345 405 L 155 405 Z" fill="#14100D" stroke="#3A2E24" stroke-width="3"/>
+  
+  <!-- Crewneck Collar -->
+  <path d="M 205 115 C 215 140 285 140 295 115 C 285 130 215 130 205 115 Z" fill="#3A2E24" stroke="#E8944A" stroke-width="1.5"/>
+  
+  <!-- Chest Graphic Art (Kawaii Metal) -->
+  <rect x="175" y="180" width="150" height="150" rx="14" fill="#1F1A16" stroke="#3A2E24" stroke-width="2"/>
+  
+  <!-- Cross Metal Lines -->
+  <line x1="185" y1="190" x2="315" y2="320" stroke="#3A2E24" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <line x1="315" y1="190" x2="185" y2="320" stroke="#3A2E24" stroke-width="1.5" stroke-dasharray="4 4"/>
+  
+  <!-- Star / Sparkle Icon Top -->
+  <path d="M 250 198 L 254 207 L 263 211 L 254 215 L 250 224 L 246 215 L 237 211 L 246 207 Z" fill="#E8944A"/>
+  
+  <!-- Main Band Graphic Text -->
+  <text x="250" y="248" font-family="system-ui, sans-serif" font-size="22" font-weight="900" fill="#F5E6D3" text-anchor="middle" letter-spacing="2">KOHI SEKAI</text>
+  <text x="250" y="270" font-family="system-ui, sans-serif" font-size="12" font-weight="900" fill="#E8944A" text-anchor="middle" letter-spacing="4">KAWAII METAL</text>
+  <text x="250" y="288" font-family="system-ui, sans-serif" font-size="10" font-weight="700" fill="#B0A599" text-anchor="middle" letter-spacing="3">VOL. 01 / 2026</text>
+  <text x="250" y="310" font-family="system-ui, sans-serif" font-size="9" font-weight="500" fill="#E8944A" text-anchor="middle">コーヒーの世界</text>
+
+  <!-- Bottom Tag -->
+  <rect x="195" y="425" width="110" height="22" rx="11" fill="#241E19" stroke="#E8944A" stroke-width="1.5"/>
+  <text x="250" y="440" font-family="system-ui, sans-serif" font-size="10" font-weight="900" fill="#F5E6D3" text-anchor="middle" letter-spacing="1">COTTON 24S COMBED</text>
+</svg>

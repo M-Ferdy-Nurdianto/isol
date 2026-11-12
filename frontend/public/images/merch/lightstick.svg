@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <rect width="500" height="500" rx="32" fill="#1A1512"/>
+  <rect x="10" y="10" width="480" height="480" rx="24" fill="#241E19" stroke="#3A2E24" stroke-width="3"/>
+  
+  <!-- Outer Glow Halo Around Lightstick Tube -->
+  <rect x="200" y="55" width="100" height="230" rx="24" fill="#E8944A" opacity="0.12"/>
+  <rect x="210" y="65" width="80" height="210" rx="20" fill="#E8944A" opacity="0.25"/>
+
+  <!-- Lightstick Glowing Tube (Acrylic Cylinder) -->
+  <rect x="215" y="70" width="70" height="200" rx="16" fill="#2A1F17" stroke="#E8944A" stroke-width="2.5"/>
+  
+  <!-- Inner Light Core / Filament Plate -->
+  <rect x="225" y="80" width="50" height="180" rx="10" fill="#E8944A" opacity="0.85"/>
+  
+  <!-- Laser Etched Star & Logo in Acrylic Tube -->
+  <!-- Idol Star Icon -->
+  <path d="M 250 115 L 254 125 L 265 127 L 257 135 L 259 146 L 250 140 L 241 146 L 243 135 L 235 127 L 246 125 Z" fill="#FFF" opacity="0.9"/>
+  
+  <!-- Vertical Text inside Glow Tube -->
+  <text x="250" y="170" font-family="system-ui, sans-serif" font-size="12" font-weight="900" fill="#1A1512" text-anchor="middle" letter-spacing="3">KOHI</text>
+  <text x="250" y="190" font-family="system-ui, sans-serif" font-size="12" font-weight="900" fill="#1A1512" text-anchor="middle" letter-spacing="3">SEKAI</text>
+  <text x="250" y="215" font-family="system-ui, sans-serif" font-size="9" font-weight="900" fill="#FFF" text-anchor="middle" letter-spacing="1">15 COLORS</text>
+  <text x="250" y="240" font-family="system-ui, sans-serif" font-size="8" font-weight="700" fill="#1A1512" text-anchor="middle">OFFICIAL PENLIGHT</text>
+
+  <!-- Tube Collar Ring (Metal) -->
+  <rect x="210" y="265" width="80" height="16" rx="4" fill="#4A3E34" stroke="#B0A599" stroke-width="1.5"/>
+  <circle cx="250" cy="273" r="3" fill="#E8944A"/>
+
+  <!-- Handle Grip (Ergonomic Espresso Base) -->
+  <path d="M 215 281 L 285 281 L 280 410 L 220 410 Z" fill="#14100D" stroke="#3A2E24" stroke-width="3"/>
+  
+  <!-- Handle Texture Grooves -->
+  <line x1="222" y1="310" x2="278" y2="310" stroke="#3A2E24" stroke-width="2"/>
+  <line x1="222" y1="330" x2="278" y2="330" stroke="#3A2E24" stroke-width="2"/>
+  <line x1="222" y1="350" x2="278" y2="350" stroke="#3A2E24" stroke-width="2"/>
+  <line x1="222" y1="370" x2="278" y2="370" stroke="#3A2E24" stroke-width="2"/>
+
+  <!-- Power Switch Button (Round Amber) -->
+  <circle cx="250" cy="330" r="10" fill="#E8944A" stroke="#241E19" stroke-width="2"/>
+  <circle cx="250" cy="330" r="4" fill="#FFF"/>
+
+  <!-- Handle Base Cap -->
+  <rect x="216" y="410" width="68" height="18" rx="6" fill="#3A2E24" stroke="#4A3E34" stroke-width="1.5"/>
+  
+  <!-- Wrist Strap Attachment Loop & Lanyard -->
+  <path d="M 245 428 C 245 440 255 440 255 428" fill="none" stroke="#B0A599" stroke-width="2"/>
+  <path d="M 250 435 C 235 460 210 470 215 480 C 220 488 260 480 250 435" fill="none" stroke="#E8944A" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Badge / Specs -->
+  <rect x="180" y="445" width="140" height="22" rx="11" fill="#241E19" stroke="#E8944A" stroke-width="1.5"/>
+  <text x="250" y="460" font-family="system-ui, sans-serif" font-size="10" font-weight="900" fill="#F5E6D3" text-anchor="middle" letter-spacing="1">15 COLOR SWITCH</text>
+</svg>

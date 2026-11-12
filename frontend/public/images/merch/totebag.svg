@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <rect width="500" height="500" rx="32" fill="#1A1512"/>
+  <rect x="10" y="10" width="480" height="480" rx="24" fill="#241E19" stroke="#3A2E24" stroke-width="3"/>
+  
+  <!-- Totebag Straps / Handles -->
+  <!-- Left Handle Loop -->
+  <path d="M 195 210 L 195 90 C 195 65 240 65 240 90 L 240 210" fill="none" stroke="#E8944A" stroke-width="14" stroke-linecap="round"/>
+  <!-- Right Handle Loop -->
+  <path d="M 260 210 L 260 90 C 260 65 305 65 305 90 L 305 210" fill="none" stroke="#E8944A" stroke-width="14" stroke-linecap="round"/>
+  
+  <!-- Handle Stitch Details -->
+  <path d="M 195 210 L 195 90 C 195 65 240 65 240 90 L 240 210" fill="none" stroke="#1A1512" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M 260 210 L 260 90 C 260 65 305 65 305 90 L 305 210" fill="none" stroke="#1A1512" stroke-width="2" stroke-dasharray="4 4"/>
+
+  <!-- Main Canvas Bag Body -->
+  <path d="M 140 200 L 360 200 L 345 425 C 345 435 335 440 325 440 L 175 440 C 165 440 155 435 155 425 Z" fill="#161210" stroke="#3A2E24" stroke-width="3"/>
+  
+  <!-- Top Zipper Hem Line -->
+  <rect x="140" y="200" width="220" height="18" fill="#241E19" stroke="#3A2E24" stroke-width="1.5"/>
+  <line x1="140" y1="209" x2="360" y2="209" stroke="#E8944A" stroke-width="2" stroke-dasharray="6 3"/>
+
+  <!-- Handle Attachments on Bag -->
+  <rect x="187" y="200" width="16" height="30" rx="3" fill="#E8944A"/>
+  <rect x="297" y="200" width="16" height="30" rx="3" fill="#E8944A"/>
+  <!-- Rivet Details -->
+  <circle cx="195" cy="222" r="3" fill="#1A1512"/>
+  <circle cx="305" cy="222" r="3" fill="#1A1512"/>
+
+  <!-- Front Graphic Print Area -->
+  <rect x="175" y="250" width="150" height="150" rx="12" fill="#241E19" stroke="#3A2E24" stroke-width="2"/>
+  
+  <!-- Graphic Elements -->
+  <!-- Coffee Bean Metal Icon -->
+  <ellipse cx="250" cy="290" rx="24" ry="18" fill="#1A1512" stroke="#E8944A" stroke-width="2.5" transform="rotate(-25 250 290)"/>
+  <path d="M 240 275 C 248 290 252 290 260 305" fill="none" stroke="#E8944A" stroke-width="2.5"/>
+  
+  <!-- Text on Tote -->
+  <text x="250" y="335" font-family="system-ui, sans-serif" font-size="16" font-weight="900" fill="#F5E6D3" text-anchor="middle" letter-spacing="2">KOHI SEKAI</text>
+  <text x="250" y="355" font-family="system-ui, sans-serif" font-size="10" font-weight="900" fill="#E8944A" text-anchor="middle" letter-spacing="3">CANVAS TOTEBAG</text>
+  <text x="250" y="375" font-family="system-ui, sans-serif" font-size="8.5" font-weight="700" fill="#B0A599" text-anchor="middle" letter-spacing="1">PREMIUM HEAVY CANVAS</text>
+
+  <!-- Bottom Tag -->
+  <rect x="185" y="452" width="130" height="20" rx="10" fill="#241E19" stroke="#E8944A" stroke-width="1.5"/>
+  <text x="250" y="466" font-family="system-ui, sans-serif" font-size="9" font-weight="900" fill="#E8944A" text-anchor="middle" letter-spacing="1">ZIPPER &amp; INNER POCKET</text>
+</svg>

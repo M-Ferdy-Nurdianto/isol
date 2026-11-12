@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <rect width="500" height="500" rx="32" fill="#1A1512"/>
+  <rect x="10" y="10" width="480" height="480" rx="24" fill="#241E19" stroke="#3A2E24" stroke-width="3"/>
+  
+  <!-- Outer Acrylic Transparent Contour -->
+  <path d="M 250 85 C 290 85 305 130 305 180 C 320 220 330 280 320 350 L 180 350 C 170 280 180 220 195 180 C 195 130 210 85 250 85 Z" fill="#3A2E24" opacity="0.35" stroke="#E8944A" stroke-width="2"/>
+
+  <!-- Character Figure Body (Idol on Stage) -->
+  <!-- Hair & Head -->
+  <circle cx="250" cy="140" r="30" fill="#241E19" stroke="#E8944A" stroke-width="2"/>
+  <!-- Twin Tails (Amber) -->
+  <path d="M 225 130 C 205 140 195 175 205 200 C 215 190 220 170 225 155 Z" fill="#E8944A"/>
+  <path d="M 275 130 C 295 140 305 175 295 200 C 285 190 280 170 275 155 Z" fill="#E8944A"/>
+  <!-- Headband with Mini Coffee Cup -->
+  <rect x="235" y="100" width="30" height="10" rx="3" fill="#E8944A"/>
+  <circle cx="250" cy="98" r="6" fill="#F5E6D3"/>
+  
+  <!-- Face Feature Silhouette -->
+  <circle cx="240" cy="138" r="4" fill="#F5E6D3"/>
+  <circle cx="260" cy="138" r="4" fill="#F5E6D3"/>
+  <path d="M 245 150 Q 250 156 255 150" fill="none" stroke="#F5E6D3" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Idol Stage Outfit (Jacket + Ribbon) -->
+  <path d="M 230 170 L 270 170 L 285 240 L 215 240 Z" fill="#161210" stroke="#3A2E24" stroke-width="2"/>
+  <!-- Amber Vest / Trim -->
+  <path d="M 240 170 L 250 210 L 260 170 Z" fill="#E8944A"/>
+  <!-- Idol Ribbon -->
+  <path d="M 245 175 L 235 185 L 245 195 L 250 185 L 255 195 L 265 185 L 255 175 Z" fill="#E8944A"/>
+
+  <!-- Idol Skirt (Pleated Stage Skirt) -->
+  <path d="M 215 240 L 285 240 L 305 305 L 195 305 Z" fill="#241E19" stroke="#E8944A" stroke-width="2.5"/>
+  <line x1="230" y1="240" x2="220" y2="305" stroke="#3A2E24" stroke-width="2"/>
+  <line x1="250" y1="240" x2="250" y2="305" stroke="#3A2E24" stroke-width="2"/>
+  <line x1="270" y1="240" x2="280" y2="305" stroke="#3A2E24" stroke-width="2"/>
+
+  <!-- Legs & Boots -->
+  <rect x="230" y="305" width="14" height="45" fill="#14100D"/>
+  <rect x="256" y="305" width="14" height="45" fill="#14100D"/>
+  <rect x="226" y="335" width="18" height="15" rx="3" fill="#E8944A"/>
+  <rect x="256" y="335" width="18" height="15" rx="3" fill="#E8944A"/>
+
+  <!-- Acrylic Standee Tab Slot Insert -->
+  <rect x="235" y="350" width="30" height="20" rx="3" fill="#3A2E24" stroke="#E8944A" stroke-width="2"/>
+
+  <!-- Standee Base Plate (Oval Saucer) -->
+  <ellipse cx="250" cy="375" rx="130" ry="32" fill="#241E19" stroke="#E8944A" stroke-width="3"/>
+  <ellipse cx="250" cy="375" rx="115" ry="24" fill="#161210" stroke="#3A2E24" stroke-width="1.5"/>
+  
+  <!-- Base Slot Hole -->
+  <rect x="232" y="370" width="36" height="10" rx="3" fill="#1A1512" stroke="#E8944A" stroke-width="1.5"/>
+  
+  <!-- Base Plate Typography -->
+  <text x="250" y="420" font-family="system-ui, sans-serif" font-size="12" font-weight="900" fill="#F5E6D3" text-anchor="middle" letter-spacing="3">KOHI SEKAI</text>
+  <text x="250" y="436" font-family="system-ui, sans-serif" font-size="9" font-weight="700" fill="#B0A599" text-anchor="middle" letter-spacing="1">12CM ACRYLIC STANDEE</text>
+
+  <!-- Spec Badge -->
+  <rect x="180" y="450" width="140" height="20" rx="10" fill="#E8944A"/>
+  <text x="250" y="464" font-family="system-ui, sans-serif" font-size="9" font-weight="900" fill="#1A1512" text-anchor="middle" letter-spacing="1">UV PRINT 3MM THICK</text>
+</svg>

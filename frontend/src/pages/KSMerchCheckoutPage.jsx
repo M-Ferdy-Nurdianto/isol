@@ -623,10 +623,10 @@ const KSMerchCheckoutPage = () => {
                                 <img
                                   src={getAssetPath(item.gambar_url)}
                                   alt={item.nama}
-                                  className="w-full h-full object-cover"
+                                  className="w-full h-full object-contain p-1"
                                   onError={(e) => {
                                     e.target.onerror = null
-                                    e.target.src = getAssetPath('/images/members/placeholder.svg')
+                                    e.target.src = getAssetPath('/images/merch/jersey.svg')
                                   }}
                                 />
                               ) : (

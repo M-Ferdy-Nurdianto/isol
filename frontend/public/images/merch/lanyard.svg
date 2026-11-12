@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <rect width="500" height="500" rx="32" fill="#1A1512"/>
+  <rect x="10" y="10" width="480" height="480" rx="24" fill="#241E19" stroke="#3A2E24" stroke-width="3"/>
+  
+  <!-- Ribbon Straps (Top Loop) -->
+  <!-- Left Strap -->
+  <path d="M 210 60 L 235 220 L 255 220 L 230 60 Z" fill="#181310" stroke="#3A2E24" stroke-width="2"/>
+  <!-- Right Strap -->
+  <path d="M 290 60 L 265 220 L 245 220 L 270 60 Z" fill="#181310" stroke="#3A2E24" stroke-width="2"/>
+  
+  <!-- Amber Accent Lines on Ribbon -->
+  <line x1="220" y1="65" x2="245" y2="215" stroke="#E8944A" stroke-width="2.5"/>
+  <line x1="280" y1="65" x2="255" y2="215" stroke="#E8944A" stroke-width="2.5"/>
+  
+  <!-- Ribbon Text Pattern (Rotated along strap) -->
+  <text x="215" y="145" font-family="system-ui, sans-serif" font-size="9" font-weight="900" fill="#F5E6D3" transform="rotate(78 215 145)" letter-spacing="2">KOHI SEKAI</text>
+  <text x="275" y="145" font-family="system-ui, sans-serif" font-size="9" font-weight="900" fill="#F5E6D3" transform="rotate(-78 275 145)" letter-spacing="2">KOHI SEKAI</text>
+
+  <!-- Metal Buckle / Stopper -->
+  <rect x="235" y="215" width="30" height="18" rx="4" fill="#6B5E52" stroke="#B0A599" stroke-width="1.5"/>
+  <!-- Metal Clasp Hook -->
+  <path d="M 245 233 C 245 245 255 245 255 233 Z" fill="none" stroke="#B0A599" stroke-width="3"/>
+  <path d="M 242 245 L 258 245 L 254 260 L 246 260 Z" fill="#6B5E52" stroke="#B0A599" stroke-width="2"/>
+  <circle cx="250" cy="265" r="5" fill="#B0A599"/>
+
+  <!-- PVC Card Holder Frame (Hanging Pass) -->
+  <rect x="170" y="270" width="160" height="200" rx="14" fill="#161210" stroke="#E8944A" stroke-width="2"/>
+  
+  <!-- Transparent Sleeve Inner -->
+  <rect x="180" y="285" width="140" height="175" rx="8" fill="#241E19" stroke="#3A2E24" stroke-width="1.5"/>
+  
+  <!-- ID Pass Content -->
+  <!-- Top Bar -->
+  <rect x="180" y="285" width="140" height="32" rx="6" fill="#E8944A"/>
+  <text x="250" y="306" font-family="system-ui, sans-serif" font-size="11" font-weight="900" fill="#1A1512" text-anchor="middle" letter-spacing="2">VIP ALL ACCESS</text>
+  
+  <!-- Pass Photo Placeholder -->
+  <circle cx="250" cy="345" r="22" fill="#1A1512" stroke="#E8944A" stroke-width="2"/>
+  <path d="M 250 333 L 254 341 L 263 342 L 256 348 L 258 357 L 250 352 L 242 357 L 244 348 L 237 342 L 246 341 Z" fill="#E8944A"/>
+  
+  <!-- Name / Title -->
+  <text x="250" y="385" font-family="system-ui, sans-serif" font-size="12" font-weight="900" fill="#F5E6D3" text-anchor="middle">KOHI SEKAI</text>
+  <text x="250" y="398" font-family="system-ui, sans-serif" font-size="9" font-weight="700" fill="#B0A599" text-anchor="middle">OFFICIAL FANPASS 2026</text>
+  
+  <!-- Barcode Simulation -->
+  <g transform="translate(195, 420)">
+    <line x1="0" y1="0" x2="0" y2="24" stroke="#F5E6D3" stroke-width="2.5"/>
+    <line x1="6" y1="0" x2="6" y2="24" stroke="#F5E6D3" stroke-width="1.5"/>
+    <line x1="12" y1="0" x2="12" y2="24" stroke="#F5E6D3" stroke-width="4"/>
+    <line x1="20" y1="0" x2="20" y2="24" stroke="#F5E6D3" stroke-width="1"/>
+    <line x1="26" y1="0" x2="26" y2="24" stroke="#F5E6D3" stroke-width="3"/>
+    <line x1="34" y1="0" x2="34" y2="24" stroke="#F5E6D3" stroke-width="1.5"/>
+    <line x1="42" y1="0" x2="42" y2="24" stroke="#F5E6D3" stroke-width="3"/>
+    <line x1="50" y1="0" x2="50" y2="24" stroke="#F5E6D3" stroke-width="1"/>
+    <line x1="58" y1="0" x2="58" y2="24" stroke="#F5E6D3" stroke-width="4"/>
+    <line x1="68" y1="0" x2="68" y2="24" stroke="#F5E6D3" stroke-width="2"/>
+    <line x1="78" y1="0" x2="78" y2="24" stroke="#F5E6D3" stroke-width="3"/>
+    <line x1="88" y1="0" x2="88" y2="24" stroke="#F5E6D3" stroke-width="1.5"/>
+    <line x1="96" y1="0" x2="96" y2="24" stroke="#F5E6D3" stroke-width="4"/>
+    <line x1="106" y1="0" x2="106" y2="24" stroke="#F5E6D3" stroke-width="2"/>
+  </g>
+</svg>

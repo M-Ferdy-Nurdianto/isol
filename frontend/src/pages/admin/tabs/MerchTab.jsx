@@ -67,8 +67,20 @@ const MerchTab = ({
                       <tr key={item.id} className="hover:bg-[var(--primary)]/5 transition-colors">
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-xl bg-[var(--background)] overflow-hidden flex-shrink-0 flex items-center justify-center border border-[var(--border)]">
-                              {item.gambar_url ? <img src={item.gambar_url} alt={item.nama} className="w-full h-full object-cover" /> : <FaBox className="text-[var(--text-secondary)] text-xl" />}
+                            <div className="w-12 h-12 rounded-xl bg-[var(--background)] overflow-hidden flex-shrink-0 flex items-center justify-center border border-[var(--border)] p-1">
+                              {item.gambar_url ? (
+                                <img
+                                  src={item.gambar_url}
+                                  alt={item.nama}
+                                  className="w-full h-full object-contain rounded-lg"
+                                  onError={(e) => {
+                                    e.target.onerror = null
+                                    e.target.src = '/images/merch/jersey.svg'
+                                  }}
+                                />
+                              ) : (
+                                <FaBox className="text-[var(--primary)] text-xl" />
+                              )}
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
