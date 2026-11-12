@@ -5,8 +5,8 @@ import CustomSelect from './CustomSelect'
 // ─── Status badge helper ───────────────────────────────────────────────────────
 const StatusBadge = ({ status }) => {
   const map = {
-    pending:   { label: 'Unchecked', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
-    checked:   { label: 'Checked',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
+    pending: { label: 'Unchecked', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
+    checked: { label: 'Checked', cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
     paid:      { label: 'Checked',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
     approved:  { label: 'Checked',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
     completed: { label: 'Completed', cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
@@ -31,8 +31,8 @@ const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
   const contactLine = order.whatsapp && order.whatsapp !== '-'
     ? `WA: ${order.whatsapp}`
     : order.instagram && order.instagram !== '-'
-    ? `IG: ${order.instagram}`
-    : null
+      ? `IG: ${order.instagram}`
+      : null
 
   const paymentMethod = order.payment_proof_url?.startsWith('data:') || order.payment_proof_url?.startsWith('http')
     ? 'Cash'
@@ -40,8 +40,8 @@ const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
   // Determine source for OTS orders
   const otsSourceBadge = order.is_ots
     ? (order.created_by === 'customer'
-        ? { label: 'OTS - User', cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' }
-        : { label: 'OTS - Admin', cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' })
+      ? { label: 'OTS - User', cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' }
+      : { label: 'OTS - Admin', cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' })
     : null
   const paymentBadge = order.is_ots
     ? { label: paymentMethod === 'QR' ? 'QRIS' : paymentMethod, cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' }
@@ -103,11 +103,11 @@ const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
         <div className="space-y-0.5">
           {order.order_items?.length > 0
             ? order.order_items.map((item, idx) => (
-                <div key={idx} className="text-xs text-[var(--text-secondary)] flex items-center gap-1">
-                  <span className="font-medium">{item.item_name}</span>
-                  <span className="text-[var(--text-secondary)] font-bold">×{item.quantity}</span>
-                </div>
-              ))
+              <div key={idx} className="text-xs text-[var(--text-secondary)] flex items-center gap-1">
+                <span className="font-medium">{item.item_name}</span>
+                <span className="text-[var(--text-secondary)] font-bold">×{item.quantity}</span>
+              </div>
+            ))
             : <span className="text-[var(--text-secondary)] text-xs">Tidak ada item</span>
           }
         </div>
@@ -138,8 +138,8 @@ const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
             onChange={(e) => onStatusChange(order.id, e.target.value)}
             variant="status"
             options={[
-              { value: 'pending',   label: 'Unchecked' },
-              { value: 'checked',   label: 'Checked' },
+              { value: 'pending', label: 'Unchecked' },
+              { value: 'checked', label: 'Checked' },
               { value: 'completed', label: 'Completed' },
             ]}
           />
@@ -323,8 +323,8 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView,
                         onChange={(e) => onStatusChange(order.id, e.target.value)}
                         variant="status"
                         options={[
-                          { value: 'pending',   label: 'Unchecked' },
-                          { value: 'checked',   label: 'Checked' },
+                          { value: 'pending', label: 'Unchecked' },
+                          { value: 'checked', label: 'Checked' },
                           { value: 'completed', label: 'Completed' },
                         ]}
                       />

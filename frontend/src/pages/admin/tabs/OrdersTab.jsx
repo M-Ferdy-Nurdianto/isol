@@ -442,8 +442,8 @@ const OrdersTab = ({
                         </td>
                         <td className="px-4 py-3.5">
                           <p className="font-bold text-[var(--text-primary)]">{order.nama_lengkap || '-'}</p>
-                          <p className="text-xs text-[#00e5e5]">WA: {order.whatsapp}</p>
-                          {order.instagram && <p className="text-xs text-[var(--text-secondary)]">IG: {order.instagram}</p>}
+                          <p className="text-xs text-[var(--text-secondary)] font-medium">WA: {order.whatsapp}</p>
+                          {order.instagram && <p className="text-xs text-[var(--text-secondary)]/80">IG: {order.instagram}</p>}
                         </td>
                         <td className="px-4 py-3.5">
                           <div className="space-y-0.5">
