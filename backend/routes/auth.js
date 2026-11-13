@@ -543,7 +543,7 @@ router.post('/verify-turnstile', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Token Turnstile tidak ditemukan' })
     }
 
-    const secretKey = process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA'
+    const secretKey = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAAF_c-nTm2Qg7hufzNDMX2-lTKkc'
 
     // Call Cloudflare siteverify endpoint
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
