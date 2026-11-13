@@ -132,11 +132,18 @@ const AdminPage = () => {
         setNotifBoxOpen(false)
       }
     }
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setNotifBoxOpen(false)
+      }
+    }
     if (notifBoxOpen) {
       document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('keydown', handleKeyDown)
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
     }
   }, [notifBoxOpen])
 
@@ -886,28 +893,42 @@ const AdminPage = () => {
               { id: 'users', label: 'Fan Users', icon: FaUserFriends },
               { id: 'recap', label: 'Recap', icon: FaChartBar },
               { id: 'settings', label: 'Settings', icon: FaEdit },
-            ].map(item => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveTab(item.id)
-                  if (item.id === 'orders') {
-                    setStatusFilter('all')
-                    setEventFilter('all')
-                    setDateFilter('all')
-                    setSearchQuery('')
-                  }
-                }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
-                  activeTab === item.id 
-                    ? 'bg-[var(--primary)] text-[var(--text-primary)] shadow-[0_0_12px_rgba(232,148,74,0.35)] translate-x-1' 
-                    : 'text-[var(--text-secondary)] hover:bg-[var(--border)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                <item.icon className={`text-lg ${activeTab === item.id ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`} />
-                {item.label}
-              </button>
-            ))}
+            ].map(item => {
+              const pendingCount = (pendingChekiOrders.length + pendingMerchOrders.length)
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id)
+                    if (item.id === 'orders') {
+                      setStatusFilter('all')
+                      setEventFilter('all')
+                      setDateFilter('all')
+                      setSearchQuery('')
+                    }
+                  }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
+                    activeTab === item.id 
+                      ? 'bg-[var(--primary)] text-[var(--text-primary)] shadow-[0_0_12px_rgba(232,148,74,0.35)] translate-x-1' 
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--border)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <item.icon className={`text-lg shrink-0 ${activeTab === item.id ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`} />
+                    <span className="truncate">{item.label}</span>
+                  </div>
+                  {item.id === 'orders' && pendingCount > 0 && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black shrink-0 transition-all ${
+                      activeTab === item.id
+                        ? 'bg-black text-[var(--primary)]'
+                        : 'bg-amber-500 text-black shadow-sm'
+                    }`}>
+                      {pendingCount > 99 ? '99+' : pendingCount}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
           </nav>
         </div>
 
@@ -919,217 +940,218 @@ const AdminPage = () => {
         </button>
       </aside>
 
+      {/* FLOATING NOTIFICATION WIDGET (Fixed: stays pinned in viewport across all tabs and scroll positions) */}
+      <div ref={notifRef} className="fixed top-4 right-4 md:top-6 md:right-8 z-50">
+        <button
+          type="button"
+          onClick={() => setNotifBoxOpen(prev => !prev)}
+          className={`relative w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-all duration-200 select-none shadow-[0_4px_24px_rgba(0,0,0,0.7)] ${
+            (pendingChekiOrders.length + pendingMerchOrders.length) > 0
+              ? 'bg-[var(--surface)] border-2 border-amber-500/80 text-amber-400 hover:bg-amber-500/10 hover:border-amber-400'
+              : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)]/50'
+          }`}
+          title={`Notifikasi Order (${pendingChekiOrders.length + pendingMerchOrders.length} belum dikonfirmasi)`}
+          aria-label="Notifikasi Order"
+        >
+          <FaBell
+            size={18}
+            className={(pendingChekiOrders.length + pendingMerchOrders.length) > 0 ? 'animate-bounce text-amber-400' : ''}
+          />
+          {(pendingChekiOrders.length + pendingMerchOrders.length) > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-[20px] px-1 bg-amber-500 text-black text-[10px] font-black rounded-full flex items-center justify-center shadow-lg border-2 border-[var(--surface)]">
+              {(pendingChekiOrders.length + pendingMerchOrders.length) > 99
+                ? '99+'
+                : (pendingChekiOrders.length + pendingMerchOrders.length)}
+            </span>
+          )}
+        </button>
+
+        {/* Floating Dropdown Modal */}
+        {notifBoxOpen && (
+          <div className="absolute right-0 top-14 w-[calc(100vw-2rem)] sm:w-96 max-w-sm rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-[0_20px_50px_rgba(0,0,0,0.9)] p-4 animate-fade-in text-[var(--text-primary)] max-h-[85vh] flex flex-col z-50">
+            {/* Header Dropdown */}
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--border)] shrink-0">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+                  <FaBell size={12} />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[var(--text-primary)] leading-tight">
+                    Notifikasi Order
+                  </h4>
+                  <p className="text-[10px] text-[var(--text-secondary)]">Menunggu konfirmasi admin</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                  (pendingChekiOrders.length + pendingMerchOrders.length) > 0
+                    ? 'bg-amber-500 text-black'
+                    : 'bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]'
+                }`}>
+                  {pendingChekiOrders.length + pendingMerchOrders.length} baru
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setNotifBoxOpen(false)}
+                  className="w-6 h-6 rounded-lg bg-[var(--background)] hover:bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+                  title="Tutup (Esc)"
+                >
+                  <FaTimes size={10} />
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Switch Pills */}
+            <div className="grid grid-cols-2 gap-2 my-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('orders')
+                  setOrderSubTab('po')
+                  setStatusFilter('pending')
+                  setNotifBoxOpen(false)
+                }}
+                className={`flex items-center justify-between px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
+                  pendingChekiOrders.length > 0
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
+                    : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <FaTicketAlt size={11} /> Cheki
+                </span>
+                <span className="font-mono font-black">{pendingChekiOrders.length}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('orders')
+                  setOrderSubTab('merch')
+                  setMerchOrderStatusFilter('pending')
+                  fetchMerchOrders()
+                  setNotifBoxOpen(false)
+                }}
+                className={`flex items-center justify-between px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
+                  pendingMerchOrders.length > 0
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
+                    : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <FaBox size={11} /> Merch
+                </span>
+                <span className="font-mono font-black">{pendingMerchOrders.length}</span>
+              </button>
+            </div>
+
+            {/* List of Orders */}
+            <div className="overflow-y-auto custom-scrollbar space-y-2 pr-0.5 flex-1 max-h-[50vh]">
+              {(pendingChekiOrders.length + pendingMerchOrders.length) === 0 ? (
+                <div className="py-6 text-center space-y-1.5">
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-base">
+                    <FaCheck />
+                  </div>
+                  <p className="text-xs font-bold text-[var(--text-primary)]">Semua Beres!</p>
+                  <p className="text-[11px] text-[var(--text-secondary)]">Tidak ada pesanan yang menunggu konfirmasi.</p>
+                </div>
+              ) : (
+                <>
+                  {pendingChekiOrders.map(ord => (
+                    <button
+                      key={`cheki-${ord.id}`}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('orders')
+                        setOrderSubTab(ord.is_ots ? 'ots' : 'po')
+                        setStatusFilter('pending')
+                        setNotifBoxOpen(false)
+                      }}
+                      className="w-full text-left p-2.5 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-amber-500/50 transition-all flex items-center justify-between gap-2 group"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                            Cheki
+                          </span>
+                          <span className="text-xs font-bold text-[var(--text-primary)] truncate group-hover:text-amber-300">
+                            {ord.nama_lengkap || ord.order_number}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5 truncate">
+                          #{ord.order_number} · {ord.payment_proof_url ? 'Ada Bukti Bayar' : 'Belum Upload Bukti'}
+                        </p>
+                      </div>
+                      <span className="text-xs font-black text-amber-400 shrink-0">
+                        Rp {Number(ord.total_harga || 0).toLocaleString('id-ID')}
+                      </span>
+                    </button>
+                  ))}
+
+                  {pendingMerchOrders.map(ord => (
+                    <button
+                      key={`merch-${ord.id}`}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('orders')
+                        setOrderSubTab('merch')
+                        setMerchOrderStatusFilter('pending')
+                        fetchMerchOrders()
+                        setNotifBoxOpen(false)
+                      }}
+                      className="w-full text-left p-2.5 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-amber-500/50 transition-all flex items-center justify-between gap-2 group"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                            Merch
+                          </span>
+                          <span className="text-xs font-bold text-[var(--text-primary)] truncate group-hover:text-amber-300">
+                            {ord.nama_lengkap || ord.whatsapp}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5 truncate">
+                          #{ord.order_number} · {ord.delivery_method === 'shipping' ? 'Dikirim' : 'Ambil di Event'}
+                        </p>
+                      </div>
+                      <span className="text-xs font-black text-amber-400 shrink-0">
+                        Rp {Number(ord.total_harga || 0).toLocaleString('id-ID')}
+                      </span>
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+
+            {/* Footer Link */}
+            {(pendingChekiOrders.length + pendingMerchOrders.length) > 0 && (
+              <div className="pt-2.5 mt-2.5 border-t border-[var(--border)] text-center shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('orders')
+                    setStatusFilter('pending')
+                    setNotifBoxOpen(false)
+                  }}
+                  className="text-[11px] font-bold text-[var(--primary)] hover:underline"
+                >
+                  Buka Semua Pesanan Unchecked →
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* MAIN CONTENT */}
       <main className="flex-1 p-4 md:p-10 md:h-screen md:overflow-y-auto pb-24 md:pb-10 space-y-6">
-        {/* TOP BAR: MOBILE HEADER & COMPACT NOTIFICATION BELL */}
-        <div className="flex items-center justify-between gap-3 relative">
-          <div className="md:hidden">
+        {/* MOBILE HEADER (mobile only) */}
+        <div className="md:hidden flex items-center justify-between pb-2 border-b border-[var(--border)] pr-14">
+          <div>
             <h1 className="text-base font-black text-[var(--text-primary)] tracking-tight uppercase">
               KOHI<span className="text-[var(--primary)]">SEKAI</span>
             </h1>
             <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">Admin Panel</p>
-          </div>
-
-          <div className="hidden md:block" />
-
-          {/* Compact Notification Bell & Dropdown */}
-          <div ref={notifRef} className="relative ml-auto z-40">
-            <button
-              type="button"
-              onClick={() => setNotifBoxOpen(prev => !prev)}
-              className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                (pendingChekiOrders.length + pendingMerchOrders.length) > 0
-                  ? 'bg-amber-500/15 border border-amber-500/40 text-amber-300 hover:bg-amber-500/25 shadow-lg'
-                  : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)]/40'
-              }`}
-              title={`Notifikasi Order (${pendingChekiOrders.length + pendingMerchOrders.length} belum dikonfirmasi)`}
-              aria-label="Notifikasi Order"
-            >
-              <FaBell size={16} className={(pendingChekiOrders.length + pendingMerchOrders.length) > 0 ? 'animate-bounce' : ''} />
-              {(pendingChekiOrders.length + pendingMerchOrders.length) > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 bg-amber-500 text-black text-[10px] font-black rounded-full flex items-center justify-center shadow-md">
-                  {(pendingChekiOrders.length + pendingMerchOrders.length) > 99
-                    ? '99+'
-                    : (pendingChekiOrders.length + pendingMerchOrders.length)}
-                </span>
-              )}
-            </button>
-
-            {/* Floating Dropdown Modal */}
-            {notifBoxOpen && (
-              <div className="absolute right-0 top-12 w-80 sm:w-96 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-2xl p-4 animate-fade-in text-[var(--text-primary)]">
-                {/* Header Dropdown */}
-                <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
-                      <FaBell size={12} />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-black uppercase tracking-wider text-[var(--text-primary)] leading-tight">
-                        Notifikasi Order
-                      </h4>
-                      <p className="text-[10px] text-[var(--text-secondary)]">Menunggu konfirmasi admin</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
-                      (pendingChekiOrders.length + pendingMerchOrders.length) > 0
-                        ? 'bg-amber-500 text-black'
-                        : 'bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]'
-                    }`}>
-                      {pendingChekiOrders.length + pendingMerchOrders.length} baru
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setNotifBoxOpen(false)}
-                      className="w-6 h-6 rounded-lg bg-[var(--background)] hover:bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-                      title="Tutup"
-                    >
-                      <FaTimes size={10} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Quick Switch Pills */}
-                <div className="grid grid-cols-2 gap-2 my-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab('orders')
-                      setOrderSubTab('po')
-                      setStatusFilter('pending')
-                      setNotifBoxOpen(false)
-                    }}
-                    className={`flex items-center justify-between px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
-                      pendingChekiOrders.length > 0
-                        ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
-                        : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <FaTicketAlt size={11} /> Cheki
-                    </span>
-                    <span className="font-mono font-black">{pendingChekiOrders.length}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab('orders')
-                      setOrderSubTab('merch')
-                      setMerchOrderStatusFilter('pending')
-                      fetchMerchOrders()
-                      setNotifBoxOpen(false)
-                    }}
-                    className={`flex items-center justify-between px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
-                      pendingMerchOrders.length > 0
-                        ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
-                        : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <FaBox size={11} /> Merch
-                    </span>
-                    <span className="font-mono font-black">{pendingMerchOrders.length}</span>
-                  </button>
-                </div>
-
-                {/* List of Orders */}
-                <div className="max-h-72 overflow-y-auto custom-scrollbar space-y-2 pr-0.5">
-                  {(pendingChekiOrders.length + pendingMerchOrders.length) === 0 ? (
-                    <div className="py-6 text-center space-y-1.5">
-                      <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-base">
-                        <FaCheck />
-                      </div>
-                      <p className="text-xs font-bold text-[var(--text-primary)]">Semua Beres!</p>
-                      <p className="text-[11px] text-[var(--text-secondary)]">Tidak ada pesanan yang menunggu konfirmasi.</p>
-                    </div>
-                  ) : (
-                    <>
-                      {pendingChekiOrders.map(ord => (
-                        <button
-                          key={`cheki-${ord.id}`}
-                          type="button"
-                          onClick={() => {
-                            setActiveTab('orders')
-                            setOrderSubTab(ord.is_ots ? 'ots' : 'po')
-                            setStatusFilter('pending')
-                            setNotifBoxOpen(false)
-                          }}
-                          className="w-full text-left p-2.5 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-amber-500/50 transition-all flex items-center justify-between gap-2 group"
-                        >
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                                Cheki
-                              </span>
-                              <span className="text-xs font-bold text-[var(--text-primary)] truncate group-hover:text-amber-300">
-                                {ord.nama_lengkap || ord.order_number}
-                              </span>
-                            </div>
-                            <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5 truncate">
-                              #{ord.order_number} · {ord.payment_proof_url ? 'Ada Bukti Bayar' : 'Belum Upload Bukti'}
-                            </p>
-                          </div>
-                          <span className="text-xs font-black text-amber-400 shrink-0">
-                            Rp {Number(ord.total_harga || 0).toLocaleString('id-ID')}
-                          </span>
-                        </button>
-                      ))}
-
-                      {pendingMerchOrders.map(ord => (
-                        <button
-                          key={`merch-${ord.id}`}
-                          type="button"
-                          onClick={() => {
-                            setActiveTab('orders')
-                            setOrderSubTab('merch')
-                            setMerchOrderStatusFilter('pending')
-                            fetchMerchOrders()
-                            setNotifBoxOpen(false)
-                          }}
-                          className="w-full text-left p-2.5 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-amber-500/50 transition-all flex items-center justify-between gap-2 group"
-                        >
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                                Merch
-                              </span>
-                              <span className="text-xs font-bold text-[var(--text-primary)] truncate group-hover:text-amber-300">
-                                {ord.nama_lengkap || ord.whatsapp}
-                              </span>
-                            </div>
-                            <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5 truncate">
-                              #{ord.order_number} · {ord.delivery_method === 'shipping' ? 'Dikirim' : 'Ambil di Event'}
-                            </p>
-                          </div>
-                          <span className="text-xs font-black text-amber-400 shrink-0">
-                            Rp {Number(ord.total_harga || 0).toLocaleString('id-ID')}
-                          </span>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                </div>
-
-                {/* Footer Link */}
-                {(pendingChekiOrders.length + pendingMerchOrders.length) > 0 && (
-                  <div className="pt-2.5 mt-2.5 border-t border-[var(--border)] text-center">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveTab('orders')
-                        setStatusFilter('pending')
-                        setNotifBoxOpen(false)
-                      }}
-                      className="text-[11px] font-bold text-[var(--primary)] hover:underline"
-                    >
-                      Buka Semua Pesanan Unchecked →
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
@@ -1384,32 +1406,42 @@ const AdminPage = () => {
       {!isOtsCartActive && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--surface)] border-t border-[var(--border)] shadow-[0_-4px_20px_rgba(26,21,18,0.8)]">
           <div className="flex items-stretch">
-            {bottomNavItems.map(item => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveTab(item.id)
-                  setShowMoreDrawer(false)
-                  if (item.id === 'orders') {
-                    setStatusFilter('all')
-                    setEventFilter('all')
-                    setDateFilter('all')
-                    setSearchQuery('')
-                  }
-                }}
-                className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-all ${
-                  activeTab === item.id
-                    ? 'text-[var(--primary)]'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-secondary)]'
-                }`}
-              >
-                <item.icon className={`text-lg transition-all ${activeTab === item.id ? 'text-[var(--primary)] drop-shadow-[0_0_6px_#E8944A]' : ''}`} />
-                {item.label}
-                {activeTab === item.id && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[var(--primary)] rounded-full" />
-                )}
-              </button>
-            ))}
+            {bottomNavItems.map(item => {
+              const pendingCount = (pendingChekiOrders.length + pendingMerchOrders.length)
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id)
+                    setShowMoreDrawer(false)
+                    if (item.id === 'orders') {
+                      setStatusFilter('all')
+                      setEventFilter('all')
+                      setDateFilter('all')
+                      setSearchQuery('')
+                    }
+                  }}
+                  className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-all relative ${
+                    activeTab === item.id
+                      ? 'text-[var(--primary)]'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-secondary)]'
+                  }`}
+                >
+                  <div className="relative">
+                    <item.icon className={`text-lg transition-all ${activeTab === item.id ? 'text-[var(--primary)] drop-shadow-[0_0_6px_#E8944A]' : ''}`} />
+                    {item.id === 'orders' && pendingCount > 0 && (
+                      <span className="absolute -top-1 -right-2 min-w-[14px] h-[14px] px-0.5 bg-amber-500 text-black text-[8px] font-black rounded-full flex items-center justify-center shadow">
+                        {pendingCount > 9 ? '9+' : pendingCount}
+                      </span>
+                    )}
+                  </div>
+                  {item.label}
+                  {activeTab === item.id && (
+                    <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[var(--primary)] rounded-full" />
+                  )}
+                </button>
+              )
+            })}
             {/* More button */}
             <button
               onClick={() => setShowMoreDrawer(prev => !prev)}
