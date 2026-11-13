@@ -1,12 +1,33 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+function copy404Plugin() {
+  return {
+    name: 'copy-404-html',
+    closeBundle() {
+      const distDir = path.resolve(__dirname, 'dist')
+      const indexPath = path.join(distDir, 'index.html')
+      const fallbackPath = path.join(distDir, '404.html')
+      if (fs.existsSync(indexPath)) {
+        fs.copyFileSync(indexPath, fallbackPath)
+        console.log('[copy-404-html] Created dist/404.html for SPA fallback')
+      }
+    }
+  }
+}
 
 export default defineConfig({
   // Auto-reload environment variables
   base: '/',
   plugins: [
     react(),
+    copy404Plugin(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'android-chrome-192x192.png', 'android-chrome-512x512.png', 'images/logos/logo.png', 'images/logos/logo.svg'],
