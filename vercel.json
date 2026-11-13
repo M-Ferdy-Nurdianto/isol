@@ -48,11 +48,14 @@
       }
     },
     {
-      "source": "/(.*)",
+      "source": "/index.html",
       "destination": {
-        "service": "frontend",
-        "path": "/index.html"
+        "service": "frontend"
       }
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "crons": [
