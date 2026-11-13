@@ -10,7 +10,6 @@ import {
   FaBox,
   FaWhatsapp,
   FaInstagram,
-  FaCheckCircle,
   FaMapMarkerAlt
 } from 'react-icons/fa'
 import api from '../../../lib/api'
@@ -23,11 +22,10 @@ const ManualMerchOrderModal = ({
   onSuccess
 }) => {
   // State form
-  const [sourceType, setSourceType] = useState('ots') // 'ots' (Booth Venue) | 'dm' (Pesanan DM)
   const [namaLengkap, setNamaLengkap] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
   const [instagram, setInstagram] = useState('')
-  const [status, setStatus] = useState('paid') // 'paid' | 'pending'
+  const [status, setStatus] = useState('paid') // 'paid' | 'pending' | 'completed'
   const [deliveryMethod, setDeliveryMethod] = useState('pickup_event') // 'pickup_event' | 'shipping'
   const [shippingAddress, setShippingAddress] = useState('')
   const [shippingCity, setShippingCity] = useState('')
@@ -42,18 +40,6 @@ const ManualMerchOrderModal = ({
   const [submitting, setSubmitting] = useState(false)
 
   if (!isOpen) return null
-
-  // Handler ganti source type (OTS vs DM)
-  const handleSourceChange = (type) => {
-    setSourceType(type)
-    if (type === 'ots') {
-      setDeliveryMethod('pickup_event')
-      setStatus('paid')
-      if (!catatan) setCatatan('Beli langsung di booth event')
-    } else {
-      if (catatan === 'Beli langsung di booth event') setCatatan('')
-    }
-  }
 
   // Tambah item ke keranjang
   const handleAddItem = (item) => {
@@ -106,7 +92,7 @@ const ManualMerchOrderModal = ({
   const totalItemsCount = cartItems.reduce((acc, curr) => acc + curr.quantity, 0)
   const totalPrice = cartItems.reduce((acc, curr) => acc + curr.harga * curr.quantity, 0)
 
-  // Submit manual merch order
+  // Submit order merch
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -164,7 +150,7 @@ const ManualMerchOrderModal = ({
         shipping_postal_code: deliveryMethod === 'shipping' && shippingPostalCode ? shippingPostalCode.trim() : null,
         shipping_courier: deliveryMethod === 'shipping' && shippingCourier ? shippingCourier.trim() : null,
         tracking_number: deliveryMethod === 'shipping' && trackingNumber ? trackingNumber.trim() : null,
-        catatan: catatan.trim() ? `${sourceType === 'ots' ? '[OTS Booth] ' : '[Pesanan DM] '}${catatan.trim()}` : (sourceType === 'ots' ? 'Beli langsung di booth event' : 'Pesanan manual via DM'),
+        catatan: catatan.trim() || null,
         items: cartItems.map(i => ({
           merchandise_id: i.merchandise_id,
           nama: i.nama,
@@ -187,7 +173,7 @@ const ManualMerchOrderModal = ({
       if (onSuccess) onSuccess()
       onClose()
     } catch (error) {
-      console.error('Error creating manual merch order:', error)
+      console.error('Error creating merch order:', error)
       Swal.fire({
         icon: 'error',
         title: 'Gagal Menyimpan Order',
@@ -219,50 +205,22 @@ const ManualMerchOrderModal = ({
               </div>
               <div>
                 <h3 className="text-base font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
-                  Input Order Merch Manual
+                  Input Order Merch
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)]">
-                  Catat pesanan langsung dari booth acara (OTS) atau order via DM Instagram / WhatsApp
+                  Tambah pesanan merchandise baru ke dalam sistem
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              {/* Toggle Sumber Pesanan */}
-              <div className="flex bg-[var(--background)] p-1 rounded-xl border border-[var(--border)]">
-                <button
-                  type="button"
-                  onClick={() => handleSourceChange('ots')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                    sourceType === 'ots'
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  <FaStore size={11} /> OTS Booth
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSourceChange('dm')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
-                    sourceType === 'dm'
-                      ? 'bg-[var(--primary)] text-black'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  <FaInstagram size={11} /> DM / Manual
-                </button>
-              </div>
-
-              <button
-                type="button"
-                onClick={onClose}
-                className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--border)] transition ml-1"
-                title="Tutup"
-              >
-                <FaTimes size={16} />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--border)] transition ml-1"
+              title="Tutup"
+            >
+              <FaTimes size={16} />
+            </button>
           </div>
 
           {/* Body Modal (2 Kolom Grid) */}
@@ -642,7 +600,7 @@ const ManualMerchOrderModal = ({
           {/* Sticky Modal Footer */}
           <div className="px-6 py-4 bg-[var(--background)] border-t border-[var(--border)] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
-              <span className="text-xs text-[var(--text-secondary)]">Total Tagihan:</span>
+              <span className="text-xs text-[var(--text-secondary)]">Total:</span>
               <span className="text-base font-black text-[var(--primary)]">
                 Rp {totalPrice.toLocaleString('id-ID')}
               </span>
@@ -684,11 +642,11 @@ const ManualMerchOrderModal = ({
 
           {/* Mobile Sheet Header */}
           <div className="px-5 pb-3 border-b border-[var(--border)] flex items-center justify-between shrink-0">
-            <div>
-              <h3 className="text-base font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
-                <FaBox className="text-[var(--primary)] text-sm" /> Input Order Merch
+            <div className="flex items-center gap-2">
+              <FaBox className="text-[var(--primary)] text-sm" />
+              <h3 className="text-base font-black text-[var(--text-primary)] uppercase tracking-tight">
+                Input Order Merch
               </h3>
-              <p className="text-[10px] text-[var(--text-secondary)]">OTS Booth & DM Admin</p>
             </div>
             <button
               type="button"
@@ -701,32 +659,6 @@ const ManualMerchOrderModal = ({
 
           {/* Mobile Scrollable Form Body */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-            {/* Toggle Tipe Order */}
-            <div className="grid grid-cols-2 gap-2 bg-[var(--background)] p-1 rounded-xl border border-[var(--border)]">
-              <button
-                type="button"
-                onClick={() => handleSourceChange('ots')}
-                className={`py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                  sourceType === 'ots'
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                    : 'text-[var(--text-secondary)]'
-                }`}
-              >
-                <FaStore size={12} /> OTS Booth
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSourceChange('dm')}
-                className={`py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                  sourceType === 'dm'
-                    ? 'bg-[var(--primary)] text-black'
-                    : 'text-[var(--text-secondary)]'
-                }`}
-              >
-                <FaInstagram size={12} /> DM / Manual
-              </button>
-            </div>
-
             {/* Input Pembeli */}
             <div className="space-y-2.5 p-3.5 rounded-xl bg-[var(--background)] border border-[var(--border)]">
               <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">

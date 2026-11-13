@@ -396,7 +396,7 @@ const OrdersTab = ({
                 onClick={() => setShowManualMerchModal(true)}
                 className="px-4 py-2 rounded-xl bg-[var(--primary)] text-black font-black hover:bg-[var(--primary)]/90 flex items-center gap-2 text-xs transition-all shadow-[0_2px_10px_rgba(232,148,74,0.3)] active:scale-95"
               >
-                <FaPlus size={11} /> Input Order Merch (OTS / DM)
+                <FaPlus size={11} /> Input Order Merch
               </button>
               <button
                 onClick={async () => {
