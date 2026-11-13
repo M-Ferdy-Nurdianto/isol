@@ -15,57 +15,12 @@ import {
   FaUser,
   FaTimesCircle,
   FaLandmark,
-  FaImage,
-  FaShoppingBag,
-  FaTicketAlt
+  FaImage
 } from 'react-icons/fa'
 import api from '../../../lib/api'
 import { formatMemberName } from '../../../lib/memberUtils'
 import { getAssetPath } from '../../../lib/pathUtils'
 import CustomSelect from './CustomSelect'
-
-const DEFAULT_OFFICIAL_MERCH = [
-  {
-    id: 'merch-tshirt-01',
-    nama: 'Kohi Sekai Official T-Shirt - Kawaii Metal Vol. 1',
-    deskripsi: 'Kaos katun combed 24s premium bertema Kawaii Metal dengan sablon plastisol halus tahan lama.',
-    harga: 175000,
-    stok: 25,
-    available: true,
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    gambar_url: '/images/members/placeholder.svg'
-  },
-  {
-    id: 'merch-lightstick-01',
-    nama: 'Official Lightstick - Neon Glow Stick 15 Colors',
-    deskripsi: 'Lightstick resmi Kohi Sekai dengan 15 pilihan warna cerah dan tali lanyard eksklusif.',
-    harga: 150000,
-    stok: 40,
-    available: true,
-    sizes: [],
-    gambar_url: '/images/members/placeholder.svg'
-  },
-  {
-    id: 'merch-photocard-01',
-    nama: 'Exclusive Photocard Pack Vol. 1 (5 Cards)',
-    deskripsi: 'Set photocard holographic eksklusif isi 5 kartu menampilkan seluruh member idol Kohi Sekai.',
-    harga: 50000,
-    stok: 60,
-    available: true,
-    sizes: [],
-    gambar_url: '/images/members/placeholder.svg'
-  },
-  {
-    id: 'merch-acrylic-01',
-    nama: 'Kohi Sekai Idol Acrylic Standee',
-    deskripsi: 'Standee akrilik premium tebal 3mm tinggi 12cm dengan cetakan UV jernih.',
-    harga: 65000,
-    stok: 35,
-    available: true,
-    sizes: [],
-    gambar_url: '/images/members/placeholder.svg'
-  }
-]
 
 const OTSOrderInlineForm = ({
   members = [],
@@ -139,13 +94,6 @@ const OTSOrderInlineForm = ({
 
   const [submitting, setSubmitting] = useState(false)
   const [cartExpanded, setCartExpanded] = useState(false)
-  const [activeCategory, setActiveCategory] = useState('cheki') // 'cheki' | 'merch'
-  const [selectedMerchSizes, setSelectedMerchSizes] = useState({})
-
-  const displayMerch = useMemo(() => {
-    if (merch && merch.length > 0) return merch
-    return DEFAULT_OFFICIAL_MERCH
-  }, [merch])
 
   // ── Fan account search state ───────────────────────────────────────────────
   const [fanSearchQuery, setFanSearchQuery] = useState('')
@@ -277,41 +225,6 @@ const OTSOrderInlineForm = ({
     }
   }
 
-  // addMerchItem: official merchandise with optional size
-  const addMerchItem = (item) => {
-    const hasSizes = Array.isArray(item.sizes) && item.sizes.length > 0
-    const chosenSize = hasSizes ? (selectedMerchSizes[item.id] || item.sizes[0]) : null
-    const key = chosenSize ? `merch_${item.id}_${chosenSize}` : `merch_${item.id}`
-    const displayName = chosenSize ? `${item.nama} (${chosenSize})` : item.nama
-    const price = Number(item.harga) || 0
-
-    const existingIndex = formData.items.findIndex(
-      i => i.item_key === key || (i.merchandise_id === item.id && i.size === chosenSize)
-    )
-
-    if (existingIndex > -1) {
-      const updated = [...formData.items]
-      updated[existingIndex].quantity += 1
-      setFormData({ ...formData, items: updated })
-    } else {
-      setFormData({
-        ...formData,
-        items: [
-          ...formData.items,
-          {
-            item_key: key,
-            merchandise_id: item.id,
-            cheki_type: 'merch',
-            size: chosenSize,
-            name: displayName,
-            price,
-            quantity: 1
-          }
-        ]
-      })
-    }
-  }
-
   const updateQuantity = (index, delta) => {
     const updated = [...formData.items]
     const newQty = updated[index].quantity + delta
@@ -334,7 +247,7 @@ const OTSOrderInlineForm = ({
       return
     }
     if (formData.items.length === 0) {
-      Swal.fire({ icon: 'warning', title: 'Belum Ada Item', text: 'Pilih minimal satu tiket cheki atau merchandise.', confirmButtonColor: '#E8944A' })
+      Swal.fire({ icon: 'warning', title: 'Belum Ada Item', text: 'Pilih minimal satu tiket cheki.', confirmButtonColor: '#E8944A' })
       return
     }
     if (!formData.nama_lengkap || formData.nama_lengkap.trim() === '') {
@@ -404,12 +317,8 @@ const OTSOrderInlineForm = ({
               <span className="text-[10px] text-[var(--primary)] font-mono font-bold">
                 Rp {item.price.toLocaleString('id-ID')}
               </span>
-              {item.cheki_type === 'merch' ? (
-                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-[var(--primary)]/20 text-[var(--primary)] border border-[var(--primary)]/30">
-                  Merch
-                </span>
-              ) : item.cheki_type === 'wide' ? (
-                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-[var(--primary)]/20 text-[var(--primary)] border border-[var(--primary)]/30">
+              {item.cheki_type === 'wide' ? (
+                <span className="px-1.5 py-0.2 rounded text-[8px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
                   Wide
                 </span>
               ) : item.cheki_type === 'grup' ? (
@@ -641,172 +550,8 @@ const OTSOrderInlineForm = ({
     </div>
   )
 
-  const MerchGrid = () => (
-    <div className="bg-[var(--background)] border border-[var(--border)] p-4 rounded-xl flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h4 className="font-bold text-xs text-[var(--text-secondary)] flex items-center gap-2">
-          <FaShoppingBag className="text-[var(--primary)]" /> Official Merchandise ({displayMerch.length})
-        </h4>
-        <span className="text-[10px] text-[var(--text-secondary)] font-mono">
-          Ready Stock di Venue
-        </span>
-      </div>
-
-      {displayMerch.length === 0 ? (
-        <div className="p-6 rounded-xl bg-[var(--surface)] border border-[var(--border)] text-center text-[var(--text-secondary)] text-xs">
-          Belum ada produk merchandise yang tersedia saat ini.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {displayMerch.map((item) => {
-            const hasSizes = Array.isArray(item.sizes) && item.sizes.length > 0
-            const currentSelectedSize = hasSizes ? (selectedMerchSizes[item.id] || item.sizes[0]) : null
-            const itemKey = currentSelectedSize ? `merch_${item.id}_${currentSelectedSize}` : `merch_${item.id}`
-            const selectedItem = formData.items.find(i => i.item_key === itemKey || (i.merchandise_id === item.id && i.size === currentSelectedSize))
-            const count = selectedItem ? selectedItem.quantity : 0
-            const price = Number(item.harga) || 0
-            const stockCount = typeof item.stok === 'number' ? item.stok : 0
-            const isOutOfStock = typeof item.stok === 'number' && item.stok <= 0
-
-            return (
-              <div
-                key={item.id}
-                className={`p-3 rounded-xl border transition-all flex flex-col justify-between gap-2.5 ${
-                  count > 0
-                    ? 'bg-[var(--primary)]/10 border-[var(--primary)]/70 shadow-sm ring-1 ring-[var(--primary)]/30'
-                    : 'bg-[var(--surface)] border-[var(--border)] hover:border-[var(--primary)]/40'
-                }`}
-              >
-                <div className="flex gap-2.5 items-start">
-                  <div className="w-14 h-14 rounded-lg bg-[var(--background)] border border-[var(--border)] overflow-hidden shrink-0 flex items-center justify-center relative">
-                    <img
-                      src={getAssetPath(item.gambar_url || '/images/members/placeholder.svg')}
-                      alt={item.nama}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = getAssetPath('/images/members/placeholder.svg')
-                      }}
-                    />
-                    {count > 0 && (
-                      <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-[var(--primary)] text-white text-[9px] font-black shadow">
-                        {count}x
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs font-bold text-[var(--text-primary)] line-clamp-2 leading-tight">
-                      {item.nama}
-                    </span>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <span className="text-xs font-black text-[var(--primary)] font-mono">
-                        Rp {price.toLocaleString('id-ID')}
-                      </span>
-                      {stockCount > 0 ? (
-                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/30 font-mono">
-                          Stok: {stockCount}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-400 font-bold border border-amber-500/30">
-                          Pre-Order
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Size selector if available */}
-                {hasSizes && (
-                  <div className="pt-1.5 border-t border-[var(--border)]">
-                    <div className="text-[10px] font-bold text-[var(--text-secondary)] mb-1">
-                      Pilihan Ukuran:
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {item.sizes.map((sz) => {
-                        const isSizeActive = currentSelectedSize === sz
-                        return (
-                          <button
-                            key={sz}
-                            type="button"
-                            onClick={() => setSelectedMerchSizes(prev => ({ ...prev, [item.id]: sz }))}
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold border transition ${
-                              isSizeActive
-                                ? 'bg-[var(--primary)] text-white border-[var(--primary)] font-black'
-                                : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/50'
-                            }`}
-                          >
-                            {sz}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Add button */}
-                <button
-                  type="button"
-                  onClick={() => addMerchItem(item)}
-                  disabled={isOutOfStock}
-                  className={`w-full py-2 px-3 rounded-lg text-xs font-bold border transition flex items-center justify-center gap-1.5 ${
-                    isOutOfStock
-                      ? 'bg-neutral-800 border-neutral-700 text-neutral-500 cursor-not-allowed'
-                      : count > 0
-                        ? 'bg-[var(--primary)] text-white border-[var(--primary)] shadow-sm'
-                        : 'bg-[var(--background)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] border-[var(--border)] hover:border-[var(--primary)]/50'
-                  }`}
-                >
-                  <FaPlus className="text-[10px]" />
-                  <span>{count > 0 ? `Tambah Lagi (${count}x)` : 'Tambah ke Order'}</span>
-                </button>
-              </div>
-            )
-          })}
-        </div>
-      )}
-    </div>
-  )
-
   const ItemsCatalog = () => (
-    <div className="space-y-3">
-      {/* Switcher Tab: Tiket Cheki vs Official Merchandise */}
-      <div className="flex bg-[var(--background)] p-1 rounded-xl border border-[var(--border)]">
-        <button
-          type="button"
-          onClick={() => setActiveCategory('cheki')}
-          className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-            activeCategory === 'cheki'
-              ? 'bg-[var(--primary)] text-white shadow-sm'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)]'
-          }`}
-        >
-          <FaTicketAlt className="text-xs" />
-          <span>Tiket Cheki</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded bg-black/25 font-mono">
-            {individualMembers.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveCategory('merch')}
-          className={`flex-1 py-2 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-            activeCategory === 'merch'
-              ? 'bg-[var(--primary)] text-white shadow-sm font-black'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface)]'
-          }`}
-        >
-          <FaShoppingBag className="text-xs" />
-          <span>Official Merch</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded bg-black/25 font-mono">
-            {displayMerch.length}
-          </span>
-        </button>
-      </div>
-
-      {/* Catalog Render */}
-      {activeCategory === 'cheki' ? <MemberGrid /> : <MerchGrid />}
-    </div>
+    <MemberGrid />
   )
 
   const PaymentSelector = () => (
@@ -979,11 +724,11 @@ const OTSOrderInlineForm = ({
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[var(--primary)] animate-pulse shrink-0"></span>
               <h3 className="text-lg font-black text-[var(--text-primary)]">
-                Form Order OTS <span className="text-[var(--primary)] font-mono text-sm">(Cheki & Merchandise)</span>
+                Form Order OTS <span className="text-[var(--primary)] font-mono text-sm">(Tiket Cheki)</span>
               </h3>
             </div>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              Input pemesanan tiket 2-Shot dan official merchandise langsung di venue tanpa popup.
+              Input pemesanan tiket 2-Shot langsung di venue tanpa popup.
             </p>
           </div>
 
@@ -1024,7 +769,7 @@ const OTSOrderInlineForm = ({
 
           <div>
             <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
-              Pilih Item Pemesanan
+              Pilih Tiket Cheki
             </label>
             <ItemsCatalog />
           </div>
@@ -1070,7 +815,7 @@ const OTSOrderInlineForm = ({
 
               {formData.items.length === 0 ? (
                 <p className="text-[11px] text-[var(--text-secondary)] py-3 text-center">
-                  Pilih tiket cheki atau merchandise di samping untuk menambahkan ke pesanan
+                  Pilih tiket cheki di samping untuk menambahkan ke pesanan
                 </p>
               ) : (
                 <CartItemsList />
