@@ -207,19 +207,64 @@ router.post('/', async (req, res) => {
   }
 })
 
-// PATCH update merch order status & shipping tracking (admin only)
+// PATCH update merch order status, delivery method & shipping tracking (admin only)
 router.patch('/:id/status', authMiddleware, requireAdmin, async (req, res) => {
   try {
-    const { status, shipping_courier, tracking_number } = req.body
+    const {
+      status,
+      shipping_courier,
+      tracking_number,
+      delivery_method,
+      shipping_address,
+      shipping_city,
+      shipping_postal_code,
+      catatan
+    } = req.body
 
-    const nextStatus = status === 'checked' ? 'paid' : status
-    const validStatuses = ['pending', 'paid', 'checked', 'packing', 'shipped', 'completed', 'cancelled']
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ error: 'Status tidak valid' })
+    const updatePayload = {}
+
+    if (status !== undefined) {
+      const nextStatus = status === 'checked' ? 'paid' : status
+      const validStatuses = ['pending', 'paid', 'checked', 'packing', 'shipped', 'completed', 'cancelled']
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ error: 'Status tidak valid' })
+      }
+      updatePayload.status = nextStatus
+      if (nextStatus === 'shipped') {
+        updatePayload.shipped_at = new Date().toISOString()
+      }
+      if (nextStatus === 'completed') {
+        updatePayload.confirmed_by = 'admin'
+        updatePayload.confirmed_at = new Date().toISOString()
+      } else if (['pending', 'paid', 'packing'].includes(nextStatus)) {
+        updatePayload.confirmed_by = null
+        updatePayload.confirmed_at = null
+      }
     }
 
-    const updatePayload = {
-      status: nextStatus
+    if (delivery_method !== undefined) {
+      const normalizedDelivery = delivery_method === 'shipping' ? 'shipping' : 'pickup_event'
+      updatePayload.delivery_method = normalizedDelivery
+
+      if (normalizedDelivery === 'shipping') {
+        if (shipping_address !== undefined) {
+          updatePayload.shipping_address = shipping_address ? String(shipping_address).trim() : null
+        }
+        if (shipping_city !== undefined) {
+          updatePayload.shipping_city = shipping_city ? String(shipping_city).trim() : null
+        }
+        if (shipping_postal_code !== undefined) {
+          updatePayload.shipping_postal_code = shipping_postal_code ? String(shipping_postal_code).trim() : null
+        }
+      } else {
+        // If changed to pickup_event and no courier explicitly passed, clear tracking
+        if (shipping_courier === undefined) {
+          updatePayload.shipping_courier = null
+        }
+        if (tracking_number === undefined) {
+          updatePayload.tracking_number = null
+        }
+      }
     }
 
     if (shipping_courier !== undefined) {
@@ -228,15 +273,12 @@ router.patch('/:id/status', authMiddleware, requireAdmin, async (req, res) => {
     if (tracking_number !== undefined) {
       updatePayload.tracking_number = tracking_number ? String(tracking_number).trim() : null
     }
-    if (nextStatus === 'shipped') {
-      updatePayload.shipped_at = new Date().toISOString()
+    if (catatan !== undefined) {
+      updatePayload.catatan = catatan ? String(catatan).trim() : null
     }
-    if (nextStatus === 'completed') {
-      updatePayload.confirmed_by = 'admin'
-      updatePayload.confirmed_at = new Date().toISOString()
-    } else {
-      updatePayload.confirmed_by = null
-      updatePayload.confirmed_at = null
+
+    if (Object.keys(updatePayload).length === 0) {
+      return res.status(400).json({ error: 'Tidak ada data perubahan yang dikirim' })
     }
 
     const { data, error } = await supabase

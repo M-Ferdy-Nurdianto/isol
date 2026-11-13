@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import Swal from 'sweetalert2'
-import { FaShoppingCart, FaPlus, FaTimes, FaFileExcel, FaBox, FaEye, FaTrash, FaStar, FaTruck, FaClipboardList, FaStore, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaShoppingCart, FaPlus, FaTimes, FaFileExcel, FaBox, FaEye, FaTrash, FaStar, FaTruck, FaClipboardList, FaStore, FaMapMarkerAlt, FaEdit, FaWhatsapp } from 'react-icons/fa'
 import RenderTable from '../components/RenderTable'
 import CustomSelect from '../components/CustomSelect'
 import ExportModal from '../../../components/ExportModal'
@@ -80,24 +80,63 @@ const OrdersTab = ({
   const [showExportModal, setShowExportModal] = useState(false)
   const [showInlineOTS, setShowInlineOTS] = useState(false)
   const [editingShippingOrder, setEditingShippingOrder] = useState(null)
-  const [shippingForm, setShippingForm] = useState({ status: 'shipped', shipping_courier: '', tracking_number: '' })
+  const [shippingForm, setShippingForm] = useState({
+    status: 'shipped',
+    delivery_method: 'shipping',
+    shipping_address: '',
+    shipping_city: '',
+    shipping_postal_code: '',
+    shipping_courier: '',
+    tracking_number: '',
+    catatan: ''
+  })
   const otsTopRef = useRef(null)
 
   const openShippingModal = (order) => {
     setEditingShippingOrder(order)
     setShippingForm({
-      status: order.status === 'pending' ? 'packing' : order.status,
+      status: order.status === 'pending' ? 'paid' : order.status,
+      delivery_method: order.delivery_method || 'shipping',
+      shipping_address: order.shipping_address || '',
+      shipping_city: order.shipping_city || '',
+      shipping_postal_code: order.shipping_postal_code || '',
       shipping_courier: order.shipping_courier || '',
-      tracking_number: order.tracking_number || ''
+      tracking_number: order.tracking_number || '',
+      catatan: order.catatan || ''
     })
   }
 
   const handleSaveShippingModal = async (e) => {
     e.preventDefault()
     if (!editingShippingOrder) return
+
+    if (shippingForm.delivery_method === 'shipping') {
+      if (!shippingForm.shipping_address || shippingForm.shipping_address.trim().length < 5) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Alamat Belum Lengkap',
+          text: 'Harap masukkan alamat pengiriman minimal 5 karakter jika metode adalah Dikirim.'
+        })
+        return
+      }
+      if (!shippingForm.shipping_city || shippingForm.shipping_city.trim().length < 2) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Kota Belum Diisi',
+          text: 'Harap masukkan kota/kabupaten tujuan pengiriman.'
+        })
+        return
+      }
+    }
+
     await onMerchOrderStatusChange(editingShippingOrder.id, shippingForm.status, {
-      shipping_courier: shippingForm.shipping_courier.trim() || null,
-      tracking_number: shippingForm.tracking_number.trim() || null
+      delivery_method: shippingForm.delivery_method,
+      shipping_address: shippingForm.delivery_method === 'shipping' ? shippingForm.shipping_address.trim() : null,
+      shipping_city: shippingForm.delivery_method === 'shipping' ? shippingForm.shipping_city.trim() : null,
+      shipping_postal_code: shippingForm.delivery_method === 'shipping' ? (shippingForm.shipping_postal_code?.trim() || null) : null,
+      shipping_courier: shippingForm.delivery_method === 'shipping' ? (shippingForm.shipping_courier?.trim() || null) : null,
+      tracking_number: shippingForm.delivery_method === 'shipping' ? (shippingForm.tracking_number?.trim() || null) : null,
+      catatan: shippingForm.catatan?.trim() || null
     })
     setEditingShippingOrder(null)
   }
@@ -347,7 +386,7 @@ const OrdersTab = ({
 
       {orderSubTab === 'merch' && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center flex-wrap gap-3">
+          <div className="flex justify-between items-center flex-wrap gap-3 pr-14 md:pr-16">
             <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">Order Merch</h3>
             <div className="flex gap-2">
               <button
@@ -455,17 +494,25 @@ const OrdersTab = ({
                           </div>
                         </td>
                         <td className="px-4 py-3.5 font-bold text-[var(--primary)]">Rp {order.total_harga.toLocaleString('id-ID')}</td>
-                        <td className="px-4 py-3.5 text-xs text-[var(--text-secondary)] max-w-[230px] space-y-1">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]">
-                            {order.delivery_method === 'shipping' ? <FaTruck size={9} /> : <FaStore size={9} />}
-                            {order.delivery_method === 'shipping' ? 'Dikirim' : 'Ambil di Event'}
-                          </span>
+                        <td className="px-4 py-3.5 text-xs text-[var(--text-secondary)] max-w-[260px] space-y-1.5">
+                          <button
+                            type="button"
+                            onClick={() => openShippingModal(order)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer group select-none ${
+                              order.delivery_method === 'shipping'
+                                ? 'bg-[var(--surface)] text-[var(--primary)] border-[var(--primary)]/30 hover:border-[var(--primary)] hover:bg-[var(--primary)]/10'
+                                : 'bg-[var(--surface)] text-amber-300 border-amber-500/30 hover:border-amber-500 hover:bg-amber-500/10'
+                            }`}
+                            title="Klik untuk ubah metode pengiriman atau alamat"
+                          >
+                            {order.delivery_method === 'shipping' ? <FaTruck size={10} /> : <FaStore size={10} />}
+                            <span>{order.delivery_method === 'shipping' ? 'Dikirim' : 'Ambil di Event'}</span>
+                            <FaEdit size={8} className="opacity-50 group-hover:opacity-100 ml-0.5" />
+                          </button>
                           {order.delivery_method === 'shipping' && order.shipping_address && (
                             <p className="text-[11px] text-[var(--text-primary)] line-clamp-2" title={`${order.shipping_address}${order.shipping_city ? `, ${order.shipping_city}` : ''}${order.shipping_postal_code ? ` (${order.shipping_postal_code})` : ''}`}>
-                              <FaMapMarkerAlt className="inline mr-1 text-[var(--primary)]" size={10} />
-                              {order.shipping_address}
-                              {order.shipping_city ? `, ${order.shipping_city}` : ''}
-                              {order.shipping_postal_code ? ` (${order.shipping_postal_code})` : ''}
+                              <FaMapMarkerAlt className="inline mr-1 text-[var(--primary)] shrink-0" size={10} />
+                              <span>{order.shipping_address}{order.shipping_city ? `, ${order.shipping_city}` : ''}{order.shipping_postal_code ? ` (${order.shipping_postal_code})` : ''}</span>
                             </p>
                           )}
                           {(order.shipping_courier || order.tracking_number) && (
@@ -474,7 +521,7 @@ const OrdersTab = ({
                             </p>
                           )}
                           {order.catatan && (
-                            <p className="text-[10px] text-[var(--text-secondary)] truncate" title={order.catatan}>Catatan: {order.catatan}</p>
+                            <p className="text-[10px] text-[var(--text-secondary)] italic truncate" title={order.catatan}>Catatan: {order.catatan}</p>
                           )}
                         </td>
                         <td className="px-4 py-3.5 text-center space-y-1">
@@ -503,7 +550,7 @@ const OrdersTab = ({
                               type="button"
                               onClick={() => openShippingModal(order)}
                               className="text-[var(--primary)] hover:text-white p-2 hover:bg-[var(--primary)]/20 rounded-lg transition-colors"
-                              title="Atur Status & Resi Pengiriman"
+                              title="Ubah Pengiriman & Status Pesanan"
                             >
                               <FaTruck />
                             </button>
@@ -535,53 +582,190 @@ const OrdersTab = ({
         />
       )}
 
-      {/* Modal Atur Status & Resi Pengiriman Merch */}
+      {/* Modal Atur Pengiriman, Alamat & Resi Merch */}
       {editingShippingOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85">
           <form
             onSubmit={handleSaveShippingModal}
-            className="w-full max-w-md bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 shadow-2xl space-y-4"
+            className="w-full max-w-lg bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar"
           >
-            <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-[var(--border)] pb-3">
               <div>
-                <h3 className="text-base font-black text-[var(--text-primary)] uppercase tracking-tight">
-                  Status & Resi Pengiriman
+                <h3 className="text-base font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
+                  <FaTruck className="text-[var(--primary)] text-sm" /> Pengiriman & Status Pesanan
                 </h3>
-                <p className="text-xs text-[var(--text-secondary)] font-mono">
-                  #{editingShippingOrder.order_number} — {editingShippingOrder.nama_lengkap || editingShippingOrder.whatsapp}
-                </p>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <span className="font-mono text-xs font-bold text-[var(--primary)]">
+                    #{editingShippingOrder.order_number}
+                  </span>
+                  <span className="text-xs text-[var(--text-secondary)]">·</span>
+                  <span className="text-xs font-bold text-[var(--text-primary)]">
+                    {editingShippingOrder.nama_lengkap || 'Customer'}
+                  </span>
+                  {editingShippingOrder.whatsapp && (
+                    <a
+                      href={`https://wa.me/${String(editingShippingOrder.whatsapp).replace(/[^0-9]/g, '').replace(/^0/, '62')}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25 transition ml-1"
+                      title="Hubungi pembeli di WhatsApp"
+                    >
+                      <FaWhatsapp size={11} /> WA: {editingShippingOrder.whatsapp}
+                    </a>
+                  )}
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setEditingShippingOrder(null)}
-                className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg"
+                className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg hover:bg-[var(--border)] transition"
               >
-                <FaTimes />
+                <FaTimes size={14} />
               </button>
             </div>
 
-            {editingShippingOrder.delivery_method === 'shipping' && editingShippingOrder.shipping_address && (
-              <div className="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs text-[var(--text-secondary)]">
-                <p className="font-bold text-[var(--text-primary)] mb-0.5 flex items-center gap-1.5">
-                  <FaMapMarkerAlt className="text-[var(--primary)]" /> Alamat Tujuan:
+            {/* Selector Metode Pengiriman (Ambil di Event vs Dikirim ke Alamat) */}
+            <div>
+              <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+                Metode Pengambilan / Pengiriman <span className="text-red-400">*</span>
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShippingForm(prev => ({ ...prev, delivery_method: 'pickup_event' }))}
+                  className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1.5 ${
+                    shippingForm.delivery_method === 'pickup_event'
+                      ? 'bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500 shadow-md'
+                      : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--primary)]/40 hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 font-bold text-xs">
+                    <FaStore className="text-sm shrink-0" /> Ambil di Event
+                  </div>
+                  <p className="text-[10px] text-[var(--text-secondary)] leading-tight">
+                    Diambil langsung pembeli di booth venue
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShippingForm(prev => ({ ...prev, delivery_method: 'shipping' }))}
+                  className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1.5 ${
+                    shippingForm.delivery_method === 'shipping'
+                      ? 'bg-[var(--primary)]/15 border-[var(--primary)] text-[var(--primary)] ring-1 ring-[var(--primary)] shadow-md'
+                      : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--primary)]/40 hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 font-bold text-xs">
+                    <FaTruck className="text-sm shrink-0" /> Dikirim ke Alamat
+                  </div>
+                  <p className="text-[10px] text-[var(--text-secondary)] leading-tight">
+                    Dikirim ekspedisi via kurir
+                  </p>
+                </button>
+              </div>
+            </div>
+
+            {/* Form Detail Pengiriman jika Metode = 'shipping' */}
+            {shippingForm.delivery_method === 'shipping' ? (
+              <div className="space-y-3 p-3.5 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--primary)]">
+                  <FaMapMarkerAlt size={12} /> Detail Alamat Pengiriman
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                    Alamat Lengkap <span className="text-red-400">*</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={shippingForm.shipping_address}
+                    onChange={e => setShippingForm({ ...shippingForm, shipping_address: e.target.value })}
+                    placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan"
+                    className="w-full px-3.5 py-2.5 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)] resize-none"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                      Kota / Kabupaten <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={shippingForm.shipping_city}
+                      onChange={e => setShippingForm({ ...shippingForm, shipping_city: e.target.value })}
+                      placeholder="Contoh: Jakarta Selatan"
+                      className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                      Kode Pos <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={shippingForm.shipping_postal_code}
+                      onChange={e => setShippingForm({ ...shippingForm, shipping_postal_code: e.target.value })}
+                      placeholder="Contoh: 12810"
+                      className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-[var(--border)]/60">
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                      Kurir / Ekspedisi <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={shippingForm.shipping_courier}
+                      onChange={e => setShippingForm({ ...shippingForm, shipping_courier: e.target.value })}
+                      placeholder="JNE, J&T, SiCepat, dll"
+                      className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                      Nomor Resi <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={shippingForm.tracking_number}
+                      onChange={e => setShippingForm({ ...shippingForm, tracking_number: e.target.value })}
+                      placeholder="Contoh: JP1234567890"
+                      className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3.5 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs text-[var(--text-secondary)] space-y-1">
+                <p className="font-bold text-amber-300 flex items-center gap-1.5">
+                  <FaStore size={12} /> Pengambilan Langsung di Venue
                 </p>
-                <p>
-                  {editingShippingOrder.shipping_address}
-                  {editingShippingOrder.shipping_city ? `, ${editingShippingOrder.shipping_city}` : ''}
-                  {editingShippingOrder.shipping_postal_code ? ` (${editingShippingOrder.shipping_postal_code})` : ''}
+                <p className="text-[11px] leading-relaxed">
+                  Pesanan akan diambil langsung oleh pembeli di booth official merchandise pada hari event dengan menunjukkan nomor pesanan atau nama lengkap.
                 </p>
               </div>
             )}
 
+            {/* Status Pesanan */}
             <div>
-              <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">Status Pesanan</label>
+              <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
+                Status Pesanan
+              </label>
               <CustomSelect
                 value={shippingForm.status}
                 onChange={e => setShippingForm({ ...shippingForm, status: e.target.value })}
                 options={[
-                  { value: 'pending', label: 'Pending' },
+                  { value: 'pending', label: 'Pending (Menunggu Verifikasi)' },
                   { value: 'paid', label: 'Lunas / Terverifikasi' },
-                  { value: 'packing', label: 'Dikemas' },
+                  { value: 'packing', label: 'Sedang Dikemas' },
                   { value: 'shipped', label: 'Sudah Dikirim' },
                   { value: 'completed', label: 'Selesai (Konfirmasi Admin)' },
                   { value: 'cancelled', label: 'Dibatalkan' }
@@ -589,43 +773,32 @@ const OrdersTab = ({
               />
             </div>
 
+            {/* Catatan / Permintaan Khusus */}
             <div>
-              <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
-                Kurir / Ekspedisi <span className="font-normal">(opsional, misal JNT, JNE, SiCepat)</span>
+              <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                Catatan / Permintaan Khusus Pembeli <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
               </label>
-              <input
-                type="text"
-                value={shippingForm.shipping_courier}
-                onChange={e => setShippingForm({ ...shippingForm, shipping_courier: e.target.value })}
-                placeholder="Contoh: J&T Express / JNE Reguler"
-                className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)]"
+              <textarea
+                rows={2}
+                value={shippingForm.catatan}
+                onChange={e => setShippingForm({ ...shippingForm, catatan: e.target.value })}
+                placeholder="Catatan dari pembeli atau catatan perubahan dari DM staff..."
+                className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)] resize-none"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
-                Nomor Resi <span className="font-normal">(opsional)</span>
-              </label>
-              <input
-                type="text"
-                value={shippingForm.tracking_number}
-                onChange={e => setShippingForm({ ...shippingForm, tracking_number: e.target.value })}
-                placeholder="Contoh: JP1234567890"
-                className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono rounded-xl focus:outline-none focus:border-[var(--primary)]"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2.5 pt-2 border-t border-[var(--border)]">
+            {/* Modal Actions */}
+            <div className="flex justify-end gap-2.5 pt-3 border-t border-[var(--border)]">
               <button
                 type="button"
                 onClick={() => setEditingShippingOrder(null)}
-                className="px-4 py-2 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                className="px-4 py-2 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)]/40 transition"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-xl bg-[var(--primary)] text-[var(--text-primary)] text-xs font-black hover:bg-[var(--primary)]/85"
+                className="px-5 py-2 rounded-xl bg-[var(--primary)] text-black text-xs font-black hover:bg-[var(--primary)]/90 transition shadow-lg"
               >
                 Simpan Perubahan
               </button>
