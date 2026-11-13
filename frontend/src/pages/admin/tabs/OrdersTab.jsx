@@ -388,7 +388,7 @@ const OrdersTab = ({
 
       {orderSubTab === 'merch' && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center flex-wrap gap-3 pr-14 md:pr-16">
+          <div className="flex justify-between items-center flex-wrap gap-3">
             <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">Order Merch</h3>
             <div className="flex gap-2 flex-wrap items-center">
               <button
