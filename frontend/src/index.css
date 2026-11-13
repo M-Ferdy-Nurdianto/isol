@@ -780,70 +780,93 @@ body.light-theme .admin-layout aside {
 }
 
 /* ============================================
-   Kohi Sekai - SweetAlert2 Admin Theme
+   Kohi Sekai - SweetAlert2 Global Theme (Deep Coffee Metal)
    ============================================ */
 
-/* --- Overlay backdrop --- */
+/* --- Overlay backdrop (Solid, Anti-Blur) --- */
+.swal2-container,
+body .swal2-container,
 body:has(.admin-layout) .swal2-container {
-  backdrop-filter: blur(4px) !important;
-  background: rgba(0, 0, 0, 0.55) !important;
-  z-index: 10000 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(10, 8, 6, 0.88) !important;
+  z-index: 100000 !important;
 }
 
 /* --- Popup container --- */
+.swal2-popup,
+body .swal2-popup,
 body:has(.admin-layout) .swal2-popup {
   background: #241E19 !important;
-  color: #f4f4f5 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #F5E6D3 !important;
+  border: 1px solid #3A2E24 !important;
   border-radius: 16px !important;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.85) !important;
   padding: 24px !important;
-  max-width: 420px !important;
+  max-width: 440px !important;
   font-family: inherit !important;
 }
 
 /* --- Icon styling --- */
+.swal2-icon,
+body .swal2-icon,
 body:has(.admin-layout) .swal2-icon {
   margin: 0 auto 16px auto !important;
 }
 
 /* Icon colors */
+.swal2-icon.swal2-warning,
+body .swal2-icon.swal2-warning,
 body:has(.admin-layout) .swal2-icon.swal2-warning {
-  border-color: #f59e0b !important;
-  color: #f59e0b !important;
+  border-color: #E5A93C !important;
+  color: #E5A93C !important;
 }
 
+.swal2-icon.swal2-error,
+body .swal2-icon.swal2-error,
 body:has(.admin-layout) .swal2-icon.swal2-error {
-  border-color: #ef4444 !important;
-  color: #ef4444 !important;
+  border-color: #D65656 !important;
+  color: #D65656 !important;
 }
 
+.swal2-icon.swal2-success,
+body .swal2-icon.swal2-success,
 body:has(.admin-layout) .swal2-icon.swal2-success {
+  border-color: #6FAE73 !important;
+  color: #6FAE73 !important;
+}
+.swal2-icon.swal2-success [class^='swal2-success-line'],
+body .swal2-icon.swal2-success [class^='swal2-success-line'],
+body:has(.admin-layout) .swal2-icon.swal2-success [class^='swal2-success-line'] {
+  background-color: #6FAE73 !important;
+}
+.swal2-icon.swal2-success .swal2-success-ring,
+body .swal2-icon.swal2-success .swal2-success-ring,
+body:has(.admin-layout) .swal2-icon.swal2-success .swal2-success-ring {
+  border: 4px solid rgba(111, 174, 115, 0.3) !important;
+}
+
+.swal2-icon.swal2-question,
+body .swal2-icon.swal2-question,
+body:has(.admin-layout) .swal2-icon.swal2-question {
   border-color: #E8944A !important;
   color: #E8944A !important;
 }
-body:has(.admin-layout) .swal2-icon.swal2-success [class^='swal2-success-line'] {
-  background-color: #E8944A !important;
-}
-body:has(.admin-layout) .swal2-icon.swal2-success .swal2-success-ring {
-  border: 4px solid rgba(232, 148, 74, 0.3) !important;
-}
 
-body:has(.admin-layout) .swal2-icon.swal2-question {
-  border-color: #06b6d4 !important;
-  color: #06b6d4 !important;
-}
-
+.swal2-icon.swal2-info,
+body .swal2-icon.swal2-info,
 body:has(.admin-layout) .swal2-icon.swal2-info {
-  border-color: #3b82f6 !important;
-  color: #3b82f6 !important;
+  border-color: #E8944A !important;
+  color: #E8944A !important;
 }
 
 /* --- Judul --- */
+.swal2-title,
+body .swal2-title,
 body:has(.admin-layout) .swal2-title {
-  color: #f4f4f5 !important;
-  font-size: 17px !important;
-  font-weight: 600 !important;
+  color: #F5E6D3 !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
   letter-spacing: -0.01em !important;
   padding: 0 0 8px 0 !important;
   margin: 0 !important;
@@ -851,8 +874,10 @@ body:has(.admin-layout) .swal2-title {
 }
 
 /* --- Body text --- */
+.swal2-html-container,
+body .swal2-html-container,
 body:has(.admin-layout) .swal2-html-container {
-  color: rgba(176, 165, 153, 0.6) !important;
+  color: #B0A599 !important;
   font-size: 13.5px !important;
   line-height: 1.55 !important;
   margin: 0 0 20px 0 !important;
@@ -863,6 +888,8 @@ body:has(.admin-layout) .swal2-html-container {
 }
 
 /* --- Tombol area --- */
+.swal2-actions,
+body .swal2-actions,
 body:has(.admin-layout) .swal2-actions {
   display: flex !important;
   flex-direction: row !important;
@@ -874,70 +901,109 @@ body:has(.admin-layout) .swal2-actions {
 }
 
 /* --- Tombol konfirmasi --- */
+.swal2-confirm,
+body .swal2-confirm,
 body:has(.admin-layout) .swal2-confirm {
   background: #E8944A !important;
-  color: #ffffff !important;
-  border: none !important;
-  border-radius: 9px !important;
+  color: #1A1512 !important;
+  border: 1px solid #E8944A !important;
+  border-radius: 10px !important;
   font-size: 13px !important;
-  font-weight: 500 !important;
+  font-weight: 800 !important;
   padding: 9px 18px !important;
   box-shadow: none !important;
   cursor: pointer !important;
   transition: opacity 0.15s, transform 0.12s !important;
 }
+.swal2-confirm:hover,
+body .swal2-confirm:hover,
 body:has(.admin-layout) .swal2-confirm:hover {
   opacity: 0.9 !important;
   transform: translateY(-1px) !important;
 }
+.swal2-confirm:active,
+body .swal2-confirm:active,
 body:has(.admin-layout) .swal2-confirm:active {
   transform: translateY(0) !important;
 }
 
 /* --- Override merah untuk tombol bahaya --- */
-body:has(.admin-layout) .swal2-confirm[style*="background-color: rgb(239, 68, 68)"],
-body:has(.admin-layout) .swal2-confirm[style*="background-color:#ef4444"],
-body:has(.admin-layout) .swal2-confirm[style*="background-color: #ef4444"] {
-  background: #dc2626 !important;
+.swal2-confirm[style*="background-color: rgb(239, 68, 68)"],
+.swal2-confirm[style*="background-color:#ef4444"],
+.swal2-confirm[style*="background-color: #ef4444"],
+.swal2-confirm[style*="background-color: rgb(214, 86, 86)"],
+.swal2-confirm[style*="background-color:#D65656"],
+.swal2-confirm[style*="background-color: #D65656"],
+.swal2-confirm[style*="background-color: rgb(220, 38, 38)"],
+.swal2-confirm[style*="background-color:#dc2626"],
+.swal2-confirm[style*="background-color: rgb(221, 51, 51)"],
+.swal2-confirm[style*="background-color:#d33"],
+.swal2-confirm[style*="background-color: #d33"] {
+  background: #D65656 !important;
+  color: #ffffff !important;
+  border-color: #D65656 !important;
 }
 
 /* --- Tombol batal --- */
+.swal2-cancel,
+body .swal2-cancel,
 body:has(.admin-layout) .swal2-cancel {
-  background: rgba(255, 255, 255, 0.07) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: #cbd5e1 !important;
-  border-radius: 9px !important;
+  background: #1A1512 !important;
+  border: 1px solid #3A2E24 !important;
+  color: #B0A599 !important;
+  border-radius: 10px !important;
   font-size: 13px !important;
-  font-weight: 500 !important;
+  font-weight: 700 !important;
   padding: 9px 16px !important;
   box-shadow: none !important;
   cursor: pointer !important;
-  transition: background 0.15s, color 0.15s !important;
+  transition: background 0.15s, color 0.15s, border-color 0.15s !important;
 }
+.swal2-cancel:hover,
+body .swal2-cancel:hover,
 body:has(.admin-layout) .swal2-cancel:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  color: #ffffff !important;
+  background: #241E19 !important;
+  border-color: #E8944A !important;
+  color: #F5E6D3 !important;
+}
+
+/* --- Inputs --- */
+.swal2-input,
+.swal2-textarea,
+.swal2-select {
+  background: #1A1512 !important;
+  border: 1px solid #3A2E24 !important;
+  color: #F5E6D3 !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  box-shadow: none !important;
+}
+.swal2-input:focus,
+.swal2-textarea:focus,
+.swal2-select:focus {
+  border-color: #E8944A !important;
+  outline: none !important;
 }
 
 /* --- Timer progress bar --- */
-body:has(.admin-layout) .swal2-timer-progress-bar-container {
+.swal2-timer-progress-bar-container {
   border-radius: 0 0 16px 16px !important;
   overflow: hidden !important;
 }
-body:has(.admin-layout) .swal2-timer-progress-bar {
+.swal2-timer-progress-bar {
   height: 3px !important;
   background: #E8944A !important;
 }
 
 /* --- Loading spinner --- */
-body:has(.admin-layout) .swal2-loader {
+.swal2-loader {
   border-color: #E8944A transparent #E8944A transparent !important;
   width: 32px !important;
   height: 32px !important;
 }
 
 /* --- Radio pills (export modal) --- */
-body:has(.admin-layout) .swal2-radio {
+.swal2-radio {
   display: flex !important;
   flex-direction: row !important;
   justify-content: center !important;
@@ -946,7 +1012,7 @@ body:has(.admin-layout) .swal2-radio {
   margin: 0 0 18px 0 !important;
   padding: 0 !important;
 }
-body:has(.admin-layout) .swal2-radio label {
+.swal2-radio label {
   flex: 1 !important;
   display: flex !important;
   align-items: center !important;
@@ -954,52 +1020,53 @@ body:has(.admin-layout) .swal2-radio label {
   gap: 8px !important;
   padding: 10px 14px !important;
   border-radius: 10px !important;
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: rgba(176, 165, 153, 0.6) !important;
+  background: #1A1512 !important;
+  border: 1px solid #3A2E24 !important;
+  color: #B0A599 !important;
   font-size: 13px !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   cursor: pointer !important;
   transition: all 0.15s ease !important;
 }
-body:has(.admin-layout) .swal2-radio label:hover {
-  border-color: rgba(255, 255, 255, 0.25) !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #f4f4f5 !important;
+.swal2-radio label:hover {
+  border-color: #E8944A !important;
+  background: #241E19 !important;
+  color: #F5E6D3 !important;
 }
-body:has(.admin-layout) .swal2-radio input[type="radio"]:checked + label,
-body:has(.admin-layout) .swal2-radio label:has(input:checked) {
+.swal2-radio input[type="radio"]:checked + label,
+.swal2-radio label:has(input:checked) {
   background: rgba(232, 148, 74, 0.15) !important;
-  border-color: rgba(232, 148, 74, 0.6) !important;
-  color: #f4f4f5 !important;
+  border-color: #E8944A !important;
+  color: #E8944A !important;
+  font-weight: 700 !important;
 }
-body:has(.admin-layout) .swal2-radio input[type="radio"] {
+.swal2-radio input[type="radio"] {
   display: none !important;
 }
 
 /* --- Mobile optimization --- */
 @media (max-width: 640px) {
-  body:has(.admin-layout) .swal2-container { padding: 12px !important; }
-  body:has(.admin-layout) .swal2-popup {
+  .swal2-container { padding: 12px !important; }
+  .swal2-popup {
     width: calc(100vw - 32px) !important;
     max-width: 380px !important;
     padding: 20px 16px !important;
     border-radius: 14px !important;
   }
-  body:has(.admin-layout) .swal2-icon {
+  .swal2-icon {
     transform: scale(0.85) !important;
     margin: 0 auto 12px auto !important;
   }
-  body:has(.admin-layout) .swal2-title { font-size: 16px !important; padding: 0 0 6px 0 !important; }
-  body:has(.admin-layout) .swal2-html-container {
+  .swal2-title { font-size: 16px !important; padding: 0 0 6px 0 !important; }
+  .swal2-html-container {
     font-size: 13px !important;
     margin: 0 0 16px 0 !important;
     padding: 0 4px !important;
     word-break: break-word !important;
   }
-  body:has(.admin-layout) .swal2-actions { flex-direction: row !important; gap: 8px !important; width: 100% !important; }
-  body:has(.admin-layout) .swal2-confirm,
-  body:has(.admin-layout) .swal2-cancel {
+  .swal2-actions { flex-direction: row !important; gap: 8px !important; width: 100% !important; }
+  .swal2-confirm,
+  .swal2-cancel {
     flex: 1 !important;
     padding: 10px 12px !important;
     font-size: 12.5px !important;
@@ -1008,11 +1075,11 @@ body:has(.admin-layout) .swal2-radio input[type="radio"] {
     align-items: center !important;
     justify-content: center !important;
   }
-  body:has(.admin-layout) .swal2-radio { flex-direction: column !important; gap: 6px !important; width: 100% !important; }
-  body:has(.admin-layout) .swal2-radio label { width: 100% !important; padding: 10px 12px !important; }
+  .swal2-radio { flex-direction: column !important; gap: 6px !important; width: 100% !important; }
+  .swal2-radio label { width: 100% !important; padding: 10px 12px !important; }
 }
 
-/* ============ AKHIR BLOK SWEETALERT2 ADMIN THEME ============ */
+/* ============ AKHIR BLOK SWEETALERT2 GLOBAL THEME ============ */
 
 body:has(.admin-layout) .excel-table {
   background: #241E19 !important;

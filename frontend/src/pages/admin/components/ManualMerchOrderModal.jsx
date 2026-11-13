@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Swal from 'sweetalert2'
+import { webAlert } from '../../../lib/webAlert'
 import {
   FaTimes,
   FaPlus,
@@ -98,42 +98,22 @@ const ManualMerchOrderModal = ({
     e.preventDefault()
 
     if (!namaLengkap.trim()) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Nama Pembeli Wajib',
-        text: 'Silakan isi nama pembeli merchandise.',
-        confirmButtonColor: '#E8944A'
-      })
+      webAlert.warning('Nama Pembeli Wajib', 'Silakan isi nama pembeli merchandise.')
       return
     }
 
     if (cartItems.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Keranjang Kosong',
-        text: 'Pilih minimal satu item merchandise untuk dimasukkan ke order.',
-        confirmButtonColor: '#E8944A'
-      })
+      webAlert.warning('Keranjang Kosong', 'Pilih minimal satu item merchandise untuk dimasukkan ke order.')
       return
     }
 
     if (deliveryMethod === 'shipping') {
       if (!shippingAddress.trim() || shippingAddress.trim().length < 5) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Alamat Belum Lengkap',
-          text: 'Harap masukkan alamat pengiriman minimal 5 karakter.',
-          confirmButtonColor: '#E8944A'
-        })
+        webAlert.warning('Alamat Belum Lengkap', 'Harap masukkan alamat pengiriman minimal 5 karakter.')
         return
       }
       if (!shippingCity.trim() || shippingCity.trim().length < 2) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Kota Belum Diisi',
-          text: 'Harap masukkan nama kota / kabupaten pengiriman.',
-          confirmButtonColor: '#E8944A'
-        })
+        webAlert.warning('Kota Belum Diisi', 'Harap masukkan nama kota / kabupaten pengiriman.')
         return
       }
     }
@@ -163,24 +143,13 @@ const ManualMerchOrderModal = ({
 
       await api.post('/merch-orders', payload)
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Order Merch Berhasil!',
-        text: `Pesanan atas nama ${payload.nama_lengkap} berhasil disimpan ke database.`,
-        timer: 2000,
-        showConfirmButton: false
-      })
+      webAlert.success('Order Merch Berhasil!', `Pesanan atas nama ${payload.nama_lengkap} berhasil disimpan ke database.`)
 
       if (onSuccess) onSuccess()
       onClose()
     } catch (error) {
       console.error('Error creating merch order:', error)
-      Swal.fire({
-        icon: 'error',
-        title: 'Gagal Menyimpan Order',
-        text: error.response?.data?.error || error.message || 'Terjadi kesalahan pada server.',
-        confirmButtonColor: '#E8944A'
-      })
+      webAlert.error('Gagal Menyimpan Order', error.response?.data?.error || error.message || 'Terjadi kesalahan pada server.')
     } finally {
       setSubmitting(false)
     }

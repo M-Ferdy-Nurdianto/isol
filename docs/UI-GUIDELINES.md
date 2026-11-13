@@ -54,3 +54,37 @@ Setiap modal form atau editor interaktif di Admin Dashboard Kohi Sekai **WAJIB**
 - **DILARANG** membuat modal pop-up mengambang sempit di desktop untuk form admin (seperti Tambah Event, Input Order Merch, Status Pengiriman Merch).
 - **DILARANG** membuat modal "serba satu layout" yang hanya mengecilkan padding tanpa membedakan struktur desktop vs mobile.
 - **DILARANG** membiarkan tombol submit modal tenggelam di bawah layar tanpa sticky footer.
+
+---
+
+## 5. Standar WebAlert & Toast (Deep Coffee Metal)
+Semua pesan umpan balik (feedback) dan dialog konfirmasi aksi wajib menggunakan helper resmi bertema Deep Coffee Metal:
+
+### A. WebAlert (`src/lib/webAlert.js` atau import via `src/lib/toast.jsx`)
+Gunakan `webAlert` untuk popup dialog dan konfirmasi:
+- **Konfirmasi Aksi**:
+  ```javascript
+  const isConfirmed = await webAlert.confirm({
+    title: 'Hapus Order?',
+    text: 'Data order ini akan dihapus permanen.',
+    confirmText: 'Ya, Hapus',
+    cancelText: 'Batal',
+    isDanger: true,
+  })
+  ```
+- **Alert Status**:
+  - `webAlert.success('Berhasil!', 'Data telah disimpan')`
+  - `webAlert.error('Gagal!', 'Terjadi kesalahan sistem')`
+  - `webAlert.warning('Perhatian!', 'Lengkapi formulir')`
+  - `webAlert.info('Informasi', 'Pesanan sedang diverifikasi')`
+  - `webAlert.loading('Memproses...', 'Mohon tunggu')`
+- **Aturan Visual**: Solid dark espresso overlay (`rgba(10, 8, 6, 0.88)`), tanpa background blur (`backdrop-filter: none`), surface `#241E19`, border `#3A2E24`.
+
+### B. Toast Notifications (`src/lib/toast.jsx` & `src/components/ui/KohiToast.jsx`)
+Gunakan `showToast` untuk notifikasi melayang tanpa memblokir layar:
+- `showToast.success('Pesan sukses')`
+- `showToast.error('Pesan gagal')`
+- `showToast.warning('Peringatan')`
+- `showToast.delete('Data berhasil dihapus')`
+- `showToast.cart('Barang ditambahkan')`
+- **Aturan Visual**: Surface `#241E19`, border `#3A2E24`, teks `#F5E6D3`. Dilarang menggunakan background navy/biru (`#111726`) atau emoji.

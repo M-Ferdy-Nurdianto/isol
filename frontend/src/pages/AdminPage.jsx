@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../lib/api'
 import { supabase } from '../lib/supabase'
-import { showToast } from '../lib/toast'
+import { showToast, webAlert } from '../lib/toast'
 import Swal from 'sweetalert2'
 
 import OrdersTab from './admin/tabs/OrdersTab'
@@ -404,53 +404,51 @@ const AdminPage = () => {
     }
   }
 
-  const handleLogout = () => {
-    Swal.fire({
-      title: 'Logout?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#E8944A',
-      cancelButtonText: 'Batal'
-    }).then(r => {
-      if (r.isConfirmed) {
-        logoutAdminSession()
-        navigate('/admin/login')
-      }
+  const handleLogout = async () => {
+    const isConfirmed = await webAlert.confirm({
+      title: 'Logout Admin?',
+      text: 'Anda akan keluar dari sesi administrator Kohi Sekai.',
+      confirmText: 'Ya, Logout',
+      cancelText: 'Batal',
+      isDanger: true,
+      icon: 'question'
     })
+    if (isConfirmed) {
+      logoutAdminSession()
+      navigate('/admin/login')
+    }
   }
 
   const handleStatusChange = async (orderId, status) => {
     try {
       await api.patch(`/orders/${orderId}/status`, { status })
-      showToast.success('Status updated!')
+      showToast.success('Status pesanan berhasil diperbarui!')
       fetchOrders()
       fetchPendingNotifications()
     } catch (error) {
-      Swal.fire({ icon: 'error', title: 'Gagal Update Status', text: error.response?.data?.error || error.message })
+      webAlert.error('Gagal Update Status', error.response?.data?.error || error.message)
     }
   }
 
   const handleDeleteOrder = async (orderId) => {
-    const result = await Swal.fire({
+    const isConfirmed = await webAlert.confirm({
       title: 'Hapus Order?',
-      text: 'Data tidak bisa dikembalikan!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Ya, Hapus!',
-      cancelButtonText: 'Batal'
+      text: 'Data order ini akan dihapus permanen dan tidak bisa dikembalikan!',
+      confirmText: 'Ya, Hapus',
+      cancelText: 'Batal',
+      isDanger: true,
+      icon: 'warning'
     })
 
-    if (!result.isConfirmed) return
+    if (!isConfirmed) return
 
     try {
       await api.delete(`/orders/${orderId}`)
-      Swal.fire('Deleted!', 'Order telah dihapus.', 'success')
+      showToast.delete('Order berhasil dihapus!')
       fetchOrders()
       fetchPendingNotifications()
     } catch (error) {
-      Swal.fire('Error!', error.message, 'error')
+      webAlert.error('Gagal Menghapus Order', error.message)
     }
   }
 
@@ -461,35 +459,27 @@ const AdminPage = () => {
       fetchOrders()
       setShowBulkDeleteModal(false)
     } catch (error) {
-      Swal.fire('Error!', error.response?.data?.error || error.message, 'error')
+      webAlert.error('Gagal Hapus Massal', error.response?.data?.error || error.message)
     }
   }
 
   const handlePurgeOldPayments = async () => {
-    const result = await Swal.fire({
+    const isConfirmed = await webAlert.confirm({
       title: 'Bersihkan Bukti Pembayaran Lama?',
       text: 'Semua foto bukti bayar dari order yang usianya sudah lebih dari 30 hari akan dihapus dari Supabase Storage untuk menghemat kuota. Riwayat pesanan tetap tersimpan di database.',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#f59e0b',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Ya, Bersihkan Sekarang',
-      cancelButtonText: 'Batal'
+      confirmText: 'Ya, Bersihkan Sekarang',
+      cancelText: 'Batal',
+      icon: 'question'
     })
 
-    if (!result.isConfirmed) return
+    if (!isConfirmed) return
 
     try {
       const response = await api.post('/orders/purge-old-payments')
-      Swal.fire({
-        icon: 'success',
-        title: 'Berhasil!',
-        text: response.data.message,
-        confirmButtonColor: '#E8944A'
-      })
+      webAlert.success('Berhasil!', response.data.message)
       fetchOrders()
     } catch (error) {
-      Swal.fire('Error!', error.response?.data?.error || error.message, 'error')
+      webAlert.error('Gagal Bersihkan Bukti', error.response?.data?.error || error.message)
     }
   }
 
@@ -772,23 +762,21 @@ const AdminPage = () => {
   }
 
   const handleDeleteMerch = async (id, nama) => {
-    const result = await Swal.fire({
+    const isConfirmed = await webAlert.confirm({
       title: `Hapus "${nama}"?`,
-      text: 'Data merchandise ini akan dihapus permanen.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Ya, Hapus',
-      cancelButtonText: 'Batal'
+      text: 'Data merchandise ini akan dihapus permanen dari katalog.',
+      confirmText: 'Ya, Hapus',
+      cancelText: 'Batal',
+      isDanger: true,
+      icon: 'warning'
     })
-    if (!result.isConfirmed) return
+    if (!isConfirmed) return
     try {
       await api.delete(`/merchandise/${id}`)
-      Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Merchandise berhasil dihapus', timer: 1500, showConfirmButton: false })
+      showToast.delete('Merchandise berhasil dihapus!')
       fetchMerch()
     } catch (error) {
-      Swal.fire({ icon: 'error', title: 'Gagal!', text: error.response?.data?.error || 'Gagal menghapus' })
+      webAlert.error('Gagal Menghapus', error.response?.data?.error || 'Gagal menghapus merchandise')
     }
   }
 
@@ -801,7 +789,7 @@ const AdminPage = () => {
       fetchMerch()
     } catch (error) {
       setMerch(prev => prev.map(m => (m.id === item.id ? { ...m, available: previousValue } : m)))
-      Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Gagal update ketersediaan' })
+      webAlert.error('Gagal Update', 'Gagal update ketersediaan merchandise')
     }
   }
 
@@ -809,17 +797,14 @@ const AdminPage = () => {
     try {
       const existingOrder = merchOrders.find(m => m.id === orderId)
       if (newStatus === 'completed' && existingOrder && existingOrder.status !== 'completed') {
-        const confirmResult = await Swal.fire({
+        const isConfirmed = await webAlert.confirm({
           title: 'Konfirmasi Selesai oleh Admin?',
           text: 'User belum mengonfirmasi penerimaan barang. Pastikan pesanan benar-benar sudah diterima sebelum menandai Selesai.',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#10b981',
-          cancelButtonColor: '#6b7280',
-          confirmButtonText: 'Ya, Tandai Selesai',
-          cancelButtonText: 'Batal'
+          confirmText: 'Ya, Tandai Selesai',
+          cancelText: 'Batal',
+          icon: 'warning'
         })
-        if (!confirmResult.isConfirmed) return
+        if (!isConfirmed) return
       }
 
       await api.patch(`/merch-orders/${orderId}/status`, { status: newStatus, ...trackingData })
@@ -827,29 +812,27 @@ const AdminPage = () => {
       fetchMerchOrders()
       fetchPendingNotifications()
     } catch (error) {
-      Swal.fire({ icon: 'error', title: 'Gagal!', text: error.response?.data?.error || 'Gagal update status' })
+      webAlert.error('Gagal Update Status', error.response?.data?.error || 'Gagal update status order merch')
     }
   }
 
   const handleDeleteMerchOrder = async (id) => {
-    const result = await Swal.fire({
+    const isConfirmed = await webAlert.confirm({
       title: 'Hapus Order Merch?',
-      text: 'Order ini akan dihapus permanen.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Ya, Hapus',
-      cancelButtonText: 'Batal'
+      text: 'Order ini akan dihapus permanen dari sistem.',
+      confirmText: 'Ya, Hapus',
+      cancelText: 'Batal',
+      isDanger: true,
+      icon: 'warning'
     })
-    if (!result.isConfirmed) return
+    if (!isConfirmed) return
     try {
       await api.delete(`/merch-orders/${id}`)
-      Swal.fire({ icon: 'success', title: 'Berhasil!', timer: 1500, showConfirmButton: false })
+      showToast.delete('Order merch berhasil dihapus!')
       fetchMerchOrders()
       fetchPendingNotifications()
     } catch (error) {
-      Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Gagal menghapus' })
+      webAlert.error('Gagal Menghapus', error.response?.data?.error || 'Gagal menghapus order merch')
     }
   }
 

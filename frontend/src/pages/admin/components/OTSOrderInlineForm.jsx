@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import Swal from 'sweetalert2'
+import { webAlert } from '../../../lib/webAlert'
 import {
   FaTimes,
   FaPlus,
@@ -243,15 +243,15 @@ const OTSOrderInlineForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!formData.event_id) {
-      Swal.fire({ icon: 'warning', title: 'Pilih Event', text: 'Silakan tentukan event terlebih dahulu.', confirmButtonColor: '#E8944A' })
+      webAlert.warning('Pilih Event', 'Silakan tentukan event terlebih dahulu.')
       return
     }
     if (formData.items.length === 0) {
-      Swal.fire({ icon: 'warning', title: 'Belum Ada Item', text: 'Pilih minimal satu tiket cheki.', confirmButtonColor: '#E8944A' })
+      webAlert.warning('Belum Ada Item', 'Pilih minimal satu tiket cheki.')
       return
     }
     if (!formData.nama_lengkap || formData.nama_lengkap.trim() === '') {
-      Swal.fire({ icon: 'warning', title: 'Nama Pembeli', text: 'Nama pembeli wajib diisi.', confirmButtonColor: '#E8944A' })
+      webAlert.warning('Nama Pembeli Wajib', 'Nama pembeli wajib diisi.')
       return
     }
 
@@ -271,13 +271,7 @@ const OTSOrderInlineForm = ({
         ? `Order untuk ${payload.nama_lengkap} berhasil diajukan. Silakan tunggu konfirmasi admin di venue.`
         : `Order untuk ${payload.nama_lengkap} berhasil disimpan.`
 
-      Swal.fire({
-        icon: 'success',
-        title,
-        text: textMsg,
-        timer: 2200,
-        showConfirmButton: false
-      })
+      webAlert.success(title, textMsg, { timer: 2200 })
       setFormData(prev => ({
         ...prev,
         nama_lengkap: mode === 'user' && fanUser ? fanUser.nama : '',
@@ -289,7 +283,7 @@ const OTSOrderInlineForm = ({
       setSelectedFan(null)
       if (onSuccess) onSuccess()
     } catch (error) {
-      Swal.fire({ icon: 'error', title: 'Gagal', text: error.response?.data?.error || error.message, confirmButtonColor: '#E8944A' })
+      webAlert.error('Gagal Menyimpan Order', error.response?.data?.error || error.message)
     } finally {
       setSubmitting(false)
     }

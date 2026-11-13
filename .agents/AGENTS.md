@@ -97,7 +97,12 @@ Sebelum mengubah kode:
   - **Mobile (`md:hidden`) - BOTTOM-SHEET MODAL**:
     - **Bottom-Sheet Drawer** (`fixed inset-x-0 bottom-0 rounded-t-3xl max-h-[92vh] flex flex-col bg-[var(--surface)] border-t border-[var(--border)] shadow-2xl z-50 animate-slide-up`) dengan visual drag bar di atas, form 1 kolom yang nyaman dioperasikan jempol, dan **Sticky Action Bar di bawah** (`sticky bottom-0 bg-[var(--surface)] border-t border-[var(--border)] p-4`).
 - Pastikan interaksi terasa hidup dengan micro-animations tanpa mengorbankan performa.
-- Gunakan utility toast resmi (`src/lib/toast.jsx` atau `src/components/ui/KohiToast.jsx`) untuk notifikasi status.
+- **STANDAR RESMI ALERT & TOAST (DEEP COFFEE METAL)**:
+  - **Toast Notifications**: Gunakan `showToast` (`src/lib/toast.jsx`) atau `kohiToast` (`src/components/ui/KohiToast.jsx`). Background solid coffee surface (`#241E19`), border `#3A2E24`, teks `#F5E6D3`. Dilarang menggunakan background navy/biru (`#111726`) atau emoji pada toast.
+  - **Web Alert & Dialog Konfirmasi**: Gunakan `webAlert` (`src/lib/webAlert.js` atau import via `src/lib/toast.jsx`):
+    - `await webAlert.confirm({ title, text, confirmText, cancelText, isDanger })`
+    - `webAlert.success(title, text)` / `webAlert.error(title, text)` / `webAlert.warning(title, text)` / `webAlert.info(title, text)`
+    - Seluruh dialog SweetAlert2 diatur otomatis solid Deep Coffee Metal tanpa backdrop blur.
 
 ## 4. Restrictions (Larangan)
 - **DILARANG** menggunakan warna-warni pelangi (purple, sky, cyan, teal, pink) untuk label dan badge biasa.

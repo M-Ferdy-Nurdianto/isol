@@ -1,3 +1,4 @@
+import React from 'react'
 import { toast } from 'react-toastify'
 import {
   FaCheckCircle,
@@ -7,17 +8,26 @@ import {
   FaTrash,
   FaSignInAlt,
   FaSignOutAlt,
-  FaFileDownload
+  FaFileDownload,
+  FaShoppingCart
 } from 'react-icons/fa'
+import { webAlert, kohiAlert } from './webAlert'
 
-// Palet warna minimalis sesuai tema Kohi Sekai:
-// - success  -> #6FAE73 (hijau sukses)
-// - error    -> #D65656 (merah status)
-// - info     -> #E8944A (amber brand)
-// - warning  -> #E5A93C (kuning pending)
-// - delete   -> #D65656 (merah hapus)
-// - auth     -> #F5E6D3 (netral login/logout)
-// - download -> #6FAE73 (hijau sukses)
+/**
+ * Toast Styles sesuai tema Deep Coffee Metal:
+ * - background: #241E19 (Dark Coffee Card & Surface)
+ * - border: #3A2E24 (Subtle Coffee Border)
+ * - text: #F5E6D3 (Warm Cream Light Text)
+ * - success: #6FAE73 (Hijau sukses)
+ * - error: #D65656 (Merah status)
+ * - info / primary: #E8944A (Amber brand)
+ * - warning: #E5A93C (Kuning status)
+ * - delete: #D65656 (Merah hapus)
+ * - auth: #E8944A (Amber brand)
+ * - logout: #B0A599 (Muted Coffee)
+ * - download: #6FAE73 (Hijau sukses)
+ * - cart: #E8944A (Amber brand)
+ */
 const toastStyles = {
   success: {
     icon: <FaCheckCircle />,
@@ -41,15 +51,19 @@ const toastStyles = {
   },
   auth: {
     icon: <FaSignInAlt />,
-    color: '#F5E6D3'
+    color: '#E8944A'
   },
   logout: {
     icon: <FaSignOutAlt />,
-    color: '#F5E6D3'
+    color: '#B0A599'
   },
   download: {
     icon: <FaFileDownload />,
     color: '#6FAE73'
+  },
+  cart: {
+    icon: <FaShoppingCart />,
+    color: '#E8944A'
   }
 }
 
@@ -59,11 +73,11 @@ const CustomToast = ({ message, type = 'info', customIcon, customColor }) => {
   const color = customColor || style.color
 
   return (
-    <div className="flex items-center gap-2.5 px-4 py-3.5 bg-[#111726] border border-white/10 rounded-2xl shadow-xl w-[92vw] sm:w-auto sm:min-w-[280px] sm:max-w-[380px] mx-auto">
-      <span style={{ color }} className="text-[17px] shrink-0">
+    <div className="flex items-center gap-3 px-4 py-3 bg-[var(--surface,#241E19)] border border-[var(--border,#3A2E24)] rounded-xl shadow-[0_12px_32px_rgba(0,0,0,0.8)] w-[92vw] sm:w-auto sm:min-w-[280px] sm:max-w-[420px] mx-auto select-none">
+      <span style={{ color }} className="text-base shrink-0">
         {icon}
       </span>
-      <p className="text-[13px] font-normal text-[#f0efec] leading-snug truncate sm:whitespace-normal">
+      <p className="text-xs font-semibold text-[var(--text-primary,#F5E6D3)] leading-snug truncate sm:whitespace-normal">
         {message}
       </p>
     </div>
@@ -104,17 +118,10 @@ export const showToast = {
     if (toast.isActive(id)) toast.update(id, { render: content, ...toastOptions(id) })
     else toast(content, toastOptions(id))
   },
-  // Toast khusus keranjang belanja / cart (emoji polos + teks tanpa bulatan background & tanpa label)
-  cart: (message, emoji = 'ðŸ›’') => {
+  // Toast keranjang belanja — menggunakan icon SVG resmi tanpa emoji
+  cart: (message) => {
     const id = `cart-${message}`
-    const content = (
-      <div className="flex items-center gap-2.5 px-4 py-3.5 bg-[#111726] border border-white/10 rounded-2xl shadow-xl w-[92vw] sm:w-auto sm:min-w-[280px] sm:max-w-[380px] mx-auto">
-        <span className="text-[17px] shrink-0">{emoji}</span>
-        <p className="text-[13px] font-normal text-[#f0efec] leading-snug truncate sm:whitespace-normal">
-          {message}
-        </p>
-      </div>
-    )
+    const content = <CustomToast message={message} type="cart" customIcon={<FaShoppingCart />} />
     if (toast.isActive(id)) toast.update(id, { render: content, ...toastOptions(id) })
     else toast(content, toastOptions(id))
   },
@@ -142,5 +149,11 @@ export const showToast = {
     const content = <CustomToast message={message} type="download" />
     if (toast.isActive(id)) toast.update(id, { render: content, ...toastOptions(id) })
     else toast(content, toastOptions(id))
-  }
+  },
+  // Shortcut ke webAlert modal dialog
+  alert: webAlert
 }
+
+// Re-export webAlert untuk kemudahan import dari satu module
+export { webAlert, kohiAlert }
+export default showToast

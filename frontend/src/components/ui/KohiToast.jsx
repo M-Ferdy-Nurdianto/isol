@@ -1,13 +1,21 @@
 /**
  * KohiToast.jsx — Kohi Sekai Custom Toast System (Pure Framer Motion)
+ * Design System: Deep Coffee Metal
  * Icons: react-icons (flat, monochrome)
  */
 
 import { createPortal } from 'react-dom'
-import { useState, useEffect, useCallback, useRef, forwardRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, forwardRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useTheme } from '../../context/ThemeContext'
-import { FaCheckCircle, FaTimesCircle, FaInfoCircle, FaShoppingBag, FaShoppingCart } from 'react-icons/fa'
+import {
+  FaCheckCircle,
+  FaTimesCircle,
+  FaInfoCircle,
+  FaExclamationTriangle,
+  FaShoppingBag,
+  FaShoppingCart
+} from 'react-icons/fa'
+import { webAlert, kohiAlert } from '../../lib/webAlert'
 
 // ── Event Bus Global ──────────────────────────────────────────────────────────
 let _dispatch = null
@@ -20,12 +28,13 @@ const bus = {
 let _id = 0
 const nextId = () => ++_id
 
-const DURATION = 1600
+const DURATION = 2200
 
 // Icon map — flat react-icons
 const ICON_MAP = {
   success: FaCheckCircle,
   error: FaTimesCircle,
+  warning: FaExclamationTriangle,
   info: FaInfoCircle,
   cart: FaShoppingCart,
   merch: FaShoppingBag,
@@ -35,34 +44,30 @@ const ICON_COLOR = {
   success: '#6FAE73',
   error: '#D65656',
   warning: '#E5A93C',
-  info: 'var(--primary)',
-  cart: 'var(--primary)',
-  merch: 'var(--primary)',
+  info: '#E8944A',
+  cart: '#E8944A',
+  merch: '#E8944A',
 }
 
-// ── Single Toast Pill Component (forwardRef wrapped to fix motion ref warning) ──
-const ToastCard = forwardRef(({ t, isDark, onDismiss }, ref) => {
+// ── Single Toast Pill Component ──
+const ToastCard = forwardRef(({ t, onDismiss }, ref) => {
   const IconComp = ICON_MAP[t.type] || FaInfoCircle
-  const iconColor = ICON_COLOR[t.type] || 'var(--primary)'
+  const iconColor = ICON_COLOR[t.type] || '#E8944A'
 
   return (
     <motion.div
       ref={ref}
       layout
-      initial={{ opacity: 0, y: -20, scale: 0.85 }}
+      initial={{ opacity: 0, y: -20, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.85 }}
+      exit={{ opacity: 0, y: -20, scale: 0.9 }}
       transition={{ type: 'spring', stiffness: 500, damping: 32 }}
       onClick={onDismiss}
-      className={`pointer-events-auto flex items-center gap-2.5 px-4 sm:px-5 py-3 rounded-full shadow-2xl border select-none cursor-pointer ${
-        isDark
-          ? 'bg-surface border-white/10 text-white shadow-black/50'
-          : 'bg-white border-gray-200/80 text-gray-900 shadow-xl'
-      }`}
+      className="pointer-events-auto flex items-center gap-2.5 px-4 sm:px-5 py-3 rounded-xl bg-[var(--surface,#241E19)] border border-[var(--border,#3A2E24)] text-[var(--text-primary,#F5E6D3)] shadow-2xl shadow-black/80 select-none cursor-pointer"
       style={{ maxWidth: '90vw' }}
     >
       <IconComp style={{ color: iconColor, fontSize: '15px' }} className="shrink-0" />
-      <span className={`text-xs font-medium leading-snug ${isDark ? 'text-[#f0efec]' : 'text-gray-900'}`}>
+      <span className="text-xs font-semibold text-[var(--text-primary,#F5E6D3)] leading-snug">
         {t.title}
       </span>
     </motion.div>
@@ -73,8 +78,6 @@ ToastCard.displayName = 'ToastCard'
 // ── Toast Container Portal ────────────────────────────────────────────────────
 export const KohiToastContainer = () => {
   const [toasts, setToasts] = useState([])
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
   const timers = useRef({})
 
   const dismiss = useCallback((id) => {
@@ -97,10 +100,10 @@ export const KohiToastContainer = () => {
   }, [add])
 
   return createPortal(
-    <div className="fixed top-24 inset-x-0 z-[999999] flex flex-col items-center pointer-events-none px-4">
+    <div className="fixed top-20 inset-x-0 z-[999999] flex flex-col items-center pointer-events-none px-4 gap-2">
       <AnimatePresence mode="popLayout">
         {toasts.map(t => (
-          <ToastCard key={t.id} t={t} isDark={isDark} onDismiss={() => dismiss(t.id)} />
+          <ToastCard key={t.id} t={t} onDismiss={() => dismiss(t.id)} />
         ))}
       </AnimatePresence>
     </div>,
@@ -136,10 +139,12 @@ export const kohiToast = {
 
   success: (message) => bus.emit({ type: 'success', title: message }),
   error: (message) => bus.emit({ type: 'error', title: message }),
+  warning: (message) => bus.emit({ type: 'warning', title: message }),
   info: (message) => bus.emit({ type: 'info', title: message }),
+  alert: webAlert,
 }
 
 // Backwards compatibility export
 export const rbToast = kohiToast
-
+export { webAlert, kohiAlert }
 export default kohiToast

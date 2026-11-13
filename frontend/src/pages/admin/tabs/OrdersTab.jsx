@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
 import Swal from 'sweetalert2'
+import { webAlert } from '../../../lib/webAlert'
 import { FaShoppingCart, FaPlus, FaTimes, FaFileExcel, FaBox, FaEye, FaTrash, FaStar, FaTruck, FaClipboardList, FaStore, FaMapMarkerAlt, FaEdit, FaWhatsapp, FaArrowLeft } from 'react-icons/fa'
 import RenderTable from '../components/RenderTable'
 import CustomSelect from '../components/CustomSelect'
@@ -114,19 +115,11 @@ const OrdersTab = ({
 
     if (shippingForm.delivery_method === 'shipping') {
       if (!shippingForm.shipping_address || shippingForm.shipping_address.trim().length < 5) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Alamat Belum Lengkap',
-          text: 'Harap masukkan alamat pengiriman minimal 5 karakter jika metode adalah Dikirim.'
-        })
+        webAlert.warning('Alamat Belum Lengkap', 'Harap masukkan alamat pengiriman minimal 5 karakter jika metode adalah Dikirim.')
         return
       }
       if (!shippingForm.shipping_city || shippingForm.shipping_city.trim().length < 2) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Kota Belum Diisi',
-          text: 'Harap masukkan kota/kabupaten tujuan pengiriman.'
-        })
+        webAlert.warning('Kota Belum Diisi', 'Harap masukkan kota/kabupaten tujuan pengiriman.')
         return
       }
     }
