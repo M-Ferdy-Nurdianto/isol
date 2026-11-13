@@ -31,19 +31,19 @@ Dokumen ini mendefinisikan aturan visual dan estetika antarmuka pengguna (UI) Ko
 
 ---
 
-## 4. Aturan Wajib Pemisahan Modal (Desktop Dialog vs Mobile Bottom-Sheet)
-Setiap modal form atau popup interaktif di Kohi Sekai **WAJIB** dipisahkan kodenya secara eksplisit menjadi 2 varian tata letak:
+## 4. Aturan Wajib Modal Global Admin (Desktop Fullscreen vs Mobile Bottom-Sheet)
+Setiap modal form atau editor interaktif di Admin Dashboard Kohi Sekai **WAJIB** dipisahkan kodenya secara eksplisit menjadi 2 varian tata letak:
 
-### A. Modal Desktop (`hidden md:flex`)
-1. **Bentuk**: Floating Dialog di tengah layar dengan background solid `bg-[var(--surface)]`, border tegas `border-[var(--border)]`, dan shadow pekat.
-2. **Ukuran Lebar**: Gunakan `max-w-2xl`, `max-w-3xl`, atau `max-w-4xl` dengan tata letak **2 Kolom (Grid)** untuk memanfaatkan lebar layar desktop (misal: kolom kiri untuk data order & status, kolom kanan untuk alamat pengiriman & rincian item).
-3. **Fixed Header & Sticky Footer**:
-   - Header modal tetap di atas dengan judul, info identitas, dan tombol tutup (`FaTimes`).
-   - Tombol aksi (`Batal` dan `Simpan / Konfirmasi`) **WAJIB** berada di sticky/fixed footer bawah modal (`border-t border-[var(--border)] bg-[var(--surface)]`) sehingga **selalu terlihat tanpa perlu scroll ke bawah**.
-4. **Body Scrollable**: Hanya area konten tengah yang boleh di-scroll (`overflow-y-auto custom-scrollbar`).
+### A. Modal Desktop (`hidden md:flex`) - FULLSCREEN OVERLAY (Tanpa Pindah Halaman)
+1. **Bukan Pop-up Melayang**: DILARANG membuat modal pop-up box sempit yang melayang di tengah layar desktop dengan backdrop gelap di tepiannya.
+2. **Fullscreen Workspace**: Modal wajib berupa Fullscreen Overlay in-place (`fixed inset-0 z-50 bg-[var(--background)] flex flex-col overflow-hidden animate-fade-in`) yang memenuhi seluruh viewport monitor tanpa navigasi pindah route/URL.
+3. **Fixed Header Bar**: Bar atas penuh (`bg-[var(--surface)] border-b border-[var(--border)] px-8 py-4 flex items-center justify-between shrink-0`) dengan icon/back arrow, judul jelas, subjudul/badge, dan tombol tutup (`FaTimes`).
+4. **Scrollable Content Body**: Area kerja leluasa di tengah (`flex-1 overflow-y-auto p-8 custom-scrollbar`) dengan container proporsional (`max-w-6xl mx-auto w-full`) menggunakan tata letak 2 kolom atau multi-kolom yang rapi.
+5. **Fixed Sticky Footer**: Bar bawah penuh (`bg-[var(--surface)] border-t border-[var(--border)] px-8 py-4 flex items-center justify-between shrink-0`) di mana tombol aksi `Batal` dan `Simpan / Konfirmasi` selalu terlihat di dasar monitor tanpa perlu scroll.
+6. **PENGECUALIAN RESMI**: Transaksi tiket Order Cheki (`kecuali order cheki`) tetap menggunakan layout form inline OTS atau popup detail yang sudah ada.
 
-### B. Modal Mobile (`md:hidden`)
-1. **Bentuk**: **Bottom-Sheet Modal** yang slide-up dari dasar layar (`fixed inset-x-0 bottom-0 max-h-[92vh] rounded-t-3xl bg-[var(--surface)] border-t border-[var(--border)] shadow-2xl flex flex-col z-50`).
+### B. Modal Mobile (`md:hidden`) - BOTTOM-SHEET MODAL
+1. **Bentuk**: **Bottom-Sheet Modal** yang slide-up dari dasar layar smartphone (`fixed inset-x-0 bottom-0 max-h-[92vh] rounded-t-3xl bg-[var(--surface)] border-t border-[var(--border)] shadow-2xl flex flex-col z-50 animate-slide-up`).
 2. **Handle Bar**: Sertakan visual handle bar di paling atas sheet (`w-12 h-1.5 bg-[var(--border)] rounded-full mx-auto my-2.5`).
 3. **Thumb-Zone Optimization**: Tata letak form mengalir vertikal (1 kolom) yang nyaman dioperasikan satu jempol.
 4. **Sticky Action Bar di Bawah**:
@@ -51,5 +51,6 @@ Setiap modal form atau popup interaktif di Kohi Sekai **WAJIB** dipisahkan koden
    - Pengguna tidak boleh dipaksa scroll ke dasar form hanya untuk menemukan tombol submit.
 
 ### C. Larangan Desain Modal
+- **DILARANG** membuat modal pop-up mengambang sempit di desktop untuk form admin (seperti Tambah Event, Input Order Merch, Status Pengiriman Merch).
 - **DILARANG** membuat modal "serba satu layout" yang hanya mengecilkan padding tanpa membedakan struktur desktop vs mobile.
 - **DILARANG** membiarkan tombol submit modal tenggelam di bawah layar tanpa sticky footer.

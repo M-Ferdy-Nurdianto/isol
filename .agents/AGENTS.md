@@ -86,10 +86,16 @@ Sebelum mengubah kode:
 
 ## 3. UI/UX Integrity & Modal Separation Rules (WAJIB DIPATUHI)
 - Setiap komponen baru wajib memiliki desain solid color yang tajam dan responsif manual (`md:hidden` vs desktop).
-- **ATURAN WAJIB PEMISAHAN MODAL (DESKTOP & MOBILE)**:
-  - Setiap modal / dialog form **DILARANG** dibuat satu layout sempit untuk semua layar.
-  - **Desktop (`hidden md:flex`)**: Floating centered dialog lebar (`max-w-3xl` / `max-w-4xl`), gunakan layout **2 Kolom (Grid)** agar ruang layar luas terpakai optimal, serta **Fixed Header & Sticky Footer** (tombol Batal & Simpan selalu terlihat di bawah tanpa perlu scroll).
-  - **Mobile (`md:hidden`)**: **Bottom-Sheet Modal** (`fixed inset-x-0 bottom-0 rounded-t-3xl max-h-[92vh] flex flex-col`) dengan visual handle bar di atas, form 1 kolom yang mudah diisi dengan jempol, serta **Sticky Action Bar di bawah** (`sticky bottom-0 bg-surface border-t border-border p-4`) agar tombol Simpan selalu siap ditekan kapan saja tanpa perlu scroll sampai bawah.
+- **ATURAN WAJIB MODAL FULLSCREEN DESKTOP & BOTTOM-SHEET MOBILE (GLOBAL ADMIN)**:
+  - Setiap modal / form editor di Admin Dashboard **DILARANG** dibuat berupa pop-up box melayang di tengah layar yang sempit (*no floating pop-up dialogs on desktop*).
+  - **Desktop (`hidden md:flex`) - FULLSCREEN OVERLAY (Tanpa Pindah Halaman)**:
+    - Modal wajib memenuhi seluruh layar (*fullscreen overlay* in-place: `fixed inset-0 z-50 bg-[var(--background)] flex flex-col overflow-hidden animate-fade-in`) tanpa navigasi pindah route/URL.
+    - **Fixed Header**: Full-width top bar (`bg-[var(--surface)] border-b border-[var(--border)] px-8 py-4`) dengan icon/back arrow, judul jelas, dan tombol tutup (`FaTimes`).
+    - **Scrollable Body**: Kontainer leluasa di tengah (`max-w-6xl mx-auto w-full p-8 overflow-y-auto custom-scrollbar`) dengan tata letak 2 kolom atau grid proporsional.
+    - **Fixed Footer**: Full-width bottom bar (`bg-[var(--surface)] border-t border-[var(--border)] px-8 py-4`) di mana tombol `Batal` dan `Simpan` selalu menempel di dasar layar dan selalu terlihat tanpa scrolling.
+    - **PENGECUALIAN RESMI**: Order Cheki (`kecuali order cheki`) tetap menggunakan form inline OTS atau popup detail cheki yang sudah ada.
+  - **Mobile (`md:hidden`) - BOTTOM-SHEET MODAL**:
+    - **Bottom-Sheet Drawer** (`fixed inset-x-0 bottom-0 rounded-t-3xl max-h-[92vh] flex flex-col bg-[var(--surface)] border-t border-[var(--border)] shadow-2xl z-50 animate-slide-up`) dengan visual drag bar di atas, form 1 kolom yang nyaman dioperasikan jempol, dan **Sticky Action Bar di bawah** (`sticky bottom-0 bg-[var(--surface)] border-t border-[var(--border)] p-4`).
 - Pastikan interaksi terasa hidup dengan micro-animations tanpa mengorbankan performa.
 - Gunakan utility toast resmi (`src/lib/toast.jsx` atau `src/components/ui/KohiToast.jsx`) untuk notifikasi status.
 

@@ -10,7 +10,8 @@ import {
   FaBox,
   FaWhatsapp,
   FaInstagram,
-  FaMapMarkerAlt
+  FaMapMarkerAlt,
+  FaArrowLeft
 } from 'react-icons/fa'
 import api from '../../../lib/api'
 import CustomSelect from './CustomSelect'
@@ -188,18 +189,25 @@ const ManualMerchOrderModal = ({
   return (
     <>
       {/* ======================================================== */}
-      {/* 1. DESKTOP MODAL (hidden md:flex) - 2 Kolom Lebar        */}
-      {/* Fixed Header + Fixed Sticky Footer                       */}
+      {/* 1. DESKTOP FULLSCREEN OVERLAY MODAL (hidden md:flex)     */}
+      {/* Tanpa Pindah Halaman, Full Viewport, Fixed Header/Footer */}
       {/* ======================================================== */}
-      <div className="fixed inset-0 z-50 hidden md:flex items-center justify-center p-6 bg-black/85">
-        <div className="absolute inset-0" onClick={onClose} />
+      <div className="fixed inset-0 z-50 hidden md:flex flex-col bg-[var(--background)] animate-fade-in overflow-hidden">
         <form
           onSubmit={handleSubmit}
-          className="relative w-full max-w-4xl bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden z-10"
+          className="flex flex-col h-full w-full overflow-hidden"
         >
-          {/* Header Modal */}
-          <div className="px-6 py-4 bg-[var(--surface)] border-b border-[var(--border)] flex items-center justify-between shrink-0">
+          {/* Header Modal Bar */}
+          <div className="px-8 py-4 bg-[var(--surface)] border-b border-[var(--border)] flex items-center justify-between shrink-0 shadow-sm">
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border)] rounded-xl transition mr-1"
+                title="Kembali"
+              >
+                <FaArrowLeft size={15} />
+              </button>
               <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/15 border border-[var(--primary)]/30 flex items-center justify-center text-[var(--primary)] text-lg shrink-0">
                 <FaBox />
               </div>
@@ -208,7 +216,7 @@ const ManualMerchOrderModal = ({
                   Input Order Merch
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)]">
-                  Tambah pesanan merchandise baru ke dalam sistem
+                  Tambah pesanan merchandise baru ke dalam database
                 </p>
               </div>
             </div>
@@ -223,9 +231,10 @@ const ManualMerchOrderModal = ({
             </button>
           </div>
 
-          {/* Body Modal (2 Kolom Grid) */}
-          <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-            <div className="grid grid-cols-12 gap-6">
+          {/* Body Content Area (Scrollable Canvas dengan Container max-w-6xl) */}
+          <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+            <div className="max-w-6xl mx-auto w-full">
+              <div className="grid grid-cols-12 gap-8">
               {/* Kolom Kiri: Data Pembeli, Status, Pengiriman (5 Kolom) */}
               <div className="col-span-5 space-y-4">
                 {/* Data Pembeli Card */}
@@ -594,34 +603,37 @@ const ManualMerchOrderModal = ({
                   </div>
                 </div>
               </div>
+              </div>
             </div>
           </div>
 
-          {/* Sticky Modal Footer */}
-          <div className="px-6 py-4 bg-[var(--background)] border-t border-[var(--border)] flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-[var(--text-secondary)]">Total:</span>
-              <span className="text-base font-black text-[var(--primary)]">
-                Rp {totalPrice.toLocaleString('id-ID')}
-              </span>
-              <span className="text-xs text-[var(--text-secondary)]">({totalItemsCount} item)</span>
-            </div>
+          {/* Fullscreen Fixed Footer */}
+          <div className="px-8 py-4 bg-[var(--surface)] border-t border-[var(--border)] flex items-center justify-between shrink-0 shadow-lg">
+            <div className="max-w-6xl mx-auto w-full flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-wider">Total Tagihan:</span>
+                <span className="text-xl font-black text-[var(--primary)] font-mono">
+                  Rp {totalPrice.toLocaleString('id-ID')}
+                </span>
+                <span className="text-xs text-[var(--text-secondary)]">({totalItemsCount} item terpilih)</span>
+              </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-5 py-2.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)]/40 transition active:scale-95"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                disabled={submitting || cartItems.length === 0}
-                className="px-6 py-2.5 rounded-xl bg-[var(--primary)] text-black text-xs font-black hover:bg-[var(--primary)]/90 transition shadow-lg active:scale-95 flex items-center gap-2 disabled:opacity-50"
-              >
-                {submitting ? 'Menyimpan...' : 'Simpan Order Merch'}
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-6 py-2.5 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)]/40 transition active:scale-95"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting || cartItems.length === 0}
+                  className="px-7 py-2.5 rounded-xl bg-[var(--primary)] text-black text-xs font-black hover:bg-[var(--primary)]/90 transition shadow-lg active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                >
+                  {submitting ? 'Menyimpan...' : 'Simpan Order Merch'}
+                </button>
+              </div>
             </div>
           </div>
         </form>
