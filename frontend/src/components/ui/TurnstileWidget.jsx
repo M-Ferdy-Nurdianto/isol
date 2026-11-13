@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { FaShieldAlt, FaCheckCircle, FaSpinner } from 'react-icons/fa'
 
-const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAAF_c-inKmR1QnVqn'
+const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAAF_c-inKmR1QaVqn'
 
 const TurnstileWidget = ({ onVerify, resetKey = 0 }) => {
   const containerRef = useRef(null)

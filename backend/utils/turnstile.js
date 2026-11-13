@@ -1,5 +1,5 @@
 export async function verifyTurnstileToken(token, ip) {
-  const secretKey = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAAF_c-nTm2Qg7hufzNDMX2-lTKkc';
+  const secretKey = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAAF_c-nTm2Qg7hufzNDMX2-1TKkc';
   
   if (!token) {
     return { success: false, error: 'Token Turnstile tidak ditemukan' };
