@@ -584,227 +584,569 @@ const OrdersTab = ({
 
       {/* Modal Atur Pengiriman, Alamat & Resi Merch */}
       {editingShippingOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85">
-          <form
-            onSubmit={handleSaveShippingModal}
-            className="w-full max-w-lg bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar"
-          >
-            {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-[var(--border)] pb-3">
-              <div>
-                <h3 className="text-base font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
-                  <FaTruck className="text-[var(--primary)] text-sm" /> Pengiriman & Status Pesanan
-                </h3>
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <span className="font-mono text-xs font-bold text-[var(--primary)]">
-                    #{editingShippingOrder.order_number}
-                  </span>
-                  <span className="text-xs text-[var(--text-secondary)]">·</span>
-                  <span className="text-xs font-bold text-[var(--text-primary)]">
-                    {editingShippingOrder.nama_lengkap || 'Customer'}
-                  </span>
-                  {editingShippingOrder.whatsapp && (
-                    <a
-                      href={`https://wa.me/${String(editingShippingOrder.whatsapp).replace(/[^0-9]/g, '').replace(/^0/, '62')}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25 transition ml-1"
-                      title="Hubungi pembeli di WhatsApp"
-                    >
-                      <FaWhatsapp size={11} /> WA: {editingShippingOrder.whatsapp}
-                    </a>
-                  )}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEditingShippingOrder(null)}
-                className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg hover:bg-[var(--border)] transition"
-              >
-                <FaTimes size={14} />
-              </button>
-            </div>
-
-            {/* Selector Metode Pengiriman (Ambil di Event vs Dikirim ke Alamat) */}
-            <div>
-              <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
-                Metode Pengambilan / Pengiriman <span className="text-red-400">*</span>
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShippingForm(prev => ({ ...prev, delivery_method: 'pickup_event' }))}
-                  className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1.5 ${
-                    shippingForm.delivery_method === 'pickup_event'
-                      ? 'bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500 shadow-md'
-                      : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--primary)]/40 hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 font-bold text-xs">
-                    <FaStore className="text-sm shrink-0" /> Ambil di Event
+        <>
+          {/* ======================================================== */}
+          {/* 1. DESKTOP MODAL (hidden md:flex) - 2 Kolom Lebar        */}
+          {/* Fixed Header + Fixed Sticky Footer (Simpan Selalu Tampak) */}
+          {/* ======================================================== */}
+          <div className="fixed inset-0 z-50 hidden md:flex items-center justify-center p-6 bg-black/85">
+            <div
+              className="absolute inset-0"
+              onClick={() => setEditingShippingOrder(null)}
+            />
+            <form
+              onSubmit={handleSaveShippingModal}
+              className="relative w-full max-w-4xl bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl flex flex-col max-h-[88vh] overflow-hidden z-10"
+            >
+              {/* Header Modal (Fixed, Never scrolls) */}
+              <div className="px-6 py-4 bg-[var(--surface)] border-b border-[var(--border)] flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--primary)]/15 border border-[var(--primary)]/30 flex items-center justify-center text-[var(--primary)] text-lg shrink-0">
+                    <FaTruck />
                   </div>
-                  <p className="text-[10px] text-[var(--text-secondary)] leading-tight">
-                    Diambil langsung pembeli di booth venue
-                  </p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShippingForm(prev => ({ ...prev, delivery_method: 'shipping' }))}
-                  className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1.5 ${
-                    shippingForm.delivery_method === 'shipping'
-                      ? 'bg-[var(--primary)]/15 border-[var(--primary)] text-[var(--primary)] ring-1 ring-[var(--primary)] shadow-md'
-                      : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--primary)]/40 hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 font-bold text-xs">
-                    <FaTruck className="text-sm shrink-0" /> Dikirim ke Alamat
+                  <div>
+                    <h3 className="text-base font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
+                      Pengiriman & Status Pesanan
+                    </h3>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      <span className="font-mono text-xs font-bold text-[var(--primary)] bg-[var(--background)] px-2 py-0.5 rounded border border-[var(--border)]">
+                        #{editingShippingOrder.order_number}
+                      </span>
+                      <span className="text-xs text-[var(--text-secondary)]">·</span>
+                      <span className="text-xs font-bold text-[var(--text-primary)]">
+                        {editingShippingOrder.nama_lengkap || 'Customer'}
+                      </span>
+                      {editingShippingOrder.whatsapp && (
+                        <a
+                          href={`https://wa.me/${String(editingShippingOrder.whatsapp).replace(/[^0-9]/g, '').replace(/^0/, '62')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/25 transition ml-1"
+                          title="Hubungi pembeli di WhatsApp"
+                        >
+                          <FaWhatsapp size={12} /> WA: {editingShippingOrder.whatsapp}
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-[10px] text-[var(--text-secondary)] leading-tight">
-                    Dikirim ekspedisi via kurir
-                  </p>
-                </button>
-              </div>
-            </div>
-
-            {/* Form Detail Pengiriman jika Metode = 'shipping' */}
-            {shippingForm.delivery_method === 'shipping' ? (
-              <div className="space-y-3 p-3.5 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--primary)]">
-                  <FaMapMarkerAlt size={12} /> Detail Alamat Pengiriman
                 </div>
 
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <div className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-secondary)]">Total Order</div>
+                    <div className="text-sm font-black text-[var(--primary)]">
+                      Rp {(editingShippingOrder.total_harga || 0).toLocaleString('id-ID')}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEditingShippingOrder(null)}
+                    className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-xl hover:bg-[var(--border)] transition ml-1"
+                    title="Tutup Modal"
+                  >
+                    <FaTimes size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Body Modal (2 Kolom Grid, Scrollable) */}
+              <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                <div className="grid grid-cols-12 gap-6">
+                  {/* Kolom Kiri: Rincian Order & Status (5 Kolom) */}
+                  <div className="col-span-5 space-y-4">
+                    {/* Ringkasan Item Pesanan */}
+                    <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-3">
+                      <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
+                        <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-1.5">
+                          <FaBox className="text-[var(--primary)] text-xs" /> Item Dipesan ({editingShippingOrder.merch_order_items?.length || 0})
+                        </span>
+                        <span className="text-[10px] text-[var(--text-secondary)] font-mono">
+                          {new Date(editingShippingOrder.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                      </div>
+                      <div className="max-h-36 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                        {editingShippingOrder.merch_order_items && editingShippingOrder.merch_order_items.length > 0 ? (
+                          editingShippingOrder.merch_order_items.map((item, idx) => (
+                            <div key={idx} className="flex items-start justify-between text-xs py-1 border-b border-[var(--border)]/40 last:border-0">
+                              <div>
+                                <p className="font-bold text-[var(--text-primary)] leading-tight">{item.item_name}</p>
+                                {item.size && (
+                                  <span className="text-[10px] text-[var(--text-secondary)] font-medium">Ukuran: {item.size}</span>
+                                )}
+                              </div>
+                              <div className="text-right shrink-0 ml-2">
+                                <span className="font-mono font-bold text-[var(--primary)]">x{item.quantity}</span>
+                                {item.subtotal_price && (
+                                  <p className="text-[10px] text-[var(--text-secondary)]">Rp {Number(item.subtotal_price).toLocaleString('id-ID')}</p>
+                                )}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-xs text-[var(--text-secondary)] italic">Tidak ada rincian item.</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Status Pesanan */}
+                    <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-2">
+                      <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
+                        Status Pesanan <span className="text-red-400">*</span>
+                      </label>
+                      <CustomSelect
+                        value={shippingForm.status}
+                        onChange={e => setShippingForm({ ...shippingForm, status: e.target.value })}
+                        options={[
+                          { value: 'pending', label: 'Pending (Menunggu Verifikasi)' },
+                          { value: 'paid', label: 'Lunas / Terverifikasi' },
+                          { value: 'packing', label: 'Sedang Dikemas' },
+                          { value: 'shipped', label: 'Sudah Dikirim' },
+                          { value: 'completed', label: 'Selesai (Konfirmasi Admin)' },
+                          { value: 'cancelled', label: 'Dibatalkan' }
+                        ]}
+                      />
+                      <p className="text-[10px] text-[var(--text-secondary)] mt-1">
+                        Status saat ini: <span className="font-bold text-[var(--primary)]">{shippingForm.status.toUpperCase()}</span>
+                      </p>
+                    </div>
+
+                    {/* Catatan / Permintaan Khusus */}
+                    <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-1.5">
+                      <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
+                        Catatan Khusus <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={shippingForm.catatan}
+                        onChange={e => setShippingForm({ ...shippingForm, catatan: e.target.value })}
+                        placeholder="Catatan dari pembeli atau instruksi pengiriman staff..."
+                        className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)] resize-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Kolom Kanan: Metode & Detail Pengiriman (7 Kolom) */}
+                  <div className="col-span-7 space-y-4">
+                    {/* Selector Metode Pengiriman */}
+                    <div>
+                      <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+                        Metode Pengambilan / Pengiriman <span className="text-red-400">*</span>
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setShippingForm(prev => ({ ...prev, delivery_method: 'pickup_event' }))}
+                          className={`p-3.5 rounded-xl border text-left transition-all flex flex-col gap-1.5 ${
+                            shippingForm.delivery_method === 'pickup_event'
+                              ? 'bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500 shadow-md'
+                              : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--primary)]/40 hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 font-bold text-xs">
+                            <FaStore className="text-sm shrink-0" /> Ambil di Event
+                          </div>
+                          <p className="text-[11px] text-[var(--text-secondary)] leading-tight">
+                            Diambil langsung pembeli di booth official venue
+                          </p>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setShippingForm(prev => ({ ...prev, delivery_method: 'shipping' }))}
+                          className={`p-3.5 rounded-xl border text-left transition-all flex flex-col gap-1.5 ${
+                            shippingForm.delivery_method === 'shipping'
+                              ? 'bg-[var(--primary)]/15 border-[var(--primary)] text-[var(--primary)] ring-1 ring-[var(--primary)] shadow-md'
+                              : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--primary)]/40 hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 font-bold text-xs">
+                            <FaTruck className="text-sm shrink-0" /> Dikirim ke Alamat
+                          </div>
+                          <p className="text-[11px] text-[var(--text-secondary)] leading-tight">
+                            Dikirim ekspedisi via kurir ke alamat pembeli
+                          </p>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Jika Dikirim ke Alamat */}
+                    {shippingForm.delivery_method === 'shipping' ? (
+                      <div className="space-y-4 p-4 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--primary)] border-b border-[var(--border)] pb-2.5">
+                          <FaMapMarkerAlt size={13} /> Detail Alamat & Ekspedisi Pengiriman
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                            Alamat Lengkap <span className="text-red-400">*</span>
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={shippingForm.shipping_address}
+                            onChange={e => setShippingForm({ ...shippingForm, shipping_address: e.target.value })}
+                            placeholder="Nama jalan, nomor rumah/kantor, RT/RW, kelurahan, kecamatan"
+                            className="w-full px-3.5 py-2.5 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)] resize-none"
+                            required
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                              Kota / Kabupaten <span className="text-red-400">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={shippingForm.shipping_city}
+                              onChange={e => setShippingForm({ ...shippingForm, shipping_city: e.target.value })}
+                              placeholder="Contoh: Jakarta Selatan"
+                              className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                              Kode Pos <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={shippingForm.shipping_postal_code}
+                              onChange={e => setShippingForm({ ...shippingForm, shipping_postal_code: e.target.value })}
+                              placeholder="Contoh: 12810"
+                              className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[var(--border)]/60">
+                          <div>
+                            <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                              Kurir / Ekspedisi <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={shippingForm.shipping_courier}
+                              onChange={e => setShippingForm({ ...shippingForm, shipping_courier: e.target.value })}
+                              placeholder="JNE, J&T, SiCepat, Wahana, dll"
+                              className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                              Nomor Resi <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={shippingForm.tracking_number}
+                              onChange={e => setShippingForm({ ...shippingForm, tracking_number: e.target.value })}
+                              placeholder="Contoh: JP1234567890"
+                              className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-5 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs text-[var(--text-secondary)] space-y-3">
+                        <p className="font-bold text-amber-300 flex items-center gap-2 text-sm">
+                          <FaStore size={14} /> Pengambilan Langsung di Venue
+                        </p>
+                        <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
+                          Pesanan ini disiapkan untuk diambil langsung oleh pembeli di booth merchandise resmi Kohi Sekai pada saat event berlangsung.
+                        </p>
+                        <div className="p-3.5 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-[11px] text-[var(--text-primary)] space-y-1.5">
+                          <p className="font-bold text-[var(--primary)]">Petunjuk Operasional Booth:</p>
+                          <ul className="list-disc list-inside space-y-1 text-[var(--text-secondary)]">
+                            <li>Cukup tunjukkan Order #{editingShippingOrder.order_number} atau nama "{editingShippingOrder.nama_lengkap}"</li>
+                            <li>Pastikan status telah diverifikasi menjadi "Lunas" sebelum barang diserahkan ke pembeli</li>
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer (Fixed Sticky at Bottom) */}
+              <div className="px-6 py-4 bg-[var(--background)] border-t border-[var(--border)] flex items-center justify-between shrink-0">
+                <span className="text-xs text-[var(--text-secondary)]">
+                  Semua perubahan status & pengiriman langsung tersinkronisasi.
+                </span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingShippingOrder(null)}
+                    className="px-5 py-2.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)]/40 transition active:scale-95"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-xl bg-[var(--primary)] text-black text-xs font-black hover:bg-[var(--primary)]/90 transition shadow-lg active:scale-95 flex items-center gap-2"
+                  >
+                    <FaTruck size={12} /> Simpan Perubahan
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {/* ======================================================== */}
+          {/* 2. MOBILE BOTTOM-SHEET MODAL (md:hidden)                  */}
+          {/* Slide up dari bawah, drag bar, tombol submit sticky bawah */}
+          {/* ======================================================== */}
+          <div className="fixed inset-0 z-50 md:hidden flex flex-col justify-end bg-black/85">
+            <div
+              className="absolute inset-0"
+              onClick={() => setEditingShippingOrder(null)}
+            />
+            <form
+              onSubmit={handleSaveShippingModal}
+              className="relative w-full max-h-[92vh] bg-[var(--surface)] border-t border-[var(--border)] rounded-t-3xl shadow-2xl flex flex-col overflow-hidden z-10 animate-slide-up"
+            >
+              {/* Handle bar */}
+              <div className="w-12 h-1.5 bg-[var(--border)] rounded-full mx-auto my-3 shrink-0" />
+
+              {/* Mobile Header */}
+              <div className="px-5 pb-3 border-b border-[var(--border)] flex items-start justify-between shrink-0">
                 <div>
-                  <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
-                    Alamat Lengkap <span className="text-red-400">*</span>
+                  <h3 className="text-base font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-2">
+                    <FaTruck className="text-[var(--primary)] text-sm" /> Pengiriman & Status
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <span className="font-mono text-xs font-bold text-[var(--primary)]">
+                      #{editingShippingOrder.order_number}
+                    </span>
+                    <span className="text-xs text-[var(--text-secondary)]">·</span>
+                    <span className="text-xs font-bold text-[var(--text-primary)]">
+                      {editingShippingOrder.nama_lengkap || 'Customer'}
+                    </span>
+                    {editingShippingOrder.whatsapp && (
+                      <a
+                        href={`https://wa.me/${String(editingShippingOrder.whatsapp).replace(/[^0-9]/g, '').replace(/^0/, '62')}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-400"
+                      >
+                        <FaWhatsapp size={10} /> WA
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingShippingOrder(null)}
+                  className="p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg hover:bg-[var(--border)] transition"
+                >
+                  <FaTimes size={16} />
+                </button>
+              </div>
+
+              {/* Mobile Body (Scrollable 1 Kolom) */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
+                {/* Ringkasan Item Pesanan */}
+                <div className="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)] space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-[var(--text-secondary)] border-b border-[var(--border)] pb-1.5">
+                    <span className="flex items-center gap-1.5 text-[var(--primary)]">
+                      <FaBox size={11} /> Item ({editingShippingOrder.merch_order_items?.length || 0})
+                    </span>
+                    <span className="text-[var(--primary)] font-black">
+                      Rp {(editingShippingOrder.total_harga || 0).toLocaleString('id-ID')}
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 max-h-28 overflow-y-auto custom-scrollbar">
+                    {editingShippingOrder.merch_order_items && editingShippingOrder.merch_order_items.length > 0 ? (
+                      editingShippingOrder.merch_order_items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between text-xs">
+                          <span className="text-[var(--text-primary)] truncate max-w-[200px]">
+                            {item.item_name} {item.size ? `(${item.size})` : ''}
+                          </span>
+                          <span className="font-mono font-bold text-[var(--primary)] shrink-0">x{item.quantity}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-[11px] text-[var(--text-secondary)] italic">Tidak ada rincian item.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Metode Pengambilan / Pengiriman */}
+                <div>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+                    Metode Pengiriman <span className="text-red-400">*</span>
                   </label>
-                  <textarea
-                    rows={2}
-                    value={shippingForm.shipping_address}
-                    onChange={e => setShippingForm({ ...shippingForm, shipping_address: e.target.value })}
-                    placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan"
-                    className="w-full px-3.5 py-2.5 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)] resize-none"
-                    required
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setShippingForm(prev => ({ ...prev, delivery_method: 'pickup_event' }))}
+                      className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1 ${
+                        shippingForm.delivery_method === 'pickup_event'
+                          ? 'bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500'
+                          : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-bold text-xs">
+                        <FaStore className="text-xs shrink-0" /> Ambil di Event
+                      </div>
+                      <p className="text-[10px] text-[var(--text-secondary)]">Booth venue</p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShippingForm(prev => ({ ...prev, delivery_method: 'shipping' }))}
+                      className={`p-3 rounded-xl border text-left transition-all flex flex-col gap-1 ${
+                        shippingForm.delivery_method === 'shipping'
+                          ? 'bg-[var(--primary)]/15 border-[var(--primary)] text-[var(--primary)] ring-1 ring-[var(--primary)]'
+                          : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-bold text-xs">
+                        <FaTruck className="text-xs shrink-0" /> Dikirim
+                      </div>
+                      <p className="text-[10px] text-[var(--text-secondary)]">Ekspedisi kurir</p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Form Alamat jika shipping */}
+                {shippingForm.delivery_method === 'shipping' ? (
+                  <div className="space-y-3 p-3.5 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--primary)]">
+                      <FaMapMarkerAlt size={12} /> Detail Alamat Pengiriman
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                        Alamat Lengkap <span className="text-red-400">*</span>
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={shippingForm.shipping_address}
+                        onChange={e => setShippingForm({ ...shippingForm, shipping_address: e.target.value })}
+                        placeholder="Nama jalan, nomor rumah, RT/RW"
+                        className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)] resize-none"
+                        required
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                          Kota <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={shippingForm.shipping_city}
+                          onChange={e => setShippingForm({ ...shippingForm, shipping_city: e.target.value })}
+                          placeholder="Jakarta Selatan"
+                          className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                          Kode Pos
+                        </label>
+                        <input
+                          type="text"
+                          value={shippingForm.shipping_postal_code}
+                          onChange={e => setShippingForm({ ...shippingForm, shipping_postal_code: e.target.value })}
+                          placeholder="12810"
+                          className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--border)]/60">
+                      <div>
+                        <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                          Kurir
+                        </label>
+                        <input
+                          type="text"
+                          value={shippingForm.shipping_courier}
+                          onChange={e => setShippingForm({ ...shippingForm, shipping_courier: e.target.value })}
+                          placeholder="JNE, J&T"
+                          className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                          Nomor Resi
+                        </label>
+                        <input
+                          type="text"
+                          value={shippingForm.tracking_number}
+                          onChange={e => setShippingForm({ ...shippingForm, tracking_number: e.target.value })}
+                          placeholder="Resi"
+                          className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono rounded-xl focus:outline-none focus:border-[var(--primary)]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3.5 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs text-[var(--text-secondary)] space-y-1">
+                    <p className="font-bold text-amber-300 flex items-center gap-1.5">
+                      <FaStore size={12} /> Ambil di Booth Venue
+                    </p>
+                    <p className="text-[11px] leading-relaxed">
+                      Pesanan diambil langsung di booth merchandise event oleh pembeli.
+                    </p>
+                  </div>
+                )}
+
+                {/* Status Pesanan */}
+                <div>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
+                    Status Pesanan
+                  </label>
+                  <CustomSelect
+                    value={shippingForm.status}
+                    onChange={e => setShippingForm({ ...shippingForm, status: e.target.value })}
+                    options={[
+                      { value: 'pending', label: 'Pending (Menunggu Verifikasi)' },
+                      { value: 'paid', label: 'Lunas / Terverifikasi' },
+                      { value: 'packing', label: 'Sedang Dikemas' },
+                      { value: 'shipped', label: 'Sudah Dikirim' },
+                      { value: 'completed', label: 'Selesai (Konfirmasi Admin)' },
+                      { value: 'cancelled', label: 'Dibatalkan' }
+                    ]}
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
-                      Kota / Kabupaten <span className="text-red-400">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingForm.shipping_city}
-                      onChange={e => setShippingForm({ ...shippingForm, shipping_city: e.target.value })}
-                      placeholder="Contoh: Jakarta Selatan"
-                      className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)]"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
-                      Kode Pos <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingForm.shipping_postal_code}
-                      onChange={e => setShippingForm({ ...shippingForm, shipping_postal_code: e.target.value })}
-                      placeholder="Contoh: 12810"
-                      className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono rounded-xl focus:outline-none focus:border-[var(--primary)]"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-[var(--border)]/60">
-                  <div>
-                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
-                      Kurir / Ekspedisi <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingForm.shipping_courier}
-                      onChange={e => setShippingForm({ ...shippingForm, shipping_courier: e.target.value })}
-                      placeholder="JNE, J&T, SiCepat, dll"
-                      className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
-                      Nomor Resi <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingForm.tracking_number}
-                      onChange={e => setShippingForm({ ...shippingForm, tracking_number: e.target.value })}
-                      placeholder="Contoh: JP1234567890"
-                      className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono rounded-xl focus:outline-none focus:border-[var(--primary)]"
-                    />
-                  </div>
+                {/* Catatan Pembeli */}
+                <div>
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
+                    Catatan Pembeli <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={shippingForm.catatan}
+                    onChange={e => setShippingForm({ ...shippingForm, catatan: e.target.value })}
+                    placeholder="Catatan dari pembeli atau instruksi staff..."
+                    className="w-full px-3 py-2 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)] resize-none"
+                  />
                 </div>
               </div>
-            ) : (
-              <div className="p-3.5 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs text-[var(--text-secondary)] space-y-1">
-                <p className="font-bold text-amber-300 flex items-center gap-1.5">
-                  <FaStore size={12} /> Pengambilan Langsung di Venue
-                </p>
-                <p className="text-[11px] leading-relaxed">
-                  Pesanan akan diambil langsung oleh pembeli di booth official merchandise pada hari event dengan menunjukkan nomor pesanan atau nama lengkap.
-                </p>
+
+              {/* Mobile Sticky Footer */}
+              <div className="p-4 bg-[var(--background)] border-t border-[var(--border)] flex gap-2.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setEditingShippingOrder(null)}
+                  className="w-1/3 py-2.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] text-xs font-bold text-[var(--text-secondary)] active:scale-95 text-center"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="w-2/3 py-2.5 rounded-xl bg-[var(--primary)] text-black text-xs font-black active:scale-95 text-center shadow-lg"
+                >
+                  Simpan Perubahan
+                </button>
               </div>
-            )}
-
-            {/* Status Pesanan */}
-            <div>
-              <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">
-                Status Pesanan
-              </label>
-              <CustomSelect
-                value={shippingForm.status}
-                onChange={e => setShippingForm({ ...shippingForm, status: e.target.value })}
-                options={[
-                  { value: 'pending', label: 'Pending (Menunggu Verifikasi)' },
-                  { value: 'paid', label: 'Lunas / Terverifikasi' },
-                  { value: 'packing', label: 'Sedang Dikemas' },
-                  { value: 'shipped', label: 'Sudah Dikirim' },
-                  { value: 'completed', label: 'Selesai (Konfirmasi Admin)' },
-                  { value: 'cancelled', label: 'Dibatalkan' }
-                ]}
-              />
-            </div>
-
-            {/* Catatan / Permintaan Khusus */}
-            <div>
-              <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1">
-                Catatan / Permintaan Khusus Pembeli <span className="font-normal text-[10px] text-[var(--text-secondary)]">(opsional)</span>
-              </label>
-              <textarea
-                rows={2}
-                value={shippingForm.catatan}
-                onChange={e => setShippingForm({ ...shippingForm, catatan: e.target.value })}
-                placeholder="Catatan dari pembeli atau catatan perubahan dari DM staff..."
-                className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl focus:outline-none focus:border-[var(--primary)] resize-none"
-              />
-            </div>
-
-            {/* Modal Actions */}
-            <div className="flex justify-end gap-2.5 pt-3 border-t border-[var(--border)]">
-              <button
-                type="button"
-                onClick={() => setEditingShippingOrder(null)}
-                className="px-4 py-2 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)]/40 transition"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-xl bg-[var(--primary)] text-black text-xs font-black hover:bg-[var(--primary)]/90 transition shadow-lg"
-              >
-                Simpan Perubahan
-              </button>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
+        </>
       )}
     </div>
   )

@@ -84,8 +84,12 @@ Sebelum mengubah kode:
 - **No Modals for Core CMS**: Gunakan layout Full Page Editor di dalam tab Admin untuk entitas utama (Members, Events, Merch).
 - **Dual Photo Support**: Selalu dukung `image_url` (profil) dan `shop_image_url` (shop tiket 2-shot) pada entitas member.
 
-## 3. UI/UX Integrity
+## 3. UI/UX Integrity & Modal Separation Rules (WAJIB DIPATUHI)
 - Setiap komponen baru wajib memiliki desain solid color yang tajam dan responsif manual (`md:hidden` vs desktop).
+- **ATURAN WAJIB PEMISAHAN MODAL (DESKTOP & MOBILE)**:
+  - Setiap modal / dialog form **DILARANG** dibuat satu layout sempit untuk semua layar.
+  - **Desktop (`hidden md:flex`)**: Floating centered dialog lebar (`max-w-3xl` / `max-w-4xl`), gunakan layout **2 Kolom (Grid)** agar ruang layar luas terpakai optimal, serta **Fixed Header & Sticky Footer** (tombol Batal & Simpan selalu terlihat di bawah tanpa perlu scroll).
+  - **Mobile (`md:hidden`)**: **Bottom-Sheet Modal** (`fixed inset-x-0 bottom-0 rounded-t-3xl max-h-[92vh] flex flex-col`) dengan visual handle bar di atas, form 1 kolom yang mudah diisi dengan jempol, serta **Sticky Action Bar di bawah** (`sticky bottom-0 bg-surface border-t border-border p-4`) agar tombol Simpan selalu siap ditekan kapan saja tanpa perlu scroll sampai bawah.
 - Pastikan interaksi terasa hidup dengan micro-animations tanpa mengorbankan performa.
 - Gunakan utility toast resmi (`src/lib/toast.jsx` atau `src/components/ui/KohiToast.jsx`) untuk notifikasi status.
 
