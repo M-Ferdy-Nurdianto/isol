@@ -45,11 +45,16 @@ fix_database.sql
 *.bak
 *.tmp
 
+# MCP Local Configs
+.mcp.json
+
 # Database dumps & backups
 *.sql.backup
 *.dump
 dump/
 db/*.dump
+cloud_*.sql
+
 
 vercel-env-import.txt
 
