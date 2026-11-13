@@ -121,10 +121,14 @@ router.post('/', async (req, res) => {
       delivery_method,
       shipping_address,
       shipping_city,
-      shipping_postal_code
+      shipping_postal_code,
+      shipping_courier,
+      tracking_number,
+      status: reqStatus
     } = req.body
 
-    if (!whatsapp) {
+    const effectiveWhatsapp = whatsapp || (isAdmin ? '-' : '')
+    if (!effectiveWhatsapp) {
       return res.status(400).json({ error: 'No. WhatsApp wajib diisi' })
     }
     if (!items || items.length === 0) {
@@ -141,15 +145,21 @@ router.post('/', async (req, res) => {
       }
     }
 
-    const orderNumber = `MERCH${Date.now()}`
-    const total_harga = items.reduce((sum, item) => sum + (item.harga * item.quantity), 0)
+    const now = new Date()
+    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '')
+    const randSuffix = Math.floor(1000 + Math.random() * 9000)
+    const orderNumber = `KS-MCH${dateStr}${randSuffix}`
+    const total_harga = items.reduce((sum, item) => sum + ((Number(item.harga) || 0) * (Number(item.quantity) || 1)), 0)
+
+    const validStatuses = ['pending', 'paid', 'checked', 'packing', 'shipped', 'completed', 'cancelled']
+    const effectiveStatus = (isAdmin && reqStatus && validStatuses.includes(reqStatus)) ? reqStatus : 'pending'
 
     const { data: order, error: orderError } = await supabase
       .from('merch_orders')
       .insert({
         order_number: orderNumber,
         nama_lengkap: nama_lengkap || null,
-        whatsapp,
+        whatsapp: effectiveWhatsapp,
         instagram: instagram || null,
         catatan: catatan || null,
         total_harga,
@@ -158,7 +168,13 @@ router.post('/', async (req, res) => {
         shipping_address: normalizedDeliveryMethod === 'shipping' ? String(shipping_address).trim() : null,
         shipping_city: normalizedDeliveryMethod === 'shipping' ? String(shipping_city).trim() : null,
         shipping_postal_code: normalizedDeliveryMethod === 'shipping' && shipping_postal_code ? String(shipping_postal_code).trim() : null,
-        status: 'pending'
+        shipping_courier: normalizedDeliveryMethod === 'shipping' && shipping_courier ? String(shipping_courier).trim() : null,
+        tracking_number: normalizedDeliveryMethod === 'shipping' && tracking_number ? String(tracking_number).trim() : null,
+        status: effectiveStatus,
+        user_id: user_id || null,
+        email: email || null,
+        confirmed_by: (isAdmin && ['paid', 'completed'].includes(effectiveStatus)) ? 'admin' : null,
+        confirmed_at: (isAdmin && ['paid', 'completed'].includes(effectiveStatus)) ? new Date().toISOString() : null
       })
       .select()
       .single()
@@ -168,10 +184,10 @@ router.post('/', async (req, res) => {
     // Insert order items
     const orderItems = items.map(item => ({
       merch_order_id: order.id,
-      merchandise_id: item.merchandise_id || null,
-      item_name: item.nama,
-      harga: item.harga,
-      quantity: item.quantity,
+      merchandise_id: item.merchandise_id || item.id || null,
+      item_name: item.nama || item.item_name || 'Merchandise',
+      harga: Number(item.harga) || 0,
+      quantity: Number(item.quantity) || 1,
       size: item.size || null
     }))
 
@@ -183,19 +199,21 @@ router.post('/', async (req, res) => {
 
     // Update stock if available
     for (const item of items) {
-      if (item.merchandise_id) {
+      const merchId = item.merchandise_id || item.id
+      if (merchId) {
         const { data: merch } = await supabase
           .from('merchandise')
           .select('stok')
-          .eq('id', item.merchandise_id)
+          .eq('id', merchId)
           .single()
 
         if (merch && merch.stok > 0) {
-          const newStok = Math.max(0, merch.stok - item.quantity)
+          const qty = Number(item.quantity) || 1
+          const newStok = Math.max(0, merch.stok - qty)
           await supabase
             .from('merchandise')
             .update({ stok: newStok })
-            .eq('id', item.merchandise_id)
+            .eq('id', merchId)
         }
       }
     }

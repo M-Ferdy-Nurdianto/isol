@@ -5,6 +5,7 @@ import RenderTable from '../components/RenderTable'
 import CustomSelect from '../components/CustomSelect'
 import ExportModal from '../../../components/ExportModal'
 import OTSOrderInlineForm from '../components/OTSOrderInlineForm'
+import ManualMerchOrderModal from '../components/ManualMerchOrderModal'
 
 const OrdersTab = ({
   orders,
@@ -79,6 +80,7 @@ const OrdersTab = ({
 
   const [showExportModal, setShowExportModal] = useState(false)
   const [showInlineOTS, setShowInlineOTS] = useState(false)
+  const [showManualMerchModal, setShowManualMerchModal] = useState(false)
   const [editingShippingOrder, setEditingShippingOrder] = useState(null)
   const [shippingForm, setShippingForm] = useState({
     status: 'shipped',
@@ -388,7 +390,14 @@ const OrdersTab = ({
         <div className="space-y-4">
           <div className="flex justify-between items-center flex-wrap gap-3 pr-14 md:pr-16">
             <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">Order Merch</h3>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap items-center">
+              <button
+                type="button"
+                onClick={() => setShowManualMerchModal(true)}
+                className="px-4 py-2 rounded-xl bg-[var(--primary)] text-black font-black hover:bg-[var(--primary)]/90 flex items-center gap-2 text-xs transition-all shadow-[0_2px_10px_rgba(232,148,74,0.3)] active:scale-95"
+              >
+                <FaPlus size={11} /> Input Order Merch (OTS / DM)
+              </button>
               <button
                 onClick={async () => {
                   const { value: format } = await Swal.fire({
@@ -1147,6 +1156,16 @@ const OrdersTab = ({
             </form>
           </div>
         </>
+      )}
+
+      {/* Modal Input Order Merchandise Manual (OTS Venue / Pesanan DM) */}
+      {showManualMerchModal && (
+        <ManualMerchOrderModal
+          isOpen={showManualMerchModal}
+          onClose={() => setShowManualMerchModal(false)}
+          merch={merch}
+          onSuccess={onFetchMerchOrders}
+        />
       )}
     </div>
   )
