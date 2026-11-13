@@ -172,3 +172,4 @@ export const webAlert = {
 // Aliases
 export const kohiAlert = webAlert
 export default webAlert
+
