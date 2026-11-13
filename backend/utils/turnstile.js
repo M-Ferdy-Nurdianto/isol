@@ -1,4 +1,4 @@
-﻿export async function verifyTurnstileToken(token, ip) {
+export async function verifyTurnstileToken(token, ip) {
   const secretKey = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAAF_c-nTm2Qg7hufzNDMX2-lTKkc';
   
   if (!token) {

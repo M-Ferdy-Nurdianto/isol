@@ -124,8 +124,8 @@ app.use(cors({
       return callback(null, origin)
     }
     
-    // Allow all vercel.app subdomains for preview deployments
-    if (origin && origin.endsWith('.vercel.app')) {
+    // Allow all vercel.app subdomains and custom domains
+    if (origin && (origin.endsWith('.vercel.app') || origin.endsWith('ferdy.web.id') || origin.includes('kohiprototype'))) {
       return callback(null, origin)
     }
     
