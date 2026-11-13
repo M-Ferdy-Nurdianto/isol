@@ -80,7 +80,7 @@ const CustomSelect = ({
       case 'pending':
         return 'bg-amber-500/15 text-amber-300 border-amber-500/40 hover:bg-amber-500/25'
       case 'checked':
-        return 'bg-[#00e5e5]/15 text-[#00e5e5] border-[#00e5e5]/40 hover:bg-[#00e5e5]/25'
+        return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/25'
       case 'completed':
         return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/25'
       default:
