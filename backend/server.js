@@ -121,6 +121,10 @@ app.use(cors({
     if (allowedOrigins.includes(origin)) {
       return callback(null, true)
     }
+    // Allow all vercel.app subdomains for preview and production deployments
+    if (origin && origin.endsWith('.vercel.app')) {
+      return callback(null, origin)
+    }
     return callback(null, false)
   },
   credentials: true
@@ -154,6 +158,11 @@ app.use('/api/news', newsRoutes)
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Kohi Sekai API Running' })
+})
+
+// Vercel Cron Keep-alive
+app.get('/api/cron/keep-alive', (req, res) => {
+  res.json({ success: true, message: 'Keep-alive success', timestamp: new Date().toISOString() })
 })
 
 // Error handling
