@@ -7,17 +7,45 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-function copy404Plugin() {
+const SPA_ROUTES = [
+  '404',
+  'login',
+  'about',
+  'shop',
+  'checkout',
+  'merch-checkout',
+  'music',
+  'profile',
+  'ots',
+  'reset-password',
+  'admin',
+  'admin/login'
+]
+
+function generateSpaHtmlPlugin() {
   return {
-    name: 'copy-404-html',
+    name: 'generate-spa-html',
     closeBundle() {
       const distDir = path.resolve(__dirname, 'dist')
       const indexPath = path.join(distDir, 'index.html')
-      const fallbackPath = path.join(distDir, '404.html')
-      if (fs.existsSync(indexPath)) {
-        fs.copyFileSync(indexPath, fallbackPath)
-        console.log('[copy-404-html] Created dist/404.html for SPA fallback')
-      }
+      if (!fs.existsSync(indexPath)) return
+
+      SPA_ROUTES.forEach((route) => {
+        const filePath = path.join(distDir, `${route}.html`)
+        const dirPath = path.dirname(filePath)
+        if (!fs.existsSync(dirPath)) {
+          fs.mkdirSync(dirPath, { recursive: true })
+        }
+        fs.copyFileSync(indexPath, filePath)
+
+        // Also create directory with index.html for directory-based clean URL resolution
+        const routeDir = path.join(distDir, route)
+        if (!fs.existsSync(routeDir)) {
+          fs.mkdirSync(routeDir, { recursive: true })
+        }
+        fs.copyFileSync(indexPath, path.join(routeDir, 'index.html'))
+      })
+      console.log('[generate-spa-html] Generated static HTML fallbacks for all SPA routes.')
     }
   }
 }
@@ -27,7 +55,7 @@ export default defineConfig({
   base: '/',
   plugins: [
     react(),
-    copy404Plugin(),
+    generateSpaHtmlPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'android-chrome-192x192.png', 'android-chrome-512x512.png', 'images/logos/logo.png', 'images/logos/logo.svg'],
