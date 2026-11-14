@@ -55,6 +55,55 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 })
 
+// GET /api/merch-orders/fan-orders (Public / Fan Order History by Email, User ID, or WhatsApp)
+router.get('/fan-orders', async (req, res) => {
+  try {
+    const email = req.query.email ? String(req.query.email).trim() : null
+    const userId = req.query.user_id ? String(req.query.user_id).trim() : null
+    const whatsapp = req.query.whatsapp ? String(req.query.whatsapp).trim() : null
+
+    if (!email && !userId && !whatsapp) {
+      return res.status(400).json({ success: false, error: 'Email, User ID, atau WhatsApp diperlukan' })
+    }
+
+    let query = supabase
+      .from('merch_orders')
+      .select(`
+        *,
+        merch_order_items (
+          id,
+          item_name,
+          harga,
+          quantity,
+          merchandise_id,
+          size
+        )
+      `)
+      .order('created_at', { ascending: false })
+
+    const conditions = []
+    if (userId) conditions.push(`user_id.eq.${userId}`)
+    if (email) conditions.push(`email.ilike.${email}`)
+    if (whatsapp) conditions.push(`whatsapp.ilike.${whatsapp}`)
+
+    if (conditions.length > 1) {
+      query = query.or(conditions.join(','))
+    } else if (conditions.length === 1) {
+      if (userId) query = query.eq('user_id', userId)
+      else if (email) query = query.ilike('email', email)
+      else if (whatsapp) query = query.ilike('whatsapp', whatsapp)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+
+    res.json({ success: true, data: data || [] })
+  } catch (error) {
+    console.error('Error fetching fan merch orders:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+})
+
 // GET single merch order (admin only)
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
