@@ -728,7 +728,12 @@ router.post('/test-email', async (req, res) => {
     const result = await sendEmail(to, subject, html || '<h1>Halo dari Kohi Sekai!</h1><p>Ini adalah email percobaan.</p>')
     
     if (result.success) {
-      return res.json({ success: true, message: 'Email berhasil dikirim, silakan cek Inbucket (http://127.0.0.1:54324)', messageId: result.messageId })
+      return res.json({
+        success: true,
+        message: 'Email berhasil dikirim via Resend',
+        from: result.from,
+        messageId: result.messageId
+      })
     } else {
       throw result.error
     }

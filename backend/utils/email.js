@@ -47,7 +47,7 @@ const sendWithResend = async ({ to, subject, html, from }) => {
     throw new Error(data.message || `Resend error code: ${response.status}`)
   }
 
-  return { success: true, messageId: data.id, provider: 'resend' }
+  return { success: true, messageId: data.id, provider: 'resend', from }
 }
 
 /**
@@ -94,14 +94,14 @@ export const sendEmail = async (toOrPayload, maybeSubject, maybeHtml) => {
   )
 
   // Default sender address:
-  // Gunakan RESEND_FROM atau EMAIL_FROM jika valid, default ke domain verified: noreply@kohiprototype.ferdy.web.id
+  // Wajib menggunakan domain verified 'kohiprototype.ferdy.web.id'.
+  // Jika RESEND_FROM/EMAIL_FROM adalah resend.dev, gmail, atau yahoo, abaikan dan gunakan domain resmi.
   let fromAddress = process.env.RESEND_FROM
-  if (!fromAddress) {
-    if (process.env.EMAIL_FROM && !process.env.EMAIL_FROM.includes('@gmail.com') && !process.env.EMAIL_FROM.includes('@yahoo.com')) {
-      fromAddress = process.env.EMAIL_FROM
-    } else {
-      fromAddress = 'noreply@kohiprototype.ferdy.web.id'
-    }
+  if (!fromAddress || fromAddress.includes('resend.dev')) {
+    fromAddress = process.env.EMAIL_FROM
+  }
+  if (!fromAddress || fromAddress.includes('@gmail.com') || fromAddress.includes('@yahoo.com') || fromAddress.includes('resend.dev')) {
+    fromAddress = 'noreply@kohiprototype.ferdy.web.id'
   }
   const from = `"${fromName}" <${fromAddress}>`
 
