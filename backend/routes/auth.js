@@ -734,7 +734,10 @@ router.post('/test-email', async (req, res) => {
     }
   } catch (error) {
     console.error('Error in test-email:', error)
-    res.status(500).json({ error: error.message || 'Gagal mengirim email' })
+    res.status(500).json({
+      error: typeof error === 'string' ? error : (error?.message || JSON.stringify(error)),
+      hasResendKey: Boolean(process.env.RESEND_API_KEY)
+    })
   }
 })
 
