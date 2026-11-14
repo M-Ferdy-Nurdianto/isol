@@ -20,7 +20,8 @@ import {
   FaListOl,
   FaIdCard,
   FaEye,
-  FaEyeSlash
+  FaEyeSlash,
+  FaRedo
 } from 'react-icons/fa'
 import KSHeader from '../components/KSHeader'
 import TurnstileWidget from '../components/ui/TurnstileWidget'
@@ -91,6 +92,60 @@ const KSLoginPage = () => {
   const [registerTurnstileResetKey, setRegisterTurnstileResetKey] = useState(0)
   const [showRegisterPassword, setShowRegisterPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  // Resend OTP Rate Limit States (3x jeda 30s, setelah 3x jeda 10 menit)
+  const [resendCooldown, setResendCooldown] = useState(0)
+  const [resendLoading, setResendLoading] = useState(false)
+  const [isOtpBlocked, setIsOtpBlocked] = useState(false)
+  const [otpAttempts, setOtpAttempts] = useState(0)
+
+  // Format countdown mm:ss atau Xs
+  const formatCountdown = (totalSeconds) => {
+    if (totalSeconds <= 0) return '0s'
+    const mins = Math.floor(totalSeconds / 60)
+    const secs = totalSeconds % 60
+    if (mins > 0) {
+      return `${mins}:${secs.toString().padStart(2, '0')}`
+    }
+    return `${secs} detik`
+  }
+
+  // Interval timer hitung mundur resend OTP
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          setIsOtpBlocked(false)
+          sessionStorage.removeItem('kohi_otp_expiry')
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [resendCooldown])
+
+  // Sinkronisasi cooldown tersisa dari sessionStorage saat di Step 3
+  useEffect(() => {
+    if (registerStep === 3) {
+      const savedExpiry = sessionStorage.getItem('kohi_otp_expiry')
+      if (savedExpiry) {
+        const remaining = Math.ceil((Number(savedExpiry) - Date.now()) / 1000)
+        if (remaining > 0) {
+          setResendCooldown(remaining)
+          if (remaining > 30) {
+            setIsOtpBlocked(true)
+          }
+        } else {
+          sessionStorage.removeItem('kohi_otp_expiry')
+        }
+      }
+    }
+  }, [registerStep])
 
   // Forgot Password Modal State
   const [showForgotModal, setShowForgotModal] = useState(false)
@@ -219,16 +274,63 @@ const KSLoginPage = () => {
       })
 
       if (res.data?.success) {
-        kohiToast.success('OTP terkirim! Silakan cek email Anda.')
+        kohiToast.success('OTP terkirim! Silakan periksa inbox email Anda.')
         setRegisterStep(3)
+        const cooldownSec = res.data.cooldown || 30
+        setResendCooldown(cooldownSec)
+        setIsOtpBlocked(Boolean(res.data.isBlocked))
+        setOtpAttempts(res.data.attempts || 1)
+        sessionStorage.setItem('kohi_otp_expiry', String(Date.now() + cooldownSec * 1000))
       } else {
         throw new Error(res.data?.error || 'Gagal mengirim OTP')
       }
     } catch (err) {
-      kohiToast.error(err.response?.data?.error || err.message || 'Gagal mengirim OTP.')
+      const errorData = err.response?.data
+      if (errorData?.retryAfter) {
+        setResendCooldown(errorData.retryAfter)
+        setIsOtpBlocked(Boolean(errorData.isBlocked))
+        setOtpAttempts(errorData.attempts || 3)
+        sessionStorage.setItem('kohi_otp_expiry', String(Date.now() + errorData.retryAfter * 1000))
+      }
+      kohiToast.error(errorData?.error || err.message || 'Gagal mengirim OTP.')
       setRegisterTurnstileResetKey(prev => prev + 1)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Handle Resend OTP (Step 3)
+  const handleResendOTP = async () => {
+    if (resendCooldown > 0 || resendLoading) return
+
+    setResendLoading(true)
+    try {
+      const res = await api.post('/auth/send-otp', {
+        email: registerForm.email,
+        nama: registerForm.nama,
+      })
+
+      if (res.data?.success) {
+        kohiToast.success('Kode OTP baru berhasil dikirim ke email!')
+        const cooldownSec = res.data.cooldown || 30
+        setResendCooldown(cooldownSec)
+        setIsOtpBlocked(Boolean(res.data.isBlocked))
+        setOtpAttempts(res.data.attempts || 1)
+        sessionStorage.setItem('kohi_otp_expiry', String(Date.now() + cooldownSec * 1000))
+      } else {
+        throw new Error(res.data?.error || 'Gagal mengirim ulang OTP')
+      }
+    } catch (err) {
+      const errorData = err.response?.data
+      if (errorData?.retryAfter) {
+        setResendCooldown(errorData.retryAfter)
+        setIsOtpBlocked(Boolean(errorData.isBlocked))
+        setOtpAttempts(errorData.attempts || 3)
+        sessionStorage.setItem('kohi_otp_expiry', String(Date.now() + errorData.retryAfter * 1000))
+      }
+      kohiToast.error(errorData?.error || err.message || 'Gagal mengirim ulang OTP.')
+    } finally {
+      setResendLoading(false)
     }
   }
 
@@ -954,6 +1056,61 @@ const KSLoginPage = () => {
                             <p className="text-[11px] text-text-secondary text-center mt-2">
                               Kode dikirimkan ke <strong className="text-text-primary">{registerForm.email}</strong>
                             </p>
+                          </div>
+
+                          {/* RESEND OTP SECTION */}
+                          <div className="p-3.5 rounded-2xl bg-surface border border-border flex flex-col items-center justify-center gap-2 text-center">
+                            <div className="flex items-center gap-1.5 text-xs text-text-secondary">
+                              <FaRedo className={`text-primary ${resendLoading ? 'animate-spin' : ''}`} size={11} />
+                              <span>Tidak menerima kode di email?</span>
+                            </div>
+
+                            {resendCooldown > 0 ? (
+                              <div className="w-full">
+                                <div className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-background border border-border text-xs">
+                                  {isOtpBlocked ? (
+                                    <span className="text-warning font-semibold flex items-center gap-1.5 text-[11px]">
+                                      <FaExclamationTriangle size={12} className="text-warning flex-shrink-0" />
+                                      <span>Batas 3x tercapai. Tunggu</span>
+                                      <strong className="text-text-primary font-mono bg-surface px-1.5 py-0.5 rounded border border-border">
+                                        {formatCountdown(resendCooldown)}
+                                      </strong>
+                                    </span>
+                                  ) : (
+                                    <span className="text-text-secondary flex items-center gap-1.5 text-[11px]">
+                                      <span>Kirim ulang tersedia dalam</span>
+                                      <strong className="text-primary font-mono bg-surface px-1.5 py-0.5 rounded border border-border">
+                                        {formatCountdown(resendCooldown)}
+                                      </strong>
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[10px] text-text-secondary/70 mt-1.5">
+                                  {isOtpBlocked
+                                    ? 'Jeda keamanan 10 menit aktif untuk melindungi pengiriman email.'
+                                    : `Pengiriman ke-${otpAttempts || 1} dari 3 (jeda 30 detik)`}
+                                </p>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={handleResendOTP}
+                                disabled={resendLoading}
+                                className="w-full py-2.5 px-4 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary font-bold text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                              >
+                                {resendLoading ? (
+                                  <>
+                                    <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                    <span>Mengirim Kode Baru...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <FaRedo size={12} />
+                                    <span>Kirim Ulang Kode OTP</span>
+                                  </>
+                                )}
+                              </button>
+                            )}
                           </div>
 
                           <div className="flex items-center gap-3 mt-4 pt-2">

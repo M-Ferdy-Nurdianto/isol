@@ -11,6 +11,144 @@ const router = express.Router()
 const otpStore = new Map()
 
 // ============================================================================
+// RATE LIMITER OTP REGISTRASI (Anti-Spam & Hemat Kuota Resend)
+// 1. Pelacakan berbasis IP pengirim (dan fallback email)
+// 2. 3x pengiriman pertama: jeda minimal 30 detik antar pengiriman
+// 3. Setelah 3x pengiriman: jeda wajib 10 menit (600 detik)
+// ============================================================================
+const otpRateLimitStore = new Map()
+
+// Cleanup berkala setiap 30 menit
+setInterval(() => {
+  const now = Date.now()
+  for (const [key, data] of otpRateLimitStore.entries()) {
+    if (now - data.lastSentAt > 2 * 60 * 60 * 1000 && (!data.blockedUntil || now > data.blockedUntil)) {
+      otpRateLimitStore.delete(key)
+    }
+  }
+}, 30 * 60 * 1000)
+
+const getOtpClientIp = (req) => {
+  const cfIp = req.headers['cf-connecting-ip']
+  if (typeof cfIp === 'string' && cfIp.trim().length > 0) return cfIp.trim()
+  const forwarded = req.headers['x-forwarded-for']
+  if (typeof forwarded === 'string' && forwarded.trim().length > 0) return forwarded.split(',')[0].trim()
+  return req.ip || req.socket?.remoteAddress || 'unknown-ip'
+}
+
+const checkOtpRateLimit = (req) => {
+  const now = Date.now()
+  const ip = getOtpClientIp(req)
+  const key = `ip:${ip}`
+
+  let record = otpRateLimitStore.get(key)
+  if (!record) {
+    record = { count: 0, lastSentAt: 0, blockedUntil: 0 }
+    otpRateLimitStore.set(key, record)
+  }
+
+  // 1. Cek apakah masih dalam masa blokir 10 menit
+  if (record.blockedUntil && now < record.blockedUntil) {
+    const remainingSeconds = Math.ceil((record.blockedUntil - now) / 1000)
+    const minutes = Math.floor(remainingSeconds / 60)
+    const seconds = remainingSeconds % 60
+    const timeFormatted = minutes > 0 ? `${minutes} menit ${seconds} detik` : `${seconds} detik`
+    return {
+      allowed: false,
+      statusCode: 429,
+      error: `Batas pengiriman kode tercapai (3x). Silakan tunggu ${timeFormatted} sebelum meminta kode baru.`,
+      retryAfter: remainingSeconds,
+      isBlocked: true,
+      attempts: record.count,
+      blockedUntil: record.blockedUntil
+    }
+  }
+
+  // Jika masa blokir sudah berakhir, reset siklus ke awal
+  if (record.blockedUntil && now >= record.blockedUntil) {
+    record.count = 0
+    record.blockedUntil = 0
+  }
+
+  // 2. Cek jika sudah 3x kirim dan belum lewat 10 menit
+  if (record.count >= 3) {
+    const tenMinutes = 10 * 60 * 1000
+    if (now - record.lastSentAt < tenMinutes) {
+      record.blockedUntil = record.lastSentAt + tenMinutes
+      const remainingSeconds = Math.ceil((record.blockedUntil - now) / 1000)
+      const minutes = Math.floor(remainingSeconds / 60)
+      const seconds = remainingSeconds % 60
+      const timeFormatted = minutes > 0 ? `${minutes} menit ${seconds} detik` : `${seconds} detik`
+      return {
+        allowed: false,
+        statusCode: 429,
+        error: `Batas pengiriman kode tercapai (3x). Silakan tunggu ${timeFormatted} sebelum meminta kode baru.`,
+        retryAfter: remainingSeconds,
+        isBlocked: true,
+        attempts: record.count,
+        blockedUntil: record.blockedUntil
+      }
+    } else {
+      record.count = 0
+      record.blockedUntil = 0
+    }
+  }
+
+  // 3. Cek jeda antar pengiriman 30 detik untuk pengiriman 1-3
+  if (record.count > 0) {
+    const thirtySeconds = 30 * 1000
+    const elapsed = now - record.lastSentAt
+    if (elapsed < thirtySeconds) {
+      const remainingSeconds = Math.ceil((thirtySeconds - elapsed) / 1000)
+      return {
+        allowed: false,
+        statusCode: 429,
+        error: `Harap tunggu ${remainingSeconds} detik sebelum meminta kode baru.`,
+        retryAfter: remainingSeconds,
+        isBlocked: false,
+        attempts: record.count
+      }
+    }
+  }
+
+  return { allowed: true, record, ip }
+}
+
+const recordOtpSent = (req) => {
+  const now = Date.now()
+  const ip = getOtpClientIp(req)
+  const key = `ip:${ip}`
+
+  let record = otpRateLimitStore.get(key)
+  if (!record) {
+    record = { count: 0, lastSentAt: 0, blockedUntil: 0 }
+    otpRateLimitStore.set(key, record)
+  }
+
+  record.count += 1
+  record.lastSentAt = now
+
+  if (record.count >= 3) {
+    record.blockedUntil = now + 10 * 60 * 1000
+    return {
+      cooldown: 600, // 10 menit
+      attempts: record.count,
+      maxAttempts: 3,
+      isBlocked: true,
+      blockedUntil: record.blockedUntil
+    }
+  }
+
+  return {
+    cooldown: 30, // 30 detik
+    attempts: record.count,
+    maxAttempts: 3,
+    isBlocked: false,
+    blockedUntil: null
+  }
+}
+
+// ============================================================================
 // 1. UNIFIED LOGIN (Admin by username/password OR Fan by email)
 // ============================================================================
 router.post('/login', async (req, res) => {
@@ -601,7 +739,43 @@ router.post('/test-email', async (req, res) => {
 })
 
 // ============================================================================
-// 8. POST /api/auth/send-otp (Generate & Send OTP for Fan Registration)
+// 8. GET /api/auth/otp-status (Check Resend Cooldown Status for Client)
+// ============================================================================
+router.get('/otp-status', (req, res) => {
+  const check = checkOtpRateLimit(req)
+  if (!check.allowed) {
+    return res.json({
+      canResend: false,
+      retryAfter: check.retryAfter,
+      isBlocked: check.isBlocked,
+      attempts: check.attempts,
+      error: check.error,
+      blockedUntil: check.blockedUntil
+    })
+  }
+
+  const ip = getOtpClientIp(req)
+  const record = otpRateLimitStore.get(`ip:${ip}`) || { count: 0, lastSentAt: 0 }
+  const now = Date.now()
+  let retryAfter = 0
+  if (record.count > 0 && record.count < 3) {
+    const elapsed = now - record.lastSentAt
+    if (elapsed < 30000) {
+      retryAfter = Math.ceil((30000 - elapsed) / 1000)
+    }
+  }
+
+  return res.json({
+    canResend: retryAfter === 0,
+    retryAfter,
+    isBlocked: false,
+    attempts: record.count,
+    cooldown: record.count >= 3 ? 600 : 30
+  })
+})
+
+// ============================================================================
+// 9. POST /api/auth/send-otp (Generate & Send OTP for Fan Registration with Rate Limit)
 // ============================================================================
 router.post('/send-otp', async (req, res) => {
   try {
@@ -610,15 +784,32 @@ router.post('/send-otp', async (req, res) => {
       return res.status(400).json({ error: 'Email wajib diisi' })
     }
 
+    const cleanEmail = email.trim().toLowerCase()
+
+    // 1. Cek Rate Limiting (Per IP: 3x @ 30s, lalu blokir 10 menit)
+    const rateCheck = checkOtpRateLimit(req)
+    if (!rateCheck.allowed) {
+      return res.status(rateCheck.statusCode || 429).json({
+        error: rateCheck.error,
+        retryAfter: rateCheck.retryAfter,
+        isBlocked: rateCheck.isBlocked,
+        attempts: rateCheck.attempts,
+        blockedUntil: rateCheck.blockedUntil
+      })
+    }
+
+    // Catat percobaan pengiriman (mencatat attempt dan menghitung cooldown)
+    const rateInfo = recordOtpSent(req)
+
     // Generate 6 digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString()
-    const cleanEmail = email.trim().toLowerCase()
     
     // Log OTP to console for easy testing with temp mails
     console.log(`\n==========================================`)
     console.log(`🔑 REGISTER OTP REQUEST`)
     console.log(`📧 Email: ${cleanEmail}`)
     console.log(`🔑 KODE OTP: ${otp}`)
+    console.log(`📊 Percobaan: ${rateInfo.attempts}/3 | Cooldown: ${rateInfo.cooldown}s | Blokir 10m: ${rateInfo.isBlocked}`)
     console.log(`💡 (Atau gunakan Magic OTP: 000000 untuk testing)`)
     console.log(`==========================================\n`)
 
@@ -686,13 +877,26 @@ router.post('/send-otp', async (req, res) => {
     try {
       const result = await sendEmail(cleanEmail, 'Kode Verifikasi Registrasi - Kohi Sekai', html)
       if (result.success) {
-        return res.json({ success: true, message: 'OTP telah dikirim ke email Anda' })
+        return res.json({
+          success: true,
+          message: 'OTP telah dikirim ke email Anda',
+          cooldown: rateInfo.cooldown,
+          attempts: rateInfo.attempts,
+          maxAttempts: 3,
+          isBlocked: rateInfo.isBlocked,
+          blockedUntil: rateInfo.blockedUntil
+        })
       } else {
         console.warn('[OTP] sendEmail failed, but OTP is saved in memory for dev:', result.error?.message || result.error)
         if (process.env.NODE_ENV !== 'production' || !process.env.SMTP_USER) {
           return res.json({
             success: true,
-            message: 'OTP telah dibuat (Mode Dev: gunakan kode 000000 atau periksa console server)'
+            message: 'OTP telah dibuat (Mode Dev: gunakan kode 000000 atau periksa console server)',
+            cooldown: rateInfo.cooldown,
+            attempts: rateInfo.attempts,
+            maxAttempts: 3,
+            isBlocked: rateInfo.isBlocked,
+            blockedUntil: rateInfo.blockedUntil
           })
         }
         throw result.error
@@ -701,7 +905,12 @@ router.post('/send-otp', async (req, res) => {
       if (process.env.NODE_ENV !== 'production' || !process.env.SMTP_USER) {
         return res.json({
           success: true,
-          message: 'OTP telah dibuat (Mode Dev: gunakan kode 000000 atau periksa console server)'
+          message: 'OTP telah dibuat (Mode Dev: gunakan kode 000000 atau periksa console server)',
+          cooldown: rateInfo.cooldown,
+          attempts: rateInfo.attempts,
+          maxAttempts: 3,
+          isBlocked: rateInfo.isBlocked,
+          blockedUntil: rateInfo.blockedUntil
         })
       }
       throw mailErr
