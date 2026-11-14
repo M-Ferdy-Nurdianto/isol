@@ -849,26 +849,48 @@ const OTSOrderInlineForm = ({
                 <CartItemsList />
               )}
 
-              <div className="pt-2 border-t border-[var(--border)] flex justify-between items-center">
-                <span className="text-xs text-[var(--text-secondary)]">Total Tagihan:</span>
-                <span className="text-base font-black text-[var(--primary)]">
-                  Rp {totalPrice.toLocaleString('id-ID')}
-                </span>
+              {formData.items.length > 0 && (
+                <div className="pt-2 border-t border-[var(--border)] flex justify-between items-center text-xs">
+                  <span className="text-[var(--text-secondary)]">Total Sementara:</span>
+                  <span className="font-bold text-[var(--primary)] font-mono">
+                    Rp {totalPrice.toLocaleString('id-ID')}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="lg:col-span-7 flex flex-col justify-between">
+            <ItemsCatalog />
+
+            {/* Desktop: Total Tagihan & Tombol Konfirmasi di kolom kanan agar layout seimbang dan tidak kosong */}
+            <div className="mt-4 bg-[var(--surface)] border border-[var(--border)] p-4 rounded-xl shadow-lg flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-[var(--primary)]/15 border border-[var(--primary)]/30 flex items-center justify-center text-[var(--primary)] text-lg shrink-0">
+                  <FaMoneyBillWave />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Total Tagihan</span>
+                    <span className="px-2 py-0.5 rounded-md bg-[var(--primary)]/15 text-[var(--primary)] text-[10px] font-black border border-[var(--primary)]/30">
+                      {totalQty} Item
+                    </span>
+                  </div>
+                  <div className="text-xl font-black text-[var(--primary)] tracking-tight">
+                    Rp {totalPrice.toLocaleString('id-ID')}
+                  </div>
+                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={submitting || formData.items.length === 0}
-                className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-[var(--text-primary)] rounded-xl text-xs font-bold transition shadow-[0_2px_10px_rgba(232,148,74,0.25)] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="px-6 py-3.5 bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-[var(--text-primary)] rounded-xl text-xs font-black transition shadow-[0_2px_10px_rgba(232,148,74,0.25)] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95 shrink-0"
               >
-                <FaCheckCircle />
-                {submitting ? 'Menyimpan...' : 'Simpan Order OTS'}
+                <FaCheckCircle className="text-sm" />
+                {submitting ? 'Menyimpan...' : (mode === 'user' ? 'Ajukan Pesanan OTS' : 'Simpan Order OTS')}
               </button>
             </div>
-          </div>
-
-          <div className="lg:col-span-7">
-            <ItemsCatalog />
           </div>
         </div>
       </form>
