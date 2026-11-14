@@ -262,10 +262,13 @@ router.post('/login', async (req, res) => {
         token,
         user: {
           id: fanUser.id,
+          fan_id: fanUser.fan_id,
           nama: fanUser.nama,
           email: fanUser.email,
           whatsapp: fanUser.whatsapp,
           instagram: fanUser.instagram,
+          image_url: fanUser.image_url || null,
+          banner_url: fanUser.banner_url || null,
           role: fanUser.role || 'fan'
         }
       })
@@ -403,6 +406,8 @@ router.post('/register', async (req, res) => {
         email: savedUser.email,
         whatsapp: savedUser.whatsapp,
         instagram: savedUser.instagram,
+        image_url: savedUser.image_url || null,
+        banner_url: savedUser.banner_url || null,
         role: savedUser.role || 'fan'
       }
     })
@@ -534,10 +539,13 @@ router.post('/fan/login', async (req, res) => {
       token,
       user: {
         id: fanRecord.id,
+        fan_id: fanRecord.fan_id,
         nama: fanRecord.nama,
         email: fanRecord.email,
         whatsapp: fanRecord.whatsapp,
         instagram: fanRecord.instagram,
+        image_url: fanRecord.image_url || null,
+        banner_url: fanRecord.banner_url || null,
         role: fanRecord.role || 'fan'
       }
     })
@@ -984,8 +992,9 @@ router.put('/fan/profile', async (req, res) => {
     const token = authHeader.split(' ')[1]
     const decoded = jwt.verify(token, JWT_SECRET)
 
-    if (decoded.role === 'admin') {
-      return res.status(403).json({ error: 'Endpoint ini khusus untuk fan' })
+    const targetEmail = (decoded.email || (decoded.role === 'admin' ? req.body.email : null) || '').trim().toLowerCase()
+    if (!targetEmail) {
+      return res.status(400).json({ error: 'Email tidak ditemukan untuk update profil' })
     }
 
     const { image_url, banner_url, nama, whatsapp, instagram } = req.body
@@ -1004,7 +1013,7 @@ router.put('/fan/profile', async (req, res) => {
     const { data, error } = await supabase
       .from('users')
       .update(updateData)
-      .eq('email', decoded.email)
+      .ilike('email', targetEmail)
       .select()
       .maybeSingle()
 

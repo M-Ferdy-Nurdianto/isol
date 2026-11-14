@@ -45,6 +45,26 @@ export const FanAuthProvider = ({ children }) => {
     }
   }, [fanUser])
 
+  // On mount: sync latest user data (including updated avatar and banner) from server
+  useEffect(() => {
+    const syncLatestProfile = async () => {
+      try {
+        const token = localStorage.getItem('ks_fan_token')
+        if (!token) return
+
+        const res = await api.get('/auth/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (res.data?.success && res.data?.user && res.data.user.role !== 'admin') {
+          setFanUser(prev => ({ ...(prev || {}), ...res.data.user }))
+        }
+      } catch (err) {
+        // Silent catch if offline or token expired
+      }
+    }
+    syncLatestProfile()
+  }, [])
+
   const login = async (userData) => {
     const { nama, email, whatsapp, instagram, password } = userData
 

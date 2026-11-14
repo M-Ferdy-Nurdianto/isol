@@ -29,18 +29,26 @@ if (import.meta.env.MODE === 'production') {
 // Add auth token to requests and handle Content-Type + Guest Mode sandbox interceptor
 api.interceptors.request.use(
   (config) => {
-    const adminToken = getValidAdminToken()
-    if (adminToken) {
-      config.headers.Authorization = `Bearer ${adminToken}`
-      touchAdminSession()
+    // Only set Authorization header if not already explicitly provided by caller
+    if (!config.headers.Authorization) {
+      const adminToken = getValidAdminToken()
+      if (adminToken) {
+        config.headers.Authorization = `Bearer ${adminToken}`
+        touchAdminSession()
+      } else {
+        // Fallback: send FAN token if available (for logged-in fan users)
+        try {
+          const fanToken = typeof localStorage !== 'undefined' ? localStorage.getItem('ks_fan_token') : null
+          if (fanToken) {
+            config.headers.Authorization = `Bearer ${fanToken}`
+          }
+        } catch {}
+      }
     } else {
-      // Fallback: send FAN token if available (for logged-in fan users)
-      try {
-        const fanToken = typeof localStorage !== 'undefined' ? localStorage.getItem('ks_fan_token') : null
-        if (fanToken) {
-          config.headers.Authorization = `Bearer ${fanToken}`
-        }
-      } catch {}
+      const adminToken = getValidAdminToken()
+      if (adminToken && config.headers.Authorization === `Bearer ${adminToken}`) {
+        touchAdminSession()
+      }
     }
 
     // Only set Content-Type to JSON if data is not FormData

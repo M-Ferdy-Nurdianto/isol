@@ -15,6 +15,7 @@ import { useFanAuth } from '../context/FanAuthContext'
 import KSHeader from '../components/KSHeader'
 import { kohiToast } from '../components/ui/KohiToast'
 import ImageCropModal from '../components/ImageCropModal'
+import { getAssetPath } from '../lib/pathUtils'
 import api from '../lib/api'
 
 const KSProfilePage = () => {
@@ -28,7 +29,17 @@ const KSProfilePage = () => {
   const [loading, setLoading] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [uploadingBanner, setUploadingBanner] = useState(false)
+  const [avatarLoadError, setAvatarLoadError] = useState(false)
+  const [bannerLoadError, setBannerLoadError] = useState(false)
   const [cropModalData, setCropModalData] = useState(null)
+
+  useEffect(() => {
+    setAvatarLoadError(false)
+  }, [fanUser?.image_url])
+
+  useEffect(() => {
+    setBannerLoadError(false)
+  }, [fanUser?.banner_url])
   
   const [activeTab, setActiveTab] = useState('profile') // 'profile' or 'history'
   const [selectedReceiptOrder, setSelectedReceiptOrder] = useState(null)
@@ -219,23 +230,33 @@ const KSProfilePage = () => {
 
     try {
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append('file', file, `${type || (isBanner ? 'banner' : 'avatar')}.jpg`)
 
-      const uploadRes = await api.post(`/upload/fan-image?type=${type}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      const fanToken = localStorage.getItem('ks_fan_token')
+      const headers = { 'Content-Type': 'multipart/form-data' }
+      if (fanToken) {
+        headers.Authorization = `Bearer ${fanToken}`
+      }
+
+      const uploadRes = await api.post(`/upload/fan-image?type=${type}`, formData, { headers })
 
       if (uploadRes.data?.success) {
         const imageUrl = uploadRes.data.data.url
         const token = localStorage.getItem('ks_fan_token')
         const updateRes = await api.put('/auth/fan/profile', {
-          [isBanner ? 'banner_url' : 'image_url']: imageUrl
+          [isBanner ? 'banner_url' : 'image_url']: imageUrl,
+          email: fanUser?.email
         }, {
           headers: { Authorization: `Bearer ${token}` }
         })
 
         if (updateRes.data?.success) {
           updateProfile({ [isBanner ? 'banner_url' : 'image_url']: imageUrl })
+          if (isBanner) {
+            setBannerLoadError(false)
+          } else {
+            setAvatarLoadError(false)
+          }
           kohiToast.success(`${isBanner ? 'Banner' : 'Foto profil'} berhasil diperbarui!`)
         } else {
           throw new Error('Gagal menyimpan ke database')
@@ -867,16 +888,17 @@ const KSProfilePage = () => {
           
           {/* Cover Photo */}
           <div className="h-32 sm:h-48 relative group overflow-hidden bg-surface">
-            {fanUser.banner_url && (
+            {fanUser?.banner_url && !bannerLoadError && (
               <img 
-                src={fanUser.banner_url} 
+                src={getAssetPath(fanUser.banner_url)} 
                 alt="Cover" 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onError={() => setBannerLoadError(true)}
               />
             )}
             
             {/* Dark overlay for pattern if no banner */}
-            {!fanUser.banner_url && (
+            {(!fanUser?.banner_url || bannerLoadError) && (
               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, var(--primary) 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
             )}
 
@@ -917,11 +939,16 @@ const KSProfilePage = () => {
               
               <div className="relative group shrink-0">
                 <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl border-4 border-surface bg-primary flex items-center justify-center text-white shadow-md overflow-hidden relative">
-                  {fanUser.image_url ? (
-                    <img src={fanUser.image_url} alt="Profile" className="w-full h-full object-cover" />
+                  {fanUser?.image_url && !avatarLoadError ? (
+                    <img 
+                      src={getAssetPath(fanUser.image_url)} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover" 
+                      onError={() => setAvatarLoadError(true)}
+                    />
                   ) : (
                     <div className="w-full h-full bg-primary flex items-center justify-center">
-                      <span className="text-3xl md:text-5xl font-black uppercase tracking-wider">{fanUser.nama?.charAt(0) || 'K'}</span>
+                      <span className="text-3xl md:text-5xl font-black uppercase tracking-wider">{fanUser?.nama?.charAt(0) || 'K'}</span>
                     </div>
                   )}
                   

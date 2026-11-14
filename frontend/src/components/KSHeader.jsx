@@ -3,13 +3,14 @@ import { FaHome, FaUsers, FaTicketAlt, FaMusic, FaUser, FaSun, FaMoon, FaShoppin
 import { useTheme } from '../context/ThemeContext'
 import { useFanAuth } from '../context/FanAuthContext'
 import { useMerchCart } from '../context/MerchCartContext'
+import { getAssetPath } from '../lib/pathUtils'
 import FanAuthModal from './auth/FanAuthModal'
 import FanOrderHistoryModal from './auth/FanOrderHistoryModal'
 
 const KSHeader = () => {
   const location = useLocation()
   const { theme, toggleTheme } = useTheme()
-  const { isLoggedIn } = useFanAuth()
+  const { isLoggedIn, fanUser } = useFanAuth()
   const { openCart, totalItems } = useMerchCart()
 
   const navLinks = [
@@ -118,14 +119,22 @@ const KSHeader = () => {
               {/* Fan User Button */}
               <Link
                 to={isLoggedIn ? "/profile" : "/login"}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border bg-[#F2E8DC] dark:bg-[#1A1512] border-[#E2D4C3] dark:border-[#352A21] hover:bg-black/5 dark:hover:bg-white/10 ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border bg-[#F2E8DC] dark:bg-[#1A1512] border-[#E2D4C3] dark:border-[#352A21] hover:bg-black/5 dark:hover:bg-white/10 overflow-hidden ${
                   isLoggedIn 
                     ? 'text-primary' 
                     : 'text-[#736253] dark:text-white hover:text-[#2B2420]'
                 }`}
                 aria-label="Profil Penggemar"
               >
-                <FaUser size={13} />
+                {isLoggedIn && fanUser?.image_url ? (
+                  <img 
+                    src={getAssetPath(fanUser.image_url)} 
+                    alt={fanUser?.nama || 'Profil'} 
+                    className="w-full h-full object-cover" 
+                    onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.style.display = 'inline-block'; }}
+                  />
+                ) : null}
+                <FaUser size={13} style={{ display: isLoggedIn && fanUser?.image_url ? 'none' : 'inline-block' }} />
               </Link>
             </div>
           </nav>
@@ -156,7 +165,19 @@ const KSHeader = () => {
                     : 'text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 font-bold'
                 }`}
               >
-                <Icon size={16} />
+                {tab.name === 'Profil' && isLoggedIn && fanUser?.image_url ? (
+                  <div className="w-4 h-4 rounded-full overflow-hidden border border-current shrink-0">
+                    <img 
+                      src={getAssetPath(fanUser.image_url)} 
+                      alt="PP" 
+                      className="w-full h-full object-cover" 
+                      onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.style.display = 'block'; }}
+                    />
+                    <Icon size={16} style={{ display: 'none' }} />
+                  </div>
+                ) : (
+                  <Icon size={16} />
+                )}
                 <span className="text-[9px] mt-0.5 uppercase tracking-wider leading-none">
                   {tab.name}
                 </span>
