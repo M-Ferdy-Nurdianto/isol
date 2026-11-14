@@ -283,7 +283,7 @@ const OTSOrderInlineForm = ({
       }))
       setCartExpanded(false)
       setSelectedFan(null)
-      if (onSuccess) onSuccess()
+      if (onSuccess) onSuccess(payload)
     } catch (error) {
       webAlert.error('Gagal Menyimpan Order', error.response?.data?.error || error.message)
     } finally {

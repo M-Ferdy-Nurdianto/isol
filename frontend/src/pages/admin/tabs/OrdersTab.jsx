@@ -63,10 +63,11 @@ const OrdersTab = ({
     return event && (event.is_special || event.type === 'special')
   }
 
-  // Filter Logic
+  // Filter Logic:
+  // OTS orders include ALL OTS orders (regular + special) so venue admins never lose sight of tickets
   const specialOrders = orders.filter(o => isSpecialOrder(o))
-  const otsOrders = orders.filter(o => o.is_ots && !isSpecialOrder(o))
-  const poOrders = orders.filter(o => !o.is_ots && !isSpecialOrder(o))
+  const otsOrders = orders.filter(o => o.is_ots)
+  const poOrders = orders.filter(o => !o.is_ots)
 
   const hasActiveFilter = statusFilter !== 'all' || eventFilter !== 'all' || dateFilter !== 'all' || !!searchQuery
 
@@ -181,9 +182,16 @@ const OrdersTab = ({
             setShowInlineOTS(false)
             if (onOtsCartActiveChange) onOtsCartActiveChange(false)
           }}
-          onSuccess={() => {
+          onSuccess={(newOrder) => {
             if (onOtsCartActiveChange) onOtsCartActiveChange(false)
-            if (onRefreshOrders) onRefreshOrders()
+            if (newOrder?.event_id && eventFilter !== 'all' && String(eventFilter) !== String(newOrder.event_id)) {
+              setEventFilter(String(newOrder.event_id))
+            } else if (onRefreshOrders) {
+              onRefreshOrders()
+            }
+            if (statusFilter !== 'all' && statusFilter !== 'checked') {
+              setStatusFilter('all')
+            }
           }}
           onCartChange={(count) => {
             if (onOtsCartActiveChange) onOtsCartActiveChange(count > 0)
@@ -203,7 +211,7 @@ const OrdersTab = ({
       <div className="bg-[var(--surface)] border border-[var(--border)] p-2 rounded-2xl shadow-xl relative">
         <div className="flex overflow-x-auto gap-2 custom-scrollbar snap-x snap-mandatory scroll-smooth pr-8">
           {[
-            { id: 'all', label: 'All (Reg)' },
+            { id: 'all', label: 'All' },
             { id: 'ots', label: 'OTS' },
             { id: 'po', label: 'PO' },
             { id: 'special', label: 'Special' },

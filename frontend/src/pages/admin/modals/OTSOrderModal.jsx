@@ -91,7 +91,7 @@ const OTSOrderModal = ({ members, events = [], onClose, onSuccess, hargaOtsPerMe
         title: 'Order OTS Berhasil!',
         confirmButtonColor: '#E8944A'
       })
-      onSuccess()
+      if (onSuccess) onSuccess(formData)
     } catch (error) {
       Swal.fire({
         icon: 'error',

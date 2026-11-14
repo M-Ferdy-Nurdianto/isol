@@ -326,12 +326,12 @@ const AdminPage = () => {
       const eventList = res.data.data || []
       setEvents(eventList)
 
-      // Otomatis pilih event aktif (bukan 'all') jika belum ada event spesifik yang dipilih
+      // Otomatis pilih event aktif jika belum ada event spesifik yang dipilih
       if (eventList.length > 0) {
         setEventFilter(prev => {
-          if (!prev || prev === 'all') {
+          if (prev === null || prev === undefined || prev === '') {
             const activeEvent = eventList.find(e => !e.is_past) || eventList[0]
-            return activeEvent ? String(activeEvent.id) : prev
+            return activeEvent ? String(activeEvent.id) : 'all'
           }
           return prev
         })
@@ -1352,9 +1352,13 @@ const AdminPage = () => {
           members={members}
           events={events}
           onClose={() => setShowOTSModal(false)}
-          onSuccess={() => {
+          onSuccess={(newOrder) => {
             setShowOTSModal(false)
-            fetchOrders()
+            if (newOrder?.event_id && eventFilter !== 'all' && String(eventFilter) !== String(newOrder.event_id)) {
+              setEventFilter(String(newOrder.event_id))
+            } else {
+              fetchOrders()
+            }
           }}
           hargaOtsPerMember={hargaOtsPerMember}
           hargaOtsGrup={hargaOtsGrup}
