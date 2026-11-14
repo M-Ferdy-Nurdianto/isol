@@ -9,6 +9,7 @@ import {
   FaUserTimes, 
   FaUsers, 
   FaPalette,
+  FaImage,
   FaImages,
   FaInstagram,
   FaArrowLeft,
@@ -99,6 +100,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
     hadir: true,
     image_url: '',
     shop_image_url: '',
+    banner_image_url: '',
     is_secret: false,
     silhouette_image_url: ''
   })
@@ -108,12 +110,15 @@ const MembersTab = ({ members = [], onRefresh }) => {
   const [avatarFile, setAvatarFile] = useState(null)
   const [shopAvatarPreview, setShopAvatarPreview] = useState('')
   const [shopAvatarFile, setShopAvatarFile] = useState(null)
+  const [bannerPreview, setBannerPreview] = useState('')
+  const [bannerFile, setBannerFile] = useState(null)
   const [silhouettePreview, setSilhouettePreview] = useState('')
   const [silhouetteFile, setSilhouetteFile] = useState(null)
 
   // Drag and drop states for photo uploads
   const [isDraggingAvatar, setIsDraggingAvatar] = useState(false)
   const [isDraggingShopAvatar, setIsDraggingShopAvatar] = useState(false)
+  const [isDraggingBanner, setIsDraggingBanner] = useState(false)
   const [isDraggingSilhouette, setIsDraggingSilhouette] = useState(false)
   const [draggingGallerySlot, setDraggingGallerySlot] = useState(null)
 
@@ -123,6 +128,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
   const avatarInputRef = useRef(null)
   const shopAvatarInputRef = useRef(null)
+  const bannerInputRef = useRef(null)
   const silhouetteInputRef = useRef(null)
   const galleryInputRefs = [useRef(null), useRef(null), useRef(null)]
 
@@ -143,6 +149,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
         hadir: member.hadir !== undefined ? member.hadir : true,
         image_url: member.image_url || '',
         shop_image_url: member.shop_image_url || '',
+        banner_image_url: member.banner_image_url || '',
         is_secret: Boolean(member.is_secret),
         silhouette_image_url: member.silhouette_image_url || ''
       })
@@ -159,6 +166,9 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
       setShopAvatarPreview(resolveMemberShopImage(member.shop_image_url, member.member_id, member.nama_panggung))
       setShopAvatarFile(null)
+
+      setBannerPreview(member.banner_image_url || '')
+      setBannerFile(null)
 
       setSilhouettePreview(member.silhouette_image_url || '')
       setSilhouetteFile(null)
@@ -177,6 +187,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
         hadir: true,
         image_url: '',
         shop_image_url: '',
+        banner_image_url: '',
         is_secret: false,
         silhouette_image_url: ''
       })
@@ -187,6 +198,8 @@ const MembersTab = ({ members = [], onRefresh }) => {
       setAvatarFile(null)
       setShopAvatarPreview('')
       setShopAvatarFile(null)
+      setBannerPreview('')
+      setBannerFile(null)
       setSilhouettePreview('')
       setSilhouetteFile(null)
     }
@@ -276,6 +289,42 @@ const MembersTab = ({ members = [], onRefresh }) => {
     if (file && file.type.startsWith('image/')) {
       setShopAvatarFile(file)
       setShopAvatarPreview(URL.createObjectURL(file))
+    }
+  }
+
+  // Upload handler for member landscape banner
+  const handleBannerChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setBannerFile(file)
+      setBannerPreview(URL.createObjectURL(file))
+    }
+  }
+
+  // Drag & drop handlers for Landscape Banner
+  const handleBannerDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  const handleBannerDragEnter = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingBanner(true)
+  }
+  const handleBannerDragLeave = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.currentTarget.contains(e.relatedTarget)) return
+    setIsDraggingBanner(false)
+  }
+  const handleBannerDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingBanner(false)
+    const file = e.dataTransfer?.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      setBannerFile(file)
+      setBannerPreview(URL.createObjectURL(file))
     }
   }
 
@@ -395,6 +444,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
     try {
       let finalAvatarUrl = formData.image_url
       let finalShopImageUrl = formData.shop_image_url
+      let finalBannerImageUrl = formData.banner_image_url
       let finalSilhouetteUrl = formData.silhouette_image_url
 
       // 1. Upload avatar if selected
@@ -409,7 +459,13 @@ const MembersTab = ({ members = [], onRefresh }) => {
         finalShopImageUrl = await uploadFile(shopAvatarFile, 'shop')
       }
 
-      // 3. Upload silhouette if selected
+      // 3. Upload banner landscape if selected
+      if (bannerFile) {
+        showToast.info('Mengunggah foto banner landscape member...')
+        finalBannerImageUrl = await uploadFile(bannerFile, 'banner')
+      }
+
+      // 4. Upload silhouette if selected
       if (silhouetteFile) {
         showToast.info('Mengunggah foto siluet teaser...')
         finalSilhouetteUrl = await uploadFile(silhouetteFile, 'silhouette')
@@ -431,6 +487,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
         ...formData,
         image_url: finalAvatarUrl,
         shop_image_url: finalShopImageUrl,
+        banner_image_url: finalBannerImageUrl,
         silhouette_image_url: finalSilhouetteUrl,
         is_secret: Boolean(formData.is_secret),
         gallery: finalGalleryUrls.filter(u => Boolean(u && u.trim()))
@@ -918,6 +975,124 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     <span className="hidden md:inline-block text-[10px] text-[var(--text-secondary)]">
                       atau seret foto langsung ke area ini
                     </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Foto Banner Landscape Member (Cover Profil Fan) Card */}
+            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
+                  Foto Banner Landscape Member (Cover Profil Fan)
+                </label>
+                <div className="flex items-center gap-1.5">
+                  <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]">
+                    1200 × 675 px (16:9)
+                  </span>
+                  <span className="text-[10px] text-[var(--primary)] font-bold bg-[var(--primary)]/10 px-2 py-0.5 rounded-full border border-[var(--primary)]/20">
+                    Pilihan Banner Fan
+                  </span>
+                </div>
+              </div>
+
+              <div
+                onDragOver={handleBannerDragOver}
+                onDragEnter={handleBannerDragEnter}
+                onDragLeave={handleBannerDragLeave}
+                onDrop={handleBannerDrop}
+                className={`flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border-2 rounded-xl transition-all ${
+                  isDraggingBanner 
+                    ? 'border-dashed border-[var(--primary)] bg-[var(--primary)]/10 ring-2 ring-[var(--primary)]/20' 
+                    : 'border-[var(--border)]'
+                }`}
+              >
+                <div
+                  className={`relative w-48 h-28 sm:w-56 sm:h-32 rounded-2xl overflow-hidden border-2 cursor-pointer group shadow-xl shrink-0 bg-black/50 transition-all ${
+                    isDraggingBanner ? 'scale-105 border-[var(--primary)]' : ''
+                  }`}
+                  style={{ borderColor: isDraggingBanner ? undefined : (formData.color || 'var(--border)') }}
+                  onClick={() => bannerInputRef.current?.click()}
+                >
+                  {bannerPreview ? (
+                    <img
+                      src={bannerPreview.startsWith('http') || bannerPreview.startsWith('blob:') ? bannerPreview : getAssetPath(bannerPreview)}
+                      alt="Preview Banner Member"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      onError={(e) => {
+                        e.target.onerror = null
+                        e.target.src = getAssetPath('/images/members/group.webp')
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-[var(--text-secondary)] p-2 text-center">
+                      <FaImage className="text-3xl mb-1 text-[var(--primary)]/60" />
+                      <span className="text-[10px]">Pilih Banner Landscape</span>
+                    </div>
+                  )}
+
+                  {/* Normal hover overlay */}
+                  <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5 text-center p-2 ${isDraggingBanner ? 'hidden' : ''}`}>
+                    <FaUpload /> Ganti Banner
+                  </div>
+
+                  {/* Dragging active overlay */}
+                  {isDraggingBanner && (
+                    <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-[var(--primary)] text-xs font-bold gap-1 z-20 pointer-events-none">
+                      <FaUpload className="text-2xl animate-bounce" />
+                      <span>Lepas di Sini</span>
+                    </div>
+                  )}
+
+                  <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-[var(--primary)] rounded text-[9px] font-bold">
+                    16:9 Landscape
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-center sm:text-left flex-1">
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <p className="text-xs text-[var(--text-secondary)] font-medium">
+                      {bannerFile ? bannerFile.name : (formData.banner_image_url ? 'Foto banner aktif' : 'Belum ada foto banner')}
+                    </p>
+                    {isDraggingBanner && (
+                      <span className="px-2 py-0.5 rounded bg-[var(--primary)]/20 border border-[var(--primary)]/40 text-[var(--primary)] text-[10px] font-bold animate-pulse">
+                        Lepas untuk Unggah
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-[11px] text-[var(--text-secondary)]">
+                    Foto landscape resolusi tinggi (16:9, disarankan 1200×675 px). Foto ini akan menjadi katalog cover banner yang dapat dipilih oleh fans di halaman profil mereka.
+                  </p>
+
+                  <input
+                    type="file"
+                    ref={bannerInputRef}
+                    onChange={handleBannerChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => bannerInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)]/20 hover:bg-[var(--primary)]/30 border border-[var(--primary)]/40 text-xs font-bold text-[var(--primary)] transition"
+                    >
+                      <FaUpload /> Unggah Banner Landscape
+                    </button>
+                    {formData.banner_image_url && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData({ ...formData, banner_image_url: '' })
+                          setBannerPreview('')
+                          setBannerFile(null)
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs font-bold text-red-400 transition"
+                      >
+                        <FaTimes /> Hapus Banner
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

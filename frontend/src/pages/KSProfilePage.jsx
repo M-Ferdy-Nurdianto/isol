@@ -1,7 +1,7 @@
 import { toPng } from 'html-to-image'
 import { groupTitlesByPeriod } from '../lib/fanTitleUtils'
 import DigitalReceipt from '../components/shop/DigitalReceipt'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
@@ -9,12 +9,11 @@ import {
   FaHistory, FaTicketAlt, FaCheck, FaHourglassHalf, FaExternalLinkAlt, 
   FaReceipt, FaCamera, FaSpinner, FaEdit, FaSave, FaTimes, FaShoppingBag,
   FaCheckCircle, FaCopy, FaCalendarAlt, FaQrcode, FaDownload, FaCrown, FaTrophy,
-  FaBox, FaTruck, FaStore, FaMapMarkerAlt
+  FaBox, FaTruck, FaStore, FaMapMarkerAlt, FaImage, FaPalette
 } from 'react-icons/fa'
 import { useFanAuth } from '../context/FanAuthContext'
 import KSHeader from '../components/KSHeader'
 import { kohiToast } from '../components/ui/KohiToast'
-import ImageCropModal from '../components/ImageCropModal'
 import { getAssetPath } from '../lib/pathUtils'
 import api from '../lib/api'
 
@@ -27,11 +26,17 @@ const KSProfilePage = () => {
   const [fanTitles, setFanTitles] = useState([])
   const [showTitlesModal, setShowTitlesModal] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [uploadingAvatar, setUploadingAvatar] = useState(false)
-  const [uploadingBanner, setUploadingBanner] = useState(false)
+  
+  // Member & Official Asset Picker States (Anti Storage Bloat)
+  const [members, setMembers] = useState([])
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false)
+  const [showBannerPicker, setShowBannerPicker] = useState(false)
+  const [selectedAvatarOption, setSelectedAvatarOption] = useState('')
+  const [selectedBannerOption, setSelectedBannerOption] = useState('')
+  const [savingAsset, setSavingAsset] = useState(false)
+
   const [avatarLoadError, setAvatarLoadError] = useState(false)
   const [bannerLoadError, setBannerLoadError] = useState(false)
-  const [cropModalData, setCropModalData] = useState(null)
 
   useEffect(() => {
     setAvatarLoadError(false)
@@ -40,6 +45,19 @@ const KSProfilePage = () => {
   useEffect(() => {
     setBannerLoadError(false)
   }, [fanUser?.banner_url])
+
+  // Fetch official members for avatar and banner choices
+  useEffect(() => {
+    api.get('/members')
+      .then(res => {
+        if (res.data?.success && Array.isArray(res.data.data)) {
+          setMembers(res.data.data)
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load official members for avatar/banner picker:', err)
+      })
+  }, [])
   
   const [activeTab, setActiveTab] = useState('profile') // 'profile' or 'history'
   const [selectedReceiptOrder, setSelectedReceiptOrder] = useState(null)
@@ -119,9 +137,6 @@ const KSProfilePage = () => {
     instagram: fanUser?.instagram || ''
   })
 
-  const avatarInputRef = useRef(null)
-  const bannerInputRef = useRef(null)
-
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -152,7 +167,7 @@ const KSProfilePage = () => {
         })
         .finally(() => setLoading(false))
     }
-  }, [fanUser?.email, fanUser?.id])
+  }, [fanUser?.email, fanUser?.id, fanUser?.whatsapp])
 
   useEffect(() => {
     if (fanUser?.nama || fanUser?.email) {
@@ -165,7 +180,6 @@ const KSProfilePage = () => {
         .catch(err => console.error('Failed to load fan titles:', err))
     }
   }, [fanUser?.nama, fanUser?.email])
-
 
   if (!isLoggedIn || !fanUser) return null
 
@@ -200,76 +214,159 @@ const KSProfilePage = () => {
     navigate('/')
   }
 
-  const handleImageChange = (event, type) => {
-    const file = event.target.files[0]
-    if (!file) return
-
-    if (!file.type.startsWith('image/')) {
-      kohiToast.error('Format file tidak didukung. Harap upload gambar.')
-      return
-    }
-
-    const reader = new FileReader()
-    reader.addEventListener('load', () => {
-      setCropModalData({
-        imageSrc: reader.result?.toString() || '',
-        isBanner: type === 'banner',
-        type
-      })
-      if (event.target) event.target.value = null
-    })
-    reader.readAsDataURL(file)
+  const handleOpenAvatarPicker = () => {
+    setSelectedAvatarOption(fanUser?.image_url || '')
+    setShowAvatarPicker(true)
   }
 
-  const handleUploadCroppedImage = async (file) => {
-    if (!cropModalData) return
-    const { isBanner, type } = cropModalData
-    setCropModalData(null)
+  const handleOpenBannerPicker = () => {
+    setSelectedBannerOption(fanUser?.banner_url || '')
+    setShowBannerPicker(true)
+  }
 
-    isBanner ? setUploadingBanner(true) : setUploadingAvatar(true)
+  // Official Avatar Options List
+  const avatarOptions = useMemo(() => {
+    const list = [
+      {
+        id: 'opt-initial',
+        url: '',
+        title: 'Inisial Nama',
+        subtitle: 'Default Profil (Huruf Depan)',
+        isInitial: true
+      },
+      {
+        id: 'opt-group-avatar',
+        url: '/images/members/group.webp',
+        title: 'Kohi Sekai',
+        subtitle: 'Official Group All Members',
+        isGroup: true
+      }
+    ]
 
-    try {
-      const formData = new FormData()
-      formData.append('file', file, `${type || (isBanner ? 'banner' : 'avatar')}.jpg`)
-
-      const fanToken = localStorage.getItem('ks_fan_token')
-      const headers = { 'Content-Type': 'multipart/form-data' }
-      if (fanToken) {
-        headers.Authorization = `Bearer ${fanToken}`
+    members.forEach((m) => {
+      if (m.member_id === 'group' || (m.nama_panggung || '').toLowerCase().includes('kohi sekai')) {
+        return
       }
 
-      const uploadRes = await api.post(`/upload/fan-image?type=${type}`, formData, { headers })
-
-      if (uploadRes.data?.success) {
-        const imageUrl = uploadRes.data.data.url
-        const token = localStorage.getItem('ks_fan_token')
-        const updateRes = await api.put('/auth/fan/profile', {
-          [isBanner ? 'banner_url' : 'image_url']: imageUrl,
-          email: fanUser?.email
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
+      if (m.image_url) {
+        list.push({
+          id: `opt-member-${m.id || m.member_id}-main`,
+          url: m.image_url,
+          title: m.nama_panggung,
+          subtitle: m.tagline || 'Member Kohi Sekai',
+          color: m.color
         })
+      }
 
-        if (updateRes.data?.success) {
-          updateProfile({ [isBanner ? 'banner_url' : 'image_url']: imageUrl })
-          if (isBanner) {
-            setBannerLoadError(false)
-          } else {
-            setAvatarLoadError(false)
-          }
-          kohiToast.success(`${isBanner ? 'Banner' : 'Foto profil'} berhasil diperbarui!`)
-        } else {
-          throw new Error('Gagal menyimpan ke database')
-        }
+      if (m.shop_image_url && m.shop_image_url !== m.image_url) {
+        list.push({
+          id: `opt-member-${m.id || m.member_id}-shop`,
+          url: m.shop_image_url,
+          title: `${m.nama_panggung} (2-Shot)`,
+          subtitle: 'Foto Edisi Shop',
+          color: m.color
+        })
+      }
+    })
+
+    return list
+  }, [members])
+
+  // Official Banner Options List (16:9 Landscape)
+  const bannerOptions = useMemo(() => {
+    const list = [
+      {
+        id: 'opt-banner-default',
+        url: '',
+        title: 'Espresso Minimalist',
+        subtitle: 'Default Pattern Dark',
+        isDefault: true
+      },
+      {
+        id: 'opt-banner-group',
+        url: '/images/members/group.webp',
+        title: 'Kohi Sekai Group',
+        subtitle: 'Official Group Banner',
+        isGroup: true
+      }
+    ]
+
+    members.forEach((m) => {
+      if (m.member_id === 'group' || (m.nama_panggung || '').toLowerCase().includes('kohi sekai')) {
+        return
+      }
+
+      const bannerUrl = m.banner_image_url || m.image_url
+      if (bannerUrl) {
+        list.push({
+          id: `opt-banner-member-${m.id || m.member_id}`,
+          url: bannerUrl,
+          title: m.nama_panggung,
+          subtitle: m.banner_image_url ? 'Banner Landscape (16:9)' : 'Foto Resmi Member',
+          isUploadedLandscape: Boolean(m.banner_image_url),
+          color: m.color
+        })
+      }
+    })
+
+    return list
+  }, [members])
+
+  // Save selected avatar to Supabase
+  const handleSaveAvatar = async (forcedUrl) => {
+    const urlToSave = forcedUrl !== undefined ? forcedUrl : selectedAvatarOption
+    try {
+      setSavingAsset(true)
+      const token = localStorage.getItem('ks_fan_token')
+      const res = await api.put('/auth/fan/profile', {
+        image_url: urlToSave || null,
+        email: fanUser?.email
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+
+      if (res.data?.success) {
+        updateProfile({ image_url: urlToSave || null })
+        setAvatarLoadError(false)
+        setShowAvatarPicker(false)
+        kohiToast.success('Foto profil berhasil diperbarui!')
       } else {
-        throw new Error('Gagal mengupload gambar')
+        throw new Error(res.data?.error || 'Gagal menyimpan foto profil')
       }
     } catch (err) {
-      console.error('Upload error:', err)
-      const errorMsg = err.response?.data?.error || err.message || 'Terjadi kesalahan saat upload'
-      kohiToast.error(errorMsg)
+      console.error('Failed to update avatar:', err)
+      kohiToast.error(err.response?.data?.error || err.message || 'Gagal memperbarui foto profil')
     } finally {
-      isBanner ? setUploadingBanner(false) : setUploadingAvatar(false)
+      setSavingAsset(false)
+    }
+  }
+
+  // Save selected banner to Supabase
+  const handleSaveBanner = async (forcedUrl) => {
+    const urlToSave = forcedUrl !== undefined ? forcedUrl : selectedBannerOption
+    try {
+      setSavingAsset(true)
+      const token = localStorage.getItem('ks_fan_token')
+      const res = await api.put('/auth/fan/profile', {
+        banner_url: urlToSave || null,
+        email: fanUser?.email
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+
+      if (res.data?.success) {
+        updateProfile({ banner_url: urlToSave || null })
+        setBannerLoadError(false)
+        setShowBannerPicker(false)
+        kohiToast.success('Cover banner berhasil diperbarui!')
+      } else {
+        throw new Error(res.data?.error || 'Gagal menyimpan cover banner')
+      }
+    } catch (err) {
+      console.error('Failed to update banner:', err)
+      kohiToast.error(err.response?.data?.error || err.message || 'Gagal memperbarui cover banner')
+    } finally {
+      setSavingAsset(false)
     }
   }
 
@@ -902,23 +999,16 @@ const KSProfilePage = () => {
               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, var(--primary) 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
             )}
 
-            {/* Upload Cover Overlay */}
-            <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100 ${uploadingBanner ? 'opacity-100' : ''}`}>
+            {/* Cover Overlay Button */}
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100">
               <button 
-                onClick={() => bannerInputRef.current?.click()}
-                disabled={uploadingBanner}
-                className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-black/80 hover:bg-black text-white border border-white/20 rounded-full font-bold text-xs md:text-sm transition-all"
+                type="button"
+                onClick={handleOpenBannerPicker}
+                className="flex items-center gap-2 px-3.5 py-1.5 md:px-4 md:py-2 bg-black/80 hover:bg-black text-white border border-white/20 rounded-full font-bold text-xs md:text-sm transition-all shadow-md active:scale-95"
               >
-                {uploadingBanner ? <FaSpinner className="animate-spin" /> : <FaCamera />}
-                {uploadingBanner ? 'Mengunggah...' : 'Ganti Cover'}
+                <FaImage className="text-primary" />
+                <span>Pilih Banner Cover</span>
               </button>
-              <input 
-                type="file" 
-                ref={bannerInputRef} 
-                className="hidden" 
-                accept="image/*"
-                onChange={(e) => handleImageChange(e, 'banner')}
-              />
             </div>
             
             {/* Desktop Sign Out Button (Top Right over cover) */}
@@ -952,28 +1042,24 @@ const KSProfilePage = () => {
                     </div>
                   )}
                   
-                  {/* Upload Avatar Overlay */}
+                  {/* Pick Avatar Overlay */}
                   <div 
-                    onClick={() => !uploadingAvatar && avatarInputRef.current?.click()}
-                    className={`absolute inset-0 bg-black/40 transition-opacity duration-300 flex items-center justify-center cursor-pointer md:opacity-0 md:group-hover:opacity-100 ${uploadingAvatar ? 'opacity-100' : ''}`}
+                    onClick={handleOpenAvatarPicker}
+                    className="absolute inset-0 bg-black/40 transition-opacity duration-300 flex items-center justify-center cursor-pointer md:opacity-0 md:group-hover:opacity-100"
+                    title="Pilih foto profil resmi idol"
                   >
-                    {uploadingAvatar ? <FaSpinner className="animate-spin text-xl md:text-2xl text-white" /> : <FaCamera className="text-xl md:text-2xl text-white" />}
+                    <FaCamera className="text-xl md:text-2xl text-white" />
                   </div>
                 </div>
                 {/* Small camera icon explicitly shown on mobile */}
                 <button 
-                  onClick={() => !uploadingAvatar && avatarInputRef.current?.click()}
+                  type="button"
+                  onClick={handleOpenAvatarPicker}
                   className="md:hidden absolute -bottom-2 -right-2 w-8 h-8 bg-surface border-2 border-border text-primary rounded-full flex items-center justify-center shadow-sm z-20"
+                  title="Pilih foto profil resmi idol"
                 >
                   <FaCamera className="text-xs" />
                 </button>
-                <input 
-                  type="file" 
-                  ref={avatarInputRef} 
-                  className="hidden" 
-                  accept="image/*"
-                  onChange={(e) => handleImageChange(e, 'avatar')}
-                />
               </div>
 
               {/* Name, ID, Verification, and Titles */}
@@ -1165,13 +1251,437 @@ const KSProfilePage = () => {
 
       </main>
 
-      <ImageCropModal
-        isOpen={!!cropModalData}
-        onClose={() => setCropModalData(null)}
-        imageSrc={cropModalData?.imageSrc}
-        aspect={cropModalData?.isBanner ? 16/9 : 1/1}
-        onCropComplete={handleUploadCroppedImage}
-      />
+      {/* =========================================================================
+          MODAL 1: OFFICIAL AVATAR PICKER (DESKTOP FULLSCREEN & MOBILE BOTTOM-SHEET)
+          Anti Storage Bloat: User picks curated idol member assets without uploading
+          ========================================================================= */}
+      {showAvatarPicker && (
+        <>
+          {/* DESKTOP (hidden md:flex) - FULLSCREEN OVERLAY IN-PLACE */}
+          <div className="hidden md:flex fixed inset-0 z-50 bg-[var(--background)] flex-col overflow-hidden animate-fade-in">
+            {/* Fixed Header Desktop */}
+            <div className="bg-[var(--surface)] border-b border-[var(--border)] px-8 py-4 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <FaUser size={18} />
+                </div>
+                <div>
+                  <h2 className="text-base font-black text-text-primary tracking-tight uppercase">
+                    PILIH FOTO PROFIL RESMI (OSHI KOHI SEKAI)
+                  </h2>
+                  <p className="text-xs text-text-secondary">
+                    Gunakan foto resmi idol favoritmu untuk foto profil tanpa membebani penyimpanan
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAvatarPicker(false)}
+                className="w-9 h-9 rounded-xl bg-background border border-border text-text-secondary hover:text-text-primary flex items-center justify-center transition"
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            {/* Scrollable Body Desktop */}
+            <div className="max-w-6xl mx-auto w-full p-8 overflow-y-auto custom-scrollbar flex-1">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {avatarOptions.map((opt) => {
+                  const isSelected = (selectedAvatarOption === '' && opt.url === '') || (selectedAvatarOption && opt.url === selectedAvatarOption)
+                  return (
+                    <div
+                      key={opt.id}
+                      onClick={() => setSelectedAvatarOption(opt.url)}
+                      className={`relative rounded-2xl p-4 border-2 transition-all flex flex-col items-center text-center cursor-pointer group ${
+                        isSelected
+                          ? 'border-primary bg-primary/10 shadow-lg shadow-primary/5'
+                          : 'border-border bg-surface hover:border-primary/50'
+                      }`}
+                    >
+                      {isSelected && (
+                        <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center shadow-md text-[10px]">
+                          <FaCheck />
+                        </div>
+                      )}
+
+                      <div className="w-20 h-20 rounded-2xl overflow-hidden bg-background border border-border mb-3 flex items-center justify-center shrink-0">
+                        {opt.isInitial ? (
+                          <div className="w-full h-full bg-primary flex items-center justify-center text-white font-black text-3xl">
+                            {fanUser?.nama?.charAt(0) || 'K'}
+                          </div>
+                        ) : (
+                          <img
+                            src={getAssetPath(opt.url)}
+                            alt={opt.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                            onError={(e) => {
+                              e.target.onerror = null
+                              e.target.src = getAssetPath('/images/members/placeholder.svg')
+                            }}
+                          />
+                        )}
+                      </div>
+
+                      <p className="text-xs font-black text-text-primary tracking-tight truncate w-full">
+                        {opt.title}
+                      </p>
+                      <span className="text-[10px] text-text-secondary truncate w-full mt-0.5">
+                        {opt.subtitle}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Fixed Footer Desktop */}
+            <div className="bg-[var(--surface)] border-t border-[var(--border)] px-8 py-4 flex items-center justify-between shrink-0">
+              <div className="text-xs text-text-secondary">
+                Pilihan Avatar: <strong className="text-text-primary font-bold">{avatarOptions.find(o => (selectedAvatarOption === '' && o.url === '') || (selectedAvatarOption && o.url === selectedAvatarOption))?.title || 'Kustom'}</strong>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAvatarPicker(false)}
+                  className="px-5 py-2.5 rounded-xl bg-background border border-border text-xs font-bold text-text-secondary hover:text-text-primary transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  disabled={savingAsset}
+                  onClick={() => handleSaveAvatar()}
+                  className="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg transition active:scale-95 disabled:opacity-50"
+                >
+                  {savingAsset ? <FaSpinner className="animate-spin" /> : <FaCheck />}
+                  <span>Terapkan Foto Profil</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* MOBILE (md:hidden) - BOTTOM-SHEET DRAWER */}
+          <div className="md:hidden fixed inset-0 z-50 bg-black/85 flex flex-col justify-end animate-fade-in">
+            <div className="absolute inset-0" onClick={() => setShowAvatarPicker(false)} />
+            <div className="relative w-full rounded-t-3xl max-h-[88vh] flex flex-col bg-surface border-t border-border shadow-2xl z-10 animate-slide-up overflow-hidden">
+              <div className="w-12 h-1.5 rounded-full bg-border mx-auto mt-3 mb-1 shrink-0" />
+
+              <div className="px-5 py-3 border-b border-border flex items-center justify-between shrink-0">
+                <div>
+                  <h3 className="text-sm font-black text-text-primary uppercase tracking-tight">
+                    Foto Profil Resmi
+                  </h3>
+                  <p className="text-[10px] text-text-secondary">
+                    Pilih avatar oshi favoritmu
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAvatarPicker(false)}
+                  className="w-7 h-7 rounded-lg bg-background border border-border text-text-secondary flex items-center justify-center text-xs"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+
+              <div className="p-4 overflow-y-auto custom-scrollbar flex-1 grid grid-cols-2 gap-3">
+                {avatarOptions.map((opt) => {
+                  const isSelected = (selectedAvatarOption === '' && opt.url === '') || (selectedAvatarOption && opt.url === selectedAvatarOption)
+                  return (
+                    <div
+                      key={`mob-${opt.id}`}
+                      onClick={() => setSelectedAvatarOption(opt.url)}
+                      className={`relative rounded-2xl p-3 border-2 transition-all flex flex-col items-center text-center cursor-pointer ${
+                        isSelected
+                          ? 'border-primary bg-primary/10 shadow-md'
+                          : 'border-border bg-background/50'
+                      }`}
+                    >
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-primary text-white flex items-center justify-center text-[9px]">
+                          <FaCheck />
+                        </div>
+                      )}
+
+                      <div className="w-16 h-16 rounded-xl overflow-hidden bg-surface border border-border mb-2 flex items-center justify-center shrink-0">
+                        {opt.isInitial ? (
+                          <div className="w-full h-full bg-primary flex items-center justify-center text-white font-black text-2xl">
+                            {fanUser?.nama?.charAt(0) || 'K'}
+                          </div>
+                        ) : (
+                          <img
+                            src={getAssetPath(opt.url)}
+                            alt={opt.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.onerror = null
+                              e.target.src = getAssetPath('/images/members/placeholder.svg')
+                            }}
+                          />
+                        )}
+                      </div>
+
+                      <p className="text-xs font-black text-text-primary tracking-tight truncate w-full">
+                        {opt.title}
+                      </p>
+                      <span className="text-[9px] text-text-secondary truncate w-full">
+                        {opt.subtitle}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="sticky bottom-0 bg-surface border-t border-border p-4 flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setShowAvatarPicker(false)}
+                  className="flex-1 py-3 rounded-xl bg-background border border-border text-xs font-bold text-text-secondary text-center"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  disabled={savingAsset}
+                  onClick={() => handleSaveAvatar()}
+                  className="flex-1 py-3 rounded-xl bg-primary text-white text-xs font-black uppercase tracking-wider text-center flex items-center justify-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50"
+                >
+                  {savingAsset ? <FaSpinner className="animate-spin" /> : <FaCheck />}
+                  <span>Terapkan</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* =========================================================================
+          MODAL 2: OFFICIAL BANNER PICKER (DESKTOP FULLSCREEN & MOBILE BOTTOM-SHEET)
+          Landscape 16:9 Cover Provided by Admin / Official Assets
+          ========================================================================= */}
+      {showBannerPicker && (
+        <>
+          {/* DESKTOP (hidden md:flex) - FULLSCREEN OVERLAY IN-PLACE */}
+          <div className="hidden md:flex fixed inset-0 z-50 bg-[var(--background)] flex-col overflow-hidden animate-fade-in">
+            {/* Fixed Header Desktop */}
+            <div className="bg-[var(--surface)] border-b border-[var(--border)] px-8 py-4 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <FaImage size={18} />
+                </div>
+                <div>
+                  <h2 className="text-base font-black text-text-primary tracking-tight uppercase">
+                    PILIH COVER BANNER PROFIL (16:9 LANDSCAPE)
+                  </h2>
+                  <p className="text-xs text-text-secondary">
+                    Pilih dari katalog banner landscape resmi member & grup Kohi Sekai
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowBannerPicker(false)}
+                className="w-9 h-9 rounded-xl bg-background border border-border text-text-secondary hover:text-text-primary flex items-center justify-center transition"
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            {/* Scrollable Body Desktop */}
+            <div className="max-w-6xl mx-auto w-full p-8 overflow-y-auto custom-scrollbar flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {bannerOptions.map((opt) => {
+                  const isSelected = (selectedBannerOption === '' && opt.url === '') || (selectedBannerOption && opt.url === selectedBannerOption)
+                  return (
+                    <div
+                      key={opt.id}
+                      onClick={() => setSelectedBannerOption(opt.url)}
+                      className={`relative aspect-[16/9] rounded-2xl overflow-hidden border-2 transition-all cursor-pointer group flex flex-col justify-between ${
+                        isSelected
+                          ? 'border-primary shadow-xl shadow-primary/10 ring-2 ring-primary/40'
+                          : 'border-border bg-surface hover:border-primary/50'
+                      }`}
+                    >
+                      {opt.isDefault ? (
+                        <div className="w-full h-full bg-surface flex flex-col items-center justify-center p-4 text-center">
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-2">
+                            <FaPalette size={18} />
+                          </div>
+                          <p className="text-xs font-black text-text-primary">Espresso Minimalist</p>
+                          <span className="text-[10px] text-text-secondary">Pola Dark Deep Coffee</span>
+                        </div>
+                      ) : (
+                        <>
+                          <img
+                            src={getAssetPath(opt.url)}
+                            alt={opt.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => {
+                              e.target.onerror = null
+                              e.target.src = getAssetPath('/images/members/group.webp')
+                            }}
+                          />
+                          <div className="absolute inset-x-0 bottom-0 bg-black/85 p-3 flex items-center justify-between border-t border-white/10">
+                            <div className="min-w-0 pr-2">
+                              <p className="text-xs font-black text-white tracking-tight truncate">
+                                {opt.title}
+                              </p>
+                              <span className="text-[10px] text-zinc-400 block truncate">
+                                {opt.subtitle}
+                              </span>
+                            </div>
+                            {opt.isUploadedLandscape && (
+                              <span className="px-2 py-0.5 rounded bg-primary/20 border border-primary/40 text-primary text-[9px] font-bold shrink-0">
+                                16:9 Official
+                              </span>
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      {isSelected && (
+                        <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-primary text-white flex items-center gap-1 shadow-lg text-[10px] font-bold">
+                          <FaCheck size={9} />
+                          <span>Dipilih</span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Fixed Footer Desktop */}
+            <div className="bg-[var(--surface)] border-t border-[var(--border)] px-8 py-4 flex items-center justify-between shrink-0">
+              <div className="text-xs text-text-secondary">
+                Pilihan Banner: <strong className="text-text-primary font-bold">{bannerOptions.find(o => (selectedBannerOption === '' && o.url === '') || (selectedBannerOption && o.url === selectedBannerOption))?.title || 'Kustom'}</strong>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowBannerPicker(false)}
+                  className="px-5 py-2.5 rounded-xl bg-background border border-border text-xs font-bold text-text-secondary hover:text-text-primary transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  disabled={savingAsset}
+                  onClick={() => handleSaveBanner()}
+                  className="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg transition active:scale-95 disabled:opacity-50"
+                >
+                  {savingAsset ? <FaSpinner className="animate-spin" /> : <FaCheck />}
+                  <span>Terapkan Cover Banner</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* MOBILE (md:hidden) - BOTTOM-SHEET DRAWER */}
+          <div className="md:hidden fixed inset-0 z-50 bg-black/85 flex flex-col justify-end animate-fade-in">
+            <div className="absolute inset-0" onClick={() => setShowBannerPicker(false)} />
+            <div className="relative w-full rounded-t-3xl max-h-[88vh] flex flex-col bg-surface border-t border-border shadow-2xl z-10 animate-slide-up overflow-hidden">
+              <div className="w-12 h-1.5 rounded-full bg-border mx-auto mt-3 mb-1 shrink-0" />
+
+              <div className="px-5 py-3 border-b border-border flex items-center justify-between shrink-0">
+                <div>
+                  <h3 className="text-sm font-black text-text-primary uppercase tracking-tight">
+                    Cover Banner Resmi
+                  </h3>
+                  <p className="text-[10px] text-text-secondary">
+                    Pilih banner landscape favoritmu
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowBannerPicker(false)}
+                  className="w-7 h-7 rounded-lg bg-background border border-border text-text-secondary flex items-center justify-center text-xs"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+
+              <div className="p-4 overflow-y-auto custom-scrollbar flex-1 space-y-3">
+                {bannerOptions.map((opt) => {
+                  const isSelected = (selectedBannerOption === '' && opt.url === '') || (selectedBannerOption && opt.url === selectedBannerOption)
+                  return (
+                    <div
+                      key={`mob-${opt.id}`}
+                      onClick={() => setSelectedBannerOption(opt.url)}
+                      className={`relative aspect-[16/9] rounded-2xl overflow-hidden border-2 transition-all cursor-pointer ${
+                        isSelected
+                          ? 'border-primary shadow-lg ring-1 ring-primary/40'
+                          : 'border-border bg-background/50'
+                      }`}
+                    >
+                      {opt.isDefault ? (
+                        <div className="w-full h-full bg-surface flex flex-col items-center justify-center p-3 text-center">
+                          <FaPalette className="text-primary text-xl mb-1" />
+                          <p className="text-xs font-black text-text-primary">Espresso Minimalist</p>
+                          <span className="text-[9px] text-text-secondary">Pola Dark Deep Coffee</span>
+                        </div>
+                      ) : (
+                        <>
+                          <img
+                            src={getAssetPath(opt.url)}
+                            alt={opt.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.onerror = null
+                              e.target.src = getAssetPath('/images/members/group.webp')
+                            }}
+                          />
+                          <div className="absolute inset-x-0 bottom-0 bg-black/85 p-2.5 flex items-center justify-between">
+                            <div className="min-w-0 pr-2">
+                              <p className="text-xs font-black text-white tracking-tight truncate">
+                                {opt.title}
+                              </p>
+                              <span className="text-[9px] text-zinc-400 block truncate">
+                                {opt.subtitle}
+                              </span>
+                            </div>
+                            {opt.isUploadedLandscape && (
+                              <span className="px-1.5 py-0.5 rounded bg-primary/20 border border-primary/40 text-primary text-[8px] font-bold shrink-0">
+                                16:9
+                              </span>
+                            )}
+                          </div>
+                        </>
+                      )}
+
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-primary text-white flex items-center gap-1 text-[9px] font-bold">
+                          <FaCheck size={8} />
+                          <span>Dipilih</span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="sticky bottom-0 bg-surface border-t border-border p-4 flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setShowBannerPicker(false)}
+                  className="flex-1 py-3 rounded-xl bg-background border border-border text-xs font-bold text-text-secondary text-center"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  disabled={savingAsset}
+                  onClick={() => handleSaveBanner()}
+                  className="flex-1 py-3 rounded-xl bg-primary text-white text-xs font-black uppercase tracking-wider text-center flex items-center justify-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50"
+                >
+                  {savingAsset ? <FaSpinner className="animate-spin" /> : <FaCheck />}
+                  <span>Terapkan</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Title Details Modal */}
       {showTitlesModal && (
@@ -1179,15 +1689,15 @@ const KSProfilePage = () => {
           onClick={(e) => { if (e.target === e.currentTarget) setShowTitlesModal(false) }}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 animate-fade-in"
         >
-          <div className="bg-[#111726] border border-white/10 rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto custom-scrollbar text-white p-5 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="bg-surface border border-border rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto custom-scrollbar text-text-primary p-5 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-border">
               <div className="flex items-center gap-2">
                 <FaTrophy className="text-yellow-400 text-lg" />
                 <div>
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                  <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
                     Daftar Gelar & Title Fan
                   </h3>
-                  <p className="text-[11px] text-zinc-400">
+                  <p className="text-[11px] text-text-secondary">
                     Peringkat perolehan cheki berdasarkan periode & member
                   </p>
                 </div>
@@ -1195,7 +1705,7 @@ const KSProfilePage = () => {
               <button
                 type="button"
                 onClick={() => setShowTitlesModal(false)}
-                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center text-sm transition"
+                className="w-8 h-8 rounded-lg bg-background hover:bg-surface border border-border text-text-secondary hover:text-text-primary flex items-center justify-center text-sm transition"
               >
                 <FaTimes />
               </button>
@@ -1203,13 +1713,13 @@ const KSProfilePage = () => {
 
             <div className="space-y-4">
               {groupedTitles.map((group, idx) => (
-                <div key={idx} className="bg-[#182032] border border-white/5 rounded-xl p-3.5 space-y-2.5">
-                  <div className="flex items-center justify-between pb-2 border-b border-white/5">
+                <div key={idx} className="bg-background border border-border rounded-xl p-3.5 space-y-2.5">
+                  <div className="flex items-center justify-between pb-2 border-b border-border">
                     <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5 uppercase tracking-wide">
                       <FaCrown className="text-yellow-400 text-xs" />
                       Periode {group.periodName}
                     </span>
-                    <span className="text-[10px] font-mono text-zinc-400 bg-white/5 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-mono text-text-secondary bg-surface border border-border px-2 py-0.5 rounded-full">
                       {group.members.length} Gelar
                     </span>
                   </div>
@@ -1218,7 +1728,7 @@ const KSProfilePage = () => {
                     {group.members.map((m, mIdx) => (
                       <div
                         key={mIdx}
-                        className="flex items-center justify-between bg-[#111726]/60 border border-white/5 px-3 py-2 rounded-lg text-xs"
+                        className="flex items-center justify-between bg-surface border border-border px-3 py-2 rounded-lg text-xs"
                       >
                         <div className="flex items-center gap-2">
                           <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${
@@ -1230,7 +1740,7 @@ const KSProfilePage = () => {
                           }`}>
                             #{m.rank}
                           </span>
-                          <span className="font-semibold text-white">
+                          <span className="font-semibold text-text-primary">
                             {m.memberName}
                           </span>
                         </div>
