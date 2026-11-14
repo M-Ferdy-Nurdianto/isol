@@ -88,23 +88,20 @@ export const sendEmail = async (toOrPayload, maybeSubject, maybeHtml) => {
   const fromName = process.env.EMAIL_FROM_NAME || 'Kohi Sekai'
   const isOnlineResend = Boolean(
     process.env.RESEND_API_KEY && (
-      process.env.EMAIL_PROVIDER === 'resend' ||
-      process.env.NODE_ENV === 'production' ||
-      !process.env.SMTP_USER
+      process.env.EMAIL_PROVIDER !== 'smtp' &&
+      process.env.EMAIL_PROVIDER !== 'nodemailer'
     )
   )
 
   // Default sender address:
-  // Jika Resend, gunakan RESEND_FROM atau fallback ke onboarding@resend.dev jika EMAIL_FROM adalah domain publik (gmail/yahoo) yang belum terverifikasi di Resend
-  let fromAddress = process.env.EMAIL_FROM
-  if (isOnlineResend) {
-    if (process.env.RESEND_FROM) {
-      fromAddress = process.env.RESEND_FROM
-    } else if (!fromAddress || fromAddress.includes('@gmail.com') || fromAddress.includes('@yahoo.com')) {
-      fromAddress = 'onboarding@resend.dev'
+  // Gunakan RESEND_FROM atau EMAIL_FROM jika valid, default ke domain verified: noreply@kohiprototype.ferdy.web.id
+  let fromAddress = process.env.RESEND_FROM
+  if (!fromAddress) {
+    if (process.env.EMAIL_FROM && !process.env.EMAIL_FROM.includes('@gmail.com') && !process.env.EMAIL_FROM.includes('@yahoo.com')) {
+      fromAddress = process.env.EMAIL_FROM
+    } else {
+      fromAddress = 'noreply@kohiprototype.ferdy.web.id'
     }
-  } else if (!fromAddress) {
-    fromAddress = 'noreply@kohisekai.com'
   }
   const from = `"${fromName}" <${fromAddress}>`
 
