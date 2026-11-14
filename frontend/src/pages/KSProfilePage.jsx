@@ -32,7 +32,7 @@ const KSProfilePage = () => {
   
   const [activeTab, setActiveTab] = useState('profile') // 'profile' or 'history'
   const [selectedReceiptOrder, setSelectedReceiptOrder] = useState(null)
-  const [orderTypeFilter, setOrderTypeFilter] = useState('all') // 'all', 'po', 'ots'
+  const [orderTypeFilter, setOrderTypeFilter] = useState('po') // 'po', 'ots', 'merch'
   const [copiedId, setCopiedId] = useState(null)
   const [downloadingOrderId, setDownloadingOrderId] = useState(null)
   const [downloadingOrder, setDownloadingOrder] = useState(null)
@@ -376,43 +376,84 @@ const KSProfilePage = () => {
 
     return (
       <div className="bg-surface border border-border rounded-3xl shadow-xl overflow-hidden h-full flex flex-col">
-        {/* Header Panel - Solid Color, No Gradient */}
-        <div className="p-5 sm:p-6 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface">
-          <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary block mb-0.5">
-              Kohi Stage Fan Vault
-            </span>
-            <h2 className="text-xl font-black flex items-center gap-2.5 text-text-primary tracking-tight">
-              <FaHistory className="text-primary text-base" />
-              Riwayat Pesanan Tiket
-            </h2>
+        {/* Header Panel - Solid Color, Deep Coffee Metal */}
+        <div className="p-4 sm:p-6 border-b border-border bg-surface flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-primary block mb-0.5">
+                Kohi Stage Fan Vault
+              </span>
+              <h2 className="text-lg sm:text-xl font-black flex items-center gap-2 text-text-primary tracking-tight">
+                <FaHistory className="text-primary text-base" />
+                Riwayat Pesanan
+              </h2>
+            </div>
           </div>
 
-          {/* Filter PO vs OTS vs Merch */}
-          <div className="flex items-center gap-1.5 p-1 bg-background border border-border rounded-2xl self-start sm:self-auto text-xs font-bold overflow-x-auto max-w-full">
+          {/* Filter PO vs OTS vs Merch - Fixed Grid (Tanpa Geser, Tidak Kepotong) */}
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2 p-1.5 bg-background border border-border rounded-2xl w-full">
             <button
-              onClick={() => setOrderTypeFilter('all')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs shrink-0 ${orderTypeFilter === 'all' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
-            >
-              Semua Tiket ({orders.length})
-            </button>
-            <button
+              type="button"
               onClick={() => setOrderTypeFilter('po')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs shrink-0 ${orderTypeFilter === 'po' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+              className={`py-2.5 px-1 sm:px-3 rounded-xl transition-colors font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 ${
+                orderTypeFilter === 'po'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface/60'
+              }`}
             >
-              PO Online ({poCount})
+              <span>PO Online</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
+                  orderTypeFilter === 'po'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-surface border border-border/60 text-text-secondary'
+                }`}
+              >
+                {poCount}
+              </span>
             </button>
+
             <button
+              type="button"
               onClick={() => setOrderTypeFilter('ots')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs shrink-0 ${orderTypeFilter === 'ots' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+              className={`py-2.5 px-1 sm:px-3 rounded-xl transition-colors font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 ${
+                orderTypeFilter === 'ots'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface/60'
+              }`}
             >
-              OTS Venue ({otsCount})
+              <span>OTS Venue</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
+                  orderTypeFilter === 'ots'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-surface border border-border/60 text-text-secondary'
+                }`}
+              >
+                {otsCount}
+              </span>
             </button>
+
             <button
+              type="button"
               onClick={() => setOrderTypeFilter('merch')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all font-black text-xs shrink-0 ${orderTypeFilter === 'merch' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}
+              className={`py-2.5 px-1 sm:px-3 rounded-xl transition-colors font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 ${
+                orderTypeFilter === 'merch'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface/60'
+              }`}
             >
-              Merchandise ({merchOrders.length})
+              <span className="sm:hidden">Merch</span>
+              <span className="hidden sm:inline">Merchandise</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
+                  orderTypeFilter === 'merch'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-surface border border-border/60 text-text-secondary'
+                }`}
+              >
+                {merchOrders.length}
+              </span>
             </button>
           </div>
         </div>
