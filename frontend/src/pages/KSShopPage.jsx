@@ -1035,6 +1035,10 @@ const KSShopPage = () => {
                                 : getAssetPath('/images/members/group.webp')
                             }
                             alt="Cheki Grup Kohi Sekai"
+                            onError={(e) => {
+                              e.target.onerror = null
+                              e.target.src = '/images/members/group.webp'
+                            }}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                           />
                           <div className="absolute inset-0 bg-black/60" />
@@ -1115,6 +1119,15 @@ const KSShopPage = () => {
                                   <img
                                     src={photoUrl}
                                     alt={member.nama_panggung}
+                                    onError={(e) => {
+                                      e.target.onerror = null
+                                      const name = (member.member_id || member.nama_panggung || '').toLowerCase()
+                                      if (name.includes('latte')) e.target.src = '/images/members/latte.webp'
+                                      else if (name.includes('macchiato')) e.target.src = '/images/members/macchiato.webp'
+                                      else if (name.includes('affogato')) e.target.src = '/images/members/affogato.webp'
+                                      else if (name.includes('group') || name.includes('kohi')) e.target.src = '/images/members/group.webp'
+                                      else e.target.src = '/images/members/placeholder.svg'
+                                    }}
                                     className="w-full h-full object-cover object-top"
                                   />
                                 ) : (
@@ -1186,6 +1199,15 @@ const KSShopPage = () => {
                                   <img
                                     src={photoUrl}
                                     alt={member.nama_panggung}
+                                    onError={(e) => {
+                                      e.target.onerror = null
+                                      const name = (member.member_id || member.nama_panggung || '').toLowerCase()
+                                      if (name.includes('latte')) e.target.src = '/images/members/latte.webp'
+                                      else if (name.includes('macchiato')) e.target.src = '/images/members/macchiato.webp'
+                                      else if (name.includes('affogato')) e.target.src = '/images/members/affogato.webp'
+                                      else if (name.includes('group') || name.includes('kohi')) e.target.src = '/images/members/group.webp'
+                                      else e.target.src = '/images/members/placeholder.svg'
+                                    }}
                                     className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                                   />
                                 ) : (
