@@ -166,11 +166,17 @@ const OTSOrderInlineForm = ({
 
   const selectedEvent = events.find(e => e.id === formData.event_id)
 
+  const isGroupMember = (m) => {
+    if (!m) return false
+    const slug = (m.member_id || '').toLowerCase()
+    const name = (m.nama_panggung || '').toLowerCase().trim()
+    return slug === 'group' || slug === 'kohisekai' || name === 'kohi sekai' || m.order_index === 999
+  }
+
   const activeMembersInLineup = members.filter(member => {
     if (member.hadir === false) return false
-    const isGroup = member.member_id === 'group' || member.member_id === 'kohisekai' || member.nama_panggung?.toLowerCase().includes('kohi')
-    if (isGroup) return true
-    if (selectedEvent && selectedEvent.event_lineup && selectedEvent.event_lineup.length > 0) {
+    if (isGroupMember(member)) return true
+    if (selectedEvent && Array.isArray(selectedEvent.event_lineup) && selectedEvent.event_lineup.length > 0) {
       const allowedIds = selectedEvent.event_lineup.map(l => String(l.member_id || l.members?.id || l.members?.member_id))
       const memberIdStr = String(member.id)
       const memberSlugStr = String(member.member_id || '')
@@ -179,12 +185,8 @@ const OTSOrderInlineForm = ({
     return true
   })
 
-  const groupMember = activeMembersInLineup.find(
-    m => m.member_id === 'group' || m.member_id === 'kohisekai' || m.nama_panggung?.toLowerCase().includes('kohi')
-  )
-  const individualMembers = activeMembersInLineup.filter(
-    m => !(m.member_id === 'group' || m.member_id === 'kohisekai' || m.nama_panggung?.toLowerCase().includes('kohi'))
-  )
+  const groupMember = activeMembersInLineup.find(isGroupMember)
+  const individualMembers = activeMembersInLineup.filter(m => !isGroupMember(m))
 
   // addItem: chekiType: 'regular' | 'wide' | 'grup'
   const addItem = (member, chekiType = 'regular') => {
@@ -461,9 +463,20 @@ const OTSOrderInlineForm = ({
                     }`}
                   >
                     <div className="flex items-center justify-between gap-1">
-                      <span className="text-xs font-bold text-[var(--text-primary)] truncate">
-                        {formatMemberName(member.nama_panggung)}
-                      </span>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <img
+                          src={getAssetPath(member.shop_image_url || member.image_url)}
+                          alt={member.nama_panggung}
+                          onError={(e) => {
+                            e.target.onerror = null
+                            e.target.src = '/images/members/placeholder.svg'
+                          }}
+                          className="w-6 h-6 rounded-full object-cover shrink-0 border border-[var(--border)]"
+                        />
+                        <span className="text-xs font-bold text-[var(--text-primary)] truncate">
+                          {formatMemberName(member.nama_panggung)}
+                        </span>
+                      </div>
                       {totalThisMember > 0 && (
                         <span className="px-1.5 py-0.5 rounded-md bg-[var(--primary)] text-[var(--text-primary)] text-[10px] font-black shrink-0">
                           {totalThisMember}x
@@ -590,13 +603,38 @@ const OTSOrderInlineForm = ({
     </div>
   )
 
+  const renderFanAvatar = (fan, sizeClass = 'w-8 h-8', textClass = 'text-xs') => {
+    const avatarUrl = fan?.image_url || fan?.avatar_url
+    return (
+      <div className={`relative ${sizeClass} shrink-0`}>
+        {avatarUrl ? (
+          <img
+            src={getAssetPath(avatarUrl)}
+            alt={fan?.nama || 'Fan'}
+            onError={(e) => {
+              e.target.onerror = null
+              e.target.style.display = 'none'
+              const fb = e.target.parentElement?.querySelector('.avatar-fb')
+              if (fb) fb.style.display = 'flex'
+            }}
+            className={`${sizeClass} rounded-full object-cover border border-[var(--primary)]/40`}
+          />
+        ) : null}
+        <div
+          className={`avatar-fb ${sizeClass} rounded-full bg-[var(--primary)]/20 border border-[var(--primary)]/40 flex items-center justify-center font-black ${textClass} text-[var(--primary)]`}
+          style={{ display: avatarUrl ? 'none' : 'flex' }}
+        >
+          {fan?.nama?.charAt(0)?.toUpperCase() || 'F'}
+        </div>
+      </div>
+    )
+  }
+
   const renderFanInput = () => {
     if (mode === 'user' && fanUser) {
       return (
-        <div className="flex items-center gap-2 px-3.5 py-3 bg-[var(--primary)]/10 border border-[var(--primary)]/50 rounded-xl">
-          <div className="w-9 h-9 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center shrink-0">
-            <FaUserCheck className="text-[var(--primary)]" />
-          </div>
+        <div className="flex items-center gap-2.5 px-3.5 py-3 bg-[var(--primary)]/10 border border-[var(--primary)]/50 rounded-xl">
+          {renderFanAvatar(fanUser, 'w-9 h-9', 'text-sm')}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-[var(--text-primary)] truncate">{fanUser.nama}</p>
             <p className="text-[11px] text-[var(--text-secondary)] truncate">Akunmu · Fan #{fanUser.fan_code || '-'}{fanUser.whatsapp ? ` · ${fanUser.whatsapp}` : ''}</p>
@@ -610,10 +648,8 @@ const OTSOrderInlineForm = ({
 
     if (selectedFan) {
       return (
-        <div className="flex items-center gap-2 px-3.5 py-2.5 bg-[var(--primary)]/10 border border-[var(--primary)]/50 rounded-xl">
-          <div className="w-7 h-7 rounded-lg bg-[var(--primary)]/20 flex items-center justify-center shrink-0">
-            <FaUserCheck className="text-[var(--primary)] text-sm" />
-          </div>
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 bg-[var(--primary)]/10 border border-[var(--primary)]/50 rounded-xl">
+          {renderFanAvatar(selectedFan, 'w-8 h-8', 'text-xs')}
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-[var(--text-primary)] truncate">{selectedFan.nama}</p>
             <p className="text-[10px] text-[var(--text-secondary)] truncate">Fan #{selectedFan.fan_code}{selectedFan.whatsapp ? ` · ${selectedFan.whatsapp}` : ''}</p>
@@ -652,9 +688,7 @@ const OTSOrderInlineForm = ({
                   onClick={() => handleSelectFan(fan)}
                   className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[var(--primary)]/10 transition text-left border-b border-[var(--border)] last:border-0"
                 >
-                  <div className="w-7 h-7 rounded-full bg-[var(--border)] flex items-center justify-center shrink-0 text-[var(--text-secondary)]">
-                    <FaUser className="text-[10px]" />
-                  </div>
+                  {renderFanAvatar(fan, 'w-7 h-7', 'text-[10px]')}
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-[var(--text-primary)] truncate">{fan.nama}</p>
                     <p className="text-[10px] text-[var(--text-secondary)] truncate">
