@@ -983,20 +983,55 @@ const KSProfilePage = () => {
         {/* HERO / HEADER CARD */}
         <div className="bg-surface border border-border rounded-3xl shadow-sm overflow-hidden mb-6 sm:mb-8">
           
-          {/* Cover Photo */}
-          <div className="h-32 sm:h-48 relative group overflow-hidden bg-surface">
-            {fanUser?.banner_url && !bannerLoadError && (
+          {/* Cover Photo - Deep Coffee Metal Frame */}
+          <div className="h-36 sm:h-52 relative group overflow-hidden bg-[#100C0A] border-b-2 border-border">
+            {fanUser?.banner_url && !bannerLoadError ? (
               <img 
                 src={getAssetPath(fanUser.banner_url)} 
                 alt="Cover" 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 onError={() => setBannerLoadError(true)}
               />
-            )}
-            
-            {/* Dark overlay for pattern if no banner */}
-            {(!fanUser?.banner_url || bannerLoadError) && (
-              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, var(--primary) 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+            ) : (
+              /* Dedicated Default Banner: Distinct Roasted Espresso with Kohi Brand Watermark */
+              <div className="w-full h-full bg-[#120E0C] relative flex items-center justify-between px-6 sm:px-10 overflow-hidden select-none">
+                {/* Subtle Amber Top Accent Line (Solid Color) */}
+                <div className="absolute top-0 inset-x-0 h-1 bg-primary/70" />
+
+                {/* Grid Pattern with distinct contrast */}
+                <div 
+                  className="absolute inset-0 opacity-25 pointer-events-none" 
+                  style={{ 
+                    backgroundImage: 'radial-gradient(circle at 2px 2px, var(--primary) 1.5px, transparent 0)', 
+                    backgroundSize: '20px 20px' 
+                  }} 
+                />
+
+                {/* Left Side: Coffee Brand Emblem */}
+                <div className="relative z-0 flex items-center gap-3 opacity-60">
+                  <div className="w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center text-primary font-black text-base shadow-inner">
+                    KS
+                  </div>
+                  <div>
+                    <span className="text-[9px] uppercase tracking-[0.25em] font-mono text-primary font-bold block">
+                      Official Fan Space
+                    </span>
+                    <span className="text-sm font-black tracking-wider text-text-primary">
+                      KOHI SEKAI
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right Side: Japanese Typography Watermark */}
+                <div className="relative z-0 text-right opacity-30 hidden sm:block">
+                  <span className="text-2xl lg:text-3xl font-black tracking-tighter text-text-primary font-mono block">
+                    コーヒーの世界
+                  </span>
+                  <span className="text-[9px] uppercase tracking-widest text-primary font-mono font-bold">
+                    Deep Coffee Metal
+                  </span>
+                </div>
+              </div>
             )}
 
             {/* Cover Overlay Button */}
@@ -1004,7 +1039,7 @@ const KSProfilePage = () => {
               <button 
                 type="button"
                 onClick={handleOpenBannerPicker}
-                className="flex items-center gap-2 px-3.5 py-1.5 md:px-4 md:py-2 bg-black/80 hover:bg-black text-white border border-white/20 rounded-full font-bold text-xs md:text-sm transition-all shadow-md active:scale-95"
+                className="flex items-center gap-2 px-4 py-2 bg-black/85 hover:bg-black text-white border border-primary/50 hover:border-primary rounded-full font-bold text-xs md:text-sm transition-all shadow-xl active:scale-95"
               >
                 <FaImage className="text-primary" />
                 <span>Pilih Banner Cover</span>
@@ -1012,7 +1047,7 @@ const KSProfilePage = () => {
             </div>
             
             {/* Desktop Sign Out Button (Top Right over cover) */}
-            <div className="absolute top-4 right-4 hidden md:block">
+            <div className="absolute top-4 right-4 hidden md:block z-10">
               <button 
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 bg-black/80 hover:bg-danger text-white border border-white/20 rounded-full text-sm font-bold transition-colors shadow-lg"
@@ -1503,12 +1538,20 @@ const KSProfilePage = () => {
                       }`}
                     >
                       {opt.isDefault ? (
-                        <div className="w-full h-full bg-surface flex flex-col items-center justify-center p-4 text-center">
-                          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-2">
+                        <div className="w-full h-full bg-[#120E0C] border-b-2 border-border flex flex-col items-center justify-center p-4 text-center relative overflow-hidden">
+                          <div className="absolute top-0 inset-x-0 h-1 bg-primary/70" />
+                          <div 
+                            className="absolute inset-0 opacity-25 pointer-events-none" 
+                            style={{ 
+                              backgroundImage: 'radial-gradient(circle at 2px 2px, var(--primary) 1.5px, transparent 0)', 
+                              backgroundSize: '16px 16px' 
+                            }} 
+                          />
+                          <div className="w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center text-primary mb-2 z-10 shadow-sm">
                             <FaPalette size={18} />
                           </div>
-                          <p className="text-xs font-black text-text-primary">Espresso Minimalist</p>
-                          <span className="text-[10px] text-text-secondary">Pola Dark Deep Coffee</span>
+                          <p className="text-xs font-black text-text-primary z-10">Espresso Minimalist</p>
+                          <span className="text-[10px] text-text-secondary z-10 font-mono">Pola Dark Deep Coffee Resmi</span>
                         </div>
                       ) : (
                         <>
@@ -1615,10 +1658,18 @@ const KSProfilePage = () => {
                       }`}
                     >
                       {opt.isDefault ? (
-                        <div className="w-full h-full bg-surface flex flex-col items-center justify-center p-3 text-center">
-                          <FaPalette className="text-primary text-xl mb-1" />
-                          <p className="text-xs font-black text-text-primary">Espresso Minimalist</p>
-                          <span className="text-[9px] text-text-secondary">Pola Dark Deep Coffee</span>
+                        <div className="w-full h-full bg-[#120E0C] border-b-2 border-border flex flex-col items-center justify-center p-3 text-center relative overflow-hidden">
+                          <div className="absolute top-0 inset-x-0 h-1 bg-primary/70" />
+                          <div 
+                            className="absolute inset-0 opacity-25 pointer-events-none" 
+                            style={{ 
+                              backgroundImage: 'radial-gradient(circle at 2px 2px, var(--primary) 1.5px, transparent 0)', 
+                              backgroundSize: '16px 16px' 
+                            }} 
+                          />
+                          <FaPalette className="text-primary text-xl mb-1 z-10" />
+                          <p className="text-xs font-black text-text-primary z-10">Espresso Minimalist</p>
+                          <span className="text-[9px] text-text-secondary z-10 font-mono">Pola Dark Deep Coffee Resmi</span>
                         </div>
                       ) : (
                         <>

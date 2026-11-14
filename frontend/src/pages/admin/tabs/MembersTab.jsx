@@ -21,7 +21,8 @@ import {
   FaTimes,
   FaUserSecret,
   FaEyeSlash,
-  FaQuestion
+  FaQuestion,
+  FaShoppingBag
 } from 'react-icons/fa'
 import Swal from 'sweetalert2'
 import api from '../../../lib/api'
@@ -718,6 +719,39 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 <p className="text-[11px] text-[var(--text-secondary)]">
                   {isGroup ? 'Pengaturan visual banner utama & paket Cheki grup' : 'Pengaturan profil, foto, dan identitas idol'}
                 </p>
+
+                {/* Quick-Jump Foto Navigator Pills */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-2">
+                  <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mr-1">Foto:</span>
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('card-foto-profil')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[var(--background)] border border-[var(--border)] text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)] transition"
+                  >
+                    <FaCamera size={9} className="text-[var(--primary)]" />
+                    <span>Profil (1:1)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('card-foto-shop')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[var(--background)] border border-[var(--border)] text-[10px] font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)] transition"
+                  >
+                    <FaShoppingBag size={9} className="text-[var(--primary)]" />
+                    <span>Shop (3:4)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('card-banner-landscape')?.scrollIntoView({ behavior: 'smooth' })}
+                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-bold transition shadow-sm ${
+                      bannerPreview || formData.banner_image_url
+                        ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                        : 'bg-[var(--primary)]/20 border-[var(--primary)]/50 text-[var(--primary)]'
+                    }`}
+                  >
+                    <FaImage size={9} />
+                    <span>Banner Landscape (16:9) {bannerPreview || formData.banner_image_url ? '✓' : '★ Unggah Di Sini'}</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -757,7 +791,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
           {/* Left Column: Visual Assets (Avatar, Color, 3 Gallery Slots) */}
           <div className="lg:col-span-5 space-y-6">
             {/* Foto Utama Card */}
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
+            <div id="card-foto-profil" className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                   Foto {isGroup ? 'Banner / Cover Utama' : 'Profil Member'}
@@ -869,7 +903,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
             </div>
 
             {/* Foto Pajangan Shop (Tiket Cheki) Card */}
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
+            <div id="card-foto-shop" className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                   Foto Pajangan Shop (Tiket Cheki)
@@ -981,16 +1015,16 @@ const MembersTab = ({ members = [], onRefresh }) => {
             </div>
 
             {/* Foto Banner Landscape Member (Cover Profil Fan) Card */}
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
+            <div id="card-banner-landscape" className="bg-[var(--surface)] border-2 border-[var(--primary)]/50 hover:border-[var(--primary)] rounded-2xl p-5 shadow-xl space-y-4 transition-all">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-                  Foto Banner Landscape Member (Cover Profil Fan)
+                <label className="text-xs font-bold text-[var(--primary)] uppercase tracking-wider flex items-center gap-1.5">
+                  <FaImage /> Foto Banner Landscape Member (Cover Profil Fan)
                 </label>
                 <div className="flex items-center gap-1.5">
                   <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]">
                     1200 × 675 px (16:9)
                   </span>
-                  <span className="text-[10px] text-[var(--primary)] font-bold bg-[var(--primary)]/10 px-2 py-0.5 rounded-full border border-[var(--primary)]/20">
+                  <span className="text-[10px] text-[var(--primary)] font-bold bg-[var(--primary)]/20 px-2 py-0.5 rounded-full border border-[var(--primary)]/30">
                     Pilihan Banner Fan
                   </span>
                 </div>
@@ -1810,6 +1844,60 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       <span className="text-[var(--text-secondary)] flex items-center gap-1"><FaImages /> Galeri:</span>
                       <span className="text-[var(--text-secondary)] font-medium">{galleryCount} / 3 foto terpasang</span>
                     </div>
+                  </div>
+
+                  {/* 16:9 Landscape Banner Status / Preview */}
+                  <div className="mt-3 pt-2.5 border-t border-[var(--border)]">
+                    <div className="flex items-center justify-between text-[11px] mb-1.5">
+                      <span className="text-[var(--text-secondary)] flex items-center gap-1 font-medium">
+                        <FaImage className="text-[var(--primary)]" /> Banner Landscape (16:9):
+                      </span>
+                      {member.banner_image_url ? (
+                        <span className="text-emerald-400 font-bold text-[10px]">Tersedia ✓</span>
+                      ) : (
+                        <span className="text-amber-400 font-bold text-[10px]">Belum Ada</span>
+                      )}
+                    </div>
+
+                    {member.banner_image_url ? (
+                      <div
+                        onClick={() => {
+                          handleOpenEditor(member)
+                          setTimeout(() => document.getElementById('card-banner-landscape')?.scrollIntoView({ behavior: 'smooth' }), 120)
+                        }}
+                        className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-[var(--border)] group/banner cursor-pointer hover:border-[var(--primary)] transition shadow-sm bg-black/40"
+                        title="Banner Landscape (16:9) Member - Klik untuk ganti"
+                      >
+                        <img
+                          src={member.banner_image_url.startsWith('http') ? member.banner_image_url : getAssetPath(member.banner_image_url)}
+                          alt={`Banner ${member.nama_panggung}`}
+                          className="w-full h-full object-cover group-hover/banner:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.target.onerror = null
+                            e.target.src = resolveMemberImage('', member.member_id, member.nama_panggung)
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/banner:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-bold">
+                          <FaEdit /> Ubah Banner Landscape
+                        </div>
+                        <span className="absolute bottom-1 right-1 bg-black/80 text-[9px] font-mono font-bold text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                          16:9 BANNER
+                        </span>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleOpenEditor(member)
+                          setTimeout(() => document.getElementById('card-banner-landscape')?.scrollIntoView({ behavior: 'smooth' }), 120)
+                        }}
+                        className="w-full py-2 px-3 rounded-xl border border-dashed border-[var(--primary)]/50 bg-[var(--primary)]/5 hover:bg-[var(--primary)]/15 text-center transition flex items-center justify-center gap-1.5 text-[11px] font-bold text-[var(--primary)] group/bannerbtn"
+                        title="Klik untuk unggah banner landscape 16:9"
+                      >
+                        <FaImage className="text-xs group-hover/bannerbtn:scale-110 transition-transform" />
+                        <span>+ Unggah Banner 16:9 (Cover Fan)</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Gallery Thumbnails Preview */}
