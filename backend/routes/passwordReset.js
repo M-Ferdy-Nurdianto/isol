@@ -73,7 +73,7 @@ router.post('/admin/email/:userId', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Akun user tidak ditemukan' })
     }
 
-    if (!user.email || user.email.includes('@refreshbreeze.com') || !user.email.includes('@')) {
+    if (!user.email || user.email.includes('@kohisekai.com') || user.email.includes('@refreshbreeze.com') || !user.email.includes('@')) {
       return res.status(400).json({
         error: 'User tidak memiliki email valid yang terdaftar untuk menerima link reset.'
       })

@@ -1,41 +1,63 @@
 // Shared member data for consistent color usage across all pages
+// Deep Coffee Metal palette for Kohi Sekai
 
 export const memberData = {
-    'yanyee': {
-        color: '#F97316',
-        name: 'YanYee'
+    'dea': {
+        color: '#E8944A',
+        name: 'Dea'
     },
-    'sinta': {
-        color: '#10B981',
-        name: 'Sinta'
+    'latte': {
+        color: '#F0A868',
+        name: 'Kohi Latte'
     },
-    'cissi': {
-        color: '#FBBF24',
-        name: 'Cissi'
+    'macchiato': {
+        color: '#E5A93C',
+        name: 'Kohi Macchiato'
     },
-    'channie': {
-        color: '#6D28D9',
-        name: 'Channie'
-    },
-    'acaa': {
-        color: '#3B82F6',
-        name: 'Acaa'
-    },
-    'cally': {
-        color: '#2DD4BF',
-        name: 'Cally'
-    },
-    'piya': {
-        color: '#F472B6',
-        name: 'Piya'
-    },
-    'rara': {
-        color: '#9e1527',
-        name: 'Rara'
+    'affogato': {
+        color: '#C9A97E',
+        name: 'Kohi Affogato'
     },
     'group': {
         color: '#E8944A',
-        name: 'Group'
+        name: 'Kohi Sekai'
+    },
+    'kohisekai': {
+        color: '#E8944A',
+        name: 'Kohi Sekai'
+    },
+    // Compatibility aliases mapped to coffee tones
+    'sinta': {
+        color: '#C68B59',
+        name: 'Sinta'
+    },
+    'yanyee': {
+        color: '#E8944A',
+        name: 'YanYee'
+    },
+    'cissi': {
+        color: '#E5A93C',
+        name: 'Cissi'
+    },
+    'channie': {
+        color: '#A855F7',
+        name: 'Channie'
+    },
+    'acaa': {
+        color: '#D7B48D',
+        name: 'Acaa'
+    },
+    'cally': {
+        color: '#78350F',
+        name: 'Cally'
+    },
+    'piya': {
+        color: '#B45309',
+        name: 'Piya'
+    },
+    'rara': {
+        color: '#9E1527',
+        name: 'Rara'
     }
 }
 

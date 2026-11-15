@@ -30,18 +30,18 @@ import { getAssetPath } from '../../../lib/pathUtils'
 import { showToast } from '../../../lib/toast'
 
 const PRESET_COLORS = [
-  { name: 'Amber Gold', hex: '#FBBF24' },
-  { name: 'Sky Blue', hex: '#3B82F6' },
-  { name: 'Royal Purple', hex: '#6D28D9' },
-  { name: 'Mint Teal', hex: '#2DD4BF' },
-  { name: 'Emerald Green', hex: '#10B981' },
-  { name: 'Breeze Green', hex: '#E8944A' },
-  { name: 'Crimson Red', hex: '#9E1527' },
-  { name: 'Rose Pink', hex: '#F472B6' },
-  { name: 'Neon Coral', hex: '#FF6B9D' },
-  { name: 'Vibrant Orange', hex: '#F97316' },
-  { name: 'Lavender', hex: '#8B5CF6' },
-  { name: 'Hot Pink', hex: '#EC4899' },
+  { name: 'Amber Crema', hex: '#E8944A' },
+  { name: 'Espresso Roast', hex: '#4A2E18' },
+  { name: 'Warm Latte', hex: '#C68B59' },
+  { name: 'Caramel Macchiato', hex: '#E5A93C' },
+  { name: 'Dark Mocha', hex: '#78350F' },
+  { name: 'Cream Vanilla', hex: '#D7B48D' },
+  { name: 'Cinnamon Brown', hex: '#B45309' },
+  { name: 'Deep Arabica', hex: '#3A2E24' },
+  { name: 'Special Purple', hex: '#A855F7' },
+  { name: 'Coffee Cherry', hex: '#9E1527' },
+  { name: 'Golden Crema', hex: '#FBBF24' },
+  { name: 'Affogato Sweet', hex: '#C9A97E' },
 ]
 
 // Helper to resolve images safely with local fallbacks
@@ -96,7 +96,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
     tanggal_lahir: '',
     hobi: '',
     instagram: '',
-    color: '#10B981',
+    color: '#E8944A',
     order_index: 0,
     hadir: true,
     image_url: '',
@@ -145,7 +145,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
         tanggal_lahir: member.tanggal_lahir || '',
         hobi: member.hobi || '',
         instagram: member.instagram || '',
-        color: member.color || '#10B981',
+        color: member.color || '#E8944A',
         order_index: member.order_index !== undefined ? member.order_index : 0,
         hadir: member.hadir !== undefined ? member.hadir : true,
         image_url: member.image_url || '',
@@ -183,7 +183,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
         tanggal_lahir: '',
         hobi: '',
         instagram: '',
-        color: '#10B981',
+        color: '#E8944A',
         order_index: members.length,
         hadir: true,
         image_url: '',
@@ -533,14 +533,14 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 ...heroConfig.members[existingIdx],
                 name: payload.is_secret ? '???' : payload.nama_panggung.toUpperCase(),
                 // Pertahankan warna hero khusus yang sudah diatur di Tab Hero (jangan ditimpa warna kartu member)
-                color: heroConfig.members[existingIdx].color || 'bg-[#5A8F5A]',
+                color: heroConfig.members[existingIdx].color || 'bg-[#3A2E24]',
                 photo: (payload.is_secret && finalSilhouetteUrl) ? finalSilhouetteUrl : (heroConfig.members[existingIdx].photo || heroPhoto)
               }
             } else {
               heroConfig.members.push({
                 id: memberSlug,
                 name: payload.is_secret ? '???' : payload.nama_panggung.toUpperCase(),
-                color: 'bg-[#5A8F5A]', // Default Hero tint
+                color: 'bg-[#3A2E24]', // Default Hero tint
                 photo: heroPhoto,
                 posX: 50,
                 posY: 30,
@@ -612,7 +612,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
               heroConfig.members.push({
                 id: mSlug,
                 name: member.is_secret ? '???' : (member.nama_panggung || 'MEMBER').toUpperCase(),
-                color: member.color || 'bg-[#5A8F5A]',
+                color: member.color || 'bg-[#3A2E24]',
                 photo: photo,
                 is_secret: Boolean(member.is_secret),
                 posX: 50,
@@ -744,8 +744,8 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     onClick={() => document.getElementById('card-banner-landscape')?.scrollIntoView({ behavior: 'smooth' })}
                     className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-bold transition shadow-sm ${
                       bannerPreview || formData.banner_image_url
-                        ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
-                        : 'bg-[var(--primary)]/20 border-[var(--primary)]/50 text-[var(--primary)]'
+                        ? 'bg-[var(--primary)]/20 border-[var(--primary)]/50 text-[var(--primary)]'
+                        : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)]'
                     }`}
                   >
                     <FaImage size={9} />
@@ -797,10 +797,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
                   Foto {isGroup ? 'Banner / Cover Utama' : 'Profil Member'}
                 </label>
                 <div className="flex items-center gap-1.5">
-                  <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                  <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]">
                     {isGroup ? '1200 × 675 px (16:9)' : '800 × 800 px (1:1)'}
                   </span>
-                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                  <span className="text-[10px] text-[var(--primary)] font-bold bg-[var(--primary)]/10 px-2 py-0.5 rounded-full border border-[var(--primary)]/20">
                     Drag & Drop Ready
                   </span>
                 </div>
@@ -1142,7 +1142,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
-                    value={formData.color || '#10B981'}
+                    value={formData.color || '#E8944A'}
                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                     className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0 p-0"
                   />
@@ -1150,8 +1150,8 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     type="text"
                     value={formData.color || ''}
                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    placeholder="#10B981"
-                    className="w-24 px-2.5 py-1 bg-[var(--background)] border border-[var(--border)] rounded-lg text-xs font-mono font-bold text-center focus:outline-none focus:border-emerald-500"
+                    placeholder="#E8944A"
+                    className="w-24 px-2.5 py-1 bg-[var(--background)] border border-[var(--border)] rounded-lg text-xs font-mono font-bold text-center focus:outline-none focus:border-[var(--primary)]"
                   />
                 </div>
               </div>
@@ -1190,8 +1190,8 @@ const MembersTab = ({ members = [], onRefresh }) => {
                   </label>
                   <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Tampil pada popup detail profil member di halaman publik</p>
                 </div>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                  600 Ã— 800 px (3:4)
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]">
+                  600 × 800 px (3:4)
                 </span>
               </div>
 
@@ -1296,7 +1296,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     type="text"
                     value={formData.nama_panggung}
                     onChange={(e) => setFormData({ ...formData, nama_panggung: e.target.value })}
-                    placeholder="Contoh: Sinta"
+                    placeholder="Contoh: Dea"
                     required
                     className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
                   />
@@ -1310,12 +1310,12 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     type="text"
                     value={formData.member_id}
                     onChange={(e) => setFormData({ ...formData, member_id: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '') })}
-                    placeholder="Contoh: sinta"
+                    placeholder="Contoh: dea"
                     required
                     disabled={isEditing && isGroup}
                     className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)] disabled:opacity-40"
                   />
-                  <span className="text-[10px] text-[var(--text-secondary)] mt-1 block">ID unik huruf kecil tanpa spasi (e.g. cissi, acaa).</span>
+                  <span className="text-[10px] text-[var(--text-secondary)] mt-1 block">ID unik huruf kecil tanpa spasi (e.g. dea, latte, macchiato).</span>
                 </div>
               </div>
 
@@ -1325,10 +1325,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
                   type="text"
                   value={formData.tagline}
                   onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-                  placeholder="Contoh: Morning Breeze, Forest Breeze"
+                  placeholder="Contoh: Sweet Caramel Latte, Warm Espresso"
                   className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
                 />
-                <span className="text-[10px] text-[var(--text-secondary)] mt-1 block">Konsep tema elemen member (e.g. Morning Breeze, Forest Breeze).</span>
+                <span className="text-[10px] text-[var(--text-secondary)] mt-1 block">Konsep aroma dan rasa kopi member (e.g. Sweet Caramel Latte, Warm Espresso).</span>
               </div>
             </div>
 
@@ -1341,7 +1341,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 rows={3}
                 value={formData.jikoshoukai}
                 onChange={(e) => setFormData({ ...formData, jikoshoukai: e.target.value })}
-                placeholder='"Si pemalu tetapi suka hal-hal baru, haloo semuanya aku Sintaa!"'
+                placeholder='"Secangkir kehangatan di setiap senyuman, halo semuanya aku Dea dari Kohi Sekai!"'
                 className="w-full px-4 py-3 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)] leading-relaxed"
               />
               <p className="text-[10px] text-[var(--text-secondary)]">Kalimat ciri khas ikonik member saat menyapa audiens dan fans.</p>
@@ -1371,7 +1371,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     type="text"
                     value={formData.hobi}
                     onChange={(e) => setFormData({ ...formData, hobi: e.target.value })}
-                    placeholder="e.g. Memasak, menyanyi"
+                    placeholder="e.g. Menyeduh kopi, menyanyi"
                     className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
                   />
                 </div>
@@ -1382,7 +1382,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     type="text"
                     value={formData.instagram}
                     onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
-                    placeholder="e.g. @sii_ntaa"
+                    placeholder="e.g. @dea.kohisekai"
                     className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
                   />
                 </div>
@@ -1587,7 +1587,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-7 py-2.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-[var(--text-primary)] text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-emerald-900/40 disabled:opacity-50"
+                className="flex items-center gap-2 px-7 py-2.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-[var(--text-primary)] text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-black/40 disabled:opacity-50"
               >
                 <FaSave /> {saving ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan' : 'Tambah Member')}
               </button>
@@ -1837,7 +1837,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                     {member.instagram && (
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="text-[var(--text-secondary)] flex items-center gap-1"><FaInstagram /> IG:</span>
-                        <span className="text-emerald-400 font-mono">{member.instagram}</span>
+                        <span className="text-[var(--primary)] font-mono">{member.instagram}</span>
                       </div>
                     )}
                     <div className="flex items-center justify-between text-[11px]">
@@ -1880,7 +1880,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/banner:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-bold">
                           <FaEdit /> Ubah Banner Landscape
                         </div>
-                        <span className="absolute bottom-1 right-1 bg-black/80 text-[9px] font-mono font-bold text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                        <span className="absolute bottom-1 right-1 bg-black/80 text-[9px] font-mono font-bold text-[var(--primary)] px-1.5 py-0.5 rounded border border-[var(--primary)]/30">
                           16:9 BANNER
                         </span>
                       </div>

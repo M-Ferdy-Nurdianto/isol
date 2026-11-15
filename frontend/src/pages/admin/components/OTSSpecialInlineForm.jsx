@@ -98,7 +98,7 @@ const OTSSpecialInlineForm = ({
 
   const activeLineupMembers = members.filter(member => {
     if (member.hadir === false) return false
-    if (member.member_id === 'group' || member.member_id === 'refreshbreeze') return false
+    if (member.member_id === 'group' || member.member_id === 'kohisekai' || member.member_id === 'refreshbreeze') return false
     const memberIdStr = String(member.id)
     const memberSlugStr = String(member.member_id || '')
     return lineupMemberIds.includes(memberIdStr) || lineupMemberIds.includes(memberSlugStr)

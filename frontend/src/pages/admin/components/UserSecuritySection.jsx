@@ -39,7 +39,7 @@ const UserSecuritySection = ({ user, onActionSuccess }) => {
   }, [user?.id, fetchResetHistory])
 
   const handleSendEmail = async () => {
-    if (!user?.email || user.email.includes('@refreshbreeze.com')) {
+    if (!user?.email || user.email.includes('@kohisekai.com') || user.email.includes('@refreshbreeze.com')) {
       Swal.fire({
         icon: 'warning',
         title: 'Email Tidak Valid',
