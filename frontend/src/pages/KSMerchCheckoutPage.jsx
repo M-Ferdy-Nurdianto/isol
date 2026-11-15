@@ -355,14 +355,13 @@ const KSMerchCheckoutPage = () => {
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="block text-xs font-bold text-text-secondary mb-1">
-                              No. WhatsApp <span className="text-red-400">*</span>
+                              No. WhatsApp <span className="text-[10px] text-text-secondary font-normal">(opsional)</span>
                             </label>
                             <input
                               type="tel"
-                              required
                               value={buyer.whatsapp}
                               onChange={(e) => setBuyer({ ...buyer, whatsapp: e.target.value })}
-                              placeholder="081234567890"
+                              placeholder="081234567890 (Opsional)"
                               className="w-full px-4 py-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A] transition-colors"
                             />
                           </div>
@@ -375,11 +374,20 @@ const KSMerchCheckoutPage = () => {
                               type="text"
                               value={buyer.instagram}
                               onChange={(e) => setBuyer({ ...buyer, instagram: e.target.value })}
-                              placeholder="@username"
+                              placeholder="@username (Opsional)"
                               className="w-full px-4 py-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A] transition-colors"
                             />
                           </div>
                         </div>
+
+                        {(!buyer.whatsapp || !buyer.whatsapp.trim()) && (
+                          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-[11px] text-text-secondary mt-3">
+                            <FaInfoCircle className="text-amber-400 shrink-0 mt-0.5" />
+                            <span>
+                              <strong className="text-text-primary font-bold">Pengingat Kontak:</strong> Nomor WhatsApp belum diisi. Anda tetap dapat melanjutkan pesanan merchandise ini dan melengkapinya nanti di profil.
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -745,14 +753,13 @@ const KSMerchCheckoutPage = () => {
 
                     <div>
                       <label className="block text-[11px] font-bold text-text-secondary mb-1">
-                        No. WhatsApp <span className="text-red-400">*</span>
+                        No. WhatsApp <span className="text-[10px] text-text-secondary font-normal">(opsional)</span>
                       </label>
                       <input
                         type="tel"
-                        required
                         value={buyer.whatsapp}
                         onChange={(e) => setBuyer({ ...buyer, whatsapp: e.target.value })}
-                        placeholder="08xxxxxxxxxx"
+                        placeholder="08xxxxxxxxxx (Opsional)"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
                       />
                     </div>
@@ -765,10 +772,19 @@ const KSMerchCheckoutPage = () => {
                         type="text"
                         value={buyer.instagram}
                         onChange={(e) => setBuyer({ ...buyer, instagram: e.target.value })}
-                        placeholder="@username"
+                        placeholder="@username (Opsional)"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
                       />
                     </div>
+
+                    {(!buyer.whatsapp || !buyer.whatsapp.trim()) && (
+                      <div className="flex items-start gap-2 p-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-[10px] text-text-secondary">
+                        <FaInfoCircle className="text-amber-400 shrink-0 mt-0.5" />
+                        <span>
+                          <strong className="text-text-primary font-bold">Catatan:</strong> WhatsApp belum diisi. Anda tetap dapat lanjut checkout dan melengkapinya nanti di profil.
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Mobile Form Section: Pengambilan / Pengiriman */}

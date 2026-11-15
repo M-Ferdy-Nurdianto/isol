@@ -24,7 +24,8 @@ import {
   FaChevronUp,
   FaChevronDown,
   FaUserCheck,
-  FaEdit
+  FaEdit,
+  FaInfoCircle
 } from 'react-icons/fa'
 import KSHeader from '../components/KSHeader'
 import FanAuthModal from '../components/auth/FanAuthModal'
@@ -701,20 +702,64 @@ const KSCheckoutPage = () => {
                       <span className="text-text-secondary block text-[10px] uppercase font-bold tracking-wider mb-0.5">
                         Nomor WhatsApp
                       </span>
-                      <span className="font-bold text-text-primary text-sm truncate block">
-                        {form.whatsapp || '-'}
-                      </span>
+                      {form.whatsapp && form.whatsapp !== '-' ? (
+                        <span className="font-bold text-text-primary text-sm truncate block">
+                          {form.whatsapp}
+                        </span>
+                      ) : (
+                        <div>
+                          <span className="font-bold text-[var(--warning)] text-xs block">
+                            Belum diisi
+                          </span>
+                          <span className="text-[10px] text-text-secondary block mt-0.5">
+                            Opsional · Bisa lanjut beli
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="p-3.5 rounded-2xl bg-background border border-border">
                       <span className="text-text-secondary block text-[10px] uppercase font-bold tracking-wider mb-0.5">
                         Akun Instagram
                       </span>
-                      <span className="font-bold text-text-primary text-sm truncate block">
-                        {form.instagram || '-'}
-                      </span>
+                      {form.instagram && form.instagram !== '-' ? (
+                        <span className="font-bold text-text-primary text-sm truncate block">
+                          {form.instagram}
+                        </span>
+                      ) : (
+                        <div>
+                          <span className="font-medium text-text-secondary text-xs block">
+                            Belum diisi
+                          </span>
+                          <span className="text-[10px] text-text-secondary/70 block mt-0.5">
+                            Opsional
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
+
+                  {/* Pengingat Kontak (Non-Blocking Reminder) */}
+                  {(!form.whatsapp || form.whatsapp === '-' || !form.instagram || form.instagram === '-') && (
+                    <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-background border border-border text-xs">
+                      <FaInfoCircle className="text-[var(--warning)] shrink-0 mt-0.5 text-sm" />
+                      <div className="flex-1 leading-relaxed">
+                        <span className="text-text-primary font-bold">
+                          Pengingat Kontak:
+                        </span>{' '}
+                        <span className="text-text-secondary">
+                          {!form.whatsapp || form.whatsapp === '-' ? 'Nomor WhatsApp belum terisi di profil. ' : ''}
+                          {!form.instagram || form.instagram === '-' ? 'Akun Instagram belum terisi. ' : ''}
+                          Anda tetap bisa langsung melanjutkan pembelian tiket ini sekarang, dan dapat melengkapi kontak Anda kapan saja melalui{' '}
+                        </span>
+                        <Link to="/profile" className="text-primary font-bold hover:underline inline-flex items-center gap-1">
+                          <span>Ubah Profil</span>
+                          <FaArrowLeft className="rotate-180" size={10} />
+                        </Link>
+                        <span className="text-text-secondary">.</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
               </div>
