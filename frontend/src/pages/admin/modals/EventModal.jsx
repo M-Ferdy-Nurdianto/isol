@@ -200,7 +200,7 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                       </label>
                       <input
                         type="text"
-                        placeholder="Contoh: Kohi Sunday Festival 2026"
+                        placeholder="Contoh: Kohi Sekai 1st Anniversary Live Jogja"
                         value={formData.nama}
                         onChange={(e) => setFormData({...formData, nama: e.target.value})}
                         className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-xs focus:outline-none focus:border-[var(--primary)]"
@@ -253,7 +253,7 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                         <div className="relative">
                           <input
                             type="text"
-                            placeholder="Contoh: Hall A, Senayan Park Jakarta"
+                            placeholder="Contoh: Jogja Expo Center (JEC), Yogyakarta"
                             value={formData.lokasi}
                             onChange={(e) => setFormData({...formData, lokasi: e.target.value})}
                             className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-xs focus:outline-none focus:border-[var(--primary)]"
@@ -495,7 +495,7 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                 </label>
                 <input
                   type="text"
-                  placeholder="Nama Event"
+                  placeholder="Kohi Sekai 1st Anniversary: Live in Jogja"
                   value={formData.nama}
                   onChange={(e) => setFormData({...formData, nama: e.target.value})}
                   className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl text-xs focus:outline-none focus:border-[var(--primary)]"
@@ -543,7 +543,7 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                   </label>
                   <input
                     type="text"
-                    placeholder="Lokasi Venue"
+                    placeholder="Jogja Expo Center (JEC), Yogyakarta"
                     value={formData.lokasi}
                     onChange={(e) => setFormData({...formData, lokasi: e.target.value})}
                     className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl text-xs"

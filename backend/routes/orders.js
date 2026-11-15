@@ -235,7 +235,7 @@ router.post('/', async (req, res) => {
     const orderNumber = `RB${Date.now()}`
 
     // Generate auto email from timestamp
-    const autoEmail = `order-${Date.now()}@refreshbreeze.com`
+    const autoEmail = `order-${Date.now()}@kohisekai.com`
 
     // Determine if kontak is phone or instagram
     const isPhone = kontak && /^[0-9+\-\s()]+$/.test(kontak)
@@ -402,7 +402,7 @@ router.post('/ots', authMiddleware, async (req, res) => {
         user_id: user_id || null,
         nama_lengkap,
         whatsapp: whatsapp || '-',
-        email: email || `ots-${Date.now()}@refreshbreeze.com`,
+        email: email || `ots-${Date.now()}@kohisekai.com`,
         instagram: instagram || '-',
         total_harga,
         status: 'checked',
@@ -677,7 +677,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
 
     // Create Excel workbook
     const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet('REFRESH_BREEZE_REPORT')
+    const worksheet = workbook.addWorksheet('KOHI_SEKAI_REPORT')
 
     worksheet.columns = [
       { key: 'col1', width: 18 },
@@ -783,10 +783,10 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
       })
     })
 
-    const titleRow = worksheet.addRow(['REFRESH BREEZE - LAPORAN PENJUALAN'])
-    mergeRow(titleRow.number, 'A', 'J', 'REFRESH BREEZE - LAPORAN PENJUALAN', {
+    const titleRow = worksheet.addRow(['KOHI SEKAI - LAPORAN PENJUALAN'])
+    mergeRow(titleRow.number, 'A', 'J', 'KOHI SEKAI - LAPORAN PENJUALAN', {
       font: { bold: true, size: 14, color: { argb: 'FFFFFFFF' } },
-      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF079108' } },
+      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8944A' } },
       alignment: { vertical: 'middle', horizontal: 'left' }
     })
 
@@ -935,7 +935,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
     addOrderSection('PO ORDERS', 'FF16A34A', poOrders)
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    res.setHeader('Content-Disposition', `attachment; filename=RefreshBreeze_Report_${Date.now()}.xlsx`)
+    res.setHeader('Content-Disposition', `attachment; filename=KohiSekai_Report_${Date.now()}.xlsx`)
 
     await workbook.xlsx.write(res)
     res.end()

@@ -187,7 +187,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
               <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Nama event</label>
               <input
                 type="text"
-                placeholder="Refresh Carnival Vol. 3"
+                placeholder="Kohi Sekai 1st Anniversary: Live in Jogja"
                 value={formData.nama}
                 onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -230,7 +230,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                     <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Lokasi</label>
                     <input
                       type="text"
-                      placeholder="Tulungagung Cultural Hall"
+                      placeholder="Jogja Expo Center (JEC), Yogyakarta"
                       value={formData.lokasi}
                       onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
                       className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-[var(--primary)]"
@@ -252,7 +252,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                   <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Jam cheki</label>
                   <input
                     type="text"
-                    placeholder="15:00 - 17:00 WIB"
+                    placeholder="15:30 - 18:00 WIB"
                     value={formData.cheki_time}
                     onChange={(e) => setFormData({ ...formData, cheki_time: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-sm focus:outline-none focus:border-[var(--primary)]"
