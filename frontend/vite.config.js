@@ -18,6 +18,7 @@ const SPA_ROUTES = [
   'profile',
   'ots',
   'reset-password',
+  'magic-login',
   'admin',
   'admin/login'
 ]
