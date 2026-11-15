@@ -6,6 +6,7 @@ const FanAuthContext = createContext({
   isLoggedIn: false,
   login: async () => {},
   loginByEmail: async () => {},
+  setSession: () => {},
   logout: () => {},
   updateProfile: () => {},
   authModalOpen: false,
@@ -118,6 +119,16 @@ export const FanAuthProvider = ({ children }) => {
     throw new Error(res.data?.error || 'Gagal login dengan email tersebut')
   }
 
+  const setSession = useCallback((token, user) => {
+    if (token) {
+      localStorage.setItem('ks_fan_token', token)
+    }
+    if (user) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
+      setFanUser(user)
+    }
+  }, [])
+
   const logout = () => {
     setFanUser(null)
     localStorage.removeItem(STORAGE_KEY)
@@ -162,6 +173,7 @@ export const FanAuthProvider = ({ children }) => {
         isLoggedIn: Boolean(fanUser?.email),
         login,
         loginByEmail,
+        setSession,
         logout,
         updateProfile,
         authModalOpen,

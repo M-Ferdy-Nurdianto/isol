@@ -46,6 +46,7 @@ const SettingsTab = ({
   maintenanceEstimatedEnd, setMaintenanceEstimatedEnd,
   configLoading, updateConfig,
   onShowBulkDeleteModal, onPurgeOldPayments,
+  onShowWipeModal,
   chekiGrupEnabled, setChekiGrupEnabled,
   hargaChekiGrupPo, setHargaChekiGrupPo,
   hargaChekiGrupOts, setHargaChekiGrupOts,
@@ -559,6 +560,31 @@ const SettingsTab = ({
             <button type="button" onClick={onShowBulkDeleteModal} className="w-full bg-[var(--danger)]/15 hover:bg-[var(--danger)]/25 border border-[var(--danger)]/40 text-[var(--danger)] py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 active:scale-95">
               <FaTrash /> Buka Opsi Hapus Data
             </button>
+          </div>
+
+          {/* Wipe Dummy Data Card (Wipe DB) */}
+          <div className="bg-[var(--background)] rounded-xl p-5 border border-red-500/40 flex flex-col justify-between gap-4 md:col-span-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[var(--danger)]"></span>
+                  <h4 className="text-sm font-bold text-[var(--text-primary)]">
+                    Reset Data Dummy (Wipe Database)
+                  </h4>
+                </div>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-2xl">
+                  Bersihkan seluruh transaksi (pesanan cheki & merch), riwayat struk, dan seluruh akun fans testing.
+                  Lineup Member, Merchandise, Konfigurasi Web, dan Akun Admin tetap aman dan tidak akan terhapus.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onShowWipeModal}
+                className="shrink-0 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 active:scale-95"
+              >
+                <FaExclamationTriangle /> Reset Data Dummy
+              </button>
+            </div>
           </div>
         </div>
       </div>

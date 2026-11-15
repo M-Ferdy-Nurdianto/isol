@@ -423,92 +423,89 @@ router.post('/register', async (req, res) => {
         const frontendBaseUrl = req.headers.origin || process.env.FRONTEND_URL || 'https://kohiprototype.ferdy.web.id'
         magicLink = `${frontendBaseUrl.replace(/\/$/, '')}/magic-login?token=${magicToken}`
 
-        // Kirim Email Sambutan Resmi Deep Coffee
+        // Kirim Email Aktivasi Resmi Kohi Sekai (Deep Coffee - Clean, Formal, No Emojis)
         const fanCodeFormatted = String(savedUser.fan_id || '').padStart(4, '0')
-        const emailHtml = `
-<!DOCTYPE html>
-<html>
+        const emailHtml = `<!DOCTYPE html>
+<html lang="id">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Selamat Datang di Kohi Sekai</title>
+  <title>Aktivasi Akun Fan Kohi Sekai</title>
 </head>
 <body style="margin:0;padding:0;background-color:#1A1512;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#F5E6D3;">
-  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1A1512;padding:30px 15px;">
+  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1A1512;padding:32px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:540px;background-color:#241E19;border:1px solid #3A2E24;border-radius:24px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.6);">
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:520px;background-color:#241E19;border:1px solid #3A2E24;border-radius:12px;overflow:hidden;">
           
-          <!-- Header Brand Bar -->
+          <!-- Brand Header -->
           <tr>
-            <td style="background-color:#1E1814;padding:24px 30px;border-bottom:1px solid #3A2E24;text-align:center;">
-              <span style="font-size:11px;letter-spacing:4px;color:#E8944A;font-weight:bold;text-transform:uppercase;display:block;margin-bottom:4px;">OFFICIAL FAN SPACE</span>
-              <h1 style="margin:0;font-size:24px;font-weight:900;letter-spacing:1px;color:#F5E6D3;">KOHI SEKAI</h1>
-              <span style="font-size:11px;color:#B0A599;font-family:monospace;">コーヒーの世界 · Yogyakarta</span>
+            <td style="background-color:#1A1512;padding:24px 28px;border-bottom:1px solid #3A2E24;text-align:center;">
+              <span style="font-size:10px;letter-spacing:3px;color:#E8944A;font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Official Fan Space</span>
+              <h1 style="margin:0;font-size:20px;font-weight:700;letter-spacing:1.5px;color:#F5E6D3;">KOHI SEKAI</h1>
+              <span style="font-size:11px;color:#B0A599;">Dunia Kopi · Yogyakarta</span>
             </td>
           </tr>
 
-          <!-- Body Content -->
+          <!-- Main Content -->
           <tr>
-            <td style="padding:32px 30px;">
-              <p style="font-size:16px;line-height:1.6;margin:0 0 16px 0;color:#F5E6D3;">
-                Halo <strong>${cleanNama}</strong>! ☕
+            <td style="padding:28px 28px 24px;">
+              <p style="font-size:15px;line-height:1.6;margin:0 0 14px 0;color:#F5E6D3;">
+                Halo <strong>${cleanNama}</strong>,
               </p>
-              <p style="font-size:13px;line-height:1.6;margin:0 0 24px 0;color:#B0A599;">
-                Akun Fan kamu telah aktif didaftarkan di venue acara <strong>Kohi Sekai</strong>. Kamu kini resmi tergabung dalam keluarga komunitas fan dengan nomor keanggotaan resmi:
+              <p style="font-size:13px;line-height:1.6;margin:0 0 22px 0;color:#B0A599;">
+                Akun Fan Kohi Sekai Anda telah berhasil didaftarkan melalui layanan On-the-Spot (OTS) venue. Berikut adalah rincian keanggotaan resmi Anda:
               </p>
 
-              <!-- Fan ID Badge Card -->
-              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1A1512;border:1px solid #3A2E24;border-radius:16px;margin-bottom:28px;">
+              <!-- Credentials Box -->
+              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1A1512;border:1px solid #3A2E24;border-radius:8px;margin-bottom:24px;">
                 <tr>
-                  <td style="padding:16px 20px;text-align:center;">
-                    <span style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#B0A599;display:block;margin-bottom:4px;">NOMOR FAN ID KAMU</span>
-                    <span style="font-size:28px;font-weight:900;color:#E8944A;letter-spacing:3px;font-family:monospace;">#${fanCodeFormatted}</span>
+                  <td style="padding:16px 20px;">
+                    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="padding:4px 0;font-size:12px;color:#B0A599;width:140px;">Nomor Fan ID</td>
+                        <td style="padding:4px 0;font-size:13px;font-weight:700;color:#E8944A;font-family:monospace;">#${fanCodeFormatted}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:4px 0;font-size:12px;color:#B0A599;">Alamat Email</td>
+                        <td style="padding:4px 0;font-size:13px;font-weight:600;color:#F5E6D3;">${cleanEmail}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:4px 0;font-size:12px;color:#B0A599;">Password Sementara</td>
+                        <td style="padding:4px 0;font-size:13px;font-weight:700;color:#E8944A;font-family:monospace;letter-spacing:1px;">${randomPassword}</td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
 
-              <!-- Primary CTA: 1-Click Magic Login -->
-              <div style="text-align:center;margin-bottom:28px;">
-                <a href="${magicLink}" style="display:inline-block;background-color:#E8944A;color:#1A1512;text-decoration:none;font-weight:900;font-size:14px;letter-spacing:0.5px;padding:15px 36px;border-radius:14px;box-shadow:0 8px 20px rgba(232,148,74,0.35);text-transform:uppercase;">
-                  ⚡ Masuk ke Akun Saya (1-Klik)
+              <!-- Primary CTA Button -->
+              <div style="text-align:center;margin:24px 0 20px 0;">
+                <a href="${magicLink}" style="display:inline-block;background-color:#E8944A;color:#1A1512;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:0.5px;padding:13px 32px;border-radius:8px;text-transform:uppercase;">
+                  Masuk ke Akun Saya
                 </a>
-                <span style="display:block;font-size:11px;color:#B0A599;margin-top:10px;">
-                  Link login otomatis ini aktif selama <strong>30 hari</strong> di browser HP kamu.
-                </span>
               </div>
 
-              <!-- Fallback Manual Credentials Box -->
-              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1E1814;border:1px solid #3A2E24;border-radius:14px;margin-bottom:24px;">
-                <tr>
-                  <td style="padding:18px 20px;">
-                    <span style="font-size:11px;font-weight:bold;color:#E8944A;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">
-                      Atau Login Manual di Website:
-                    </span>
-                    <p style="margin:4px 0;font-size:12px;color:#F5E6D3;font-family:monospace;">
-                      • Email: <strong style="color:#FFF;">${cleanEmail}</strong>
-                    </p>
-                    <p style="margin:4px 0;font-size:12px;color:#F5E6D3;font-family:monospace;">
-                      • Password Sementara: <strong style="color:#E8944A;font-size:15px;letter-spacing:1px;">${randomPassword}</strong>
-                    </p>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="font-size:11px;line-height:1.5;color:#B0A599;margin:0;">
-                <em>*Kamu dapat mengubah password sementara ini kapan saja di menu Pengaturan Profil setelah masuk.</em>
+              <p style="font-size:11px;line-height:1.5;color:#B0A599;text-align:center;margin:0 0 20px 0;">
+                Tombol masuk di atas aktif selama <strong>30 hari</strong>. Anda dapat mengkliknya langsung untuk mengakses profil tanpa perlu memasukkan password.
               </p>
+
+              <div style="background-color:#1A1512;border:1px solid #3A2E24;border-radius:8px;padding:12px 16px;">
+                <p style="font-size:11px;line-height:1.5;color:#B0A599;margin:0;">
+                  Demi keamanan akun, Anda dapat memperbarui password sementara kapan saja melalui menu Pengaturan Profil setelah masuk.
+                </p>
+              </div>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td style="background-color:#1E1814;padding:20px 30px;border-top:1px solid #3A2E24;text-align:center;">
-              <p style="font-size:11px;color:#736253;margin:0 0 6px 0;">
+            <td style="background-color:#1A1512;padding:18px 28px;border-top:1px solid #3A2E24;text-align:center;">
+              <p style="font-size:11px;color:#736253;margin:0 0 4px 0;">
                 Kohi Sekai (コーヒーの世界) · Indonesian Japanese-Style Idol Group
               </p>
               <p style="font-size:10px;color:#55483D;margin:0;">
-                Email otomatis ini dikirimkan khusus untuk akun resmi kamu. Jangan berikan link kepada orang lain.
+                Email ini dikirimkan secara otomatis oleh sistem. Harap tidak membalas email ini.
               </p>
             </td>
           </tr>
@@ -518,13 +515,12 @@ router.post('/register', async (req, res) => {
     </tr>
   </table>
 </body>
-</html>
-        `
+</html>`
 
         // Kirim email async tanpa memblokir respon registrasi
         sendEmail(
           cleanEmail,
-          `☕ Selamat Datang di Kohi Sekai! Akun Fan Kamu Sudah Siap (#${fanCodeFormatted})`,
+          `Aktivasi Akun Fan Kohi Sekai - #${fanCodeFormatted}`,
           emailHtml
         ).catch(err => console.error('[OTS Welcome Email] Gagal kirim email:', err))
 
@@ -1053,57 +1049,69 @@ router.post('/send-otp', async (req, res) => {
     // Valid for 10 minutes
     otpStore.set(cleanEmail, { otp, expiresAt: Date.now() + 10 * 60 * 1000 })
 
-    const html = `
-<!DOCTYPE html>
+    const html = `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kode Verifikasi - Kohi Sekai</title>
 </head>
-<body style="margin:0;padding:0;background:#1A1512;font-family:'Segoe UI',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#1A1512;padding:40px 20px;">
+<body style="margin:0;padding:0;background-color:#1A1512;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#F5E6D3;">
+  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1A1512;padding:32px 16px;">
     <tr>
       <td align="center">
-        <table width="520" cellpadding="0" cellspacing="0" style="background:#241E19;border:1px solid #3A2E24;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
-          <!-- Header Bar Accent -->
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:520px;background-color:#241E19;border:1px solid #3A2E24;border-radius:12px;overflow:hidden;">
+          
+          <!-- Brand Header -->
           <tr>
-            <td style="background:#E8944A;height:4px;"></td>
-          </tr>
-          <!-- Logo & Title -->
-          <tr>
-            <td style="padding:36px 36px 24px;text-align:center;">
-              <div style="display:inline-block;background:rgba(232,148,74,0.15);border:1px solid rgba(232,148,74,0.4);border-radius:12px;padding:12px 20px;margin-bottom:20px;">
-                <span style="color:#E8944A;font-size:18px;font-weight:900;letter-spacing:2px;">KOHI SEKAI</span>
-              </div>
-              <h1 style="color:#F5E6D3;font-size:22px;font-weight:900;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;">Kode Verifikasi</h1>
-              <p style="color:#B0A599;font-size:13px;margin:0;">Halo, <strong style="color:#F5E6D3;">${nama || 'Fan'}</strong>!</p>
+            <td style="background-color:#1A1512;padding:24px 28px;border-bottom:1px solid #3A2E24;text-align:center;">
+              <span style="font-size:10px;letter-spacing:3px;color:#E8944A;font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Official Fan Space</span>
+              <h1 style="margin:0;font-size:20px;font-weight:700;letter-spacing:1.5px;color:#F5E6D3;">KOHI SEKAI</h1>
+              <span style="font-size:11px;color:#B0A599;">Dunia Kopi · Yogyakarta</span>
             </td>
           </tr>
-          <!-- Body -->
+
+          <!-- Main Content -->
           <tr>
-            <td style="padding:0 36px 36px;">
-              <p style="color:#D5C9BD;font-size:14px;line-height:1.7;margin:0 0 20px;text-align:center;">
-                Ini adalah kode OTP untuk menyelesaikan pendaftaran akun Kohi Sekai Anda:
+            <td style="padding:28px 28px 24px;">
+              <p style="font-size:15px;line-height:1.6;margin:0 0 14px 0;color:#F5E6D3;">
+                Halo <strong>${nama || 'Fan'}</strong>,
               </p>
-              <div style="background:#E8944A;color:#1A1512;font-size:32px;font-weight:900;letter-spacing:6px;text-align:center;padding:20px;border-radius:12px;margin:24px 0;box-shadow:0 4px 16px rgba(232,148,74,0.25);">
-                ${otp}
-              </div>
-              <div style="background:#1A1512;border:1px solid #3A2E24;border-radius:10px;padding:16px;margin-top:12px;">
-                <p style="color:#B0A599;font-size:12px;margin:0;text-align:center;line-height:1.6;">
-                  Kode ini <strong style="color:#F5E6D3;">hanya berlaku selama 10 menit</strong>. Jangan berikan kode ini kepada siapa pun.
+              <p style="font-size:13px;line-height:1.6;margin:0 0 22px 0;color:#B0A599;">
+                Berikut adalah kode verifikasi (OTP) untuk menyelesaikan proses pendaftaran akun Kohi Sekai Anda:
+              </p>
+
+              <!-- OTP Code Display -->
+              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1A1512;border:1px solid #3A2E24;border-radius:8px;margin-bottom:22px;">
+                <tr>
+                  <td style="padding:20px;text-align:center;">
+                    <span style="font-size:32px;font-weight:700;color:#E8944A;letter-spacing:8px;font-family:monospace;display:inline-block;">
+                      ${otp}
+                    </span>
+                  </td>
+                </tr>
+              </table>
+
+              <div style="background-color:#1A1512;border:1px solid #3A2E24;border-radius:8px;padding:14px 16px;">
+                <p style="font-size:11px;line-height:1.5;color:#B0A599;margin:0;text-align:center;">
+                  Kode verifikasi ini berlaku selama <strong>10 menit</strong>. Demi keamanan akun Anda, mohon untuk tidak membagikan kode ini kepada siapa pun.
                 </p>
               </div>
             </td>
           </tr>
+
           <!-- Footer -->
           <tr>
-            <td style="padding:20px 36px;border-top:1px solid #3A2E24;text-align:center;">
-              <p style="color:#736253;font-size:11px;margin:0;">
-                Email ini dikirim oleh sistem otomatis Kohi Sekai. Harap tidak membalas email ini.
+            <td style="background-color:#1A1512;padding:18px 28px;border-top:1px solid #3A2E24;text-align:center;">
+              <p style="font-size:11px;color:#736253;margin:0 0 4px 0;">
+                Kohi Sekai (コーヒーの世界) · Indonesian Japanese-Style Idol Group
+              </p>
+              <p style="font-size:10px;color:#55483D;margin:0;">
+                Email ini dikirimkan secara otomatis oleh sistem. Harap tidak membalas email ini.
               </p>
             </td>
           </tr>
+
         </table>
       </td>
     </tr>

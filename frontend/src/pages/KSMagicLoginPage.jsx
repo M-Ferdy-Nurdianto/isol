@@ -9,7 +9,7 @@ const KSMagicLoginPage = () => {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
   const navigate = useNavigate()
-  const { login } = useFanAuth()
+  const { setSession } = useFanAuth()
 
   const [status, setStatus] = useState('verifying') // 'verifying' | 'success' | 'error'
   const [errorMessage, setErrorMessage] = useState('')
@@ -32,18 +32,24 @@ const KSMagicLoginPage = () => {
         if (!isMounted) return
 
         if (res.data?.success && res.data?.token && res.data?.user) {
-          // Login context session
-          login(res.data.token, res.data.user)
-          setUserName(res.data.user.nama || 'Fan')
-          setStatus('success')
-          kohiToast.success(`Selamat datang, ${res.data.user.nama || 'Fan'}! Anda berhasil masuk.`)
+          const user = res.data.user
+          const authToken = res.data.token
 
-          // Auto redirect to profile after brief visual confirmation
+          // Set localStorage directly and update FanAuthContext state
+          localStorage.setItem('ks_fan_token', authToken)
+          localStorage.setItem('ks_fan_user', JSON.stringify(user))
+          setSession(authToken, user)
+
+          setUserName(user.nama || 'Fan')
+          setStatus('success')
+          kohiToast.success(`Selamat datang, ${user.nama || 'Fan'}! Anda berhasil masuk.`)
+
+          // Seamless auto-redirect directly to Profile / Fan Vault
           setTimeout(() => {
             if (isMounted) {
               navigate('/profile', { replace: true })
             }
-          }, 1200)
+          }, 400)
         } else {
           throw new Error(res.data?.error || 'Gagal memproses sesi login.')
         }
@@ -61,7 +67,7 @@ const KSMagicLoginPage = () => {
     return () => {
       isMounted = false
     }
-  }, [token, login, navigate])
+  }, [token, setSession, navigate])
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] flex flex-col items-center justify-center p-4 sm:p-6 select-none font-outfit">

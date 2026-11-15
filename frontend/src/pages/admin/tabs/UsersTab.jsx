@@ -17,6 +17,8 @@ import {
 import api from '../../../lib/api'
 import UserDetailModal from '../modals/UserDetailModal'
 import UserOTSModal from '../modals/UserOTSModal'
+import WipeDummyDataModal from '../modals/WipeDummyDataModal'
+import { FaTrashAlt } from 'react-icons/fa'
 
 const UsersTab = () => {
   const [users, setUsers] = useState([])
@@ -25,6 +27,7 @@ const UsersTab = () => {
   const [selectedUser, setSelectedUser] = useState(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
   const [showOTSForm, setShowOTSForm] = useState(false)
+  const [showWipeModal, setShowWipeModal] = useState(false)
   const [totalCount, setTotalCount] = useState(0)
 
   const fetchUsers = useCallback(async (query = '') => {
@@ -87,6 +90,13 @@ const UsersTab = () => {
                 <FaUserPlus /> Register OTS
               </>
             )}
+          </button>
+          <button
+            onClick={() => setShowWipeModal(true)}
+            className="px-3.5 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 text-xs font-bold transition flex items-center gap-1.5"
+            title="Reset Database & Hapus Seluruh Data Dummy"
+          >
+            <FaTrashAlt className="text-xs" /> Reset Dummy
           </button>
           <span className="hidden sm:inline-block px-3 py-1.5 rounded-xl bg-[var(--primary)]/10 border border-[var(--primary)]/30 text-xs font-mono font-bold text-[var(--primary)]">
             {totalCount} Akun Terdaftar
@@ -294,6 +304,14 @@ const UsersTab = () => {
           }}
           user={selectedUser}
           onRefresh={() => fetchUsers(search)}
+        />
+      )}
+
+      {/* Wipe Dummy Data Modal */}
+      {showWipeModal && (
+        <WipeDummyDataModal
+          onClose={() => setShowWipeModal(false)}
+          onSuccess={() => fetchUsers(search)}
         />
       )}
     </div>

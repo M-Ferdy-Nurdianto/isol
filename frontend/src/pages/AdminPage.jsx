@@ -18,6 +18,7 @@ import UsersTab from './admin/tabs/UsersTab'
 import OrderDetailModal from './admin/modals/OrderDetailModal'
 import OTSOrderModal from './admin/modals/OTSOrderModal'
 import BulkDeleteModal from './admin/modals/BulkDeleteModal'
+import WipeDummyDataModal from './admin/modals/WipeDummyDataModal'
 import EventModal from './admin/modals/EventModal'
 
 import { generateExcel, generateMerchExcel, generateMerchPDF, generatePDF } from '../lib/exportUtils'
@@ -73,6 +74,7 @@ const AdminPage = () => {
   const [showEventModal, setShowEventModal] = useState(false)
   const [showOrderDetailModal, setShowOrderDetailModal] = useState(false)
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
+  const [showWipeModal, setShowWipeModal] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [isOtsCartActive, setIsOtsCartActive] = useState(false)
   const [editingEvent, setEditingEvent] = useState(null)
@@ -1388,6 +1390,7 @@ const AdminPage = () => {
             configLoading={configLoading}
             updateConfig={updateConfig}
             onShowBulkDeleteModal={() => setShowBulkDeleteModal(true)}
+            onShowWipeModal={() => setShowWipeModal(true)}
             onPurgeOldPayments={handlePurgeOldPayments}
             chekiGrupEnabled={chekiGrupEnabled}
             setChekiGrupEnabled={setChekiGrupEnabled}
@@ -1443,6 +1446,16 @@ const AdminPage = () => {
           events={events}
           onClose={() => setShowBulkDeleteModal(false)}
           onConfirm={handleBulkDelete}
+        />
+      )}
+
+      {showWipeModal && (
+        <WipeDummyDataModal
+          onClose={() => setShowWipeModal(false)}
+          onSuccess={() => {
+            fetchOrders()
+            fetchEvents()
+          }}
         />
       )}
 

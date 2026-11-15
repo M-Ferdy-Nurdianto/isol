@@ -90,69 +90,72 @@ router.post('/admin/email/:userId', authMiddleware, async (req, res) => {
     )
     const resetUrl = `${frontendBaseUrl}/reset-password?token=${encodeURIComponent(resetToken)}&type=email_token`
 
-    const html = `
-<!DOCTYPE html>
+    const html = `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reset Password - Kohi Sekai</title>
 </head>
-<body style="margin:0;padding:0;background:#1A1512;font-family:'Segoe UI',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#1A1512;padding:40px 20px;">
+<body style="margin:0;padding:0;background-color:#1A1512;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#F5E6D3;">
+  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1A1512;padding:32px 16px;">
     <tr>
       <td align="center">
-        <table width="520" cellpadding="0" cellspacing="0" style="background:#241E19;border:1px solid #3A2E24;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
-          <!-- Header Bar Accent -->
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:520px;background-color:#241E19;border:1px solid #3A2E24;border-radius:12px;overflow:hidden;">
+          
+          <!-- Brand Header -->
           <tr>
-            <td style="background:#E8944A;height:4px;"></td>
-          </tr>
-          <!-- Logo & Title -->
-          <tr>
-            <td style="padding:36px 36px 24px;text-align:center;">
-              <div style="display:inline-block;background:rgba(232,148,74,0.15);border:1px solid rgba(232,148,74,0.4);border-radius:12px;padding:12px 20px;margin-bottom:20px;">
-                <span style="color:#E8944A;font-size:18px;font-weight:900;letter-spacing:2px;">KOHI SEKAI</span>
-              </div>
-              <h1 style="color:#F5E6D3;font-size:22px;font-weight:900;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;">Reset Password</h1>
-              <p style="color:#B0A599;font-size:13px;margin:0;">Halo, <strong style="color:#F5E6D3;">${user.nama || 'Fan'}</strong>!</p>
+            <td style="background-color:#1A1512;padding:24px 28px;border-bottom:1px solid #3A2E24;text-align:center;">
+              <span style="font-size:10px;letter-spacing:3px;color:#E8944A;font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Official Fan Space</span>
+              <h1 style="margin:0;font-size:20px;font-weight:700;letter-spacing:1.5px;color:#F5E6D3;">KOHI SEKAI</h1>
+              <span style="font-size:11px;color:#B0A599;">Dunia Kopi · Yogyakarta</span>
             </td>
           </tr>
-          <!-- Body -->
+
+          <!-- Main Content -->
           <tr>
-            <td style="padding:0 36px 36px;">
-              <p style="color:#D5C9BD;font-size:14px;line-height:1.7;margin:0 0 20px;">
-                Kami menerima permintaan reset password untuk akun Kohi Sekai yang terhubung dengan email ini dari Administrator. Klik tombol di bawah untuk membuat password baru.
+            <td style="padding:28px 28px 24px;">
+              <p style="font-size:15px;line-height:1.6;margin:0 0 14px 0;color:#F5E6D3;">
+                Halo <strong>${user.nama || 'Fan'}</strong>,
               </p>
+              <p style="font-size:13px;line-height:1.6;margin:0 0 22px 0;color:#B0A599;">
+                Kami menerima permintaan reset password untuk akun Kohi Sekai yang terhubung dengan email ini dari Administrator. Klik tombol di bawah untuk membuat password baru:
+              </p>
+
               <!-- CTA Button -->
-              <div style="text-align:center;margin:28px 0;">
-                <a href="${resetUrl}"
-                   style="display:inline-block;background:#E8944A;color:#1A1512;text-decoration:none;font-size:13px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;padding:14px 36px;border-radius:12px;box-shadow:0 4px 12px rgba(232,148,74,0.3);">
+              <div style="text-align:center;margin:24px 0 20px 0;">
+                <a href="${resetUrl}" style="display:inline-block;background-color:#E8944A;color:#1A1512;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:0.5px;padding:13px 32px;border-radius:8px;text-transform:uppercase;">
                   Atur Ulang Password
                 </a>
               </div>
-              <!-- Warning note -->
-              <div style="background:#1A1512;border:1px solid #3A2E24;border-radius:10px;padding:16px;margin-top:12px;">
-                <p style="color:#B0A599;font-size:12px;margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Perhatian</p>
-                <ul style="color:#D5C9BD;font-size:12px;margin:0;padding-left:16px;line-height:1.8;">
-                  <li>Link ini <strong style="color:#F5E6D3;">hanya berlaku 30 menit</strong> sejak email ini diterima.</li>
-                  <li>Jangan bagikan link ini kepada siapapun.</li>
-                </ul>
+
+              <!-- Notice Box -->
+              <div style="background-color:#1A1512;border:1px solid #3A2E24;border-radius:8px;padding:14px 16px;margin-bottom:18px;">
+                <p style="font-size:11px;line-height:1.6;color:#B0A599;margin:0;">
+                  Link ini berlaku selama <strong>30 menit</strong>. Mohon tidak membagikan link ini kepada siapa pun.
+                </p>
               </div>
-              <!-- Link fallback -->
-              <p style="color:#736253;font-size:11px;margin:20px 0 0;word-break:break-all;">
-                Jika tombol tidak berfungsi, salin dan buka URL ini di browser:<br>
+
+              <!-- Fallback URL -->
+              <p style="font-size:11px;line-height:1.5;color:#736253;word-break:break-all;margin:0;">
+                Jika tombol di atas tidak berfungsi, salin dan buka tautan ini di browser Anda:<br>
                 <a href="${resetUrl}" style="color:#E8944A;text-decoration:none;">${resetUrl}</a>
               </p>
             </td>
           </tr>
+
           <!-- Footer -->
           <tr>
-            <td style="padding:20px 36px;border-top:1px solid #3A2E24;text-align:center;">
-              <p style="color:#736253;font-size:11px;margin:0;">
-                Email ini dikirim oleh sistem otomatis Kohi Sekai. Harap tidak membalas email ini.
+            <td style="background-color:#1A1512;padding:18px 28px;border-top:1px solid #3A2E24;text-align:center;">
+              <p style="font-size:11px;color:#736253;margin:0 0 4px 0;">
+                Kohi Sekai (コーヒーの世界) · Indonesian Japanese-Style Idol Group
+              </p>
+              <p style="font-size:10px;color:#55483D;margin:0;">
+                Email ini dikirimkan secara otomatis oleh sistem. Harap tidak membalas email ini.
               </p>
             </td>
           </tr>
+
         </table>
       </td>
     </tr>
@@ -603,70 +606,72 @@ router.post('/request-email', async (req, res) => {
     console.log('[Reset Password] Link generated:', resetUrl)
 
     // Buat HTML email yang menarik sesuai tema Kohi Sekai (Warm Dark Coffee)
-    const html = `
-<!DOCTYPE html>
+    const html = `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reset Password - Kohi Sekai</title>
 </head>
-<body style="margin:0;padding:0;background:#1A1512;font-family:'Segoe UI',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#1A1512;padding:40px 20px;">
+<body style="margin:0;padding:0;background-color:#1A1512;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#F5E6D3;">
+  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1A1512;padding:32px 16px;">
     <tr>
       <td align="center">
-        <table width="520" cellpadding="0" cellspacing="0" style="background:#241E19;border:1px solid #3A2E24;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
-          <!-- Header Bar Accent -->
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:520px;background-color:#241E19;border:1px solid #3A2E24;border-radius:12px;overflow:hidden;">
+          
+          <!-- Brand Header -->
           <tr>
-            <td style="background:#E8944A;height:4px;"></td>
-          </tr>
-          <!-- Logo & Title -->
-          <tr>
-            <td style="padding:36px 36px 24px;text-align:center;">
-              <div style="display:inline-block;background:rgba(232,148,74,0.15);border:1px solid rgba(232,148,74,0.4);border-radius:12px;padding:12px 20px;margin-bottom:20px;">
-                <span style="color:#E8944A;font-size:18px;font-weight:900;letter-spacing:2px;">KOHI SEKAI</span>
-              </div>
-              <h1 style="color:#F5E6D3;font-size:22px;font-weight:900;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;">Reset Password</h1>
-              <p style="color:#B0A599;font-size:13px;margin:0;">Halo, <strong style="color:#F5E6D3;">${targetUser.nama || 'Fan'}</strong>!</p>
+            <td style="background-color:#1A1512;padding:24px 28px;border-bottom:1px solid #3A2E24;text-align:center;">
+              <span style="font-size:10px;letter-spacing:3px;color:#E8944A;font-weight:700;text-transform:uppercase;display:block;margin-bottom:4px;">Official Fan Space</span>
+              <h1 style="margin:0;font-size:20px;font-weight:700;letter-spacing:1.5px;color:#F5E6D3;">KOHI SEKAI</h1>
+              <span style="font-size:11px;color:#B0A599;">Dunia Kopi · Yogyakarta</span>
             </td>
           </tr>
-          <!-- Body -->
+
+          <!-- Main Content -->
           <tr>
-            <td style="padding:0 36px 36px;">
-              <p style="color:#D5C9BD;font-size:14px;line-height:1.7;margin:0 0 20px;">
-                Kami menerima permintaan reset password untuk akun Kohi Sekai yang terhubung dengan email ini. Klik tombol di bawah untuk membuat password baru.
+            <td style="padding:28px 28px 24px;">
+              <p style="font-size:15px;line-height:1.6;margin:0 0 14px 0;color:#F5E6D3;">
+                Halo <strong>${targetUser.nama || 'Fan'}</strong>,
               </p>
+              <p style="font-size:13px;line-height:1.6;margin:0 0 22px 0;color:#B0A599;">
+                Kami menerima permintaan reset password untuk akun Kohi Sekai yang terhubung dengan email ini. Klik tombol di bawah untuk membuat password baru:
+              </p>
+
               <!-- CTA Button -->
-              <div style="text-align:center;margin:28px 0;">
-                <a href="${resetUrl}"
-                   style="display:inline-block;background:#E8944A;color:#1A1512;text-decoration:none;font-size:13px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;padding:14px 36px;border-radius:12px;box-shadow:0 4px 12px rgba(232,148,74,0.3);">
+              <div style="text-align:center;margin:24px 0 20px 0;">
+                <a href="${resetUrl}" style="display:inline-block;background-color:#E8944A;color:#1A1512;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:0.5px;padding:13px 32px;border-radius:8px;text-transform:uppercase;">
                   Atur Ulang Password
                 </a>
               </div>
-              <!-- Warning note -->
-              <div style="background:#1A1512;border:1px solid #3A2E24;border-radius:10px;padding:16px;margin-top:12px;">
-                <p style="color:#B0A599;font-size:12px;margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Perhatian</p>
-                <ul style="color:#D5C9BD;font-size:12px;margin:0;padding-left:16px;line-height:1.8;">
-                  <li>Link ini <strong style="color:#F5E6D3;">hanya berlaku 30 menit</strong> sejak email ini diterima.</li>
-                  <li>Abaikan email ini jika Anda tidak merasa meminta reset password.</li>
-                  <li>Jangan bagikan link ini kepada siapapun.</li>
-                </ul>
+
+              <!-- Notice Box -->
+              <div style="background-color:#1A1512;border:1px solid #3A2E24;border-radius:8px;padding:14px 16px;margin-bottom:18px;">
+                <p style="font-size:11px;line-height:1.6;color:#B0A599;margin:0;">
+                  Link ini berlaku selama <strong>30 menit</strong>. Jika Anda tidak merasa melakukan permintaan ini, silakan abaikan email ini. Mohon tidak membagikan link ini kepada siapa pun.
+                </p>
               </div>
-              <!-- Link fallback -->
-              <p style="color:#736253;font-size:11px;margin:20px 0 0;word-break:break-all;">
-                Jika tombol tidak berfungsi, salin dan buka URL ini di browser:<br>
+
+              <!-- Fallback URL -->
+              <p style="font-size:11px;line-height:1.5;color:#736253;word-break:break-all;margin:0;">
+                Jika tombol di atas tidak berfungsi, salin dan buka tautan ini di browser Anda:<br>
                 <a href="${resetUrl}" style="color:#E8944A;text-decoration:none;">${resetUrl}</a>
               </p>
             </td>
           </tr>
+
           <!-- Footer -->
           <tr>
-            <td style="padding:20px 36px;border-top:1px solid #3A2E24;text-align:center;">
-              <p style="color:#736253;font-size:11px;margin:0;">
-                Email ini dikirim oleh sistem otomatis Kohi Sekai. Harap tidak membalas email ini.
+            <td style="background-color:#1A1512;padding:18px 28px;border-top:1px solid #3A2E24;text-align:center;">
+              <p style="font-size:11px;color:#736253;margin:0 0 4px 0;">
+                Kohi Sekai (コーヒーの世界) · Indonesian Japanese-Style Idol Group
+              </p>
+              <p style="font-size:10px;color:#55483D;margin:0;">
+                Email ini dikirimkan secara otomatis oleh sistem. Harap tidak membalas email ini.
               </p>
             </td>
           </tr>
+
         </table>
       </td>
     </tr>

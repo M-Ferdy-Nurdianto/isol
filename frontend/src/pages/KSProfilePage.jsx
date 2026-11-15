@@ -142,7 +142,8 @@ const KSProfilePage = () => {
   }, [])
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    const saved = localStorage.getItem('ks_fan_user')
+    if (!isLoggedIn && !saved) {
       navigate('/login', { replace: true, state: { from: '/profile' } })
     }
   }, [isLoggedIn, navigate])
@@ -181,7 +182,16 @@ const KSProfilePage = () => {
     }
   }, [fanUser?.nama, fanUser?.email])
 
-  if (!isLoggedIn || !fanUser) return null
+  const savedLocalUser = (() => {
+    try {
+      const s = localStorage.getItem('ks_fan_user')
+      return s ? JSON.parse(s) : null
+    } catch {
+      return null
+    }
+  })()
+
+  if ((!isLoggedIn && !savedLocalUser) || (!fanUser && !savedLocalUser)) return null
 
   const handleSaveProfile = async () => {
     try {
