@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken'
 import { supabase } from '../config/supabase.js'
 import { authMiddleware } from '../middleware/auth.js'
 import { sendEmail } from '../utils/email.js'
+import { getFrontendBaseUrl } from '../utils/url.js'
 
 const router = express.Router()
 
@@ -79,7 +80,7 @@ router.post('/admin/email/:userId', authMiddleware, async (req, res) => {
       })
     }
 
-    const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
+    const frontendBaseUrl = getFrontendBaseUrl(req)
     const jwtSecret = process.env.JWT_SECRET || 'kohisekai_secret_jwt_key_2026'
     
     // Generate token explicitly to bypass Supabase Auth limitations for OTS accounts
@@ -601,7 +602,7 @@ router.post('/request-email', async (req, res) => {
       { expiresIn: '30m' }
     )
 
-    const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
+    const frontendBaseUrl = getFrontendBaseUrl(req)
     const resetUrl = `${frontendBaseUrl}/reset-password?token=${encodeURIComponent(resetToken)}&type=email_token`
     console.log('[Reset Password] Link generated:', resetUrl)
 

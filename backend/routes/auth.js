@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { supabase } from '../config/supabase.js'
 import { sendEmail } from '../utils/email.js'
+import { getFrontendBaseUrl } from '../utils/url.js'
 import { JWT_SECRET, signToken, verifyToken } from '../config/jwt.js'
 
 const router = express.Router()
@@ -420,8 +421,8 @@ router.post('/register', async (req, res) => {
           JWT_SECRET,
           { expiresIn: '30d' }
         )
-        const frontendBaseUrl = req.headers.origin || process.env.FRONTEND_URL || 'https://kohiprototype.ferdy.web.id'
-        magicLink = `${frontendBaseUrl.replace(/\/$/, '')}/magic-login?token=${magicToken}`
+        const frontendBaseUrl = getFrontendBaseUrl(req)
+        magicLink = `${frontendBaseUrl}/magic-login?token=${magicToken}`
 
         // Kirim Email Aktivasi Resmi Kohi Sekai (Deep Coffee - Clean, Formal, No Emojis)
         const fanCodeFormatted = String(savedUser.fan_id || '').padStart(4, '0')

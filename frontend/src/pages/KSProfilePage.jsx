@@ -142,18 +142,34 @@ const KSProfilePage = () => {
   }, [])
 
   useEffect(() => {
+    const token = localStorage.getItem('ks_fan_token')
     const saved = localStorage.getItem('ks_fan_user')
-    if (!isLoggedIn && !saved) {
+    if (!isLoggedIn && !token && !saved) {
       navigate('/login', { replace: true, state: { from: '/profile' } })
     }
   }, [isLoggedIn, navigate])
 
+  const savedLocalUser = useMemo(() => {
+    try {
+      const s = localStorage.getItem('ks_fan_user')
+      return s ? JSON.parse(s) : null
+    } catch {
+      return null
+    }
+  }, [])
+
+  const currentUser = fanUser || savedLocalUser
+
   useEffect(() => {
-    if (fanUser?.email || fanUser?.id || fanUser?.whatsapp) {
+    const effectiveEmail = currentUser?.email
+    const effectiveId = currentUser?.id
+    const effectiveWa = currentUser?.whatsapp
+
+    if (effectiveEmail || effectiveId || effectiveWa) {
       setLoading(true)
-      const email = fanUser.email ? encodeURIComponent(fanUser.email) : ''
-      const userId = fanUser.id ? `&user_id=${fanUser.id}` : ''
-      const wa = fanUser.whatsapp ? `&whatsapp=${encodeURIComponent(fanUser.whatsapp)}` : ''
+      const email = effectiveEmail ? encodeURIComponent(effectiveEmail) : ''
+      const userId = effectiveId ? `&user_id=${effectiveId}` : ''
+      const wa = effectiveWa ? `&whatsapp=${encodeURIComponent(effectiveWa)}` : ''
 
       Promise.all([
         api.get(`/auth/fan/orders?email=${email}${userId}`).catch(() => ({ data: { success: false } })),
@@ -168,11 +184,11 @@ const KSProfilePage = () => {
         })
         .finally(() => setLoading(false))
     }
-  }, [fanUser?.email, fanUser?.id, fanUser?.whatsapp])
+  }, [currentUser?.email, currentUser?.id, currentUser?.whatsapp])
 
   useEffect(() => {
-    if (fanUser?.nama || fanUser?.email) {
-      api.get(`/leaderboard/fan-titles?name=${encodeURIComponent(fanUser.nama || '')}&email=${encodeURIComponent(fanUser.email || '')}`)
+    if (currentUser?.nama || currentUser?.email) {
+      api.get(`/leaderboard/fan-titles?name=${encodeURIComponent(currentUser.nama || '')}&email=${encodeURIComponent(currentUser.email || '')}`)
         .then(res => {
           if (res.data?.success) {
             setFanTitles(res.data.data || [])
@@ -180,18 +196,9 @@ const KSProfilePage = () => {
         })
         .catch(err => console.error('Failed to load fan titles:', err))
     }
-  }, [fanUser?.nama, fanUser?.email])
+  }, [currentUser?.nama, currentUser?.email])
 
-  const savedLocalUser = (() => {
-    try {
-      const s = localStorage.getItem('ks_fan_user')
-      return s ? JSON.parse(s) : null
-    } catch {
-      return null
-    }
-  })()
-
-  if ((!isLoggedIn && !savedLocalUser) || (!fanUser && !savedLocalUser)) return null
+  if (!isLoggedIn && !currentUser) return null
 
   const handleSaveProfile = async () => {
     try {
@@ -435,7 +442,7 @@ const KSProfilePage = () => {
             />
           ) : (
             <div className="p-3 bg-background border border-border rounded-xl font-medium text-text-primary">
-              {fanUser.nama || '-'}
+              {currentUser?.nama || '-'}
             </div>
           )}
         </div>
@@ -445,7 +452,7 @@ const KSProfilePage = () => {
             <FaEnvelope className="opacity-70" /> Email
           </label>
           <div className="p-3 bg-background/50 border border-border rounded-xl font-medium text-text-secondary truncate cursor-not-allowed" title="Email tidak dapat diubah">
-            {fanUser.email || '-'}
+            {currentUser?.email || '-'}
           </div>
         </div>
 
@@ -462,7 +469,7 @@ const KSProfilePage = () => {
             />
           ) : (
             <div className="p-3 bg-background border border-border rounded-xl font-medium text-text-primary">
-              {fanUser.whatsapp || '-'}
+              {currentUser?.whatsapp || '-'}
             </div>
           )}
         </div>
@@ -483,7 +490,7 @@ const KSProfilePage = () => {
             </div>
           ) : (
             <div className="p-3 bg-background border border-border rounded-xl font-medium text-text-primary">
-              {fanUser.instagram ? `@${fanUser.instagram}` : '-'}
+              {currentUser?.instagram ? `@${currentUser.instagram}` : '-'}
             </div>
           )}
         </div>
@@ -995,9 +1002,9 @@ const KSProfilePage = () => {
           
           {/* Cover Photo - Deep Coffee Frame */}
           <div className="h-36 sm:h-52 relative group overflow-hidden bg-[#100C0A] border-b-2 border-border">
-            {fanUser?.banner_url && !bannerLoadError ? (
+            {currentUser?.banner_url && !bannerLoadError ? (
               <img 
-                src={getAssetPath(fanUser.banner_url)} 
+                src={getAssetPath(currentUser.banner_url)} 
                 alt="Cover" 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 onError={() => setBannerLoadError(true)}
@@ -1074,16 +1081,16 @@ const KSProfilePage = () => {
               
               <div className="relative group shrink-0">
                 <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl border-4 border-surface bg-primary flex items-center justify-center text-white shadow-md overflow-hidden relative">
-                  {fanUser?.image_url && !avatarLoadError ? (
+                  {currentUser?.image_url && !avatarLoadError ? (
                     <img 
-                      src={getAssetPath(fanUser.image_url)} 
+                      src={getAssetPath(currentUser.image_url)} 
                       alt="Profile" 
                       className="w-full h-full object-cover" 
                       onError={() => setAvatarLoadError(true)}
                     />
                   ) : (
                     <div className="w-full h-full bg-primary flex items-center justify-center">
-                      <span className="text-3xl md:text-5xl font-black uppercase tracking-wider">{fanUser?.nama?.charAt(0) || 'K'}</span>
+                      <span className="text-3xl md:text-5xl font-black uppercase tracking-wider">{currentUser?.nama?.charAt(0) || 'K'}</span>
                     </div>
                   )}
                   
@@ -1111,13 +1118,13 @@ const KSProfilePage = () => {
               <div className="flex-1 min-w-0 md:pt-16 pb-1">
                 {/* Line 1: Name */}
                 <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight truncate">
-                  {fanUser.nama || 'Kiki'}
+                  {currentUser?.nama || 'Fan'}
                 </h1>
 
                 {/* Line 2: ID & Verification */}
                 <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                   <p className="text-text-secondary text-sm font-mono font-medium">
-                    ID: {fanUser.fan_id ? String(fanUser.fan_id).padStart(4, '0') : (fanUser.id?.split('-')[1] || fanUser.id?.substring(0,8) || 'Member')}
+                    ID: {currentUser?.fan_id ? String(currentUser.fan_id).padStart(4, '0') : (currentUser?.id?.split('-')[1] || currentUser?.id?.substring(0,8) || 'Member')}
                   </p>
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-success/10 text-success border border-success/20 rounded-full text-[10px] font-bold uppercase tracking-widest">
                     <FaCheck className="text-[9px]" /> Fan Terverifikasi

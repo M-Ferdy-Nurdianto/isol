@@ -3,18 +3,22 @@ import { showToast } from './toast'
 import { isGuestMode, maskOrderForGuest, maskMerchOrderForGuest, generateGuestMockResponse } from './guestMock'
 import { getValidAdminToken, touchAdminSession, logoutAdminSession } from './authSession'
 
-// In production (Vercel), use the API URL from environment variable
-// In development, use localhost
+// In production (Vercel), use relative '/api' so it always works seamlessly on any domain
 let API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL
 
-if (!API_URL) {
-  API_URL = import.meta.env.MODE === 'production' 
-    ? '/api' 
-    : `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:5000/api`
-} else if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && API_URL.includes('localhost')) {
-  // If accessing from a mobile device (non-localhost) but the API is configured with localhost,
-  // dynamically substitute localhost with the computer's local IP address so requests reach the backend.
-  API_URL = API_URL.replace('localhost', window.location.hostname)
+if (typeof window !== 'undefined') {
+  const isLocalDev = ['localhost', '127.0.0.1'].includes(window.location.hostname) ||
+                     window.location.hostname.startsWith('192.168.') ||
+                     window.location.hostname.startsWith('10.')
+  if (!isLocalDev || import.meta.env.MODE === 'production') {
+    API_URL = '/api'
+  } else if (!API_URL) {
+    API_URL = `http://${window.location.hostname}:5000/api`
+  } else if (API_URL.includes('localhost') && window.location.hostname !== 'localhost') {
+    API_URL = API_URL.replace('localhost', window.location.hostname)
+  }
+} else if (!API_URL) {
+  API_URL = '/api'
 }
 
 const api = axios.create({

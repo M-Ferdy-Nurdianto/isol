@@ -44,12 +44,12 @@ const KSMagicLoginPage = () => {
           setStatus('success')
           kohiToast.success(`Selamat datang, ${user.nama || 'Fan'}! Anda berhasil masuk.`)
 
-          // Seamless auto-redirect directly to Profile / Fan Vault
+          // Seamless auto-redirect directly to Profile / Fan Vault via hard navigation to guarantee session hydration
           setTimeout(() => {
             if (isMounted) {
-              navigate('/profile', { replace: true })
+              window.location.href = '/profile'
             }
-          }, 400)
+          }, 300)
         } else {
           throw new Error(res.data?.error || 'Gagal memproses sesi login.')
         }
@@ -120,7 +120,7 @@ const KSMagicLoginPage = () => {
             <div className="pt-2">
               <button
                 type="button"
-                onClick={() => navigate('/profile', { replace: true })}
+                onClick={() => { window.location.href = '/profile' }}
                 className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-[var(--background)] font-black text-xs uppercase tracking-wider transition shadow-lg shadow-[var(--primary)]/20"
               >
                 <span>Buka Profil Saya Sekarang</span>

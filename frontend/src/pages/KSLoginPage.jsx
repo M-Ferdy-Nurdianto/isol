@@ -41,7 +41,9 @@ const KSLoginPage = () => {
 
   // Redirect if logged in
   useEffect(() => {
-    if (isLoggedIn) {
+    const token = localStorage.getItem('ks_fan_token')
+    const saved = localStorage.getItem('ks_fan_user')
+    if (isLoggedIn || (token && saved)) {
       navigate('/profile', { replace: true })
     }
   }, [isLoggedIn, navigate])
