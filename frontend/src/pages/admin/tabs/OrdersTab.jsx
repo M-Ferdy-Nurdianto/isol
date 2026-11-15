@@ -210,8 +210,9 @@ const OrdersTab = ({
         />
       )}
       {/* Sub-tabs */}
-      <div className="bg-[var(--surface)] border border-[var(--border)] p-2 rounded-2xl shadow-xl relative">
-        <div className="flex overflow-x-auto gap-2 custom-scrollbar snap-x snap-mandatory scroll-smooth pr-8">
+      <div className="bg-[var(--surface)] border border-[var(--border)] p-1.5 md:p-2 rounded-2xl shadow-xl overflow-hidden">
+        {/* DESKTOP LAYOUT (hidden md:grid): 5 Kolom presisi penuh tanpa scrollbar */}
+        <div className="hidden md:grid grid-cols-5 gap-2">
           {[
             { id: 'all', label: 'All' },
             { id: 'ots', label: 'OTS' },
@@ -222,12 +223,36 @@ const OrdersTab = ({
             <button
               key={tab.id}
               onClick={tab.onClick || (() => setOrderSubTab(tab.id))}
-              className={`flex-1 min-w-[100px] snap-start shrink-0 px-4 py-3 rounded-xl font-bold text-xs transition-all duration-200 ${orderSubTab === tab.id
-                ? 'bg-[var(--primary)] text-white shadow-md scale-[1.02]'
+              className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs transition-colors duration-150 ${orderSubTab === tab.id
+                ? 'bg-[var(--primary)] text-white shadow-md font-extrabold'
                 : 'text-[var(--text-secondary)] hover:bg-[var(--background)] hover:text-[var(--text-primary)]'
                 }`}
             >
               <span className="flex items-center justify-center">
+                {tab.label}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* MOBILE LAYOUT (md:hidden): 5 Tombol proporsional pas di genggaman tanpa scroll */}
+        <div className="md:hidden grid grid-cols-5 gap-1">
+          {[
+            { id: 'all', label: 'All' },
+            { id: 'ots', label: 'OTS' },
+            { id: 'po', label: 'PO' },
+            { id: 'special', label: 'Special' },
+            { id: 'merch', label: 'Merch', onClick: () => { setOrderSubTab('merch'); onFetchMerchOrders() } }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={tab.onClick || (() => setOrderSubTab(tab.id))}
+              className={`w-full py-2 px-1 rounded-xl font-bold text-[11px] transition-colors duration-150 truncate ${orderSubTab === tab.id
+                ? 'bg-[var(--primary)] text-white shadow-sm font-extrabold'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--background)] hover:text-[var(--text-primary)]'
+                }`}
+            >
+              <span className="flex items-center justify-center truncate">
                 {tab.label}
               </span>
             </button>
