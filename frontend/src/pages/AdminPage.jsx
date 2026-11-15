@@ -57,6 +57,8 @@ const AdminPage = () => {
   const [members, setMembers] = useState([])
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [updatingOrderIds, setUpdatingOrderIds] = useState(new Set())
+  const [updatingMerchOrderIds, setUpdatingMerchOrderIds] = useState(new Set())
 
   const [statusFilter, setStatusFilter] = useState(() => localStorage.getItem('admin_status_filter') || 'all')
   const [otsFilter, setOtsFilter] = useState(() => localStorage.getItem('admin_ots_filter') || 'all')
@@ -295,9 +297,10 @@ const AdminPage = () => {
     return params
   }
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (options = {}) => {
+    const isSilent = Boolean(options?.silent)
     try {
-      setLoading(true)
+      if (!isSilent) setLoading(true)
       const params = buildOrderParams()
       const response = await api.get('/orders', { params })
       setOrders(response.data.data || [])
@@ -307,7 +310,7 @@ const AdminPage = () => {
         navigate('/admin/login')
       }
     } finally {
-      setLoading(false)
+      if (!isSilent) setLoading(false)
     }
   }
 
@@ -389,9 +392,10 @@ const AdminPage = () => {
     }
   }
 
-  const fetchMerchOrders = async () => {
+  const fetchMerchOrders = async (options = {}) => {
+    const isSilent = Boolean(options?.silent)
     try {
-      setLoadingMerchOrders(true)
+      if (!isSilent) setLoadingMerchOrders(true)
       const params = {}
       if (merchOrderStatusFilter !== 'all') params.status = merchOrderStatusFilter
       if (merchOrderSearch) params.search = merchOrderSearch
@@ -400,7 +404,7 @@ const AdminPage = () => {
     } catch (error) {
       console.error(error)
     } finally {
-      setLoadingMerchOrders(false)
+      if (!isSilent) setLoadingMerchOrders(false)
     }
   }
 
@@ -419,14 +423,47 @@ const AdminPage = () => {
     }
   }
 
-  const handleStatusChange = async (orderId, status) => {
+  const handleStatusChange = async (orderId, newStatus) => {
+    // 1. Simpan snapshot data untuk rollback jika update gagal
+    const previousOrders = [...orders]
+    const targetStatus = newStatus === 'checked' ? 'paid' : newStatus
+
+    // 2. Optimistic Update: Langsung ubah di state lokal (0ms delay, tidak ada flicker/refresh)
+    setOrders(prev => prev.map(order => {
+      if (order.id === orderId) {
+        return { ...order, status: targetStatus }
+      }
+      return order
+    }))
+
+    // Tandai order sedang disinkronkan ke server (tampilkan spinner mikro pada dropdown status)
+    setUpdatingOrderIds(prev => new Set(prev).add(orderId))
+
     try {
-      await api.patch(`/orders/${orderId}/status`, { status })
+      // 3. Kirim request update ke server di background
+      const res = await api.patch(`/orders/${orderId}/status`, { status: newStatus })
+
+      // Jika server mengembalikan row terbaru, gabungkan data secara mulus
+      if (res.data?.data) {
+        const serverData = res.data.data
+        setOrders(prev => prev.map(order => (order.id === orderId ? { ...order, ...serverData } : order)))
+      }
+
       showToast.success('Status pesanan berhasil diperbarui!')
-      fetchOrders()
+
+      // 4. Background silent sync (tanpa memicu loading spinner tabel)
+      fetchOrders({ silent: true })
       fetchPendingNotifications()
     } catch (error) {
+      // Rollback jika terjadi kegagalan jaringan atau server
+      setOrders(previousOrders)
       webAlert.error('Gagal Update Status', error.response?.data?.error || error.message)
+    } finally {
+      setUpdatingOrderIds(prev => {
+        const next = new Set(prev)
+        next.delete(orderId)
+        return next
+      })
     }
   }
 
@@ -807,12 +844,46 @@ const AdminPage = () => {
         if (!isConfirmed) return
       }
 
-      await api.patch(`/merch-orders/${orderId}/status`, { status: newStatus, ...trackingData })
+      const previousMerchOrders = [...merchOrders]
+      const targetStatus = newStatus === 'checked' ? 'paid' : newStatus
+
+      // Optimistic update
+      setMerchOrders(prev => prev.map(m => {
+        if (m.id === orderId) {
+          const updated = { ...m, status: targetStatus, ...trackingData }
+          if (targetStatus === 'completed') {
+            updated.confirmed_by = 'admin'
+            updated.confirmed_at = new Date().toISOString()
+          } else if (['pending', 'paid', 'packing'].includes(targetStatus)) {
+            updated.confirmed_by = null
+            updated.confirmed_at = null
+          }
+          return updated
+        }
+        return m
+      }))
+
+      setUpdatingMerchOrderIds(prev => new Set(prev).add(orderId))
+
+      const res = await api.patch(`/merch-orders/${orderId}/status`, { status: newStatus, ...trackingData })
       showToast.success('Status order merch diperbarui!')
-      fetchMerchOrders()
+
+      if (res.data?.data) {
+        const serverData = res.data.data
+        setMerchOrders(prev => prev.map(m => (m.id === orderId ? { ...m, ...serverData } : m)))
+      }
+
+      fetchMerchOrders({ silent: true })
       fetchPendingNotifications()
     } catch (error) {
+      fetchMerchOrders({ silent: true })
       webAlert.error('Gagal Update Status', error.response?.data?.error || 'Gagal update status order merch')
+    } finally {
+      setUpdatingMerchOrderIds(prev => {
+        const next = new Set(prev)
+        next.delete(orderId)
+        return next
+      })
     }
   }
 
@@ -1187,11 +1258,13 @@ const AdminPage = () => {
             onViewOrder={viewOrderDetail}
             onDeleteOrder={handleDeleteOrder}
             onStatusChange={handleStatusChange}
+            updatingOrderIds={updatingOrderIds}
             onShowOTSModal={() => setShowOTSModal(true)}
             onExportExcel={handleExportExcel}
             onExportPdf={handleExportPdf}
             merchOrders={merchOrders}
             loadingMerchOrders={loadingMerchOrders}
+            updatingMerchOrderIds={updatingMerchOrderIds}
             merchOrderSearch={merchOrderSearch}
             setMerchOrderSearch={setMerchOrderSearch}
             merchOrderStatusFilter={merchOrderStatusFilter}

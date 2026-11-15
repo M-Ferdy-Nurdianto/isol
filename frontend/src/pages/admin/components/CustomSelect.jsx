@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { FaChevronDown } from 'react-icons/fa'
+import { FaChevronDown, FaSpinner } from 'react-icons/fa'
 
 const CustomSelect = ({
   options = [],
@@ -8,7 +8,9 @@ const CustomSelect = ({
   onChange,
   placeholder = 'Select...',
   className = '',
-  variant = 'filter' // 'filter' or 'status'
+  variant = 'filter', // 'filter' or 'status'
+  disabled = false,
+  loading = false
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [openUp, setOpenUp] = useState(false)
@@ -92,8 +94,11 @@ const CustomSelect = ({
     <div className={`relative inline-block w-full custom-dropdown-container ${className}`} ref={containerRef}>
       <button
         type="button"
+        disabled={disabled || loading}
         onClick={handleToggle}
-        className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all border outline-none ${variant === 'filter'
+        className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all border outline-none ${
+          disabled || loading ? 'opacity-80 cursor-wait pointer-events-none' : ''
+        } ${variant === 'filter'
             ? 'bg-[var(--background)] text-[var(--text-primary)] border-[var(--border)] hover:bg-[var(--primary)]/10 hover:border-[var(--primary)]/40 min-w-[140px]'
             : `cursor-pointer ${getStatusStyle(value)}`
           }`}
@@ -101,7 +106,11 @@ const CustomSelect = ({
         <span className={`truncate ${!value && value !== 0 ? 'text-[var(--text-secondary)] font-normal' : ''}`}>
           {selectedOption?.label || (value ? value : placeholder)}
         </span>
-        <FaChevronDown className={`text-[10px] transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+        {loading ? (
+          <FaSpinner className="animate-spin text-[10px] shrink-0 text-[var(--primary)]" />
+        ) : (
+          <FaChevronDown className={`text-[10px] transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+        )}
       </button>
 
       {/* RENDER IN-PLACE FOR FORMS & FILTERS (Rock solid, 100% reliable positioning) */}

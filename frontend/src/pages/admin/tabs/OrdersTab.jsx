@@ -29,11 +29,13 @@ const OrdersTab = ({
   onViewOrder,
   onDeleteOrder,
   onStatusChange,
+  updatingOrderIds,
   onShowOTSModal,
   onExportExcel,
   onExportPdf,
   merchOrders,
   loadingMerchOrders,
+  updatingMerchOrderIds,
   merchOrderSearch,
   setMerchOrderSearch,
   merchOrderStatusFilter,
@@ -346,6 +348,7 @@ const OrdersTab = ({
           title="Special Event Orders"
           emptyMessage="Tidak ada order special event"
           loading={loading}
+          updatingOrderIds={updatingOrderIds}
           onView={onViewOrder}
           onDelete={onDeleteOrder}
           onStatusChange={onStatusChange}
@@ -358,6 +361,7 @@ const OrdersTab = ({
           title="Order OTS (On The Spot)"
           emptyMessage="Tidak ada data OTS"
           loading={loading}
+          updatingOrderIds={updatingOrderIds}
           onView={onViewOrder}
           onDelete={onDeleteOrder}
           onStatusChange={onStatusChange}
@@ -381,6 +385,7 @@ const OrdersTab = ({
           title="Pre-Order (Online)"
           emptyMessage="Tidak ada data Pre-Order"
           loading={loading}
+          updatingOrderIds={updatingOrderIds}
           onView={onViewOrder}
           onDelete={onDeleteOrder}
           onStatusChange={onStatusChange}
@@ -464,6 +469,12 @@ const OrdersTab = ({
             )}
           </div>
           <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden">
+            {/* Subtle indicator if background fetching is occurring while merch orders are visible */}
+            {loadingMerchOrders && merchOrders && merchOrders.length > 0 && (
+              <div className="h-0.5 w-full bg-[var(--border)] overflow-hidden">
+                <div className="h-full bg-[var(--primary)] animate-pulse w-full" />
+              </div>
+            )}
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left">
                 <thead className="bg-[var(--background)] text-[var(--text-secondary)] uppercase text-[11px] font-bold tracking-wider border-b border-[var(--border)]">
@@ -478,9 +489,9 @@ const OrdersTab = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border)] text-sm text-[var(--text-secondary)]">
-                  {loadingMerchOrders ? (
+                  {loadingMerchOrders && (!merchOrders || merchOrders.length === 0) ? (
                     <tr><td colSpan="7" className="text-center py-10 text-[var(--text-secondary)]">Loading...</td></tr>
-                  ) : merchOrders.length === 0 ? (
+                  ) : !merchOrders || merchOrders.length === 0 ? (
                     <tr><td colSpan="7" className="text-center py-10 text-[var(--text-secondary)]">Belum ada order merch</td></tr>
                   ) : (
                     merchOrders.map((order) => (
@@ -538,6 +549,7 @@ const OrdersTab = ({
                           <CustomSelect
                             value={order.status}
                             onChange={e => onMerchOrderStatusChange(order.id, e.target.value)}
+                            loading={updatingMerchOrderIds?.has(order.id)}
                             variant="status"
                             options={[
                               { value: 'pending', label: 'Pending' },

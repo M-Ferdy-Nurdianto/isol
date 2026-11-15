@@ -20,7 +20,7 @@ const StatusBadge = ({ status }) => {
 }
 
 // ─── Mobile Card ───────────────────────────────────────────────────────────────
-const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
+const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
   const isSpecial = order.events?.type === 'special' || !!order.events?.theme_color
   const themeColor = isSpecial ? (order.events?.theme_color || '#A855F7') : null
 
@@ -136,6 +136,7 @@ const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
           <CustomSelect
             value={order.status === 'paid' || order.status === 'approved' ? 'checked' : order.status}
             onChange={(e) => onStatusChange(order.id, e.target.value)}
+            loading={isUpdating}
             variant="status"
             options={[
               { value: 'pending', label: 'Unchecked' },
@@ -164,7 +165,7 @@ const OrderCard = ({ order, onView, onDelete, onStatusChange }) => {
 }
 
 // ─── Main RenderTable ──────────────────────────────────────────────────────────
-const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView, onDelete, onStatusChange }) => {
+const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatingOrderIds, onView, onDelete, onStatusChange }) => {
   return (
     <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-xl overflow-hidden mb-6">
       {/* Header */}
@@ -180,21 +181,35 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView,
         {action && <div className="shrink-0">{action}</div>}
       </div>
 
+      {/* Subtle indicator if background fetching is occurring while data is visible */}
+      {loading && data && data.length > 0 && (
+        <div className="h-0.5 w-full bg-[var(--border)] overflow-hidden">
+          <div className="h-full bg-[var(--primary)] animate-pulse w-full" />
+        </div>
+      )}
+
       {/* ── MOBILE: Card List (< md) ── */}
       <div className="md:hidden">
-        {loading ? (
+        {loading && (!data || data.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-14 gap-3">
             <FaSpinner className="animate-spin text-3xl text-[var(--primary)]" />
             <p className="text-xs text-[var(--text-secondary)]">Memuat data order...</p>
           </div>
-        ) : data.length === 0 ? (
+        ) : !data || data.length === 0 ? (
           <div className="py-14 text-center text-[var(--text-secondary)] text-sm px-4">
             {emptyMessage}
           </div>
         ) : (
           <div className="p-3 space-y-3">
             {data.map((order) => (
-              <OrderCard key={order.id} order={order} onView={onView} onDelete={onDelete} onStatusChange={onStatusChange} />
+              <OrderCard
+                key={order.id}
+                order={order}
+                isUpdating={updatingOrderIds?.has(order.id)}
+                onView={onView}
+                onDelete={onDelete}
+                onStatusChange={onStatusChange}
+              />
             ))}
           </div>
         )}
@@ -216,14 +231,14 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView,
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border)] text-sm text-[var(--text-secondary)]">
-            {loading ? (
+            {loading && (!data || data.length === 0) ? (
               <tr>
                 <td colSpan="8" className="text-center py-12">
                   <FaSpinner className="animate-spin text-3xl text-[var(--primary)] mx-auto mb-2" />
                   <p className="text-xs text-[var(--text-secondary)]">Memuat data order...</p>
                 </td>
               </tr>
-            ) : data.length === 0 ? (
+            ) : !data || data.length === 0 ? (
               <tr>
                 <td colSpan="8" className="text-center py-12 text-[var(--text-secondary)] text-sm">
                   {emptyMessage}
@@ -321,6 +336,7 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView,
                       <CustomSelect
                         value={order.status === 'paid' || order.status === 'approved' ? 'checked' : order.status}
                         onChange={(e) => onStatusChange(order.id, e.target.value)}
+                        loading={updatingOrderIds?.has(order.id)}
                         variant="status"
                         options={[
                           { value: 'pending', label: 'Unchecked' },
