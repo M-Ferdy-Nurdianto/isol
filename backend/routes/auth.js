@@ -319,22 +319,16 @@ router.post('/register', async (req, res) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     const isOts = req.body.source === 'ots' || req.body.ots === true
 
-    // Email: wajib jika bukan OTS, opsional jika OTS (auto-generate placeholder)
-    let cleanEmail
+    // Email: WAJIB untuk OTS agar fan menerima Magic Link 30 hari & Password Acak
     if (!email || !emailRegex.test(email.trim())) {
       if (isOts) {
-        // Auto-generate placeholder email untuk OTS tanpa email
-        const slug = fanNama.trim().toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12) || 'fan'
-        cleanEmail = `ots-${slug}-${Date.now()}@noreply.kohisekai.id`
-      } else {
-        return res.status(400).json({ error: 'Format email tidak valid' })
+        return res.status(400).json({ error: 'Email aktif fan wajib diisi agar sistem dapat mengirimkan link login 1-klik dan password.' })
       }
-    } else {
-      cleanEmail = email.trim().toLowerCase()
+      return res.status(400).json({ error: 'Format email tidak valid' })
     }
+    const cleanEmail = email.trim().toLowerCase()
 
     const cleanWhatsapp = (whatsapp || '').replace(/[^0-9+]/g, '')
-    // WhatsApp opsional untuk OTS admin — validasi format hanya kalau diisi
     if (cleanWhatsapp && cleanWhatsapp.length > 0 && cleanWhatsapp.length < 8) {
       return res.status(400).json({ error: 'Nomor WhatsApp tidak valid (minimal 8 digit)' })
     }
@@ -342,9 +336,8 @@ router.post('/register', async (req, res) => {
     const cleanNama = fanNama.trim()
     const cleanInstagram = instagram ? `@${instagram.trim().replace(/^@/, '')}` : null
 
-    // Check if user already exists in users table (skip lookup for auto-generated OTS emails)
-    const isAutoEmail = cleanEmail.endsWith('@noreply.kohisekai.id')
-    const { data: existingUser } = isAutoEmail ? { data: null } : await supabase
+    // Check if user already exists in users table
+    const { data: existingUser } = await supabase
       .from('users')
       .select('*')
       .eq('email', cleanEmail)
@@ -357,8 +350,8 @@ router.post('/register', async (req, res) => {
         .from('users')
         .update({
           nama: cleanNama,
-          whatsapp: cleanWhatsapp,
-          instagram: cleanInstagram,
+          whatsapp: cleanWhatsapp || existingUser.whatsapp,
+          instagram: cleanInstagram || existingUser.instagram,
           updated_at: new Date().toISOString()
         })
         .eq('id', existingUser.id)
@@ -384,6 +377,162 @@ router.post('/register', async (req, res) => {
       savedUser = inserted
     }
 
+    // ── Generate 6-Character Random Password (e.g. FKS82A, FKS9B4) ──
+    const generateOtsPassword = () => {
+      const pool = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'
+      let code = 'FKS'
+      for (let i = 0; i < 3; i++) {
+        code += pool.charAt(Math.floor(Math.random() * pool.length))
+      }
+      return code
+    }
+    const randomPassword = isOts ? generateOtsPassword() : null
+
+    // Sinkronkan ke Supabase Auth dengan email terverifikasi langsung (tanpa butuh kode OTP di venue)
+    if (isOts && randomPassword && savedUser) {
+      try {
+        const { data: authUserRes } = await supabase.auth.admin.getUserById(savedUser.id)
+        if (authUserRes?.user) {
+          await supabase.auth.admin.updateUserById(savedUser.id, {
+            password: randomPassword,
+            email_confirm: true
+          })
+        } else {
+          await supabase.auth.admin.createUser({
+            id: savedUser.id,
+            email: cleanEmail,
+            password: randomPassword,
+            email_confirm: true,
+            user_metadata: { nama: cleanNama }
+          })
+        }
+      } catch (authErr) {
+        console.warn('[OTS Register] Supabase auth admin warning:', authErr.message)
+      }
+    }
+
+    // ── Generate Magic Login Token (Aktif 30 Hari) ──
+    let magicLink = null
+    if (isOts && savedUser) {
+      try {
+        const magicToken = jwt.sign(
+          { id: savedUser.id, email: savedUser.email, purpose: 'magic_login' },
+          JWT_SECRET,
+          { expiresIn: '30d' }
+        )
+        const frontendBaseUrl = req.headers.origin || process.env.FRONTEND_URL || 'https://kohiprototype.ferdy.web.id'
+        magicLink = `${frontendBaseUrl.replace(/\/$/, '')}/magic-login?token=${magicToken}`
+
+        // Kirim Email Sambutan Resmi Deep Coffee
+        const fanCodeFormatted = String(savedUser.fan_id || '').padStart(4, '0')
+        const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selamat Datang di Kohi Sekai</title>
+</head>
+<body style="margin:0;padding:0;background-color:#1A1512;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#F5E6D3;">
+  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1A1512;padding:30px 15px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:540px;background-color:#241E19;border:1px solid #3A2E24;border-radius:24px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.6);">
+          
+          <!-- Header Brand Bar -->
+          <tr>
+            <td style="background-color:#1E1814;padding:24px 30px;border-bottom:1px solid #3A2E24;text-align:center;">
+              <span style="font-size:11px;letter-spacing:4px;color:#E8944A;font-weight:bold;text-transform:uppercase;display:block;margin-bottom:4px;">OFFICIAL FAN SPACE</span>
+              <h1 style="margin:0;font-size:24px;font-weight:900;letter-spacing:1px;color:#F5E6D3;">KOHI SEKAI</h1>
+              <span style="font-size:11px;color:#B0A599;font-family:monospace;">コーヒーの世界 · Yogyakarta</span>
+            </td>
+          </tr>
+
+          <!-- Body Content -->
+          <tr>
+            <td style="padding:32px 30px;">
+              <p style="font-size:16px;line-height:1.6;margin:0 0 16px 0;color:#F5E6D3;">
+                Halo <strong>${cleanNama}</strong>! ☕
+              </p>
+              <p style="font-size:13px;line-height:1.6;margin:0 0 24px 0;color:#B0A599;">
+                Akun Fan kamu telah aktif didaftarkan di venue acara <strong>Kohi Sekai</strong>. Kamu kini resmi tergabung dalam keluarga komunitas fan dengan nomor keanggotaan resmi:
+              </p>
+
+              <!-- Fan ID Badge Card -->
+              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1A1512;border:1px solid #3A2E24;border-radius:16px;margin-bottom:28px;">
+                <tr>
+                  <td style="padding:16px 20px;text-align:center;">
+                    <span style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#B0A599;display:block;margin-bottom:4px;">NOMOR FAN ID KAMU</span>
+                    <span style="font-size:28px;font-weight:900;color:#E8944A;letter-spacing:3px;font-family:monospace;">#${fanCodeFormatted}</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Primary CTA: 1-Click Magic Login -->
+              <div style="text-align:center;margin-bottom:28px;">
+                <a href="${magicLink}" style="display:inline-block;background-color:#E8944A;color:#1A1512;text-decoration:none;font-weight:900;font-size:14px;letter-spacing:0.5px;padding:15px 36px;border-radius:14px;box-shadow:0 8px 20px rgba(232,148,74,0.35);text-transform:uppercase;">
+                  ⚡ Masuk ke Akun Saya (1-Klik)
+                </a>
+                <span style="display:block;font-size:11px;color:#B0A599;margin-top:10px;">
+                  Link login otomatis ini aktif selama <strong>30 hari</strong> di browser HP kamu.
+                </span>
+              </div>
+
+              <!-- Fallback Manual Credentials Box -->
+              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#1E1814;border:1px solid #3A2E24;border-radius:14px;margin-bottom:24px;">
+                <tr>
+                  <td style="padding:18px 20px;">
+                    <span style="font-size:11px;font-weight:bold;color:#E8944A;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:8px;">
+                      Atau Login Manual di Website:
+                    </span>
+                    <p style="margin:4px 0;font-size:12px;color:#F5E6D3;font-family:monospace;">
+                      • Email: <strong style="color:#FFF;">${cleanEmail}</strong>
+                    </p>
+                    <p style="margin:4px 0;font-size:12px;color:#F5E6D3;font-family:monospace;">
+                      • Password Sementara: <strong style="color:#E8944A;font-size:15px;letter-spacing:1px;">${randomPassword}</strong>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size:11px;line-height:1.5;color:#B0A599;margin:0;">
+                <em>*Kamu dapat mengubah password sementara ini kapan saja di menu Pengaturan Profil setelah masuk.</em>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#1E1814;padding:20px 30px;border-top:1px solid #3A2E24;text-align:center;">
+              <p style="font-size:11px;color:#736253;margin:0 0 6px 0;">
+                Kohi Sekai (コーヒーの世界) · Indonesian Japanese-Style Idol Group
+              </p>
+              <p style="font-size:10px;color:#55483D;margin:0;">
+                Email otomatis ini dikirimkan khusus untuk akun resmi kamu. Jangan berikan link kepada orang lain.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+        `
+
+        // Kirim email async tanpa memblokir respon registrasi
+        sendEmail(
+          cleanEmail,
+          `☕ Selamat Datang di Kohi Sekai! Akun Fan Kamu Sudah Siap (#${fanCodeFormatted})`,
+          emailHtml
+        ).catch(err => console.error('[OTS Welcome Email] Gagal kirim email:', err))
+
+      } catch (tokenErr) {
+        console.error('[OTS Magic Token] Error generating magic link:', tokenErr)
+      }
+    }
+
     const token = jwt.sign(
       {
         id: savedUser.id,
@@ -398,10 +547,14 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       success: true,
       token,
-      message: 'Registrasi berhasil',
+      message: isOts 
+        ? 'Akun fan berhasil dibuat! Email aktivasi telah dikirim ke fan.' 
+        : 'Registrasi berhasil',
+      tempPassword: randomPassword || undefined,
       user: {
         id: savedUser.id,
         fan_id: savedUser.fan_id,
+        fan_code: String(savedUser.fan_id || '').padStart(4, '0'),
         nama: savedUser.nama,
         email: savedUser.email,
         whatsapp: savedUser.whatsapp,
@@ -414,6 +567,74 @@ router.post('/register', async (req, res) => {
   } catch (error) {
     console.error('Error during register:', error)
     res.status(500).json({ error: error.message })
+  }
+})
+
+// ============================================================================
+// 2B. 1-CLICK MAGIC LOGIN (Masa Aktif 30 Hari via Email OTS)
+// ============================================================================
+router.post('/magic-login', async (req, res) => {
+  try {
+    const { token } = req.body
+    if (!token) {
+      return res.status(400).json({ error: 'Token login tidak disertakan' })
+    }
+
+    let decoded
+    try {
+      decoded = jwt.verify(token, JWT_SECRET)
+    } catch (jwtErr) {
+      if (jwtErr.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'Link login sudah kadaluarsa (lebih dari 30 hari). Silakan login manual dengan email dan password Anda.' })
+      }
+      return res.status(401).json({ error: 'Link login tidak valid atau sudah rusak' })
+    }
+
+    if (decoded.purpose !== 'magic_login') {
+      return res.status(400).json({ error: 'Tipe token login tidak valid' })
+    }
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', decoded.id)
+      .maybeSingle()
+
+    if (error || !user) {
+      return res.status(404).json({ error: 'Akun fan tidak ditemukan' })
+    }
+
+    // Generate normal session token (30 hari)
+    const sessionToken = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        nama: user.nama,
+        role: user.role || 'fan'
+      },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    )
+
+    return res.json({
+      success: true,
+      token: sessionToken,
+      user: {
+        id: user.id,
+        fan_id: user.fan_id,
+        fan_code: String(user.fan_id || '').padStart(4, '0'),
+        nama: user.nama,
+        email: user.email,
+        whatsapp: user.whatsapp,
+        instagram: user.instagram,
+        image_url: user.image_url || null,
+        banner_url: user.banner_url || null,
+        role: user.role || 'fan'
+      }
+    })
+  } catch (error) {
+    console.error('[Magic Login Error]:', error)
+    res.status(500).json({ error: 'Terjadi kesalahan server saat memproses login.' })
   }
 })
 

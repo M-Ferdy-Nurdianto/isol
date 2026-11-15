@@ -16,6 +16,7 @@ const KSLoginPage = lazy(() => import('./pages/KSLoginPage'))
 const KSProfilePage = lazy(() => import('./pages/KSProfilePage'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 const KSUserOTSPage = lazy(() => import('./pages/KSUserOTSPage'))
+const KSMagicLoginPage = lazy(() => import('./pages/KSMagicLoginPage'))
 
 // Admin Pages
 const AdminPage = lazy(() => import('./pages/AdminPage'))
@@ -95,6 +96,7 @@ function App() {
                     <Route path="/profile" element={<MaintenanceGuard><KSProfilePage /></MaintenanceGuard>} />
                     <Route path="/ots" element={<MaintenanceGuard><KSUserOTSPage /></MaintenanceGuard>} />
                     <Route path="/reset-password" element={<ResetPasswordPage />} />
+                    <Route path="/magic-login" element={<KSMagicLoginPage />} />
 
                     {/* Admin Portal Routes */}
                     <Route path="/admin/login" element={<AdminLogin />} />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { FaUserPlus, FaUser, FaEnvelope, FaWhatsapp, FaInstagram, FaSpinner, FaEye, FaEyeSlash, FaChevronUp } from 'react-icons/fa'
+import { FaUserPlus, FaUser, FaEnvelope, FaWhatsapp, FaInstagram, FaSpinner, FaEye, FaChevronUp, FaCheckCircle, FaKey, FaBolt } from 'react-icons/fa'
 import { showToast } from '../../../lib/toast'
+import { webAlert } from '../../../lib/webAlert'
 import api from '../../../lib/api'
 
 /**
@@ -32,22 +33,30 @@ const UserOTSModal = ({ onRefresh, onDone }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!formData.nama || formData.nama.length < 2) {
+    if (!formData.nama || formData.nama.trim().length < 2) {
       return showToast.error('Nama lengkap wajib diisi minimal 2 karakter')
     }
 
-    // Validasi email hanya jika diisi
-    if (formData.email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(formData.email.trim())) {
-        return showToast.error('Format email tidak valid')
-      }
+    if (!formData.email || !formData.email.trim()) {
+      return showToast.error('Email aktif fan wajib diisi untuk link login & password')
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email.trim())) {
+      return showToast.error('Format email tidak valid')
     }
 
     setLoading(true)
     try {
-      await api.post('/auth/register', { ...formData, source: 'ots' })
-      showToast.success('Akun Fan OTS berhasil dibuat!')
+      const res = await api.post('/auth/register', { ...formData, source: 'ots' })
+      const tempPass = res.data?.tempPassword || ''
+      const fanCode = res.data?.user?.fan_code || String(res.data?.user?.fan_id || '').padStart(4, '0')
+
+      await webAlert.success(
+        'Akun Fan OTS Berhasil Dibuat!',
+        `Fan ID: #${fanCode}\nNama: ${formData.nama}\nEmail: ${formData.email}\nPassword Sementara: ${tempPass}\n\nEmail berisi Link Login 1-Klik (aktif 30 hari) & Password Acak telah otomatis dikirimkan ke email fan.`
+      )
+
       handleReset()
       onRefresh?.()
       onDone?.()
@@ -109,18 +118,19 @@ const UserOTSModal = ({ onRefresh, onDone }) => {
           <div>
             <label className="text-xs font-bold text-[var(--text-secondary)] mb-1.5 flex items-center gap-1.5">
               <FaEnvelope className="text-[var(--primary)]" />
-              Email Aktif <span className="text-[var(--text-secondary)] font-normal">(opsional)</span>
+              Email Aktif Fan <span className="text-[var(--danger)]">*</span>
             </label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="email@contoh.com (bisa dikosongkan)"
+              placeholder="email.fan@gmail.com"
               className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] text-xs placeholder-[var(--text-secondary)]/50 focus:outline-none focus:border-[var(--primary)] transition-colors"
+              required
             />
             <p className="text-[10px] text-[var(--text-secondary)] mt-1">
-              Jika diisi, digunakan untuk reset password via OTP.
+              Wajib diisi agar sistem otomatis mengirimkan Link Login 1-Klik & Password.
             </p>
           </div>
 
@@ -157,13 +167,17 @@ const UserOTSModal = ({ onRefresh, onDone }) => {
           </div>
         </div>
 
-        {/* Password info note */}
-        <div className="flex items-start gap-2 px-3.5 py-2.5 rounded-xl bg-[var(--primary)]/10 border border-[var(--primary)]/25">
-          <FaEye className="text-[var(--primary)] mt-0.5 shrink-0 text-xs" />
-          <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
-            Password digenerate otomatis. Jika email diisi, fan bisa login dan reset password via OTP.
-            Jika tidak, akun tetap dibuat dan bisa diupdate emailnya nanti di halaman Fan Users.
-          </p>
+        {/* Password & Magic Link info note */}
+        <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-xl bg-[var(--primary)]/10 border border-[var(--primary)]/30">
+          <FaBolt className="text-[var(--primary)] mt-0.5 shrink-0 text-sm" />
+          <div className="space-y-0.5">
+            <span className="text-xs font-bold text-[var(--text-primary)] block">
+              Registrasi Instan Tanpa Verifikasi OTP di Venue
+            </span>
+            <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+              Sistem akan otomatis membuat akun fan terverifikasi, meng-generate <strong>Password Acak 6 digit</strong>, dan mengirimkan email berisi <strong>Link Login 1-Klik (aktif 30 hari)</strong> langsung ke inbox fan agar mereka bisa langsung masuk di HP mereka.
+            </p>
+          </div>
         </div>
 
         {/* Actions */}
