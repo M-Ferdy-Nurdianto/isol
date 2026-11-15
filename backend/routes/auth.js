@@ -1334,5 +1334,116 @@ router.put('/fan/profile', async (req, res) => {
   }
 })
 
+// ============================================================================
+// 11. POST /api/auth/fan/change-password (Fan Self-Service Password Change)
+// ============================================================================
+router.post('/fan/change-password', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Sesi login tidak valid. Silakan login kembali.' })
+    }
+
+    const token = authHeader.split(' ')[1]
+    let decoded
+    try {
+      decoded = jwt.verify(token, JWT_SECRET)
+    } catch (jwtErr) {
+      return res.status(401).json({ error: 'Sesi Anda telah berakhir. Silakan login kembali.' })
+    }
+
+    const { current_password, new_password, confirm_password } = req.body
+
+    if (!new_password || typeof new_password !== 'string' || new_password.trim().length < 6) {
+      return res.status(400).json({ error: 'Password baru minimal harus terdiri dari 6 karakter.' })
+    }
+
+    if (confirm_password && new_password.trim() !== confirm_password.trim()) {
+      return res.status(400).json({ error: 'Konfirmasi password baru tidak cocok.' })
+    }
+
+    const cleanNewPassword = new_password.trim()
+
+    // Ambil data user dari database
+    const { data: user, error: userErr } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', decoded.id)
+      .maybeSingle()
+
+    if (userErr || !user) {
+      return res.status(404).json({ error: 'Akun fan tidak ditemukan.' })
+    }
+
+    // Jika user sudah memiliki password_hash dan current_password dikirim, verifikasi dulu
+    if (user.password_hash && current_password) {
+      const cleanCurrent = String(current_password).trim()
+      let isValidCurrent = await bcrypt.compare(cleanCurrent, user.password_hash)
+      if (!isValidCurrent && cleanCurrent !== cleanCurrent.toUpperCase()) {
+        isValidCurrent = await bcrypt.compare(cleanCurrent.toUpperCase(), user.password_hash)
+      }
+
+      if (!isValidCurrent) {
+        return res.status(400).json({ error: 'Password saat ini yang Anda masukkan salah.' })
+      }
+    }
+
+    // Generate hash password baru dengan bcrypt
+    const password_hash = await bcrypt.hash(cleanNewPassword, 10)
+
+    // Update di tabel public.users
+    const { error: updateErr } = await supabase
+      .from('users')
+      .update({
+        password_hash,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', user.id)
+
+    if (updateErr) {
+      console.error('[Change Password] DB update error:', updateErr)
+      throw updateErr
+    }
+
+    // Sinkronkan ke Supabase Auth
+    try {
+      const { data: authUserRes } = await supabase.auth.admin.getUserById(user.id)
+      if (authUserRes?.user) {
+        await supabase.auth.admin.updateUserById(user.id, {
+          password: cleanNewPassword,
+          email_confirm: true
+        })
+      } else {
+        const { data: listRes } = await supabase.auth.admin.listUsers()
+        const existingByEmail = listRes?.users?.find(u => u.email?.toLowerCase() === user.email?.toLowerCase())
+        if (existingByEmail) {
+          await supabase.auth.admin.updateUserById(existingByEmail.id, {
+            password: cleanNewPassword,
+            email_confirm: true
+          })
+        } else {
+          await supabase.auth.admin.createUser({
+            id: user.id,
+            email: user.email,
+            password: cleanNewPassword,
+            email_confirm: true,
+            user_metadata: { nama: user.nama }
+          })
+        }
+      }
+    } catch (authSyncErr) {
+      console.warn('[Change Password] Supabase Auth sync warning:', authSyncErr.message)
+    }
+
+    return res.json({
+      success: true,
+      message: 'Password berhasil diperbarui! Anda dapat menggunakannya untuk login berikutnya.'
+    })
+  } catch (error) {
+    console.error('[Change Password Error]:', error)
+    return res.status(500).json({ error: error.message || 'Gagal mengubah password. Silakan coba lagi.' })
+  }
+})
+
 export default router
 

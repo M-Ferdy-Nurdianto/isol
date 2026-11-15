@@ -9,7 +9,8 @@ import {
   FaHistory, FaTicketAlt, FaCheck, FaHourglassHalf, FaExternalLinkAlt, 
   FaReceipt, FaCamera, FaSpinner, FaEdit, FaSave, FaTimes, FaShoppingBag,
   FaCheckCircle, FaCopy, FaCalendarAlt, FaQrcode, FaDownload, FaCrown, FaTrophy,
-  FaBox, FaTruck, FaStore, FaMapMarkerAlt, FaImage, FaPalette
+  FaBox, FaTruck, FaStore, FaMapMarkerAlt, FaImage, FaPalette,
+  FaLock, FaKey, FaShieldAlt, FaEye, FaEyeSlash
 } from 'react-icons/fa'
 import { useFanAuth } from '../context/FanAuthContext'
 import KSHeader from '../components/KSHeader'
@@ -223,6 +224,58 @@ const KSProfilePage = () => {
       kohiToast.error(err.response?.data?.error || 'Gagal memperbarui profil')
     } finally {
       setSavingProfile(false)
+    }
+  }
+
+  // Change Password States & Handler
+  const [showChangePassword, setShowChangePassword] = useState(false)
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
+  })
+  const [showCurrentPw, setShowCurrentPw] = useState(false)
+  const [showNewPw, setShowNewPw] = useState(false)
+  const [showConfirmPw, setShowConfirmPw] = useState(false)
+  const [changingPassword, setChangingPassword] = useState(false)
+
+  const handleChangePassword = async (e) => {
+    e?.preventDefault()
+    if (!passwordForm.new_password || passwordForm.new_password.length < 6) {
+      kohiToast.error('Password baru minimal harus 6 karakter')
+      return
+    }
+    if (passwordForm.new_password !== passwordForm.confirm_password) {
+      kohiToast.error('Konfirmasi password baru tidak cocok')
+      return
+    }
+
+    setChangingPassword(true)
+    try {
+      const token = localStorage.getItem('ks_fan_token')
+      const res = await api.post('/auth/fan/change-password', {
+        current_password: passwordForm.current_password || undefined,
+        new_password: passwordForm.new_password,
+        confirm_password: passwordForm.confirm_password
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+
+      if (res.data?.success) {
+        kohiToast.success(res.data.message || 'Password berhasil diperbarui!')
+        setPasswordForm({
+          current_password: '',
+          new_password: '',
+          confirm_password: ''
+        })
+        setShowChangePassword(false)
+      } else {
+        throw new Error(res.data?.error || 'Gagal mengubah password')
+      }
+    } catch (err) {
+      kohiToast.error(err.response?.data?.error || err.message || 'Gagal mengubah password')
+    } finally {
+      setChangingPassword(false)
     }
   }
 
@@ -492,6 +545,158 @@ const KSProfilePage = () => {
             <div className="p-3 bg-background border border-border rounded-xl font-medium text-text-primary">
               {currentUser?.instagram ? `@${currentUser.instagram}` : '-'}
             </div>
+          )}
+        </div>
+
+        {/* Keamanan & Edit Password */}
+        <div className="pt-4 border-t border-border space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
+              <FaShieldAlt className="opacity-70 text-primary" /> Keamanan & Password
+            </label>
+            {!showChangePassword ? (
+              <button
+                type="button"
+                onClick={() => setShowChangePassword(true)}
+                className="text-xs font-bold text-primary hover:text-primary/80 flex items-center gap-1.5 transition-colors"
+              >
+                <FaKey size={11} /> Ubah Password
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowChangePassword(false)
+                  setPasswordForm({ current_password: '', new_password: '', confirm_password: '' })
+                }}
+                className="text-xs font-bold text-text-secondary hover:text-text-primary flex items-center gap-1 transition-colors"
+              >
+                <FaTimes size={11} /> Tutup
+              </button>
+            )}
+          </div>
+
+          {!showChangePassword ? (
+            <div className="p-3.5 bg-background border border-border rounded-xl flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center text-primary shrink-0">
+                  <FaLock size={13} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-xs font-bold text-text-primary block tracking-wider">
+                    ••••••••••••
+                  </span>
+                  <span className="text-[10px] text-text-secondary block truncate">
+                    Bisa diperbarui kapan saja
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowChangePassword(true)}
+                className="px-3 py-1.5 rounded-lg bg-surface hover:bg-background border border-border text-xs font-bold text-text-primary hover:text-primary transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <FaKey size={10} className="text-primary" />
+                <span>Ganti Password</span>
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleChangePassword} className="p-4 bg-background border border-border rounded-xl space-y-3 animate-fade-in">
+              <p className="text-[11px] text-text-secondary leading-relaxed">
+                Atur password pribadi Anda untuk login berikutnya. Password minimal 6 karakter.
+              </p>
+
+              {/* Password Saat Ini (Opsional jika login dari link email) */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase text-text-secondary block">
+                  Password Saat Ini <span className="font-normal text-text-secondary/70">(Kosongkan jika login via link email)</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showCurrentPw ? 'text' : 'password'}
+                    value={passwordForm.current_password}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
+                    placeholder="Masukkan password saat ini (jika ada)"
+                    className="w-full p-2.5 pr-9 bg-surface border border-border focus:border-primary rounded-lg text-xs font-medium text-text-primary outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPw(!showCurrentPw)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
+                  >
+                    {showCurrentPw ? <FaEyeSlash size={12} /> : <FaEye size={12} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Password Baru */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase text-text-secondary block">
+                  Password Baru *
+                </label>
+                <div className="relative">
+                  <input
+                    type={showNewPw ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={passwordForm.new_password}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
+                    placeholder="Minimal 6 karakter"
+                    className="w-full p-2.5 pr-9 bg-surface border border-border focus:border-primary rounded-lg text-xs font-medium text-text-primary outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPw(!showNewPw)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
+                  >
+                    {showNewPw ? <FaEyeSlash size={12} /> : <FaEye size={12} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Konfirmasi Password Baru */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase text-text-secondary block">
+                  Ulangi Password Baru *
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPw ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={passwordForm.confirm_password}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
+                    placeholder="Ketik ulang password baru"
+                    className="w-full p-2.5 pr-9 bg-surface border border-border focus:border-primary rounded-lg text-xs font-medium text-text-primary outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPw(!showConfirmPw)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
+                  >
+                    {showConfirmPw ? <FaEyeSlash size={12} /> : <FaEye size={12} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowChangePassword(false)}
+                  className="px-3 py-2 rounded-lg bg-surface border border-border text-xs font-bold text-text-secondary hover:text-text-primary transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={changingPassword}
+                  className="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md shadow-primary/20"
+                >
+                  {changingPassword ? <FaSpinner className="animate-spin" /> : <FaSave />}
+                  <span>Simpan Password</span>
+                </button>
+              </div>
+            </form>
           )}
         </div>
       </div>
