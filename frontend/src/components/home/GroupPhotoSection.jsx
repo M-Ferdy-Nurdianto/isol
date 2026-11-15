@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion'
+import { getAssetPath } from '../../lib/pathUtils'
 
 const GroupPhotoSection = ({ config }) => {
-  if (!config?.url) return null
+  const photoUrl = config?.url && !config.url.includes('placeholder')
+    ? config.url
+    : '/images/members/group.webp'
 
-  const overlayText = config.overlay_text || 'KOHI SEKAI'
-  const overlayDesc = config.overlay_desc || ''
+  const overlayText = config?.overlay_text || 'KOHI SEKAI'
+  const overlayDesc = config?.overlay_desc || ''
 
   return (
     <section className="py-6 sm:py-8 px-4 bg-surface/40 border-y border-white/5 bg-pattern-diagonal relative">
@@ -18,9 +21,13 @@ const GroupPhotoSection = ({ config }) => {
         >
           {/* Group Photo */}
           <img
-            src={config.url}
+            src={photoUrl.startsWith('http') ? photoUrl : getAssetPath(photoUrl)}
             alt="Kohi Sekai Group"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              e.target.onerror = null
+              e.target.src = getAssetPath('/images/members/group.webp')
+            }}
           />
 
           {/* Clean Solid Dark Overlay */}

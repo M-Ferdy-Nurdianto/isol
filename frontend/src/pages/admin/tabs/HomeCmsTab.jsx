@@ -68,7 +68,20 @@ const HomeCmsTab = () => {
         return val
       }
 
-      setHeroSection(parseJson(configData.hero_settings) || { title: '', subtitle: '', tagline: '', cta_1_text: '', cta_1_link: '', cta_2_text: '', cta_2_link: '', corner_left_1: '', corner_left_2: '', corner_right_1: '', corner_right_2: '' })
+      const rawHero = parseJson(configData.hero_settings) || {}
+      setHeroSection({
+        title: rawHero.title || 'KOHI SEKAI',
+        subtitle: rawHero.subtitle || 'Tiga rasa, satu dunia. Kohi Sekai hadir membawa energi idol yang hangat, kuat, dan penuh semangat.',
+        tagline: rawHero.tagline || 'WE ARE',
+        cta_1_text: rawHero.cta_1_text || 'Lihat Jadwal',
+        cta_1_link: rawHero.cta_1_link || '/shop',
+        cta_2_text: rawHero.cta_2_text || 'Kenali Kami',
+        cta_2_link: rawHero.cta_2_link || '/about',
+        corner_left_1: rawHero.corner_left_1 || 'コーヒーの世界へ',
+        corner_left_2: rawHero.corner_left_2 || 'Kohi Sekai 2026',
+        corner_right_1: rawHero.corner_right_1 || 'ラテ · マキアート',
+        corner_right_2: rawHero.corner_right_2 || 'アフォガート'
+      })
       setMembersSection(parseJson(configData.members_section) || { title: '', description: '' })
       setNewsTitle(configData.news_title || 'News')
       const parsedNews = parseJson(configData.news_items)
@@ -101,7 +114,15 @@ const HomeCmsTab = () => {
         setFaqCp(parsedCp)
       }
       setFooterSection(parseJson(configData.footer_settings) || { brand_description: '', copyright_text: '' })
-      setGroupPhoto(parseJson(configData.group_photo) || { url: '', overlay_text: '', overlay_desc: '' })
+      const rawGroupPhoto = parseJson(configData.group_photo) || {}
+      const groupUrl = (rawGroupPhoto.url && !rawGroupPhoto.url.includes('placeholder'))
+        ? rawGroupPhoto.url
+        : '/images/members/group.webp'
+      setGroupPhoto({
+        url: groupUrl,
+        overlay_text: rawGroupPhoto.overlay_text || 'KOHI SEKAI',
+        overlay_desc: rawGroupPhoto.overlay_desc || 'Tiga rasa kopi yang berbeda, satu dunia...'
+      })
       setAboutUs(parseJson(configData.about_us) || { title: '', subtitle: '', description: '', images: [] })
 
       setConfig(configData)
@@ -442,7 +463,15 @@ const HomeCmsTab = () => {
                 <label className="block text-xs font-bold text-[var(--text-secondary)]">Preview Gambar Saat Ini</label>
                 <div className="w-full aspect-video bg-background border border-border border-dashed rounded-xl overflow-hidden flex items-center justify-center">
                   {groupPhoto.url ? (
-                    <img src={groupPhoto.url} alt="Hero Image" className="w-full h-full object-cover" />
+                    <img
+                      src={groupPhoto.url.startsWith('http') ? groupPhoto.url : getAssetPath(groupPhoto.url)}
+                      alt="Hero Image"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null
+                        e.target.src = getAssetPath('/images/members/group.webp')
+                      }}
+                    />
                   ) : (
                     <span className="text-xs text-[var(--text-secondary)]">Belum ada gambar</span>
                   )}
