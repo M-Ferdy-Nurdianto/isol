@@ -176,10 +176,7 @@ router.post('/', async (req, res) => {
       status: reqStatus
     } = req.body
 
-    const effectiveWhatsapp = whatsapp || (isAdmin ? '-' : '')
-    if (!effectiveWhatsapp) {
-      return res.status(400).json({ error: 'No. WhatsApp wajib diisi' })
-    }
+    const effectiveWhatsapp = (whatsapp && String(whatsapp).trim()) || '-'
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'Tidak ada item di keranjang' })
     }

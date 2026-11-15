@@ -95,11 +95,6 @@ const KSMerchCheckoutPage = () => {
       return
     }
 
-    if (!buyer.whatsapp.trim()) {
-      kohiToast.error('Nomor WhatsApp wajib diisi.')
-      return
-    }
-
     if (buyer.delivery_method === 'shipping') {
       if (!buyer.shipping_address?.trim() || buyer.shipping_address.trim().length < 5) {
         kohiToast.error('Alamat lengkap pengiriman wajib diisi minimal 5 karakter.')
@@ -128,7 +123,7 @@ const KSMerchCheckoutPage = () => {
       // 2. Prepare order payload
       const payload = {
         nama_lengkap: buyer.nama.trim(),
-        whatsapp: buyer.whatsapp.trim(),
+        whatsapp: buyer.whatsapp?.trim() || '-',
         instagram: buyer.instagram?.trim() || null,
         catatan: buyer.catatan?.trim() || null,
         delivery_method: buyer.delivery_method,
@@ -170,7 +165,7 @@ const KSMerchCheckoutPage = () => {
     <div className="min-h-screen bg-[#1A1512] text-text-primary bg-pattern-dots overflow-x-hidden relative flex flex-col justify-between">
       <KSHeader />
 
-      <main className="pt-24 sm:pt-32 pb-24 relative z-10 flex-1">
+      <main className="pt-28 sm:pt-36 pb-24 relative z-10 flex-1">
         <div className="container mx-auto max-w-6xl px-4 sm:px-6">
 
           {/* =========================================================================

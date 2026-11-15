@@ -45,10 +45,10 @@ const KSHeader = () => {
       {/* =========================================================================
           DESKTOP FLOATING ISLAND NAVBAR (hidden md:flex)
           ========================================================================= */}
-      <header className="hidden md:flex fixed top-5 inset-x-0 z-50 justify-center px-6 pointer-events-none">
-        <div className="relative w-full max-w-4xl lg:max-w-5xl pointer-events-auto">
+      <header className="hidden md:flex fixed top-0 inset-x-0 z-50 justify-center px-6 pt-3 pb-3 bg-[#FAF7F2] dark:bg-[#1A1512] border-b border-[#E8DDD0] dark:border-[#3A2E24] shadow-md shadow-black/20">
+        <div className="relative w-full max-w-4xl lg:max-w-5xl">
           <nav 
-            className="w-full rounded-full border px-6 h-16 flex items-center justify-between transition-all duration-300 relative z-50 bg-white dark:bg-[#251E19] border-[#E8DDD0] dark:border-[#3E3228] shadow-xl shadow-black/10 dark:shadow-2xl dark:shadow-black/70"
+            className="w-full rounded-full border px-6 h-14 flex items-center justify-between transition-all duration-300 relative z-50 bg-white dark:bg-[#251E19] border-[#E8DDD0] dark:border-[#3E3228] shadow-sm"
           >
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group flex-shrink-0">

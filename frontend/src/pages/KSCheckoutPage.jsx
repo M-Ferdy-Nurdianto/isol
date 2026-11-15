@@ -393,11 +393,6 @@ const KSCheckoutPage = () => {
       return
     }
 
-    if (!form.whatsapp.trim() || form.whatsapp.trim().length < 8) {
-      kohiToast.error('Silakan isi nomor WhatsApp aktif.')
-      return
-    }
-
     if (!file) {
       kohiToast.error('Silakan unggah bukti transfer pembayaran.')
       return
@@ -511,7 +506,7 @@ const KSCheckoutPage = () => {
     <div className="min-h-screen bg-background bg-pattern-dots text-text-primary selection:bg-primary/30">
       <KSHeader />
 
-      <main className="pt-24 sm:pt-28 pb-32 lg:pb-24">
+      <main className="pt-28 sm:pt-36 pb-32 lg:pb-24">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
           {/* === NAVIGATION BREADCRUMB === */}

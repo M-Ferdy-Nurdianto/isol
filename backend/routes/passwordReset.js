@@ -523,6 +523,14 @@ router.post('/verify-otp', async (req, res) => {
         }
         authUpdated = true
       }
+
+      // Selalu simpan juga password_hash ke database users
+      try {
+        const password_hash = await bcrypt.hash(new_password, 10)
+        await supabase.from('users').update({ password_hash }).eq('id', targetUser.id)
+      } catch (hashErr) {
+        console.warn('[Reset Password] Hash save warning:', hashErr.message)
+      }
     } catch (authErr) {
       console.error('[Reset Password] Supabase Auth update error:', authErr)
       return res.status(500).json({
@@ -780,6 +788,14 @@ router.post('/confirm-email', async (req, res) => {
         }
       } else {
         return res.status(400).json({ error: 'Akun autentikasi tidak ditemukan. Hubungi admin.' })
+      }
+
+      // Selalu simpan juga password_hash ke database users
+      try {
+        const password_hash = await bcrypt.hash(new_password, 10)
+        await supabase.from('users').update({ password_hash }).eq('id', user.id)
+      } catch (hashErr) {
+        console.warn('[Confirm Email Reset] Hash save warning:', hashErr.message)
       }
     } catch (authErr) {
       console.error('[Confirm Email Reset] Auth update error:', authErr)

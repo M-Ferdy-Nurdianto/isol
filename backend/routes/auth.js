@@ -229,21 +229,64 @@ router.post('/login', async (req, res) => {
         })
       }
 
-      // Jika password disertakan, verifikasi dengan Supabase Auth
+      // Jika password disertakan, verifikasi dual (Bcrypt Hash & Supabase Auth)
       if (password) {
-        try {
-          const { error: authErr } = await supabase.auth.signInWithPassword({
-            email: cleanEmail,
-            password: String(password)
-          })
-          if (authErr) {
-            const msg = (authErr.message || '').toLowerCase()
-            if (msg.includes('invalid') || msg.includes('credential') || authErr.status === 400) {
-              return res.status(401).json({ error: 'Password yang Anda masukkan salah' })
+        const cleanPassword = String(password).trim()
+        let isPasswordCorrect = false
+
+        // 1. Coba verifikasi dengan bcrypt password_hash di database users
+        if (fanUser.password_hash) {
+          try {
+            isPasswordCorrect = await bcrypt.compare(cleanPassword, fanUser.password_hash)
+            if (!isPasswordCorrect && cleanPassword !== cleanPassword.toUpperCase()) {
+              isPasswordCorrect = await bcrypt.compare(cleanPassword.toUpperCase(), fanUser.password_hash)
             }
+          } catch (bErr) {
+            console.warn('[Fan Login] Bcrypt compare error:', bErr.message)
           }
-        } catch (authCatchErr) {
-          console.warn('[Fan Login] Password verification fallback:', authCatchErr.message)
+        }
+
+        // 2. Jika belum cocok / belum ada password_hash, verifikasi dengan Supabase Auth
+        if (!isPasswordCorrect) {
+          try {
+            let { error: authErr } = await supabase.auth.signInWithPassword({
+              email: cleanEmail,
+              password: cleanPassword
+            })
+
+            // Coba uppercase fallback jika kode acak OTS
+            if (authErr && cleanPassword !== cleanPassword.toUpperCase()) {
+              const upperRes = await supabase.auth.signInWithPassword({
+                email: cleanEmail,
+                password: cleanPassword.toUpperCase()
+              })
+              if (!upperRes.error) {
+                authErr = null
+              }
+            }
+
+            if (!authErr) {
+              isPasswordCorrect = true
+              // Backfill password_hash ke database users agar login berikutnya instan
+              try {
+                const newHash = await bcrypt.hash(cleanPassword, 10)
+                await supabase.from('users').update({ password_hash: newHash }).eq('id', fanUser.id)
+              } catch (hashErr) {
+                console.warn('[Fan Login] Backfill hash error:', hashErr.message)
+              }
+            } else {
+              const msg = (authErr.message || '').toLowerCase()
+              if (msg.includes('invalid') || msg.includes('credential') || authErr.status === 400) {
+                return res.status(401).json({ error: 'Password yang Anda masukkan salah' })
+              }
+            }
+          } catch (authCatchErr) {
+            console.warn('[Fan Login] Password verification fallback:', authCatchErr.message)
+          }
+        }
+
+        if (!isPasswordCorrect) {
+          return res.status(401).json({ error: 'Password yang Anda masukkan salah' })
         }
       }
 
@@ -389,9 +432,15 @@ router.post('/register', async (req, res) => {
     }
     const randomPassword = isOts ? generateOtsPassword() : null
 
-    // Sinkronkan ke Supabase Auth dengan email terverifikasi langsung (tanpa butuh kode OTP di venue)
+    // Sinkronkan password_hash ke database users & Supabase Auth
     if (isOts && randomPassword && savedUser) {
       try {
+        const password_hash = await bcrypt.hash(randomPassword, 10)
+        await supabase
+          .from('users')
+          .update({ password_hash, updated_at: new Date().toISOString() })
+          .eq('id', savedUser.id)
+
         const { data: authUserRes } = await supabase.auth.admin.getUserById(savedUser.id)
         if (authUserRes?.user) {
           await supabase.auth.admin.updateUserById(savedUser.id, {
@@ -399,13 +448,22 @@ router.post('/register', async (req, res) => {
             email_confirm: true
           })
         } else {
-          await supabase.auth.admin.createUser({
-            id: savedUser.id,
-            email: cleanEmail,
-            password: randomPassword,
-            email_confirm: true,
-            user_metadata: { nama: cleanNama }
-          })
+          const { data: listRes } = await supabase.auth.admin.listUsers()
+          const existingByEmail = listRes?.users?.find(u => u.email?.toLowerCase() === cleanEmail.toLowerCase())
+          if (existingByEmail) {
+            await supabase.auth.admin.updateUserById(existingByEmail.id, {
+              password: randomPassword,
+              email_confirm: true
+            })
+          } else {
+            await supabase.auth.admin.createUser({
+              id: savedUser.id,
+              email: cleanEmail,
+              password: randomPassword,
+              email_confirm: true,
+              user_metadata: { nama: cleanNama }
+            })
+          }
         }
       } catch (authErr) {
         console.warn('[OTS Register] Supabase auth admin warning:', authErr.message)
@@ -702,22 +760,35 @@ router.post('/fan/login', async (req, res) => {
         }
       }
 
-      // Sinkronkan password ke Supabase Auth jika fan menyertakan password
+      // Sinkronkan password ke database users & Supabase Auth jika fan menyertakan password
       if (password && fanRecord && fanRecord.id) {
         try {
+          const password_hash = await bcrypt.hash(String(password), 10)
+          await supabase.from('users').update({ password_hash }).eq('id', fanRecord.id)
+
           const { data: authUserRes } = await supabase.auth.admin.getUserById(fanRecord.id)
           if (authUserRes?.user) {
             await supabase.auth.admin.updateUserById(fanRecord.id, {
-              password: String(password)
+              password: String(password),
+              email_confirm: true
             })
           } else {
-            await supabase.auth.admin.createUser({
-              id: fanRecord.id,
-              email: cleanEmail,
-              password: String(password),
-              email_confirm: true,
-              user_metadata: { nama: cleanNama }
-            })
+            const { data: listRes } = await supabase.auth.admin.listUsers()
+            const existingByEmail = listRes?.users?.find(u => u.email?.toLowerCase() === cleanEmail.toLowerCase())
+            if (existingByEmail) {
+              await supabase.auth.admin.updateUserById(existingByEmail.id, {
+                password: String(password),
+                email_confirm: true
+              })
+            } else {
+              await supabase.auth.admin.createUser({
+                id: fanRecord.id,
+                email: cleanEmail,
+                password: String(password),
+                email_confirm: true,
+                user_metadata: { nama: cleanNama }
+              })
+            }
           }
         } catch (authSyncErr) {
           console.warn('[Fan Register] Supabase auth password sync warning:', authSyncErr.message)

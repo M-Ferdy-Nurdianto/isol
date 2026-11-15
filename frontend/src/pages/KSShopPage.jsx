@@ -632,7 +632,7 @@ const KSShopPage = () => {
     <div className="min-h-screen bg-background bg-pattern-dots text-text-primary overflow-x-hidden relative">
       <KSHeader />
 
-      <main className="pt-20 sm:pt-28 pb-28 sm:pb-24 relative z-10">
+      <main className="pt-24 sm:pt-36 pb-28 sm:pb-24 relative z-10">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6">
 
           {/* === HERO TITLE === */}
