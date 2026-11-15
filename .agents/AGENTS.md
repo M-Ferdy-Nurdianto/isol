@@ -3,10 +3,10 @@
 ## Core Vision
 Kohi Sekai adalah platform manajemen dan shopping yang didesain khusus untuk komunitas idol dan fan, dengan fokus pada pengalaman yang premium, cepat, elegan, dan berkarakter. Project ini bukan sekadar CMS, melainkan perpanjangan dari identitas brand "Kohi Sekai" (Dunia Kopi).
 
-## Brand Identity: "Deep Coffee Metal"
-Desain Kohi Sekai mengusung tema **Deep Coffee Metal**. Perpaduan antara kehangatan nuansa kopi (*warm espresso, crema amber, latte cream*) dengan ketegasan estetika industrial (*metal, dark borders, solid surfaces*).
+## Brand Identity: "Deep Coffee"
+Desain Kohi Sekai mengusung tema **Deep Coffee**. Menghadirkan kehangatan nuansa kopi (*warm espresso, crema amber, latte cream*) dengan border tegas, kontras solid tajam, dan micro-interactions yang mulus tanpa efek kabur.
 - **Deep Coffee**: Latar belakang espresso gelap, permukaan coklat dalam, aksen amber hangat, dan tipografi krem yang nyaman dibaca.
-- **Metal Industrial**: Border tegas, kartu presisi, kontras solid tajam, dan micro-interactions yang mulus tanpa efek kabur.
+- **Solid Surfaces**: Border tegas, kartu presisi, kontras solid tajam, dan permukaan kopi yang elegan.
 
 ## Core Values
 1. **Monochromatic & Focused**: Desain bersih, berwibawa, dan elegan. Tidak warna-warni seperti pelangi.
@@ -97,12 +97,12 @@ Sebelum mengubah kode:
   - **Mobile (`md:hidden`) - BOTTOM-SHEET MODAL**:
     - **Bottom-Sheet Drawer** (`fixed inset-x-0 bottom-0 rounded-t-3xl max-h-[92vh] flex flex-col bg-[var(--surface)] border-t border-[var(--border)] shadow-2xl z-50 animate-slide-up`) dengan visual drag bar di atas, form 1 kolom yang nyaman dioperasikan jempol, dan **Sticky Action Bar di bawah** (`sticky bottom-0 bg-[var(--surface)] border-t border-[var(--border)] p-4`).
 - Pastikan interaksi terasa hidup dengan micro-animations tanpa mengorbankan performa.
-- **STANDAR RESMI ALERT & TOAST (DEEP COFFEE METAL)**:
+- **STANDAR RESMI ALERT & TOAST (DEEP COFFEE)**:
   - **Toast Notifications**: Gunakan `showToast` (`src/lib/toast.jsx`) atau `kohiToast` (`src/components/ui/KohiToast.jsx`). Background solid coffee surface (`#241E19`), border `#3A2E24`, teks `#F5E6D3`. Dilarang menggunakan background navy/biru (`#111726`) atau emoji pada toast.
   - **Web Alert & Dialog Konfirmasi**: Gunakan `webAlert` (`src/lib/webAlert.js` atau import via `src/lib/toast.jsx`):
     - `await webAlert.confirm({ title, text, confirmText, cancelText, isDanger })`
     - `webAlert.success(title, text)` / `webAlert.error(title, text)` / `webAlert.warning(title, text)` / `webAlert.info(title, text)`
-    - Seluruh dialog SweetAlert2 diatur otomatis solid Deep Coffee Metal tanpa backdrop blur.
+    - Seluruh dialog SweetAlert2 diatur otomatis solid Deep Coffee tanpa backdrop blur.
 
 ## 4. Restrictions (Larangan)
 - **DILARANG** menggunakan warna-warni pelangi (purple, sky, cyan, teal, pink) untuk label dan badge biasa.

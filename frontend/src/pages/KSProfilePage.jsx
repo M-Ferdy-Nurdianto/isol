@@ -494,7 +494,7 @@ const KSProfilePage = () => {
 
     return (
       <div className="bg-surface border border-border rounded-3xl shadow-xl overflow-hidden h-full flex flex-col">
-        {/* Header Panel - Solid Color, Deep Coffee Metal */}
+        {/* Header Panel - Solid Color, Deep Coffee */}
         <div className="p-4 sm:p-6 border-b border-border bg-surface flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div>
@@ -983,7 +983,7 @@ const KSProfilePage = () => {
         {/* HERO / HEADER CARD */}
         <div className="bg-surface border border-border rounded-3xl shadow-sm overflow-hidden mb-6 sm:mb-8">
           
-          {/* Cover Photo - Deep Coffee Metal Frame */}
+          {/* Cover Photo - Deep Coffee Frame */}
           <div className="h-36 sm:h-52 relative group overflow-hidden bg-[#100C0A] border-b-2 border-border">
             {fanUser?.banner_url && !bannerLoadError ? (
               <img 
@@ -1028,7 +1028,7 @@ const KSProfilePage = () => {
                     コーヒーの世界
                   </span>
                   <span className="text-[9px] uppercase tracking-widest text-primary font-mono font-bold">
-                    Deep Coffee Metal
+                    Kohi Sekai Yogyakarta
                   </span>
                 </div>
               </div>

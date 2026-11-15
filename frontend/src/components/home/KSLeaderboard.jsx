@@ -11,7 +11,7 @@ const getInitials = (name) => {
   return name.slice(0, 2).toUpperCase()
 }
 
-// ── Podium configs (1st / 2nd / 3rd) — solid metal palette ──────────
+// ── Podium configs (1st / 2nd / 3rd) — solid coffee palette ──────────
 const PODIUM = [
   // index 0 = rank 1st (center, tallest)
   {

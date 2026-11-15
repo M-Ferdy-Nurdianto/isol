@@ -52,8 +52,8 @@ const DAY_NAMES = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 const DEFAULT_OFFICIAL_MERCH = [
   {
     id: 'merch-jersey-01',
-    nama: 'Official Jersey Kohi Sekai 2026 - Metal Edition',
-    deskripsi: 'Jersey dry-fit eksklusif edisi 2026 dengan nomor punggung dan corak Kawaii Metal khas Kohi Sekai. Bahan adem, ringan, dan nyaman dipakai saat live show.',
+    nama: 'Official Jersey Kohi Sekai 2026 - Coffee Edition',
+    deskripsi: 'Jersey dry-fit eksklusif edisi 2026 dengan nomor punggung dan corak khas Kohi Sekai. Bahan adem, ringan, dan nyaman dipakai saat live show.',
     harga: 210000,
     stok: 35,
     available: true,
@@ -63,8 +63,8 @@ const DEFAULT_OFFICIAL_MERCH = [
   },
   {
     id: 'merch-tshirt-01',
-    nama: 'Kohi Sekai Official T-Shirt - Kawaii Metal Vol. 1',
-    deskripsi: 'Kaos katun combed 24s premium bertema Kawaii Metal dengan sablon plastisol halus tahan lama. Nyaman dipakai nonton live maupun daily outfit.',
+    nama: 'Kohi Sekai Official T-Shirt - Coffee Sekai Vol. 1',
+    deskripsi: 'Kaos katun combed 24s premium bertema Kohi Sekai dengan sablon plastisol halus tahan lama. Nyaman dipakai nonton live maupun daily outfit.',
     harga: 175000,
     stok: 40,
     available: true,
@@ -75,7 +75,7 @@ const DEFAULT_OFFICIAL_MERCH = [
   {
     id: 'merch-lanyard-01',
     nama: 'Official Member Lanyard & PVC Card Case',
-    deskripsi: 'Tali lanyard tebal 2cm dengan stopper kokoh, pengait metal, dan holder kartu transparan berlogo Kohi Sekai. Cocok untuk tiket dan ID card konser.',
+    deskripsi: 'Tali lanyard tebal 2cm dengan stopper kokoh, pengait kuat, dan holder kartu transparan berlogo Kohi Sekai. Cocok untuk tiket dan ID card konser.',
     harga: 45000,
     stok: 60,
     available: true,
@@ -86,7 +86,7 @@ const DEFAULT_OFFICIAL_MERCH = [
   {
     id: 'merch-ganci-01',
     nama: 'Gantungan Kunci Akrilik 2-Sisi (Ganci Idol)',
-    deskripsi: 'Gantungan kunci akrilik tebal 4mm dua sisi dengan klip gantungan bintang metal. Desain chibi imut dan logo resmi Kohi Sekai.',
+    deskripsi: 'Gantungan kunci akrilik tebal 4mm dua sisi dengan klip gantungan bintang. Desain chibi imut dan logo resmi Kohi Sekai.',
     harga: 30000,
     stok: 80,
     available: true,
@@ -96,7 +96,7 @@ const DEFAULT_OFFICIAL_MERCH = [
   },
   {
     id: 'merch-totebag-01',
-    nama: 'Official Canvas Totebag - Kawaii Metal Edition',
+    nama: 'Official Canvas Totebag - Coffee Edition',
     deskripsi: 'Totebag bahan canvas premium tebal dilengkapi resleting utama dan saku dalam. Muat lightstick, binder photocard, dan merchandise favoritmu.',
     harga: 85000,
     stok: 45,
@@ -288,7 +288,7 @@ const KSShopPage = () => {
               event_time: '13:00 - 21:00 WIB',
               cheki_time: '15:30 - 19:00 WIB',
               is_special: true,
-              theme_name: 'Sunday Kawaii Metal',
+              theme_name: 'Sunday Coffee Stage',
               theme_color: 'var(--primary)',
               deskripsi: 'Panggung akbar festival idol dengan lighting megah, merchandise eksklusif, dan sesi 2-Shot Cheki seharian penuh.',
               event_lineup: []

@@ -2,7 +2,7 @@ import Swal from 'sweetalert2'
 
 /**
  * webAlert — Kohi Sekai Unified Web Alert & Confirmation System
- * Design System: Deep Coffee Metal
+ * Design System: Deep Coffee
  * 
  * Sesuai manifesto:
  * - Solid color background (#241E19 surface, #1A1512 background, #3A2E24 border)
@@ -23,7 +23,7 @@ const DEFAULT_CUSTOM_CLASS = {
 }
 
 /**
- * Base configuration dengan token Deep Coffee Metal
+ * Base configuration dengan token Deep Coffee
  */
 const getBaseConfig = () => ({
   background: '#241E19',

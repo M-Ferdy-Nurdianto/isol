@@ -3,7 +3,7 @@
 Dokumen ini mendefinisikan standar penggunaan bahasa (bilingual: Bahasa Inggris & Bahasa Indonesia) di dalam aplikasi dan platform Kohi Sekai.
 
 ## Prinsip Utama
-Kohi Sekai menggunakan perpaduan **Bahasa Inggris untuk elemen navigasi/UI pendek** dan **Bahasa Indonesia untuk penjelasan kontekstual/panjang**. Pendekatan ini dipilih untuk menjaga kesan modern (Kawaii Metal) sekaligus memastikan pesan tersampaikan dengan jelas kepada mayoritas pengguna di Indonesia.
+Kohi Sekai menggunakan perpaduan **Bahasa Inggris untuk elemen navigasi/UI pendek** dan **Bahasa Indonesia untuk penjelasan kontekstual/panjang**. Pendekatan ini dipilih untuk menjaga kesan modern sekaligus memastikan pesan tersampaikan dengan jelas kepada mayoritas pengguna di Indonesia.
 
 ## Aturan Penggunaan Bahasa
 

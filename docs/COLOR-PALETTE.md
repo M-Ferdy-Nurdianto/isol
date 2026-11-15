@@ -4,7 +4,7 @@ Dokumen ini adalah **Source of Truth** untuk seluruh styling warna antarmuka pen
 
 ---
 
-## 1. Design Tokens Utama (Deep Coffee Metal)
+## 1. Design Tokens Utama (Deep Coffee)
 
 | Token | Hex | Kegunaan |
 |---|---|---|

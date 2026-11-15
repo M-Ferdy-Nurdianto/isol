@@ -6,7 +6,7 @@
 
 ## 1. Brand Identity & Filosofi Desain
 
-Kohi Sekai (**コーヒーの世界**) mengusung identitas bertema **Warm Coffee Kawaii & Sharp Industrial Metal**:
+Kohi Sekai (**コーヒーの世界**) mengusung identitas bertema **Deep Coffee (Warm Coffee & Solid Contrast)**:
 - **Tone & Rasa**: Kombinasi kehangatan kafe Jepang (espresso, latte cream, caramel) dengan energi idol musik live stage yang modern.
 - **Konvensi Styling (Solid Colors, No Glassmorphism)**:
   - Seluruh efek *glassmorphism* (seperti `backdrop-filter: blur()`, kartu kaca transparan tembus pandang) telah **dihilangkan / diminimalkan**.
@@ -29,7 +29,7 @@ Kohi Sekai (**コーヒーの世界**) mengusung identitas bertema **Warm Coffee
   --danger: #E85D5D;
 }
 
-/* Dark Mode (Deep Coffee Metal) */
+/* Dark Mode (Deep Coffee) */
 .dark {
   --primary: #E8944A;        /* Amber Glow */
   --secondary: #3A2E24;      /* Dark Espresso Roast */

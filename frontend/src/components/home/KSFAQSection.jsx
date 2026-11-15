@@ -32,7 +32,7 @@ const DEFAULT_FAQS = [
   {
     id: 3,
     tanya: 'Apakah ada merchandise resmi Kohi Sekai?',
-    jawab: 'Ya! Kami menjual berbagai merchandise resmi mulai dari T-Shirt Kawaii Metal, Official Lightstick 15 Colors, Photocard Pack eksklusif, hingga Acrylic Standee member di halaman Shop dan booth official saat live concert berlangsung.',
+    jawab: 'Ya! Kami menjual berbagai merchandise resmi mulai dari T-Shirt Kohi Sekai, Official Lightstick 15 Colors, Photocard Pack eksklusif, hingga Acrylic Standee member di halaman Shop dan booth official saat live concert berlangsung.',
     kategori: 'merch'
   },
   {

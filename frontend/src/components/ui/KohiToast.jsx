@@ -1,6 +1,6 @@
 /**
  * KohiToast.jsx — Kohi Sekai Custom Toast System (Pure Framer Motion)
- * Design System: Deep Coffee Metal
+ * Design System: Deep Coffee
  * Icons: react-icons (flat, monochrome)
  */
 

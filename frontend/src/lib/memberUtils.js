@@ -1,5 +1,5 @@
 // Shared member data for consistent color usage across all pages
-// Deep Coffee Metal palette for Kohi Sekai
+// Deep Coffee palette for Kohi Sekai
 
 export const memberData = {
     'dea': {

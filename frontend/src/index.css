@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* =========================================================================
-   KOHI SEKAI DESIGN TOKENS - Warm Coffee Kawaii & Sharp Industrial Metal
+   KOHI SEKAI DESIGN TOKENS - Deep Coffee & Warm Espresso
    Source of truth: docs/COLOR-PALETTE.md & docs/PROJECT-STRUCTURE.md
    ========================================================================= */
 
@@ -21,7 +21,7 @@
   --danger: #E85D5D;
 }
 
-/* Dark Mode (Deep Coffee Metal) */
+/* Dark Mode (Deep Coffee) */
 .dark, .admin-layout {
   --primary: #E8944A;
   --secondary: #3A2E24;
@@ -780,7 +780,7 @@ body.light-theme .admin-layout aside {
 }
 
 /* ============================================
-   Kohi Sekai - SweetAlert2 Global Theme (Deep Coffee Metal)
+   Kohi Sekai - SweetAlert2 Global Theme (Deep Coffee)
    ============================================ */
 
 /* --- Overlay backdrop (Solid, Anti-Blur) --- */

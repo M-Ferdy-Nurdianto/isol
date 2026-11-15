@@ -271,7 +271,7 @@ const MemberDetail = ({ member, members, onNavigate, onClose }) => {
   )
 }
 
-// === Member Grid Card (Clean Minimal Kawaii Metal) ===
+// === Member Grid Card (Clean Deep Coffee Aesthetic) ===
 const MemberGridCard = ({ member, onClick, index }) => {
   const isSecret = member.is_secret
   const name = isSecret ? 'Secret Member' : (member.nama_panggung || 'Member')

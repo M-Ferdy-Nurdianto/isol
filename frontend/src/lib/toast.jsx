@@ -14,7 +14,7 @@ import {
 import { webAlert, kohiAlert } from './webAlert'
 
 /**
- * Toast Styles sesuai tema Deep Coffee Metal:
+ * Toast Styles sesuai tema Deep Coffee:
  * - background: #241E19 (Dark Coffee Card & Surface)
  * - border: #3A2E24 (Subtle Coffee Border)
  * - text: #F5E6D3 (Warm Cream Light Text)

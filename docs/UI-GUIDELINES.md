@@ -57,8 +57,8 @@ Setiap modal form atau editor interaktif di Admin Dashboard Kohi Sekai **WAJIB**
 
 ---
 
-## 5. Standar WebAlert & Toast (Deep Coffee Metal)
-Semua pesan umpan balik (feedback) dan dialog konfirmasi aksi wajib menggunakan helper resmi bertema Deep Coffee Metal:
+## 5. Standar WebAlert & Toast (Deep Coffee)
+Semua pesan umpan balik (feedback) dan dialog konfirmasi aksi wajib menggunakan helper resmi bertema Deep Coffee:
 
 ### A. WebAlert (`src/lib/webAlert.js` atau import via `src/lib/toast.jsx`)
 Gunakan `webAlert` untuk popup dialog dan konfirmasi:
