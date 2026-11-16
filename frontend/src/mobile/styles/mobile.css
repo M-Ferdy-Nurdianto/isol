@@ -1,5 +1,6 @@
 /* =========================================================================
    KOHI SEKAI MOBILE STYLES (Native-Feel CSS for Android / PWA)
+   Strict Deep Coffee Theme: Solid colors, no gradients, no backdrop-blur
    ========================================================================= */
 
 @import '../../shared/styles/tokens.css';
@@ -12,9 +13,11 @@
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  background-color: var(--background);
+  color: var(--text-primary);
 }
 
-/* Safe Area Insets for Android gesture bar and notches */
+/* Safe Area Insets for Android gesture bar, punch holes, and notches */
 .safe-area-top {
   padding-top: env(safe-area-inset-top, 0px);
 }
@@ -46,16 +49,95 @@
 
 /* Native-feel Overscroll & Selection Prevention */
 .no-overscroll {
-  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
 
 .no-select {
   -webkit-user-select: none;
   user-select: none;
+  -webkit-touch-callout: none;
 }
 
-/* Smooth Native Transitions */
-.mobile-page-transition {
-  transition: opacity 0.2s ease-out, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* Smooth Tap Feedback for Buttons and Cards */
+.tap-active {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.tap-active:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* Hide scrollbar for clean horizontal chip carousels */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth Native Transitions & Keyframes */
+@keyframes mobileSlideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes mobileSlideDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0.8;
+  }
+}
+
+@keyframes mobileFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: mobileSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-down {
+  animation: mobileSlideDown 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: mobileFadeIn 0.2s ease-out forwards;
+}
+
+/* Bottom Sheet Container Standards */
+.mobile-bottom-sheet {
+  max-height: 90dvh;
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+  background-color: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Sticky Action Bar at Bottom of Sheets or Checkout */
+.mobile-sticky-action-bar {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 1rem;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
 }
