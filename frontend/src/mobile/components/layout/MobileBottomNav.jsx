@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { FaHome, FaStore, FaMusic, FaUser } from 'react-icons/fa'
-import { useFanAuth } from '@shared/context'
+import { useFanAuth } from '../../shared/context'
 
 /**
  * MobileBottomNav (Kohi Sekai Native-Feel Bottom Navigation)
