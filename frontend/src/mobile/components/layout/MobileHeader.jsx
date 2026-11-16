@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaBars, FaArrowLeft, FaShoppingBag } from 'react-icons/fa'
-import { useMerchCart, useFanAuth } from '../../shared/context'
+import { useMerchCart, useFanAuth } from '@shared/context'
 
 /**
  * MobileHeader (Kohi Sekai Native-Feel Sticky Top Header)

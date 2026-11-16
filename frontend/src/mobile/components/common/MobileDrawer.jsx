@@ -19,7 +19,7 @@ import {
   FaWhatsapp,
   FaIdCard
 } from 'react-icons/fa'
-import { useFanAuth, useTheme } from '../../shared/context'
+import { useFanAuth, useTheme } from '@shared/context'
 
 /**
  * MobileDrawer (Kohi Sekai Native-Feel Slide-out Side Drawer)
