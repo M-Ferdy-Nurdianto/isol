@@ -32,7 +32,7 @@ const allowedOrigins = [
   'http://localhost:3001',
   'http://localhost:5173',
   'https://kohi-sekai-web.vercel.app',
-  'https://kohisekai.vercel.app',
+  'https://kohiprototype.ferdy.web.id',
   process.env.FRONTEND_URL
 ].filter(Boolean)
 

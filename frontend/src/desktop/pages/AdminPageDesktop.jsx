@@ -1,0 +1,1587 @@
+import React, { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import api from '../../lib/api'
+import { supabase } from '../../lib/supabase'
+import { showToast, webAlert } from '../../lib/toast'
+import Swal from 'sweetalert2'
+
+import OrdersTab from '../../pages/admin/tabs/OrdersTab'
+import RecapTab from '../../pages/admin/tabs/RecapTab'
+import EventsTab from '../../pages/admin/tabs/EventsTab'
+import MerchTab from '../../pages/admin/tabs/MerchTab'
+import SettingsTab from '../../pages/admin/tabs/SettingsTab'
+import MembersTab from '../../pages/admin/tabs/MembersTab'
+import HomeCmsTab from '../../pages/admin/tabs/HomeCmsTab'
+import MusicTab from '../../pages/admin/tabs/MusicTab'
+import UsersTab from '../../pages/admin/tabs/UsersTab'
+
+import OrderDetailModal from '../../pages/admin/modals/OrderDetailModal'
+import OTSOrderModal from '../../pages/admin/modals/OTSOrderModal'
+import BulkDeleteModal from '../../pages/admin/modals/BulkDeleteModal'
+import WipeDummyDataModal from '../../pages/admin/modals/WipeDummyDataModal'
+import EventModal from '../../pages/admin/modals/EventModal'
+
+import { generateExcel, generateMerchExcel, generateMerchPDF, generatePDF } from '../../lib/exportUtils'
+import { isGuestMode, clearGuestSession } from '../../lib/guestMock'
+import { getValidAdminToken, logoutAdminSession, touchAdminSession } from '../../lib/authSession'
+
+import {
+  FaSignOutAlt,
+  FaShoppingCart,
+  FaCalendar,
+  FaChartBar,
+  FaBox,
+  FaEdit,
+  FaUsers,
+  FaEllipsisH,
+  FaTimes,
+  FaShieldAlt,
+  FaSync,
+  FaMusic,
+  FaUserFriends,
+  FaHome,
+  FaBell,
+  FaChevronDown,
+  FaChevronUp,
+  FaTicketAlt,
+  FaCheck
+} from 'react-icons/fa'
+
+const AdminPage = () => {
+  const navigate = useNavigate()
+  const isGuest = isGuestMode()
+
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('admin_active_tab') || 'orders')
+  const [showMoreDrawer, setShowMoreDrawer] = useState(false)
+  const [orderSubTab, setOrderSubTab] = useState(() => localStorage.getItem('admin_order_subtab') || 'all')
+  const [orders, setOrders] = useState([])
+  const [members, setMembers] = useState([])
+  const [events, setEvents] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [updatingOrderIds, setUpdatingOrderIds] = useState(new Set())
+  const [updatingMerchOrderIds, setUpdatingMerchOrderIds] = useState(new Set())
+
+  const [statusFilter, setStatusFilter] = useState(() => localStorage.getItem('admin_status_filter') || 'all')
+  const [otsFilter, setOtsFilter] = useState(() => localStorage.getItem('admin_ots_filter') || 'all')
+  const [eventFilter, setEventFilter] = useState(() => localStorage.getItem('admin_event_filter') || 'all')
+  const [recapEventFilter, setRecapEventFilter] = useState(() => localStorage.getItem('admin_recap_event_filter') || 'all')
+  const [dateFilter, setDateFilter] = useState(() => localStorage.getItem('admin_date_filter') || 'all')
+  const [searchQuery, setSearchQuery] = useState(() => localStorage.getItem('admin_search_query') || '')
+  const [dateFrom, setDateFrom] = useState(() => localStorage.getItem('admin_date_from') || '')
+  const [dateTo, setDateTo] = useState(() => localStorage.getItem('admin_date_to') || '')
+
+  const [showOTSModal, setShowOTSModal] = useState(false)
+  const [showEventModal, setShowEventModal] = useState(false)
+  const [showOrderDetailModal, setShowOrderDetailModal] = useState(false)
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
+  const [showWipeModal, setShowWipeModal] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState(null)
+  const [isOtsCartActive, setIsOtsCartActive] = useState(false)
+  const [editingEvent, setEditingEvent] = useState(null)
+
+  const [hargaPerMember, setHargaPerMember] = useState('40000')
+  const [hargaGrup, setHargaGrup] = useState('70000')
+  const [hargaOtsPerMember, setHargaOtsPerMember] = useState('40000')
+  const [hargaOtsGrup, setHargaOtsGrup] = useState('80000')
+  const [paymentBank, setPaymentBank] = useState('BCA')
+  const [paymentRekening, setPaymentRekening] = useState('0902683273')
+  const [paymentAtasNama, setPaymentAtasNama] = useState('Natasya Angelina Putri')
+  const [paymentMethod, setPaymentMethod] = useState('Manual TF')
+  // Wide Cheki toggle
+  const [wideChekiEnabled, setWideChekiEnabled] = useState(true)
+  // Regular Cheki toggle (independen dari Wide)
+  const [regularChekiEnabled, setRegularChekiEnabled] = useState(true)
+  // Custom pricing options (array of {id, label, price})
+  const [chekiCustomOptions, setChekiCustomOptions] = useState([])
+  // Payment method toggles
+  const [paymentEnableCash, setPaymentEnableCash] = useState(true)
+  const [paymentEnableTf, setPaymentEnableTf] = useState(true)
+  const [paymentEnableQris, setPaymentEnableQris] = useState(false)
+  const [paymentQrisImageUrl, setPaymentQrisImageUrl] = useState('')
+  const [paymentQrisMerchantName, setPaymentQrisMerchantName] = useState('')
+  const [maintenanceMode, setMaintenanceMode] = useState(false)
+  const [maintenanceMessage, setMaintenanceMessage] = useState('')
+  const [maintenanceEstimatedEnd, setMaintenanceEstimatedEnd] = useState('')
+  const [configLoading, setConfigLoading] = useState(false)
+  // Cheki Grup (foto semua member — terpisah dari Wide Cheki)
+  const [chekiGrupEnabled, setChekiGrupEnabled] = useState(false)
+  const [hargaChekiGrupPo, setHargaChekiGrupPo] = useState('150000')
+  const [hargaChekiGrupOts, setHargaChekiGrupOts] = useState('170000')
+
+  const [merch, setMerch] = useState([])
+  const [merchOrders, setMerchOrders] = useState([])
+  const [showMerchForm, setShowMerchForm] = useState(false)
+  const [editingMerch, setEditingMerch] = useState(null)
+  const [merchForm, setMerchForm] = useState({ nama: '', deskripsi: '', harga: '', stok: '', available: true, sizes: [], size_chart_urls: [], kategori: 'baju' })
+  const [merchImageFile, setMerchImageFile] = useState(null)
+  const [merchImagePreview, setMerchImagePreview] = useState('')
+  const [merchSizeChartFiles, setMerchSizeChartFiles] = useState([null])
+  const [merchSizeChartPreviews, setMerchSizeChartPreviews] = useState([''])
+  const [availableSizes, setAvailableSizes] = useState('')
+  const [merchSaving, setMerchSaving] = useState(false)
+  const merchFileInputRef = useRef(null)
+  const sizeChart1InputRef = useRef(null)
+
+  const [merchOrderStatusFilter, setMerchOrderStatusFilter] = useState('all')
+  const [merchOrderSearch, setMerchOrderSearch] = useState('')
+  const [loadingMerchOrders, setLoadingMerchOrders] = useState(false)
+  const [pendingChekiOrders, setPendingChekiOrders] = useState([])
+  const [pendingMerchOrders, setPendingMerchOrders] = useState([])
+  const [notifBoxOpen, setNotifBoxOpen] = useState(false)
+  const notifRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifBoxOpen(false)
+      }
+    }
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setNotifBoxOpen(false)
+      }
+    }
+    if (notifBoxOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('keydown', handleKeyDown)
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [notifBoxOpen])
+
+  useEffect(() => {
+    checkAuth()
+    fetchAll()
+
+    document.documentElement.classList.add('dark')
+    document.body.classList.add('dark-theme')
+
+    let subscription = null
+    let merchSubscription = null
+    if (supabase) {
+      subscription = supabase
+        .channel('public:orders')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
+          fetchOrders()
+          fetchPendingNotifications()
+          if (payload.eventType === 'INSERT' && payload.new.created_by === 'customer') {
+            showToast.info(payload.new.nama_lengkap, 'Order Cheki Baru!')
+          }
+        })
+        .subscribe()
+
+      merchSubscription = supabase
+        .channel('public:merch_orders')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'merch_orders' }, (payload) => {
+          fetchMerchOrders()
+          fetchPendingNotifications()
+          if (payload.eventType === 'INSERT') {
+            showToast.info(payload.new.nama_lengkap || payload.new.order_number, 'Order Merch Baru!')
+          }
+        })
+        .subscribe()
+    }
+
+    const notifInterval = setInterval(() => {
+      fetchPendingNotifications()
+    }, 30000)
+
+    return () => {
+      clearInterval(notifInterval)
+      if (supabase && subscription) {
+        supabase.removeChannel(subscription)
+      }
+      if (supabase && merchSubscription) {
+        supabase.removeChannel(merchSubscription)
+      }
+      const savedTheme = localStorage.getItem('ks-theme')
+      if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark')
+        document.documentElement.classList.add('light')
+        document.body.classList.remove('dark-theme')
+        document.body.classList.add('light-theme')
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('admin_active_tab', activeTab)
+    if (activeTab === 'orders') {
+      fetchOrders()
+      if (orderSubTab === 'merch') {
+        fetchMerchOrders()
+      }
+    }
+  }, [statusFilter, otsFilter, eventFilter, dateFilter, dateFrom, dateTo, searchQuery, activeTab, orderSubTab])
+
+  useEffect(() => {
+    if (activeTab === 'orders' && orderSubTab === 'merch') {
+      fetchMerchOrders()
+    }
+  }, [merchOrderStatusFilter])
+
+  useEffect(() => {
+    localStorage.setItem('admin_order_subtab', orderSubTab)
+  }, [orderSubTab])
+
+  useEffect(() => {
+    localStorage.setItem('admin_status_filter', statusFilter)
+    localStorage.setItem('admin_ots_filter', otsFilter)
+    localStorage.setItem('admin_event_filter', eventFilter)
+    localStorage.setItem('admin_recap_event_filter', recapEventFilter)
+    localStorage.setItem('admin_date_filter', dateFilter)
+    localStorage.setItem('admin_search_query', searchQuery)
+    if (dateFrom) localStorage.setItem('admin_date_from', dateFrom)
+    else localStorage.removeItem('admin_date_from')
+    if (dateTo) localStorage.setItem('admin_date_to', dateTo)
+    else localStorage.removeItem('admin_date_to')
+  }, [statusFilter, otsFilter, eventFilter, recapEventFilter, dateFilter, searchQuery, dateFrom, dateTo])
+
+  const checkAuth = () => {
+    if (!getValidAdminToken()) {
+      navigate('/admin/login')
+    }
+  }
+
+  const fetchAll = () => {
+    fetchOrders()
+    fetchMembers()
+    fetchEvents()
+    fetchConfig()
+    fetchMerch()
+    fetchMerchOrders()
+    fetchPendingNotifications()
+  }
+
+  const fetchPendingNotifications = async () => {
+    try {
+      const [chekiRes, merchRes] = await Promise.all([
+        api.get('/orders', { params: { status: 'pending' } }).catch(() => ({ data: { data: [] } })),
+        api.get('/merch-orders', { params: { status: 'pending' } }).catch(() => ({ data: { data: [] } }))
+      ])
+      const rawCheki = chekiRes.data?.data || []
+      const pureUserCheki = rawCheki.filter(o => o.created_by !== 'admin')
+      const pureUserMerch = merchRes.data?.data || []
+      setPendingChekiOrders(pureUserCheki)
+      setPendingMerchOrders(pureUserMerch)
+    } catch (error) {
+      console.error('Error fetching pending notifications:', error)
+    }
+  }
+
+  const buildOrderParams = () => {
+    const params = {}
+
+    if (statusFilter !== 'all') params.status = statusFilter
+
+    if (orderSubTab === 'ots') params.is_ots = 'true'
+    else if (orderSubTab === 'po') params.is_ots = 'false'
+    else if (otsFilter !== 'all') params.is_ots = otsFilter
+
+    if (eventFilter !== 'all') params.event_id = eventFilter
+    if (searchQuery) params.search = searchQuery
+
+    if (dateFilter === 'week') {
+      const weekAgo = new Date()
+      weekAgo.setDate(weekAgo.getDate() - 7)
+      params.dateFrom = weekAgo.toISOString()
+    } else if (dateFilter === 'month') {
+      const monthAgo = new Date()
+      monthAgo.setMonth(monthAgo.getMonth() - 1)
+      params.dateFrom = monthAgo.toISOString()
+    } else if (dateFilter === 'custom' && dateFrom) {
+      params.dateFrom = new Date(dateFrom).toISOString()
+      if (dateTo) params.dateTo = new Date(dateTo).toISOString()
+    }
+
+    return params
+  }
+
+  const fetchOrders = async (options = {}) => {
+    const isSilent = Boolean(options?.silent)
+    try {
+      if (!isSilent) setLoading(true)
+      const params = buildOrderParams()
+      const response = await api.get('/orders', { params })
+      setOrders(response.data.data || [])
+    } catch (error) {
+      console.error(error)
+      if (error.response?.status === 401) {
+        navigate('/admin/login')
+      }
+    } finally {
+      if (!isSilent) setLoading(false)
+    }
+  }
+
+  const fetchMembers = async () => {
+    try {
+      const res = await api.get('/members')
+      setMembers(res.data.data || [])
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchEvents = async () => {
+    try {
+      const res = await api.get('/events')
+      const eventList = res.data.data || []
+      setEvents(eventList)
+
+      // Otomatis pilih event aktif jika belum ada event spesifik yang dipilih
+      if (eventList.length > 0) {
+        setEventFilter(prev => {
+          if (prev === null || prev === undefined || prev === '') {
+            const activeEvent = eventList.find(e => !e.is_past) || eventList[0]
+            return activeEvent ? String(activeEvent.id) : 'all'
+          }
+          return prev
+        })
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchConfig = async () => {
+    try {
+      const res = await api.get('/config')
+      const configData = res.data.data || {}
+      if (configData.harga_cheki_per_member) setHargaPerMember(configData.harga_cheki_per_member)
+      if (configData.harga_cheki_grup) setHargaGrup(configData.harga_cheki_grup)
+      if (configData.harga_ots_per_member) setHargaOtsPerMember(configData.harga_ots_per_member)
+      if (configData.harga_ots_grup) setHargaOtsGrup(configData.harga_ots_grup)
+      if (configData.payment_bank) setPaymentBank(configData.payment_bank)
+      if (configData.payment_rekening) setPaymentRekening(configData.payment_rekening)
+      if (configData.payment_atas_nama) setPaymentAtasNama(configData.payment_atas_nama)
+      if (configData.payment_method) setPaymentMethod(configData.payment_method)
+      // Wide Cheki toggle
+      setWideChekiEnabled(configData.wide_cheki_enabled !== 'false' && configData.wide_cheki_enabled !== false)
+      // Regular Cheki toggle
+      setRegularChekiEnabled(configData.regular_cheki_enabled !== 'false' && configData.regular_cheki_enabled !== false)
+      // Custom pricing options
+      try {
+        const raw = configData.cheki_custom_options
+        const parsed = typeof raw === 'string' ? JSON.parse(raw || '[]') : (Array.isArray(raw) ? raw : [])
+        setChekiCustomOptions(parsed)
+      } catch { setChekiCustomOptions([]) }
+      // Payment toggles
+      setPaymentEnableTf(configData.payment_enable_tf !== 'false' && configData.payment_enable_tf !== false)
+      setPaymentEnableQris(configData.payment_enable_qris === 'true' || configData.payment_enable_qris === true)
+      if (configData.payment_qris_image_url !== undefined) setPaymentQrisImageUrl(configData.payment_qris_image_url || '')
+      if (configData.payment_qris_merchant_name !== undefined) setPaymentQrisMerchantName(configData.payment_qris_merchant_name || '')
+      setMaintenanceMode(configData.maintenance_mode === 'true' || configData.maintenance_mode === true)
+      if (configData.maintenance_message !== undefined) setMaintenanceMessage(configData.maintenance_message || '')
+      if (configData.maintenance_estimated_end !== undefined) setMaintenanceEstimatedEnd(configData.maintenance_estimated_end || '')
+      // Cheki Grup (foto semua member, terpisah dari Wide)
+      setChekiGrupEnabled(configData.cheki_grup_enabled === 'true' || configData.cheki_grup_enabled === true)
+      if (configData.harga_cheki_grup_po) setHargaChekiGrupPo(configData.harga_cheki_grup_po)
+      if (configData.harga_cheki_grup_ots) setHargaChekiGrupOts(configData.harga_cheki_grup_ots)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchMerch = async () => {
+    try {
+      const res = await api.get('/merchandise')
+      setMerch(res.data.data || [])
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const fetchMerchOrders = async (options = {}) => {
+    const isSilent = Boolean(options?.silent)
+    try {
+      if (!isSilent) setLoadingMerchOrders(true)
+      const params = {}
+      if (merchOrderStatusFilter !== 'all') params.status = merchOrderStatusFilter
+      if (merchOrderSearch) params.search = merchOrderSearch
+      const res = await api.get('/merch-orders', { params })
+      setMerchOrders(res.data.data || [])
+    } catch (error) {
+      console.error(error)
+    } finally {
+      if (!isSilent) setLoadingMerchOrders(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    const isConfirmed = await webAlert.confirm({
+      title: 'Logout Admin?',
+      text: 'Anda akan keluar dari sesi administrator Kohi Sekai.',
+      confirmText: 'Ya, Logout',
+      cancelText: 'Batal',
+      isDanger: true,
+      icon: 'question'
+    })
+    if (isConfirmed) {
+      logoutAdminSession()
+      navigate('/admin/login')
+    }
+  }
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    // 1. Simpan snapshot data untuk rollback jika update gagal
+    const previousOrders = [...orders]
+    const targetStatus = newStatus === 'checked' ? 'paid' : newStatus
+
+    // 2. Optimistic Update: Langsung ubah di state lokal (0ms delay, tidak ada flicker/refresh)
+    setOrders(prev => prev.map(order => {
+      if (order.id === orderId) {
+        return { ...order, status: targetStatus }
+      }
+      return order
+    }))
+
+    // Tandai order sedang disinkronkan ke server (tampilkan spinner mikro pada dropdown status)
+    setUpdatingOrderIds(prev => new Set(prev).add(orderId))
+
+    try {
+      // 3. Kirim request update ke server di background
+      const res = await api.patch(`/orders/${orderId}/status`, { status: newStatus })
+
+      // Jika server mengembalikan row terbaru, gabungkan data secara mulus
+      if (res.data?.data) {
+        const serverData = res.data.data
+        setOrders(prev => prev.map(order => (order.id === orderId ? { ...order, ...serverData } : order)))
+      }
+
+      showToast.success('Status pesanan berhasil diperbarui!')
+
+      // 4. Background silent sync (tanpa memicu loading spinner tabel)
+      fetchOrders({ silent: true })
+      fetchPendingNotifications()
+    } catch (error) {
+      // Rollback jika terjadi kegagalan jaringan atau server
+      setOrders(previousOrders)
+      webAlert.error('Gagal Update Status', error.response?.data?.error || error.message)
+    } finally {
+      setUpdatingOrderIds(prev => {
+        const next = new Set(prev)
+        next.delete(orderId)
+        return next
+      })
+    }
+  }
+
+  const handleDeleteOrder = async (orderId) => {
+    const isConfirmed = await webAlert.confirm({
+      title: 'Hapus Order?',
+      text: 'Data order ini akan dihapus permanen dan tidak bisa dikembalikan!',
+      confirmText: 'Ya, Hapus',
+      cancelText: 'Batal',
+      isDanger: true,
+      icon: 'warning'
+    })
+
+    if (!isConfirmed) return
+
+    try {
+      await api.delete(`/orders/${orderId}`)
+      showToast.delete('Order berhasil dihapus!')
+      fetchOrders()
+      fetchPendingNotifications()
+    } catch (error) {
+      webAlert.error('Gagal Menghapus Order', error.message)
+    }
+  }
+
+  const handleBulkDelete = async (deleteType, params = {}) => {
+    try {
+      const response = await api.post('/orders/bulk-delete', { deleteType, ...params })
+      showToast.success(response.data.message)
+      fetchOrders()
+      setShowBulkDeleteModal(false)
+    } catch (error) {
+      webAlert.error('Gagal Hapus Massal', error.response?.data?.error || error.message)
+    }
+  }
+
+  const handlePurgeOldPayments = async () => {
+    const isConfirmed = await webAlert.confirm({
+      title: 'Bersihkan Bukti Pembayaran Lama?',
+      text: 'Semua foto bukti bayar dari order yang usianya sudah lebih dari 30 hari akan dihapus dari Supabase Storage untuk menghemat kuota. Riwayat pesanan tetap tersimpan di database.',
+      confirmText: 'Ya, Bersihkan Sekarang',
+      cancelText: 'Batal',
+      icon: 'question'
+    })
+
+    if (!isConfirmed) return
+
+    try {
+      const response = await api.post('/orders/purge-old-payments')
+      webAlert.success('Berhasil!', response.data.message)
+      fetchOrders()
+    } catch (error) {
+      webAlert.error('Gagal Bersihkan Bukti', error.response?.data?.error || error.message)
+    }
+  }
+
+  const handleEditEvent = (event) => {
+    setEditingEvent(event)
+    setShowEventModal(true)
+  }
+
+  const handleDeleteEvent = async (eventId, eventName) => {
+    const result = await Swal.fire({
+      title: 'Hapus Event?',
+      text: `Apakah Anda yakin ingin menghapus event "${eventName}"? Semua order terkait akan kehilangan referensi event.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal'
+    })
+
+    if (!result.isConfirmed) return
+
+    try {
+      await api.delete(`/events/${eventId}`)
+      showToast.success('Event berhasil dihapus')
+      fetchEvents()
+    } catch (error) {
+      Swal.fire('Error!', error.response?.data?.error || error.message, 'error')
+    }
+  }
+
+  const handleTogglePast = async (eventId, currentStatus) => {
+    const isNowPast = !currentStatus;
+    const result = await Swal.fire({
+      title: isNowPast ? 'Selesaikan Event?' : 'Aktifkan Event?',
+      text: isNowPast 
+        ? 'Apakah Anda yakin event ini sudah selesai?' 
+        : 'Apakah Anda yakin ingin mengaktifkan event ini kembali?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: isNowPast ? '#E8944A' : '#3085d6',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: isNowPast ? 'Ya, Selesaikan' : 'Ya, Aktifkan',
+      cancelButtonText: 'Batal',
+      customClass: {
+        popup: 'rounded-xl',
+        confirmButton: 'rounded-lg',
+        cancelButton: 'rounded-lg'
+      }
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await api.patch(`/events/${eventId}`, { is_past: isNowPast })
+      fetchEvents()
+      showToast.success(isNowPast ? 'Event ditandai selesai!' : 'Event diaktifkan kembali!')
+    } catch (error) {
+      Swal.fire({ icon: 'error', title: 'Gagal', text: error.message })
+    }
+  }
+
+  const updateConfig = async (updates, silent = false) => {
+    try {
+      setConfigLoading(true)
+      await api.patch('/config', updates)
+      if (!silent) {
+        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Konfigurasi berhasil diupdate', confirmButtonColor: '#E8944A' })
+      } else {
+        showToast.success('Pengaturan diperbarui')
+      }
+      fetchConfig()
+    } catch (error) {
+      Swal.fire({ icon: 'error', title: 'Gagal!', text: error.response?.data?.error || 'Gagal update konfigurasi', confirmButtonColor: '#E8944A' })
+    } finally {
+      setConfigLoading(false)
+    }
+  }
+
+  const viewOrderDetail = (order) => {
+    setSelectedOrder(order)
+    setShowOrderDetailModal(true)
+  }
+
+  const handleExportExcel = async ({ scope, value }) => {
+    const params = buildOrderParams()
+    await generateExcel({ scope, value, params, events, api })
+  }
+
+  const handleExportPdf = async ({ scope, value }) => {
+    const params = buildOrderParams()
+    await generatePDF({ scope, value, params, events, api })
+  }
+
+  const handleExportMerchExcel = async () => {
+    await generateMerchExcel({ statusFilter: merchOrderStatusFilter, searchQuery: merchOrderSearch })
+  }
+
+  const handleExportMerchPdf = async () => {
+    await generateMerchPDF({ api, statusFilter: merchOrderStatusFilter, searchQuery: merchOrderSearch })
+  }
+
+  const parseHarga = (input) => {
+    if (!input) return ''
+    let str = String(input).trim().toLowerCase()
+    str = str.replace(/^(rp\.?\s*|idr\.?\s*)/i, '')
+    if (/^\d{1,3}(\.\d{3})+$/.test(str)) {
+      str = str.replace(/\./g, '')
+    }
+    str = str.replace(',', '.')
+    let multiplier = 1
+    if (/k$/i.test(str)) { multiplier = 1000; str = str.replace(/k$/i, '') }
+    else if (/rb$/i.test(str)) { multiplier = 1000; str = str.replace(/rb$/i, '') }
+    else if (/ribu$/i.test(str)) { multiplier = 1000; str = str.replace(/ribu$/i, '') }
+    else if (/jt$/i.test(str)) { multiplier = 1000000; str = str.replace(/jt$/i, '') }
+    else if (/juta$/i.test(str)) { multiplier = 1000000; str = str.replace(/juta$/i, '') }
+    const num = parseFloat(str)
+    if (Number.isNaN(num)) return ''
+    return Math.round(num * multiplier)
+  }
+
+  const [merchHargaRaw, setMerchHargaRaw] = useState('')
+
+  const handleHargaChange = (val) => {
+    setMerchHargaRaw(val)
+    const parsed = parseHarga(val)
+    if (parsed !== '') {
+      setMerchForm(f => ({ ...f, harga: parsed }))
+    } else if (val === '') {
+      setMerchForm(f => ({ ...f, harga: '' }))
+    }
+  }
+
+  const openMerchForm = (item = null) => {
+    if (item) {
+      setEditingMerch(item)
+      setMerchForm({
+        nama: item.nama,
+        deskripsi: item.deskripsi || '',
+        harga: item.harga,
+        stok: item.stok ?? '',
+        available: item.available,
+        sizes: item.sizes || [],
+        size_chart_urls: item.size_chart_urls || [],
+        kategori: item.kategori || 'baju'
+      })
+      setMerchHargaRaw(String(item.harga))
+      setMerchImagePreview(item.gambar_url || '')
+      setAvailableSizes(Array.isArray(item.sizes) ? item.sizes.join(', ') : '')
+      setMerchSizeChartPreviews([
+        item.size_chart_urls?.[0] || ''
+      ])
+    } else {
+      setEditingMerch(null)
+      setMerchForm({ nama: '', deskripsi: '', harga: '', stok: '', available: true, sizes: [], size_chart_urls: [], kategori: 'baju' })
+      setMerchHargaRaw('')
+      setMerchImagePreview('')
+      setAvailableSizes('')
+      setMerchSizeChartPreviews([''])
+    }
+    setMerchImageFile(null)
+    setMerchSizeChartFiles([null])
+    setShowMerchForm(true)
+  }
+
+  const closeMerchForm = () => {
+    setShowMerchForm(false)
+    setEditingMerch(null)
+    setMerchImageFile(null)
+    setMerchImagePreview('')
+    setMerchSizeChartFiles([null])
+    setMerchSizeChartPreviews([''])
+    setAvailableSizes('')
+  }
+
+  const handleMerchImageChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setMerchImageFile(file)
+    setMerchImagePreview(URL.createObjectURL(file))
+  }
+
+  const handleToggleSize = (size) => {
+    const currentSizes = availableSizes.split(',').map(s => s.trim()).filter(s => s !== '')
+    if (currentSizes.includes(size)) {
+      setAvailableSizes(currentSizes.filter(s => s !== size).join(', '))
+    } else {
+      setAvailableSizes([...currentSizes, size].join(', '))
+    }
+  }
+
+  const handleSizeChartChange = (e, index) => {
+    const file = e.target.files[0]
+    if (!file) return
+    const newFiles = [...merchSizeChartFiles]
+    newFiles[index] = file
+    setMerchSizeChartFiles(newFiles)
+
+    const newPreviews = [...merchSizeChartPreviews]
+    newPreviews[index] = URL.createObjectURL(file)
+    setMerchSizeChartPreviews(newPreviews)
+  }
+
+  const compressMerchImage = (file) => new Promise((resolve) => {
+    const MAX_PX = 800
+    const QUALITY = 0.82
+    const img = new Image()
+    img.onload = () => {
+      let { width, height } = img
+      if (width > MAX_PX || height > MAX_PX) {
+        if (width > height) { height = Math.round(height * MAX_PX / width); width = MAX_PX }
+        else { width = Math.round(width * MAX_PX / height); height = MAX_PX }
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+      canvas.toBlob((blob) => resolve(blob || file), 'image/jpeg', QUALITY)
+    }
+    img.onerror = () => resolve(file)
+    img.src = URL.createObjectURL(file)
+  })
+
+  const handleMerchSubmit = async (e) => {
+    e.preventDefault()
+    if (!merchForm.nama || !merchForm.harga) return showToast.warning('Nama dan harga merchandise wajib diisi')
+    setMerchSaving(true)
+    try {
+      let gambar_url = editingMerch?.gambar_url || ''
+      let size_chart_urls = [...(editingMerch?.size_chart_urls || [null])]
+      if (size_chart_urls.length < 1) size_chart_urls = [size_chart_urls[0] || null]
+
+      if (merchImageFile) {
+        const compressed = await compressMerchImage(merchImageFile)
+        const formData = new FormData()
+        formData.append('file', compressed, 'merch.jpg')
+        const uploadRes = await api.post('/upload/merch-image', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+        gambar_url = uploadRes.data.data.url
+      }
+
+      if (merchSizeChartFiles[0]) {
+        const compressed = await compressMerchImage(merchSizeChartFiles[0])
+        const formData = new FormData()
+        formData.append('file', compressed, 'size_chart.jpg')
+        const uploadRes = await api.post('/upload/merch-image', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+        size_chart_urls[0] = uploadRes.data.data.url
+      }
+
+      if (merchSizeChartPreviews[0] === '' && !merchSizeChartFiles[0]) {
+        size_chart_urls[0] = null
+      }
+
+      const payload = {
+        nama: merchForm.nama,
+        deskripsi: merchForm.deskripsi || null,
+        harga: parseInt(merchForm.harga, 10),
+        stok: merchForm.stok !== '' ? parseInt(merchForm.stok, 10) : 0,
+        gambar_url: gambar_url || null,
+        available: merchForm.available,
+        kategori: merchForm.kategori || 'baju',
+        sizes: merchForm.kategori === 'aksesoris' ? [] : availableSizes.split(',').map(s => s.trim()).filter(s => s !== ''),
+        size_chart_urls: merchForm.kategori === 'aksesoris' ? [] : size_chart_urls.filter(url => url !== null)
+      }
+
+      if (editingMerch) {
+        await api.put(`/merchandise/${editingMerch.id}`, payload)
+        showToast.success('Merchandise berhasil diperbarui!')
+      } else {
+        await api.post('/merchandise', payload)
+        showToast.success('Merchandise berhasil ditambahkan!')
+      }
+
+      closeMerchForm()
+      fetchMerch()
+    } catch (error) {
+      showToast.error(error.response?.data?.error || 'Gagal menyimpan merchandise')
+    } finally {
+      setMerchSaving(false)
+    }
+  }
+
+  const handleDeleteMerch = async (id, nama) => {
+    const isConfirmed = await webAlert.confirm({
+      title: `Hapus "${nama}"?`,
+      text: 'Data merchandise ini akan dihapus permanen dari katalog.',
+      confirmText: 'Ya, Hapus',
+      cancelText: 'Batal',
+      isDanger: true,
+      icon: 'warning'
+    })
+    if (!isConfirmed) return
+    try {
+      await api.delete(`/merchandise/${id}`)
+      showToast.delete('Merchandise berhasil dihapus!')
+      fetchMerch()
+    } catch (error) {
+      webAlert.error('Gagal Menghapus', error.response?.data?.error || 'Gagal menghapus merchandise')
+    }
+  }
+
+  const handleToggleMerchAvailability = async (item, newValue = null) => {
+    const isAvailable = newValue !== null ? (newValue === 'aktif') : !item.available
+    const previousValue = item.available
+    setMerch(prev => prev.map(m => (m.id === item.id ? { ...m, available: isAvailable } : m)))
+    try {
+      await api.put(`/merchandise/${item.id}`, { available: isAvailable })
+      fetchMerch()
+    } catch (error) {
+      setMerch(prev => prev.map(m => (m.id === item.id ? { ...m, available: previousValue } : m)))
+      webAlert.error('Gagal Update', 'Gagal update ketersediaan merchandise')
+    }
+  }
+
+  const handleMerchOrderStatusChange = async (orderId, newStatus, trackingData = {}) => {
+    try {
+      const existingOrder = merchOrders.find(m => m.id === orderId)
+      if (newStatus === 'completed' && existingOrder && existingOrder.status !== 'completed') {
+        const isConfirmed = await webAlert.confirm({
+          title: 'Konfirmasi Selesai oleh Admin?',
+          text: 'User belum mengonfirmasi penerimaan barang. Pastikan pesanan benar-benar sudah diterima sebelum menandai Selesai.',
+          confirmText: 'Ya, Tandai Selesai',
+          cancelText: 'Batal',
+          icon: 'warning'
+        })
+        if (!isConfirmed) return
+      }
+
+      const previousMerchOrders = [...merchOrders]
+      const targetStatus = newStatus === 'checked' ? 'paid' : newStatus
+
+      // Optimistic update
+      setMerchOrders(prev => prev.map(m => {
+        if (m.id === orderId) {
+          const updated = { ...m, status: targetStatus, ...trackingData }
+          if (targetStatus === 'completed') {
+            updated.confirmed_by = 'admin'
+            updated.confirmed_at = new Date().toISOString()
+          } else if (['pending', 'paid', 'packing'].includes(targetStatus)) {
+            updated.confirmed_by = null
+            updated.confirmed_at = null
+          }
+          return updated
+        }
+        return m
+      }))
+
+      setUpdatingMerchOrderIds(prev => new Set(prev).add(orderId))
+
+      const res = await api.patch(`/merch-orders/${orderId}/status`, { status: newStatus, ...trackingData })
+      showToast.success('Status order merch diperbarui!')
+
+      if (res.data?.data) {
+        const serverData = res.data.data
+        setMerchOrders(prev => prev.map(m => (m.id === orderId ? { ...m, ...serverData } : m)))
+      }
+
+      fetchMerchOrders({ silent: true })
+      fetchPendingNotifications()
+    } catch (error) {
+      fetchMerchOrders({ silent: true })
+      webAlert.error('Gagal Update Status', error.response?.data?.error || 'Gagal update status order merch')
+    } finally {
+      setUpdatingMerchOrderIds(prev => {
+        const next = new Set(prev)
+        next.delete(orderId)
+        return next
+      })
+    }
+  }
+
+  const handleDeleteMerchOrder = async (id) => {
+    const isConfirmed = await webAlert.confirm({
+      title: 'Hapus Order Merch?',
+      text: 'Order ini akan dihapus permanen dari sistem.',
+      confirmText: 'Ya, Hapus',
+      cancelText: 'Batal',
+      isDanger: true,
+      icon: 'warning'
+    })
+    if (!isConfirmed) return
+    try {
+      await api.delete(`/merch-orders/${id}`)
+      showToast.delete('Order merch berhasil dihapus!')
+      fetchMerchOrders()
+      fetchPendingNotifications()
+    } catch (error) {
+      webAlert.error('Gagal Menghapus', error.response?.data?.error || 'Gagal menghapus order merch')
+    }
+  }
+
+  // Bottom nav items (4 primary + More)
+  const bottomNavItems = [
+    { id: 'orders', label: 'Orders', icon: FaShoppingCart },
+    { id: 'events', label: 'Events', icon: FaCalendar },
+    { id: 'merch', label: 'Merch', icon: FaBox },
+    { id: 'recap', label: 'Recap', icon: FaChartBar },
+  ]
+
+  const moreItems = [
+    { id: 'members', label: 'Members', icon: FaUsers },
+    { id: 'home-cms', label: 'Home CMS', icon: FaHome },
+    { id: 'music', label: 'Music', icon: FaMusic },
+    { id: 'users', label: 'Fan Users', icon: FaUserFriends },
+    { id: 'settings', label: 'Settings', icon: FaEdit },
+  ]
+
+  return (
+    <div className="admin-layout min-h-screen md:h-screen md:overflow-hidden bg-[var(--background)] text-[var(--text-primary)] flex flex-col md:flex-row selection:bg-[var(--primary)] selection:text-white">
+      {/* SIDEBAR â€” desktop only */}
+      <aside className="hidden md:flex w-64 md:sticky md:top-0 md:h-screen md:overflow-hidden bg-[var(--surface)] border-r border-[var(--border)] p-6 flex-col justify-between shadow-2xl z-20">
+        <div>
+          <div className="mb-10 px-2 flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-black text-[var(--text-primary)] tracking-tight uppercase">KOHI<span className="text-[var(--primary)]">SEKAI</span></h1>
+              <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest mt-1">Admin Dashboard</p>
+            </div>
+            <div className="w-2.5 h-2.5 rounded-full bg-[var(--primary)] animate-pulse shadow-[0_0_8px_var(--primary)]"></div>
+          </div>
+
+          <nav className="space-y-2">
+            {[
+              { id: 'orders', label: 'Orders', icon: FaShoppingCart },
+              { id: 'events', label: 'Events', icon: FaCalendar },
+              { id: 'members', label: 'Members', icon: FaUsers },
+              { id: 'merch', label: 'Merchandise', icon: FaBox },
+              { id: 'home-cms', label: 'Home CMS', icon: FaHome },
+              { id: 'music', label: 'Music', icon: FaMusic },
+              { id: 'users', label: 'Fan Users', icon: FaUserFriends },
+              { id: 'recap', label: 'Recap', icon: FaChartBar },
+              { id: 'settings', label: 'Settings', icon: FaEdit },
+            ].map(item => {
+              const pendingCount = (pendingChekiOrders.length + pendingMerchOrders.length)
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id)
+                    if (item.id === 'orders') {
+                      setStatusFilter('all')
+                      setEventFilter('all')
+                      setDateFilter('all')
+                      setSearchQuery('')
+                    }
+                  }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
+                    activeTab === item.id 
+                      ? 'bg-[var(--primary)] text-[var(--text-primary)] shadow-[0_0_12px_rgba(232,148,74,0.35)] translate-x-1' 
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--border)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <item.icon className={`text-lg shrink-0 ${activeTab === item.id ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`} />
+                    <span className="truncate">{item.label}</span>
+                  </div>
+                  {item.id === 'orders' && pendingCount > 0 && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black shrink-0 transition-all ${
+                      activeTab === item.id
+                        ? 'bg-black text-[var(--primary)]'
+                        : 'bg-amber-500 text-black shadow-sm'
+                    }`}>
+                      {pendingCount > 99 ? '99+' : pendingCount}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </nav>
+        </div>
+
+        <button 
+          onClick={handleLogout} 
+          className="mt-8 w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-sm font-bold text-[var(--danger)] bg-[var(--danger)]/10 border border-[var(--danger)]/20 hover:bg-[var(--danger)]/20 transition-all duration-200"
+        >
+          <FaSignOutAlt /> Logout
+        </button>
+      </aside>
+
+      {/* FLOATING NOTIFICATION WIDGET (Fixed: stays pinned in viewport across all tabs and scroll positions) */}
+      <div ref={notifRef} className="fixed top-4 right-4 md:top-6 md:right-8 z-50">
+        <button
+          type="button"
+          onClick={() => setNotifBoxOpen(prev => !prev)}
+          className={`relative w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-all duration-200 select-none shadow-[0_4px_24px_rgba(0,0,0,0.7)] ${
+            (pendingChekiOrders.length + pendingMerchOrders.length) > 0
+              ? 'bg-[var(--surface)] border-2 border-amber-500/80 text-amber-400 hover:bg-amber-500/10 hover:border-amber-400'
+              : 'bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--primary)]/50'
+          }`}
+          title={`Notifikasi Order (${pendingChekiOrders.length + pendingMerchOrders.length} belum dikonfirmasi)`}
+          aria-label="Notifikasi Order"
+        >
+          <FaBell
+            size={18}
+            className={(pendingChekiOrders.length + pendingMerchOrders.length) > 0 ? 'animate-bounce text-amber-400' : ''}
+          />
+          {(pendingChekiOrders.length + pendingMerchOrders.length) > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-[20px] px-1 bg-amber-500 text-black text-[10px] font-black rounded-full flex items-center justify-center shadow-lg border-2 border-[var(--surface)]">
+              {(pendingChekiOrders.length + pendingMerchOrders.length) > 99
+                ? '99+'
+                : (pendingChekiOrders.length + pendingMerchOrders.length)}
+            </span>
+          )}
+        </button>
+
+        {/* Floating Dropdown Modal */}
+        {notifBoxOpen && (
+          <div className="absolute right-0 top-14 w-[calc(100vw-2rem)] sm:w-96 max-w-sm rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-[0_20px_50px_rgba(0,0,0,0.9)] p-4 animate-fade-in text-[var(--text-primary)] max-h-[85vh] flex flex-col z-50">
+            {/* Header Dropdown */}
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--border)] shrink-0">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+                  <FaBell size={12} />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[var(--text-primary)] leading-tight">
+                    Notifikasi Order
+                  </h4>
+                  <p className="text-[10px] text-[var(--text-secondary)]">Menunggu konfirmasi admin</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                  (pendingChekiOrders.length + pendingMerchOrders.length) > 0
+                    ? 'bg-amber-500 text-black'
+                    : 'bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]'
+                }`}>
+                  {pendingChekiOrders.length + pendingMerchOrders.length} baru
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setNotifBoxOpen(false)}
+                  className="w-6 h-6 rounded-lg bg-[var(--background)] hover:bg-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+                  title="Tutup (Esc)"
+                >
+                  <FaTimes size={10} />
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Switch Pills */}
+            <div className="grid grid-cols-2 gap-2 my-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('orders')
+                  setOrderSubTab('po')
+                  setStatusFilter('pending')
+                  setNotifBoxOpen(false)
+                }}
+                className={`flex items-center justify-between px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
+                  pendingChekiOrders.length > 0
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
+                    : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <FaTicketAlt size={11} /> Cheki
+                </span>
+                <span className="font-mono font-black">{pendingChekiOrders.length}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('orders')
+                  setOrderSubTab('merch')
+                  setMerchOrderStatusFilter('pending')
+                  fetchMerchOrders()
+                  setNotifBoxOpen(false)
+                }}
+                className={`flex items-center justify-between px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
+                  pendingMerchOrders.length > 0
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
+                    : 'bg-[var(--background)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <FaBox size={11} /> Merch
+                </span>
+                <span className="font-mono font-black">{pendingMerchOrders.length}</span>
+              </button>
+            </div>
+
+            {/* List of Orders */}
+            <div className="overflow-y-auto custom-scrollbar space-y-2 pr-0.5 flex-1 max-h-[50vh]">
+              {(pendingChekiOrders.length + pendingMerchOrders.length) === 0 ? (
+                <div className="py-6 text-center space-y-1.5">
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-base">
+                    <FaCheck />
+                  </div>
+                  <p className="text-xs font-bold text-[var(--text-primary)]">Semua Beres!</p>
+                  <p className="text-[11px] text-[var(--text-secondary)]">Tidak ada pesanan yang menunggu konfirmasi.</p>
+                </div>
+              ) : (
+                <>
+                  {pendingChekiOrders.map(ord => (
+                    <button
+                      key={`cheki-${ord.id}`}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('orders')
+                        setOrderSubTab(ord.is_ots ? 'ots' : 'po')
+                        setStatusFilter('pending')
+                        setNotifBoxOpen(false)
+                      }}
+                      className="w-full text-left p-2.5 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-amber-500/50 transition-all flex items-center justify-between gap-2 group"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                            Cheki
+                          </span>
+                          <span className="text-xs font-bold text-[var(--text-primary)] truncate group-hover:text-amber-300">
+                            {ord.nama_lengkap || ord.order_number}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5 truncate">
+                          #{ord.order_number} · {ord.payment_proof_url ? 'Ada Bukti Bayar' : 'Belum Upload Bukti'}
+                        </p>
+                      </div>
+                      <span className="text-xs font-black text-amber-400 shrink-0">
+                        Rp {Number(ord.total_harga || 0).toLocaleString('id-ID')}
+                      </span>
+                    </button>
+                  ))}
+
+                  {pendingMerchOrders.map(ord => (
+                    <button
+                      key={`merch-${ord.id}`}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('orders')
+                        setOrderSubTab('merch')
+                        setMerchOrderStatusFilter('pending')
+                        fetchMerchOrders()
+                        setNotifBoxOpen(false)
+                      }}
+                      className="w-full text-left p-2.5 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-amber-500/50 transition-all flex items-center justify-between gap-2 group"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                            Merch
+                          </span>
+                          <span className="text-xs font-bold text-[var(--text-primary)] truncate group-hover:text-amber-300">
+                            {ord.nama_lengkap || ord.whatsapp}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-[var(--text-secondary)] font-mono mt-0.5 truncate">
+                          #{ord.order_number} · {ord.delivery_method === 'shipping' ? 'Dikirim' : 'Ambil di Event'}
+                        </p>
+                      </div>
+                      <span className="text-xs font-black text-amber-400 shrink-0">
+                        Rp {Number(ord.total_harga || 0).toLocaleString('id-ID')}
+                      </span>
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+
+            {/* Footer Link */}
+            {(pendingChekiOrders.length + pendingMerchOrders.length) > 0 && (
+              <div className="pt-2.5 mt-2.5 border-t border-[var(--border)] text-center shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('orders')
+                    setStatusFilter('pending')
+                    setNotifBoxOpen(false)
+                  }}
+                  className="text-[11px] font-bold text-[var(--primary)] hover:underline"
+                >
+                  Buka Semua Pesanan Unchecked →
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* MAIN CONTENT */}
+      <main className="flex-1 p-4 md:p-10 md:h-screen md:overflow-y-auto pb-24 md:pb-10 space-y-6">
+        {/* MOBILE HEADER (mobile only) */}
+        <div className="md:hidden flex items-center justify-between pb-2 border-b border-[var(--border)] pr-14">
+          <div>
+            <h1 className="text-base font-black text-[var(--text-primary)] tracking-tight uppercase">
+              KOHI<span className="text-[var(--primary)]">SEKAI</span>
+            </h1>
+            <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">Admin Panel</p>
+          </div>
+        </div>
+
+        {/* GUEST SANDBOX NOTICE BANNER */}
+        {isGuest && (
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[0_0_20px_rgba(245,158,11,0.15)] animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                <FaShieldAlt className="text-base" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black uppercase tracking-wider text-amber-300">Mode Tamu / Sandbox Aktif</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30">GS123</span>
+                </div>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                  Anda bebas mencoba semua fitur (tambah/hapus member, event, buat OTS, ubah harga). Perubahan bersifat simulasi lokal tanpa menyentuh database asli. Data sensitif disensor.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--border)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] text-xs font-bold transition-all border border-[var(--border)]"
+              title="Reset semua simulasi ke data awal"
+            >
+              <FaSync className="text-[10px]" /> Reset Layar (Refresh)
+            </button>
+          </div>
+        )}
+
+        {activeTab === 'orders' && (
+          <OrdersTab
+            orders={orders}
+            events={events}
+            loading={loading}
+            orderSubTab={orderSubTab}
+            setOrderSubTab={setOrderSubTab}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            eventFilter={eventFilter}
+            setEventFilter={setEventFilter}
+            dateFilter={dateFilter}
+            setDateFilter={setDateFilter}
+            dateFrom={dateFrom}
+            setDateFrom={setDateFrom}
+            dateTo={dateTo}
+            setDateTo={setDateTo}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onViewOrder={viewOrderDetail}
+            onDeleteOrder={handleDeleteOrder}
+            onStatusChange={handleStatusChange}
+            updatingOrderIds={updatingOrderIds}
+            onShowOTSModal={() => setShowOTSModal(true)}
+            onExportExcel={handleExportExcel}
+            onExportPdf={handleExportPdf}
+            merchOrders={merchOrders}
+            loadingMerchOrders={loadingMerchOrders}
+            updatingMerchOrderIds={updatingMerchOrderIds}
+            merchOrderSearch={merchOrderSearch}
+            setMerchOrderSearch={setMerchOrderSearch}
+            merchOrderStatusFilter={merchOrderStatusFilter}
+            setMerchOrderStatusFilter={setMerchOrderStatusFilter}
+            onMerchOrderStatusChange={handleMerchOrderStatusChange}
+            onDeleteMerchOrder={handleDeleteMerchOrder}
+            onFetchMerchOrders={fetchMerchOrders}
+            onExportMerchExcel={handleExportMerchExcel}
+            onExportMerchPdf={handleExportMerchPdf}
+            members={members}
+            merch={merch}
+            hargaOtsPerMember={hargaOtsPerMember}
+            hargaOtsGrup={hargaOtsGrup}
+            hargaChekiGrupOts={hargaChekiGrupOts}
+            regularChekiEnabled={regularChekiEnabled}
+            wideChekiEnabled={wideChekiEnabled}
+            chekiGrupEnabled={chekiGrupEnabled}
+            paymentEnableCash={paymentEnableCash}
+            paymentEnableQris={paymentEnableQris}
+            paymentEnableTf={paymentEnableTf}
+            onRefreshOrders={fetchOrders}
+            onOtsCartActiveChange={setIsOtsCartActive}
+          />
+        )}
+
+        {activeTab === 'events' && (
+          <EventsTab
+            events={events}
+            members={members}
+            onDeleteEvent={handleDeleteEvent}
+            onTogglePast={handleTogglePast}
+            onRefresh={fetchEvents}
+          />
+        )}
+
+        {activeTab === 'merch' && (
+          <MerchTab
+            merch={merch}
+            showMerchForm={showMerchForm}
+            editingMerch={editingMerch}
+            merchForm={merchForm}
+            setMerchForm={setMerchForm}
+            merchHargaRaw={merchHargaRaw}
+            handleHargaChange={handleHargaChange}
+            availableSizes={availableSizes}
+            setAvailableSizes={setAvailableSizes}
+            merchImagePreview={merchImagePreview}
+            merchFileInputRef={merchFileInputRef}
+            handleMerchImageChange={handleMerchImageChange}
+            setMerchImageFile={setMerchImageFile}
+            setMerchImagePreview={setMerchImagePreview}
+            merchSizeChartPreviews={merchSizeChartPreviews}
+            setMerchSizeChartPreviews={setMerchSizeChartPreviews}
+            setMerchSizeChartFiles={setMerchSizeChartFiles}
+            sizeChart1InputRef={sizeChart1InputRef}
+            merchSaving={merchSaving}
+            openMerchForm={openMerchForm}
+            closeMerchForm={closeMerchForm}
+            handleMerchSubmit={handleMerchSubmit}
+            handleSizeChartChange={handleSizeChartChange}
+            handleToggleSize={handleToggleSize}
+            onToggleMerchAvailability={handleToggleMerchAvailability}
+            handleDeleteMerch={handleDeleteMerch}
+          />
+        )}
+
+        {activeTab === 'recap' && (
+          <RecapTab
+            orders={orders}
+            events={events}
+            recapEventFilter={recapEventFilter}
+            setRecapEventFilter={setRecapEventFilter}
+          />
+        )}
+
+        {activeTab === 'members' && (
+          <MembersTab
+            members={members}
+            onRefresh={fetchMembers}
+          />
+        )}
+
+        {activeTab === 'settings' && (
+          <SettingsTab
+            hargaPerMember={hargaPerMember}
+            setHargaPerMember={setHargaPerMember}
+            hargaGrup={hargaGrup}
+            setHargaGrup={setHargaGrup}
+            hargaOtsPerMember={hargaOtsPerMember}
+            setHargaOtsPerMember={setHargaOtsPerMember}
+            hargaOtsGrup={hargaOtsGrup}
+            setHargaOtsGrup={setHargaOtsGrup}
+            paymentBank={paymentBank}
+            setPaymentBank={setPaymentBank}
+            paymentRekening={paymentRekening}
+            setPaymentRekening={setPaymentRekening}
+            paymentAtasNama={paymentAtasNama}
+            setPaymentAtasNama={setPaymentAtasNama}
+            paymentMethod={paymentMethod}
+            setPaymentMethod={setPaymentMethod}
+            wideChekiEnabled={wideChekiEnabled}
+            setWideChekiEnabled={setWideChekiEnabled}
+            regularChekiEnabled={regularChekiEnabled}
+            setRegularChekiEnabled={setRegularChekiEnabled}
+            chekiCustomOptions={chekiCustomOptions}
+            setChekiCustomOptions={setChekiCustomOptions}
+            paymentEnableTf={paymentEnableTf}
+            setPaymentEnableTf={setPaymentEnableTf}
+            paymentEnableQris={paymentEnableQris}
+            setPaymentEnableQris={setPaymentEnableQris}
+            paymentQrisImageUrl={paymentQrisImageUrl}
+            setPaymentQrisImageUrl={setPaymentQrisImageUrl}
+            paymentQrisMerchantName={paymentQrisMerchantName}
+            setPaymentQrisMerchantName={setPaymentQrisMerchantName}
+            maintenanceMode={maintenanceMode}
+            setMaintenanceMode={setMaintenanceMode}
+            maintenanceMessage={maintenanceMessage}
+            setMaintenanceMessage={setMaintenanceMessage}
+            maintenanceEstimatedEnd={maintenanceEstimatedEnd}
+            setMaintenanceEstimatedEnd={setMaintenanceEstimatedEnd}
+            configLoading={configLoading}
+            updateConfig={updateConfig}
+            onShowBulkDeleteModal={() => setShowBulkDeleteModal(true)}
+            onShowWipeModal={() => setShowWipeModal(true)}
+            onPurgeOldPayments={handlePurgeOldPayments}
+            chekiGrupEnabled={chekiGrupEnabled}
+            setChekiGrupEnabled={setChekiGrupEnabled}
+            hargaChekiGrupPo={hargaChekiGrupPo}
+            setHargaChekiGrupPo={setHargaChekiGrupPo}
+            hargaChekiGrupOts={hargaChekiGrupOts}
+            setHargaChekiGrupOts={setHargaChekiGrupOts}
+          />
+        )}
+
+        {activeTab === 'home-cms' && (
+          <HomeCmsTab />
+        )}
+
+        {activeTab === 'music' && (
+          <MusicTab />
+        )}
+
+        {activeTab === 'users' && (
+          <UsersTab />
+        )}
+      </main>
+
+      {showOrderDetailModal && selectedOrder && (
+        <OrderDetailModal
+          isOpen={showOrderDetailModal}
+          onClose={() => setShowOrderDetailModal(false)}
+          order={selectedOrder}
+          events={events}
+        />
+      )}
+
+      {showOTSModal && (
+        <OTSOrderModal
+          members={members}
+          events={events}
+          onClose={() => setShowOTSModal(false)}
+          onSuccess={(newOrder) => {
+            setShowOTSModal(false)
+            if (newOrder?.event_id && eventFilter !== 'all' && String(eventFilter) !== String(newOrder.event_id)) {
+              setEventFilter(String(newOrder.event_id))
+            } else {
+              fetchOrders()
+            }
+          }}
+          hargaOtsPerMember={hargaOtsPerMember}
+          hargaOtsGrup={hargaOtsGrup}
+        />
+      )}
+
+      {showBulkDeleteModal && (
+        <BulkDeleteModal
+          events={events}
+          onClose={() => setShowBulkDeleteModal(false)}
+          onConfirm={handleBulkDelete}
+        />
+      )}
+
+      {showWipeModal && (
+        <WipeDummyDataModal
+          onClose={() => setShowWipeModal(false)}
+          onSuccess={() => {
+            fetchOrders()
+            fetchEvents()
+          }}
+        />
+      )}
+
+      {showEventModal && (
+        <EventModal
+          members={members}
+          editingEvent={editingEvent}
+          onClose={() => {
+            setShowEventModal(false)
+            setEditingEvent(null)
+          }}
+          onSuccess={() => {
+            setShowEventModal(false)
+            setEditingEvent(null)
+            fetchEvents()
+          }}
+        />
+      )}
+
+      {/* â”€â”€ BOTTOM NAVBAR (mobile only) â”€â”€ */}
+      {!isOtsCartActive && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--surface)] border-t border-[var(--border)] shadow-[0_-4px_20px_rgba(26,21,18,0.8)]">
+          <div className="flex items-stretch">
+            {bottomNavItems.map(item => {
+              const pendingCount = (pendingChekiOrders.length + pendingMerchOrders.length)
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id)
+                    setShowMoreDrawer(false)
+                    if (item.id === 'orders') {
+                      setStatusFilter('all')
+                      setEventFilter('all')
+                      setDateFilter('all')
+                      setSearchQuery('')
+                    }
+                  }}
+                  className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-all relative ${
+                    activeTab === item.id
+                      ? 'text-[var(--primary)]'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-secondary)]'
+                  }`}
+                >
+                  <div className="relative">
+                    <item.icon className={`text-lg transition-all ${activeTab === item.id ? 'text-[var(--primary)] drop-shadow-[0_0_6px_#E8944A]' : ''}`} />
+                    {item.id === 'orders' && pendingCount > 0 && (
+                      <span className="absolute -top-1 -right-2 min-w-[14px] h-[14px] px-0.5 bg-amber-500 text-black text-[8px] font-black rounded-full flex items-center justify-center shadow">
+                        {pendingCount > 9 ? '9+' : pendingCount}
+                      </span>
+                    )}
+                  </div>
+                  {item.label}
+                  {activeTab === item.id && (
+                    <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[var(--primary)] rounded-full" />
+                  )}
+                </button>
+              )
+            })}
+            {/* More button */}
+            <button
+              onClick={() => setShowMoreDrawer(prev => !prev)}
+              className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-all ${
+                showMoreDrawer || ['members','settings','home-cms','music','users'].includes(activeTab)
+                  ? 'text-[var(--primary)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-secondary)]'
+              }`}
+            >
+              <FaEllipsisH className={`text-lg ${showMoreDrawer || ['members','settings','home-cms','music','users'].includes(activeTab) ? 'text-[var(--primary)]' : ''}`} />
+              More
+            </button>
+          </div>
+        </nav>
+      )}
+
+      {/* â”€â”€ MORE DRAWER (mobile) â”€â”€ */}
+      {!isOtsCartActive && showMoreDrawer && (
+        <>
+          {/* Overlay */}
+          <div
+            className="md:hidden fixed inset-0 z-30 bg-black/85"
+            onClick={() => setShowMoreDrawer(false)}
+          />
+          {/* Drawer */}
+          <div className="md:hidden fixed bottom-[60px] left-0 right-0 z-40 bg-[var(--surface)] border-t border-[var(--border)] shadow-[0_-8px_32px_rgba(0,0,0,0.7)] rounded-t-2xl px-4 py-4 animate-fade-in">
+            <div className="w-10 h-1 bg-[var(--border)] rounded-full mx-auto mb-4" />
+            <div className="space-y-2">
+              {moreItems.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                  setActiveTab(item.id)
+                  setShowMoreDrawer(false)
+                  if (item.id === 'orders') {
+                    setStatusFilter('all')
+                    setEventFilter('all')
+                    setDateFilter('all')
+                    setSearchQuery('')
+                  }
+                }}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold transition-all ${
+                    activeTab === item.id
+                      ? 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/40'
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--border)]'
+                  }`}
+                >
+                  <item.icon className="text-base" />
+                  {item.label}
+                </button>
+              ))}
+              <button
+                onClick={() => { setShowMoreDrawer(false); handleLogout() }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-all"
+              >
+                <FaSignOutAlt /> Logout
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+export default AdminPage
+
+
+
+

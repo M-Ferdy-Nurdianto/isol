@@ -54,6 +54,14 @@ function generateSpaHtmlPlugin() {
 export default defineConfig({
   // Auto-reload environment variables
   base: '/',
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      '@shared': path.resolve(__dirname, 'src/shared'),
+      '@desktop': path.resolve(__dirname, 'src/desktop'),
+      '@mobile': path.resolve(__dirname, 'src/mobile')
+    }
+  },
   plugins: [
     react(),
     generateSpaHtmlPlugin(),
