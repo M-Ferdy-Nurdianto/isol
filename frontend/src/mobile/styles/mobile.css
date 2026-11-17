@@ -5,6 +5,12 @@
 
 @import '../../shared/styles/tokens.css';
 
+/* Safety guard against horizontal overflow */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 /* Mobile Root & Viewport Constraints */
 .mobile-app-root {
   min-height: 100dvh;
