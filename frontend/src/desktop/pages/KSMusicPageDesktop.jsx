@@ -60,9 +60,12 @@ const PlayerModal = ({ track, onClose }) => {
   )
 }
 
+// In-memory cache for instantaneous, zero-animation page switching
+let cachedMusicTracks = null
+
 const KSMusicPage = () => {
-  const [tracks, setTracks] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [tracks, setTracks] = useState(() => cachedMusicTracks || [])
+  const [loading, setLoading] = useState(() => !cachedMusicTracks)
   const [selectedTrack, setSelectedTrack] = useState(null)
 
   useEffect(() => {
@@ -71,9 +74,11 @@ const KSMusicPage = () => {
 
   const fetchTracks = async () => {
     try {
-      setLoading(true)
+      if (!cachedMusicTracks) setLoading(true)
       const res = await api.get('/music')
-      setTracks(res.data.data || [])
+      const fetched = res.data.data || []
+      cachedMusicTracks = fetched
+      setTracks(fetched)
     } catch (error) {
       console.error('Failed to fetch music', error)
     } finally {

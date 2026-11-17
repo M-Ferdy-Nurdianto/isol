@@ -5,15 +5,17 @@ import { ToastContainer, Zoom } from 'react-toastify'
 import { RBToastContainer } from './components/ui/RBToast'
 import LoadingSpinner from './components/LoadingSpinner'
 
-// Kohi Sekai Public Pages
-const KSHomePage = lazy(() => import('./pages/KSHomePage'))
-const KSAboutPage = lazy(() => import('./pages/KSAboutPage'))
-const KSShopPage = lazy(() => import('./pages/KSShopPage'))
+// Core Public Tab Pages - Eagerly loaded for instantaneous, zero-animation native transitions
+import KSHomePage from './pages/KSHomePage'
+import KSAboutPage from './pages/KSAboutPage'
+import KSShopPage from './pages/KSShopPage'
+import KSMusicPage from './pages/KSMusicPage'
+import KSProfilePage from './pages/KSProfilePage'
+import KSLoginPage from './pages/KSLoginPage'
+
+// Auxiliary & Admin Pages - Lazy loaded on demand
 const KSCheckoutPage = lazy(() => import('./pages/KSCheckoutPage'))
 const KSMerchCheckoutPage = lazy(() => import('./pages/KSMerchCheckoutPage'))
-const KSMusicPage = lazy(() => import('./pages/KSMusicPage'))
-const KSLoginPage = lazy(() => import('./pages/KSLoginPage'))
-const KSProfilePage = lazy(() => import('./pages/KSProfilePage'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 const KSUserOTSPage = lazy(() => import('./pages/KSUserOTSPage'))
 const KSMagicLoginPage = lazy(() => import('./pages/KSMagicLoginPage'))
@@ -57,15 +59,12 @@ function App() {
       offset: 100,
     })
 
-    // Preload main public page chunks in background for instantaneous seamless navigation
+    // Preload checkout chunks in background for instantaneous checkout transitions
     if (typeof window !== 'undefined') {
       const schedule = window.requestIdleCallback || ((cb) => setTimeout(cb, 100))
       schedule(() => {
-        import('./pages/KSHomePage')
-        import('./pages/KSAboutPage')
-        import('./pages/KSShopPage')
-        import('./pages/KSMusicPage')
-        import('./pages/KSProfilePage')
+        import('./pages/KSCheckoutPage')
+        import('./pages/KSMerchCheckoutPage')
       })
     }
   }, [])

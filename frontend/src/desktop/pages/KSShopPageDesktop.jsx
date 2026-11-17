@@ -140,19 +140,22 @@ const DEFAULT_OFFICIAL_MERCH = [
   }
 ]
 
+// In-memory cache for instantaneous, zero-animation page switching
+let cachedShopData = null
+
 const KSShopPage = () => {
   const navigate = useNavigate()
   const { fanUser, isLoggedIn, openAuthModal } = useFanAuth()
   const { addToCart, openCart, totalItems } = useMerchCart()
 
   // Data states
-  const [events, setEvents] = useState([])
-  const [members, setMembers] = useState([])
-  const [config, setConfig] = useState(null)
-  const [merchandise, setMerchandise] = useState([])
+  const [events, setEvents] = useState(() => cachedShopData?.events || [])
+  const [members, setMembers] = useState(() => cachedShopData?.members || [])
+  const [config, setConfig] = useState(() => cachedShopData?.config || null)
+  const [merchandise, setMerchandise] = useState(() => cachedShopData?.merchandise || [])
   const [selectedMerch, setSelectedMerch] = useState(null)
   const [selectedSize, setSelectedSize] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => !cachedShopData)
   const [activeShopTab, setActiveShopTab] = useState('cheki') // 'cheki' | 'merch'
   const [merchCategoryFilter, setMerchCategoryFilter] = useState('all') // 'all' | 'baju' | 'aksesoris'
   const [showSizeChart, setShowSizeChart] = useState(false)
@@ -331,6 +334,12 @@ const KSShopPage = () => {
           setCurrentMonthIndex(monthNum)
           setSelectedDateKey(`${defaultEvent.tahun}-${String(monthNum + 1).padStart(2, '0')}-${String(defaultEvent.tanggal).padStart(2, '0')}`)
           setSelectedEventId(defaultEvent.id)
+        }
+        cachedShopData = {
+          events: fetchedEvents,
+          members: fetchedMembers,
+          config: configRes.status === 'fulfilled' && configRes.value.data?.success ? configRes.value.data.data : null,
+          merchandise: fetchedMerch,
         }
       } catch (err) {
         console.error('Error fetching shop data:', err)
@@ -615,15 +624,22 @@ const KSShopPage = () => {
     navigate('/checkout/merch', { state: { directBuyItem: itemToBuy } })
   }
 
-  if (loading) {
+  if (loading && !cachedShopData) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-          <p className="text-xs font-black tracking-widest text-text-secondary uppercase">
-            Memuat Kalender Tiket Kohi Sekai...
-          </p>
-        </div>
+      <div className="min-h-screen bg-background bg-pattern-dots text-text-primary overflow-x-hidden relative">
+        <KSHeader />
+        <main className="pt-24 sm:pt-36 pb-28 sm:pb-24 px-4 container mx-auto max-w-7xl relative z-10">
+          <div className="text-center max-w-md mx-auto mb-8 animate-pulse flex flex-col items-center gap-3">
+            <div className="h-4 w-28 bg-surface rounded-full" />
+            <div className="h-10 w-52 bg-surface rounded-2xl" />
+            <div className="h-4 w-64 bg-surface rounded-full" />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+            {[1, 2, 3, 4].map(n => (
+              <div key={n} className="h-60 bg-surface rounded-2xl animate-pulse" />
+            ))}
+          </div>
+        </main>
       </div>
     )
   }

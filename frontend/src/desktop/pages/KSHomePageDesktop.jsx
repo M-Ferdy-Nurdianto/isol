@@ -11,14 +11,17 @@ import GroupPhotoSection from '../../components/home/GroupPhotoSection'
 import KSLeaderboard from '../../components/home/KSLeaderboard'
 import api from '../../lib/api'
 
+// In-memory cache for instantaneous, zero-animation page switching
+let cachedHomeData = null
+
 const KSHomePage = () => {
-  const [data, setData] = useState({
+  const [data, setData] = useState(() => cachedHomeData || {
     events: [],
     members: [],
     faqs: [],
     news: [],
     config: {},
-    loading: true,
+    loading: !cachedHomeData,
   })
 
   useEffect(() => {
@@ -75,7 +78,9 @@ const KSHomePage = () => {
           })
         }
 
-        setData({ events, members, faqs, news, config: configObj, loading: false })
+        const freshData = { events, members, faqs, news, config: configObj, loading: false }
+        cachedHomeData = freshData
+        setData(freshData)
       } catch (err) {
         console.error('KSHomePage fetchAll error:', err)
         setData(prev => ({ ...prev, loading: false }))
@@ -85,13 +90,18 @@ const KSHomePage = () => {
     fetchAll()
   }, [])
 
-  if (data.loading) {
+  if (data.loading && !cachedHomeData) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-          <p className="text-xs font-black tracking-widest text-text-secondary uppercase">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-background text-text-primary overflow-x-hidden">
+        <KSHeader />
+        <main className="pt-24 sm:pt-36 pb-24 px-4 flex flex-col items-center justify-center min-h-[75svh]">
+          <div className="w-full max-w-sm flex flex-col items-center gap-4 animate-pulse">
+            <div className="h-4 w-28 bg-surface rounded-full" />
+            <div className="h-10 w-64 bg-surface rounded-2xl" />
+            <div className="h-4 w-52 bg-surface rounded-full" />
+            <div className="h-12 w-44 bg-surface rounded-full mt-4" />
+          </div>
+        </main>
       </div>
     )
   }

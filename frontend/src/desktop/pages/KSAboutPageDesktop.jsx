@@ -330,39 +330,56 @@ const MemberGridCard = ({ member, onClick, index }) => {
   )
 }
 
+// In-memory cache for instantaneous, zero-animation page switching
+let cachedAboutData = null
+
 // === Main About Page ===
 const KSAboutPage = () => {
-  const [members, setMembers] = useState([])
-  const [groupInfo, setGroupInfo] = useState(null)
+  const [members, setMembers] = useState(() => cachedAboutData?.members || [])
+  const [groupInfo, setGroupInfo] = useState(() => cachedAboutData?.groupInfo || null)
   const [selectedMember, setSelectedMember] = useState(null)
-  const [aboutUs, setAboutUs] = useState({ title: '', subtitle: '', description: '', images: [], since: '2026' })
-  const [stats, setStats] = useState({ members: 0, events: 0, music: 0 })
-  const [loading, setLoading] = useState(true)
+  const [aboutUs, setAboutUs] = useState(() => cachedAboutData?.aboutUs || { title: '', subtitle: '', description: '', images: [], since: '2026' })
+  const [stats, setStats] = useState(() => cachedAboutData?.stats || { members: 0, events: 0, music: 0 })
+  const [loading, setLoading] = useState(() => !cachedAboutData)
 
   useEffect(() => {
-    api.get('/members').then(res => {
-      if (res.data.success) {
-        const all = res.data.data || []
-        const group = all.find(m => m.member_id === 'group')
+    Promise.allSettled([
+      api.get('/members'),
+      api.get('/config'),
+      api.get('/config/stats')
+    ]).then(([membersRes, configRes, statsRes]) => {
+      let allMembers = []
+      let group = null
+      if (membersRes.status === 'fulfilled' && membersRes.value.data?.success) {
+        const all = membersRes.value.data.data || []
+        group = all.find(m => m.member_id === 'group')
+        allMembers = all.filter(m => m.member_id !== 'group')
         setGroupInfo(group || null)
-        setMembers(all.filter(m => m.member_id !== 'group'))
+        setMembers(allMembers)
       }
-    }).catch(console.error)
 
-    api.get('/config').then(res => {
-      if (res.data.success) {
-        const configStr = res.data.data.about_us
+      let parsedAboutUs = { title: '', subtitle: '', description: '', images: [], since: '2026' }
+      if (configRes.status === 'fulfilled' && configRes.value.data?.success) {
+        const configStr = configRes.value.data.data?.about_us
         if (configStr) {
           try {
-            setAboutUs(JSON.parse(configStr))
+            parsedAboutUs = JSON.parse(configStr)
+            setAboutUs(parsedAboutUs)
           } catch (e) { }
         }
       }
-    }).catch(console.error)
 
-    api.get('/config/stats').then(res => {
-      if (res.data.success) {
-        setStats(res.data.data)
+      let statsData = { members: 0, events: 0, music: 0 }
+      if (statsRes.status === 'fulfilled' && statsRes.value.data?.success) {
+        statsData = statsRes.value.data.data || statsData
+        setStats(statsData)
+      }
+
+      cachedAboutData = {
+        members: allMembers,
+        groupInfo: group,
+        aboutUs: parsedAboutUs,
+        stats: statsData,
       }
     }).catch(console.error).finally(() => setLoading(false))
   }, [])

@@ -1,4 +1,4 @@
-﻿const LoadingSpinner = () => {
+const LoadingSpinner = () => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-background z-[9999] transition-opacity duration-150">
       <div className="flex flex-col items-center gap-3">
