@@ -6,7 +6,7 @@ import KSHeroMobile from '../components/home/KSHeroMobile'
 import GroupPhotoSection from '../../components/home/GroupPhotoSection'
 import KSMemberPreview from '../../components/home/KSMemberPreview'
 import KSNewsSection from '../../components/home/KSNewsSection'
-import KSLeaderboard from '../../components/home/KSLeaderboard'
+import KSLeaderboardMobile from '../components/home/KSLeaderboardMobile'
 import KSUpcomingEvent from '../../components/home/KSUpcomingEvent'
 import KSSocialSection from '../../components/home/KSSocialSection'
 import KSFAQSection from '../../components/home/KSFAQSection'
@@ -33,7 +33,10 @@ export default function KSHomePageMobile() {
   }
 
   return (
-    <div className="mobile-app-root min-h-screen bg-background text-text-primary overflow-x-hidden w-full max-w-full box-border">
+    <div 
+      className="mobile-app-root min-h-screen bg-background text-text-primary overflow-x-hidden w-full max-w-full box-border"
+      style={{ paddingBottom: 'calc(72px + env(safe-area-inset-bottom, 0px) + 16px)' }}
+    >
       <KSHeader />
 
       <main className="w-full max-w-full overflow-x-hidden">
@@ -54,7 +57,7 @@ export default function KSHomePageMobile() {
           news={news}
         />
 
-        <KSLeaderboard 
+        <KSLeaderboardMobile 
           members={members}
         />
 
