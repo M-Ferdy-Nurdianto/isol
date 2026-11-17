@@ -193,50 +193,53 @@ const KSHeader = () => {
           MOBILE FLOATING CIRCLE CAPSULE BOTTOM NAVBAR (md:hidden)
           Icon Only (Tanpa Teks) + Shop Icon Store + Safe Area Padding
           Warna Selaras & Sedikit Lebih Terang (#28211B)
+          Disembunyikan khusus di halaman checkout agar tidak menumpuk bar bayar
           ========================================================================= */}
-      <div 
-        className="md:hidden fixed bottom-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-      >
-        <nav
-          aria-label="Mobile Navigation"
-          className="pointer-events-auto w-full max-w-[320px] rounded-full p-1.5 flex items-center justify-between border bg-[#F5EDE2] dark:bg-[#28211B] border-[#E8DDD0] dark:border-[#3E3228] shadow-2xl shadow-black/60"
+      {!location.pathname.startsWith('/checkout') && !location.pathname.startsWith('/merch-checkout') && (
+        <div 
+          className="md:hidden fixed bottom-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          {bottomTabs.map((tab) => {
-            const active = isTabActive(tab)
-            const Icon = tab.icon
+          <nav
+            aria-label="Mobile Navigation"
+            className="pointer-events-auto w-full max-w-[320px] rounded-full p-1.5 flex items-center justify-between border bg-[#F5EDE2] dark:bg-[#28211B] border-[#E8DDD0] dark:border-[#3E3228] shadow-2xl shadow-black/60"
+          >
+            {bottomTabs.map((tab) => {
+              const active = isTabActive(tab)
+              const Icon = tab.icon
 
-            return (
-              <Link
-                key={tab.name}
-                to={tab.href}
-                aria-label={tab.name}
-                title={tab.name}
-                style={active ? { backgroundColor: 'var(--primary)', color: '#ffffff' } : {}}
-                className={`w-11 h-11 flex items-center justify-center rounded-full transition-all duration-200 active:scale-95 ${
-                  active
-                    ? 'shadow-md shadow-primary/30 text-white font-black'
-                    : 'text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10'
-                }`}
-              >
-                {tab.name === 'Profil' && isLoggedIn && fanUser?.image_url ? (
-                  <div className="w-6 h-6 rounded-full overflow-hidden border border-current shrink-0">
-                    <img 
-                      src={getAssetPath(fanUser.image_url)} 
-                      alt="PP" 
-                      className="w-full h-full object-cover" 
-                      onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.style.display = 'block'; }}
-                    />
-                    <Icon size={18} style={{ display: 'none' }} />
-                  </div>
-                ) : (
-                  <Icon size={18} />
-                )}
-              </Link>
-            )
-          })}
-        </nav>
-      </div>
+              return (
+                <Link
+                  key={tab.name}
+                  to={tab.href}
+                  aria-label={tab.name}
+                  title={tab.name}
+                  style={active ? { backgroundColor: 'var(--primary)', color: '#ffffff' } : {}}
+                  className={`w-11 h-11 flex items-center justify-center rounded-full transition-all duration-200 active:scale-95 ${
+                    active
+                      ? 'shadow-md shadow-primary/30 text-white font-black'
+                      : 'text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10'
+                  }`}
+                >
+                  {tab.name === 'Profil' && isLoggedIn && fanUser?.image_url ? (
+                    <div className="w-6 h-6 rounded-full overflow-hidden border border-current shrink-0">
+                      <img 
+                        src={getAssetPath(fanUser.image_url)} 
+                        alt="PP" 
+                        className="w-full h-full object-cover" 
+                        onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.style.display = 'block'; }}
+                      />
+                      <Icon size={18} style={{ display: 'none' }} />
+                    </div>
+                  ) : (
+                    <Icon size={18} />
+                  )}
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
+      )}
 
       {/* Global Modals for Fan Authentication & Order History */}
       <FanAuthModal />
