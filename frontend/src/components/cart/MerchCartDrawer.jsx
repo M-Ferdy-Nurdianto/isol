@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { FaTimes, FaTrash, FaMinus, FaPlus, FaShoppingBag, FaArrowRight, FaBox } from 'react-icons/fa'
@@ -7,6 +8,19 @@ import { getAssetPath } from '../../lib/pathUtils'
 const MerchCartDrawer = () => {
   const navigate = useNavigate()
   const { cart, isCartOpen, closeCart, updateQuantity, removeFromCart, totalItems, totalPrice } = useMerchCart()
+
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeCart()
+      }
+    }
+    if (isCartOpen) {
+      window.addEventListener('keydown', handleKeyDown)
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isCartOpen, closeCart])
 
   const handleGoToCheckout = () => {
     closeCart()
@@ -193,10 +207,10 @@ const MerchCartDrawer = () => {
                 </div>
                 <div>
                   <h3 className="text-base font-black text-text-primary uppercase tracking-tight">
-                    Keranjang Belanja Merch
+                    Keranjang ({totalItems})
                   </h3>
                   <p className="text-xs text-text-secondary font-mono">
-                    {totalItems} item merchandise
+                    {totalItems} item dipilih
                   </p>
                 </div>
               </div>
@@ -222,14 +236,14 @@ const MerchCartDrawer = () => {
                       Keranjang Masih Kosong
                     </h4>
                     <p className="text-xs text-text-secondary mt-1 max-w-xs mx-auto leading-relaxed">
-                      Pilih official merchandise favoritmu dan klik "Tambah ke Keranjang".
+                      Kamu belum menambahkan merchandise ke keranjang.
                     </p>
                   </div>
                   <button
                     onClick={closeCart}
                     className="px-6 py-2.5 rounded-full bg-[#E8944A] text-white text-xs font-black uppercase tracking-wider shadow-md hover:bg-[#E8944A]/90 transition"
                   >
-                    Jelajahi Merchandise
+                    Lihat Merch
                   </button>
                 </div>
               ) : (
@@ -257,11 +271,11 @@ const MerchCartDrawer = () => {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-black text-text-primary line-clamp-1 uppercase">
+                      <p className="text-xs font-black text-text-primary line-clamp-2 uppercase leading-snug">
                         {item.nama}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm font-black text-[#E8944A]">
+                        <span className="text-sm font-black text-[#E8944A] font-mono">
                           Rp {Number(item.harga || 0).toLocaleString('id-ID')}
                         </span>
                         {item.size && (
@@ -309,18 +323,19 @@ const MerchCartDrawer = () => {
 
             {/* Desktop Footer Checkout Bar */}
             {cart.length > 0 && (
-              <div className="p-6 border-t border-[#3A2E24] bg-[#241E19] space-y-4">
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs text-text-secondary">
-                    <span>Subtotal Produk</span>
-                    <span className="font-mono font-bold">Rp {totalPrice.toLocaleString('id-ID')}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm font-black text-text-primary pt-2 border-t border-[#3A2E24]">
-                    <span>Total Pembayaran</span>
-                    <span className="text-lg font-black text-[#E8944A] font-mono">
-                      Rp {totalPrice.toLocaleString('id-ID')}
+              <div className="p-6 border-t border-[#3A2E24] bg-[#241E19] space-y-3">
+                <div className="flex items-center justify-between pb-1">
+                  <div>
+                    <span className="text-xs font-bold text-text-secondary uppercase tracking-wider block">
+                      Total
+                    </span>
+                    <span className="text-[11px] text-text-secondary">
+                      Ongkir dihitung di checkout
                     </span>
                   </div>
+                  <span className="text-xl font-black text-[#E8944A] font-mono">
+                    Rp {totalPrice.toLocaleString('id-ID')}
+                  </span>
                 </div>
 
                 <button
@@ -328,8 +343,16 @@ const MerchCartDrawer = () => {
                   onClick={handleGoToCheckout}
                   className="w-full py-3.5 px-6 rounded-2xl bg-[#E8944A] hover:bg-[#E8944A]/90 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-[#E8944A]/20 transition active:scale-95"
                 >
-                  <span>Halaman Checkout ({totalItems} Item)</span>
+                  <span>Halaman Checkout ({totalItems} item)</span>
                   <FaArrowRight size={12} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={closeCart}
+                  className="w-full py-1 text-xs font-bold text-text-secondary hover:text-text-primary transition-colors text-center"
+                >
+                  Lanjut belanja
                 </button>
               </div>
             )}

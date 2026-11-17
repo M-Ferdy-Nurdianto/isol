@@ -13,7 +13,10 @@ import {
   FaInfoCircle,
   FaBox,
   FaShieldAlt,
-  FaUserCheck
+  FaUserCheck,
+  FaTrash,
+  FaMinus,
+  FaPlus
 } from 'react-icons/fa'
 import KSHeader from '../../components/KSHeader'
 import KSFooter from '../../components/KSFooter'
@@ -28,17 +31,17 @@ const KSMerchCheckoutPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { fanUser, isLoggedIn, openAuthModal } = useFanAuth()
-  const { cart, clearCart, totalItems: cartTotalItems, totalPrice: cartTotalPrice } = useMerchCart()
+  const { cart, clearCart, updateQuantity, removeFromCart, totalItems: cartTotalItems, totalPrice: cartTotalPrice } = useMerchCart()
 
   // Support direct buy item passed via location.state (from "Beli Sekarang" modal)
-  const directBuyItem = location.state?.directBuyItem || null
+  const [directItem, setDirectItem] = useState(location.state?.directBuyItem || null)
 
   const checkoutItems = useMemo(() => {
-    if (directBuyItem) {
-      return [directBuyItem]
+    if (directItem) {
+      return [directItem]
     }
     return cart
-  }, [directBuyItem, cart])
+  }, [directItem, cart])
 
   const totalItemCount = useMemo(() => {
     return checkoutItems.reduce((sum, i) => sum + (Number(i.quantity) || 1), 0)
@@ -47,6 +50,27 @@ const KSMerchCheckoutPage = () => {
   const subtotalPrice = useMemo(() => {
     return checkoutItems.reduce((sum, i) => sum + ((Number(i.harga) || 0) * (Number(i.quantity) || 1)), 0)
   }, [checkoutItems])
+
+  const handleItemQtyChange = (item, delta) => {
+    if (directItem) {
+      const newQty = (directItem.quantity || 1) + delta
+      if (newQty <= 0) {
+        setDirectItem(null)
+      } else {
+        setDirectItem({ ...directItem, quantity: newQty })
+      }
+    } else {
+      updateQuantity(item.cartId, delta)
+    }
+  }
+
+  const handleItemRemove = (item) => {
+    if (directItem) {
+      setDirectItem(null)
+    } else {
+      removeFromCart(item.cartId)
+    }
+  }
 
   // Form State
   const [buyer, setBuyer] = useState({
@@ -145,8 +169,10 @@ const KSMerchCheckoutPage = () => {
       const res = await api.post('/merch-orders', payload)
       if (res.data?.success && res.data?.order) {
         setSuccessOrder(res.data.order)
-        // Clear cart if checkout was from cart
-        if (!directBuyItem) {
+        // Clear cart or directItem
+        if (directItem) {
+          setDirectItem(null)
+        } else {
           clearCart()
         }
         kohiToast.success('Pesanan merchandise berhasil dibuat!')
@@ -166,7 +192,7 @@ const KSMerchCheckoutPage = () => {
       <KSHeader />
 
       <main className="pt-28 sm:pt-36 pb-24 relative z-10 flex-1">
-        <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="container mx-auto max-w-[1200px] px-4 sm:px-6">
 
           {/* =========================================================================
               SUCCESS STATE (Celebration Receipt)
@@ -323,10 +349,10 @@ const KSMerchCheckoutPage = () => {
                     ========================================================================= */}
                 <div className="hidden md:grid md:grid-cols-12 gap-8 items-start">
                   
-                  {/* LEFT COLUMN: Customer, Shipping, Payment Forms (7 cols) */}
+                  {/* LEFT COLUMN: 2 Panels Only (7 cols ~58%) */}
                   <div className="md:col-span-7 space-y-6">
 
-                    {/* Section 1: Data Penerima */}
+                    {/* Panel 1: Data Penerima */}
                     <div className="p-6 rounded-3xl bg-[#241E19] border border-[#3A2E24] shadow-xl space-y-4">
                       <div className="flex items-center gap-2.5 pb-3 border-b border-[#3A2E24]">
                         <span className="w-6 h-6 rounded-full bg-[#E8944A]/15 text-[#E8944A] text-xs font-black flex items-center justify-center">
@@ -337,9 +363,9 @@ const KSMerchCheckoutPage = () => {
                         </h2>
                       </div>
 
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         <div>
-                          <label className="block text-xs font-bold text-text-secondary mb-1">
+                          <label className="block text-xs font-bold text-text-secondary mb-1.5">
                             Nama Lengkap <span className="text-red-400">*</span>
                           </label>
                           <input
@@ -354,7 +380,7 @@ const KSMerchCheckoutPage = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-bold text-text-secondary mb-1">
+                            <label className="block text-xs font-bold text-text-secondary mb-1.5">
                               No. WhatsApp <span className="text-[10px] text-text-secondary font-normal">(opsional)</span>
                             </label>
                             <input
@@ -367,7 +393,7 @@ const KSMerchCheckoutPage = () => {
                           </div>
 
                           <div>
-                            <label className="block text-xs font-bold text-text-secondary mb-1">
+                            <label className="block text-xs font-bold text-text-secondary mb-1.5">
                               Instagram <span className="text-[10px] text-text-secondary font-normal">(opsional)</span>
                             </label>
                             <input
@@ -381,7 +407,7 @@ const KSMerchCheckoutPage = () => {
                         </div>
 
                         {(!buyer.whatsapp || !buyer.whatsapp.trim()) && (
-                          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-[11px] text-text-secondary mt-3">
+                          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-[11px] text-text-secondary">
                             <FaInfoCircle className="text-amber-400 shrink-0 mt-0.5" />
                             <span>
                               <strong className="text-text-primary font-bold">Pengingat Kontak:</strong> Nomor WhatsApp belum diisi. Anda tetap dapat melanjutkan pesanan merchandise ini dan melengkapinya nanti di profil.
@@ -391,7 +417,7 @@ const KSMerchCheckoutPage = () => {
                       </div>
                     </div>
 
-                    {/* Section 2: Metode Pengambilan / Pengiriman */}
+                    {/* Panel 2: Metode Pengambilan & Alamat */}
                     <div className="p-6 rounded-3xl bg-[#241E19] border border-[#3A2E24] shadow-xl space-y-4">
                       <div className="flex items-center gap-2.5 pb-3 border-b border-[#3A2E24]">
                         <span className="w-6 h-6 rounded-full bg-[#E8944A]/15 text-[#E8944A] text-xs font-black flex items-center justify-center">
@@ -402,42 +428,65 @@ const KSMerchCheckoutPage = () => {
                         </h2>
                       </div>
 
+                      {/* Radio cards matching Cheki Checkout style */}
                       <div className="grid grid-cols-2 gap-4">
-                        <button
-                          type="button"
+                        <label
                           onClick={() => setBuyer({ ...buyer, delivery_method: 'pickup_event' })}
-                          className={`p-4 rounded-2xl border text-left transition-all flex items-start gap-3 ${
+                          className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-start gap-3 ${
                             buyer.delivery_method === 'pickup_event'
-                              ? 'bg-[#E8944A] text-white border-[#E8944A] shadow-md shadow-[#E8944A]/20'
-                              : 'bg-[#1A1512] text-text-secondary border-[#3A2E24] hover:border-[#E8944A]/40 hover:text-text-primary'
+                              ? 'bg-[#E8944A]/10 border-[#E8944A] text-text-primary'
+                              : 'bg-[#1A1512] border-[#3A2E24] text-text-secondary hover:border-text-secondary/40'
                           }`}
                         >
-                          <FaStore className="text-base mt-0.5 shrink-0" />
-                          <div>
-                            <p className="text-xs font-black uppercase leading-tight">Ambil di Event</p>
-                            <p className={`text-[11px] mt-1 leading-tight ${buyer.delivery_method === 'pickup_event' ? 'text-white/80' : 'text-text-secondary'}`}>
+                          <input
+                            type="radio"
+                            name="delivery_method"
+                            value="pickup_event"
+                            checked={buyer.delivery_method === 'pickup_event'}
+                            onChange={() => setBuyer({ ...buyer, delivery_method: 'pickup_event' })}
+                            className="accent-[#E8944A] w-4 h-4 mt-0.5 cursor-pointer shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <FaStore className="text-[#E8944A] text-xs shrink-0" />
+                              <span className="text-xs font-black uppercase text-text-primary block">
+                                Ambil di Event
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-text-secondary mt-1 leading-snug">
                               Ambil langsung di merchandise booth saat event berikutnya
                             </p>
                           </div>
-                        </button>
+                        </label>
 
-                        <button
-                          type="button"
+                        <label
                           onClick={() => setBuyer({ ...buyer, delivery_method: 'shipping' })}
-                          className={`p-4 rounded-2xl border text-left transition-all flex items-start gap-3 ${
+                          className={`cursor-pointer p-4 rounded-2xl border transition-all flex items-start gap-3 ${
                             buyer.delivery_method === 'shipping'
-                              ? 'bg-[#E8944A] text-white border-[#E8944A] shadow-md shadow-[#E8944A]/20'
-                              : 'bg-[#1A1512] text-text-secondary border-[#3A2E24] hover:border-[#E8944A]/40 hover:text-text-primary'
+                              ? 'bg-[#E8944A]/10 border-[#E8944A] text-text-primary'
+                              : 'bg-[#1A1512] border-[#3A2E24] text-text-secondary hover:border-text-secondary/40'
                           }`}
                         >
-                          <FaTruck className="text-base mt-0.5 shrink-0" />
-                          <div>
-                            <p className="text-xs font-black uppercase leading-tight">Dikirim ke Rumah</p>
-                            <p className={`text-[11px] mt-1 leading-tight ${buyer.delivery_method === 'shipping' ? 'text-white/80' : 'text-text-secondary'}`}>
+                          <input
+                            type="radio"
+                            name="delivery_method"
+                            value="shipping"
+                            checked={buyer.delivery_method === 'shipping'}
+                            onChange={() => setBuyer({ ...buyer, delivery_method: 'shipping' })}
+                            className="accent-[#E8944A] w-4 h-4 mt-0.5 cursor-pointer shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <FaTruck className="text-[#E8944A] text-xs shrink-0" />
+                              <span className="text-xs font-black uppercase text-text-primary block">
+                                Dikirim ke Rumah
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-text-secondary mt-1 leading-snug">
                               Kirim via ekspedisi (J&T, JNE, SiCepat) dengan no. resi
                             </p>
                           </div>
-                        </button>
+                        </label>
                       </div>
 
                       {/* Conditional Shipping Form */}
@@ -493,8 +542,8 @@ const KSMerchCheckoutPage = () => {
                         </div>
                       )}
 
-                      <div>
-                        <label className="block text-xs font-bold text-text-secondary mb-1">
+                      <div className="pt-2 border-t border-[#3A2E24]/60">
+                        <label className="block text-xs font-bold text-text-secondary mb-1.5">
                           Catatan Pesanan <span className="text-[10px] text-text-secondary font-normal">(opsional)</span>
                         </label>
                         <input
@@ -506,169 +555,200 @@ const KSMerchCheckoutPage = () => {
                         />
                       </div>
                     </div>
-
-                    {/* Section 3: Pembayaran & Bukti Transfer */}
-                    <div className="p-6 rounded-3xl bg-[#241E19] border border-[#3A2E24] shadow-xl space-y-4">
-                      <div className="flex items-center gap-2.5 pb-3 border-b border-[#3A2E24]">
-                        <span className="w-6 h-6 rounded-full bg-[#E8944A]/15 text-[#E8944A] text-xs font-black flex items-center justify-center">
-                          3
-                        </span>
-                        <h2 className="text-sm font-black text-text-primary uppercase tracking-wider">
-                          Pembayaran
-                        </h2>
-                      </div>
-
-                      {/* Payment Method Switcher */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('tf')}
-                          className={`py-3 px-4 rounded-xl border text-xs font-black uppercase tracking-wider text-center transition-all ${
-                            paymentMethod === 'tf'
-                              ? 'bg-[#E8944A] text-white border-[#E8944A] shadow-md shadow-[#E8944A]/20'
-                              : 'bg-[#1A1512] text-text-secondary border-[#3A2E24] hover:border-[#E8944A]/40'
-                          }`}
-                        >
-                          Transfer Bank (BCA)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('qris')}
-                          className={`py-3 px-4 rounded-xl border text-xs font-black uppercase tracking-wider text-center transition-all ${
-                            paymentMethod === 'qris'
-                              ? 'bg-[#E8944A] text-white border-[#E8944A] shadow-md shadow-[#E8944A]/20'
-                              : 'bg-[#1A1512] text-text-secondary border-[#3A2E24] hover:border-[#E8944A]/40'
-                          }`}
-                        >
-                          QRIS Kohi Sekai
-                        </button>
-                      </div>
-
-                      {/* Transfer BCA Info */}
-                      {paymentMethod === 'tf' && (
-                        <div className="p-4 rounded-2xl bg-[#1A1512] border border-[#3A2E24] flex items-center justify-between gap-4">
-                          <div>
-                            <p className="text-[10px] font-mono text-text-secondary uppercase">
-                              Bank {bankConfig.bank}
-                            </p>
-                            <p className="text-base font-mono font-black text-text-primary tracking-wider">
-                              {bankConfig.rekening}
-                            </p>
-                            <p className="text-xs text-text-secondary">
-                              a.n. {bankConfig.atas_nama}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={handleCopyRekening}
-                            className="px-3.5 py-2 rounded-xl bg-[#241E19] hover:bg-[#3A2E24] border border-[#3A2E24] text-[#E8944A] text-xs font-black flex items-center gap-1.5 transition shrink-0"
-                          >
-                            <FaCopy size={11} />
-                            <span>{copiedRekening ? 'Tersalin!' : 'Salin Rekening'}</span>
-                          </button>
-                        </div>
-                      )}
-
-                      {/* QRIS Barcode */}
-                      {paymentMethod === 'qris' && (
-                        <div className="p-4 rounded-2xl bg-[#1A1512] border border-[#3A2E24] flex flex-col items-center text-center space-y-2">
-                          <div className="w-44 h-44 bg-white rounded-xl p-2 border border-[#3A2E24] flex items-center justify-center">
-                            <FaQrcode size={100} className="text-black" />
-                          </div>
-                          <p className="text-xs font-bold text-text-primary">
-                            {bankConfig.qris_merchant}
-                          </p>
-                          <p className="text-[10px] text-text-secondary">
-                            Scan menggunakan GoPay, OVO, Dana, BCA Mobile, atau aplikasi e-wallet lainnya.
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Bukti Transfer Upload */}
-                      <div className="pt-2">
-                        <ImageUploadDropzone
-                          label="Upload Bukti Pembayaran (opsional)"
-                          previewUrl={proofPreview}
-                          onImageChange={(compressedWebpFile, blobUrl) => {
-                            setProofFile(compressedWebpFile)
-                            setProofPreview(blobUrl)
-                          }}
-                          onRemove={() => {
-                            setProofFile(null)
-                            setProofPreview('')
-                          }}
-                          hint="Drag & drop foto struk transfer / screenshot QRIS ke sini."
-                          compact={true}
-                        />
-                      </div>
-                    </div>
                   </div>
 
-                  {/* RIGHT COLUMN: Sticky Order Summary & Submit (5 cols) */}
-                  <div className="md:col-span-5 sticky top-28 space-y-4">
+                  {/* RIGHT COLUMN: Sticky Order Summary & Payment (5 cols ~42% sticky top-24) */}
+                  <div className="md:col-span-5 sticky top-24 space-y-4">
                     <div className="p-6 rounded-3xl bg-[#241E19] border border-[#3A2E24] shadow-2xl space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-[#3A2E24]">
+                      
+                      {/* Header */}
+                      <div className="flex items-center justify-between pb-3.5 border-b border-[#3A2E24]">
                         <h2 className="text-sm font-black text-text-primary uppercase tracking-tight flex items-center gap-2">
                           <FaShoppingBag className="text-[#E8944A]" />
-                          <span>Ringkasan Pesanan</span>
+                          <span>Ringkasan & Pembayaran</span>
                         </h2>
-                        <span className="text-xs font-mono font-bold text-text-secondary">
+                        <span className="text-xs font-mono font-bold text-[#E8944A] bg-[#E8944A]/10 px-2.5 py-0.5 rounded-full border border-[#E8944A]/20">
                           {totalItemCount} item
                         </span>
                       </div>
 
-                      {/* Item list */}
-                      <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                      {/* Item list with Stepper and Delete */}
+                      <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
                         {checkoutItems.map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-3 p-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24]">
-                            <div className="w-12 h-12 rounded-lg bg-[#241E19] border border-[#3A2E24] overflow-hidden shrink-0">
+                          <div
+                            key={item.cartId || idx}
+                            className="p-3 rounded-2xl bg-[#1A1512] border border-[#3A2E24] flex items-center gap-3 hover:border-[#E8944A]/40 transition-colors"
+                          >
+                            <div className="w-14 h-14 rounded-xl bg-[#241E19] border border-[#3A2E24] overflow-hidden shrink-0">
                               {item.gambar_url ? (
                                 <img
                                   src={getAssetPath(item.gambar_url)}
                                   alt={item.nama}
-                                  className="w-full h-full object-contain p-1"
+                                  className="w-full h-full object-cover"
                                   onError={(e) => {
                                     e.target.onerror = null
-                                    e.target.src = getAssetPath('/images/merch/jersey.svg')
+                                    e.target.src = getAssetPath('/images/members/placeholder.svg')
                                   }}
                                 />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">
-                                  <FaBox className="text-[#E8944A]/40" />
+                                  <FaBox className="text-[#E8944A]/40 text-lg" />
                                 </div>
                               )}
                             </div>
+
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-black text-text-primary truncate">{item.nama}</p>
-                              <div className="flex items-center gap-2 text-[10px] text-text-secondary mt-0.5">
-                                {item.size && <span className="font-bold text-[#E8944A]">Size {item.size}</span>}
-                                <span>Jumlah: {item.quantity}</span>
+                              <p className="text-xs font-black text-text-primary line-clamp-2 uppercase leading-snug">
+                                {item.nama}
+                              </p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-xs font-black text-[#E8944A] font-mono">
+                                  Rp {(Number(item.harga || 0) * (item.quantity || 1)).toLocaleString('id-ID')}
+                                </span>
+                                {item.size && (
+                                  <span className="px-1.5 py-0.5 rounded bg-[#241E19] border border-[#3A2E24] text-[9px] font-mono font-bold text-text-secondary uppercase">
+                                    Size: {item.size}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-[#3A2E24]/60">
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleItemQtyChange(item, -1)}
+                                    className="w-6 h-6 rounded-lg bg-[#241E19] border border-[#3A2E24] flex items-center justify-center text-text-secondary hover:text-text-primary transition-colors"
+                                  >
+                                    <FaMinus size={8} />
+                                  </button>
+                                  <span className="text-xs font-mono font-black text-text-primary w-5 text-center">
+                                    {item.quantity}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleItemQtyChange(item, 1)}
+                                    className="w-6 h-6 rounded-lg bg-[#241E19] border border-[#3A2E24] flex items-center justify-center text-text-secondary hover:text-text-primary transition-colors"
+                                  >
+                                    <FaPlus size={8} />
+                                  </button>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleItemRemove(item)}
+                                  className="text-[11px] text-red-400 hover:text-red-300 font-bold flex items-center gap-1 transition-colors"
+                                >
+                                  <FaTrash size={9} />
+                                  <span>Hapus</span>
+                                </button>
                               </div>
                             </div>
-                            <span className="text-xs font-mono font-black text-text-primary shrink-0">
-                              Rp {(Number(item.harga || 0) * (item.quantity || 1)).toLocaleString('id-ID')}
-                            </span>
                           </div>
                         ))}
                       </div>
 
                       {/* Subtotal & Delivery details */}
                       <div className="pt-3 border-t border-[#3A2E24] space-y-2 text-xs">
-                        <div className="flex justify-between text-text-secondary">
-                          <span>Subtotal Produk</span>
-                          <span className="font-mono font-bold text-text-primary">Rp {subtotalPrice.toLocaleString('id-ID')}</span>
-                        </div>
-                        <div className="flex justify-between text-text-secondary">
-                          <span>Ongkir / Biaya Ambil</span>
-                          <span className="font-bold text-emerald-400">
-                            {buyer.delivery_method === 'shipping' ? 'Ditagih terpisah / COD' : 'Gratis di Event'}
+                        <div className="flex justify-between items-center text-text-secondary">
+                          <span>Pengiriman</span>
+                          <span className="font-bold text-text-primary">
+                            {buyer.delivery_method === 'pickup_event' ? (
+                              <span className="text-emerald-400 font-bold">Ongkir: Gratis di Event</span>
+                            ) : (
+                              'Ditagih terpisah / COD'
+                            )}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center text-sm font-black pt-3 border-t border-[#3A2E24]">
-                          <span className="uppercase text-text-primary">Total Pembayaran</span>
-                          <span className="text-xl font-mono text-[#E8944A]">
+                        <div className="flex justify-between items-center pt-1 border-t border-[#3A2E24]/60">
+                          <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">
+                            Total Pembayaran
+                          </span>
+                          <span className="text-xl font-black text-[#E8944A] font-mono">
                             Rp {subtotalPrice.toLocaleString('id-ID')}
                           </span>
+                        </div>
+                      </div>
+
+                      {/* Payment Method Switcher & Details */}
+                      <div className="pt-3 border-t border-[#3A2E24] space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('tf')}
+                            className={`py-2 px-3 rounded-xl border text-xs font-black uppercase tracking-wider text-center transition-all ${
+                              paymentMethod === 'tf'
+                                ? 'bg-[#E8944A]/10 border-[#E8944A] text-text-primary font-bold'
+                                : 'bg-[#1A1512] border-[#3A2E24] text-text-secondary hover:border-text-secondary/40'
+                            }`}
+                          >
+                            Transfer BCA
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('qris')}
+                            className={`py-2 px-3 rounded-xl border text-xs font-black uppercase tracking-wider text-center transition-all ${
+                              paymentMethod === 'qris'
+                                ? 'bg-[#E8944A]/10 border-[#E8944A] text-text-primary font-bold'
+                                : 'bg-[#1A1512] border-[#3A2E24] text-text-secondary hover:border-text-secondary/40'
+                            }`}
+                          >
+                            QRIS Kohi Sekai
+                          </button>
+                        </div>
+
+                        {/* Transfer BCA Info */}
+                        {paymentMethod === 'tf' && (
+                          <div className="p-3.5 rounded-2xl bg-[#1A1512] border border-[#3A2E24] flex items-center justify-between gap-3">
+                            <div>
+                              <p className="text-[10px] font-mono text-text-secondary uppercase">
+                                Bank {bankConfig.bank}
+                              </p>
+                              <p className="text-base font-mono font-black text-text-primary tracking-wider">
+                                {bankConfig.rekening}
+                              </p>
+                              <p className="text-xs text-text-secondary">
+                                a.n. {bankConfig.atas_nama}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleCopyRekening}
+                              className="px-3 py-1.5 rounded-xl bg-[#241E19] hover:bg-[#3A2E24] border border-[#3A2E24] text-[#E8944A] text-xs font-bold flex items-center gap-1.5 transition shrink-0"
+                            >
+                              <FaCopy size={11} />
+                              <span>{copiedRekening ? 'Tersalin!' : 'Salin'}</span>
+                            </button>
+                          </div>
+                        )}
+
+                        {/* QRIS Barcode */}
+                        {paymentMethod === 'qris' && (
+                          <div className="p-3.5 rounded-2xl bg-[#1A1512] border border-[#3A2E24] flex flex-col items-center text-center space-y-2">
+                            <div className="w-36 h-36 bg-white rounded-xl p-2 border border-[#3A2E24] flex items-center justify-center">
+                              <FaQrcode size={88} className="text-black" />
+                            </div>
+                            <p className="text-xs font-bold text-text-primary">
+                              {bankConfig.qris_merchant}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Bukti Transfer Upload (Opsional, no profile hint) */}
+                        <div className="pt-1">
+                          <ImageUploadDropzone
+                            label="Upload Bukti Pembayaran (opsional)"
+                            previewUrl={proofPreview}
+                            onImageChange={(compressedWebpFile, blobUrl) => {
+                              setProofFile(compressedWebpFile)
+                              setProofPreview(blobUrl)
+                            }}
+                            onRemove={() => {
+                              setProofFile(null)
+                              setProofPreview('')
+                            }}
+                            hint="Drag & drop foto struk transfer / screenshot QRIS ke sini."
+                            compact={true}
+                          />
                         </div>
                       </div>
 

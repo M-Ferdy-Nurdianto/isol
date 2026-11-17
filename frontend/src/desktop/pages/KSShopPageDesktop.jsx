@@ -652,20 +652,31 @@ const KSShopPage = () => {
         <div className="container mx-auto max-w-7xl px-4 sm:px-6">
 
           {/* === HERO TITLE === */}
-          <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-16">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] sm:text-xs font-black uppercase tracking-wider mb-3">
-              <FaTicketAlt size={11} />
-              <span>Jadwal & Tiket Cheki Resmi</span>
+          <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] sm:text-xs font-black uppercase tracking-wider mb-2.5">
+              {activeShopTab === 'cheki' ? (
+                <>
+                  <FaTicketAlt size={11} />
+                  <span>Jadwal & Tiket Cheki Resmi</span>
+                </>
+              ) : (
+                <>
+                  <FaBox size={11} />
+                  <span>Official Merchandise</span>
+                </>
+              )}
             </div>
-            <h1 className="text-3xl sm:text-6xl md:text-7xl font-black tracking-tight text-text-primary leading-none uppercase mb-3">
-              KOHI <span className="text-primary">TICKETS</span>
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-text-primary leading-none uppercase mb-2.5">
+              KOHI <span className="text-primary">{activeShopTab === 'cheki' ? 'TICKETS' : 'OFFICIAL MERCH'}</span>
             </h1>
-            <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
-              Pilih tanggal event pada kalender bulanan, tentukan member idol favoritmu, dan langsung pesan tiket 2-Shot Cheki tanpa perlu sistem keranjang.
+            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-2xl mx-auto">
+              {activeShopTab === 'cheki'
+                ? 'Pilih tanggal event pada kalender bulanan, tentukan member idol favoritmu, dan langsung pesan tiket 2-Shot Cheki tanpa perlu sistem keranjang.'
+                : 'Koleksi merchandise resmi Kohi Sekai untuk melengkapi dukunganmu di setiap panggung pertunjukan.'}
             </p>
 
             {/* Fan Status Pill */}
-            <div className="mt-6 flex items-center justify-center gap-3">
+            <div className="mt-4 flex items-center justify-center gap-3">
               {isLoggedIn ? (
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-surface border border-border text-xs">
                   <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
@@ -687,7 +698,7 @@ const KSShopPage = () => {
             </div>
 
             {/* === SHOP CATEGORY SWITCHER TABS (CHEKI vs MERCH) === */}
-            <div className="mt-8 flex items-center justify-center">
+            <div className="mt-5 flex items-center justify-center">
               <div className="p-1 rounded-2xl bg-surface border border-border inline-flex gap-1.5 shadow-lg">
                 <button
                   type="button"
@@ -1306,161 +1317,79 @@ const KSShopPage = () => {
           {/* === SECTION 4: OFFICIAL MERCHANDISE === */}
           {activeShopTab === 'merch' && (
             <section id="official-merchandise" className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/25 text-primary text-[10px] sm:text-xs font-black uppercase tracking-wider mb-2">
-                    <FaBox size={11} />
-                    <span>Official Merchandise</span>
-                  </div>
-                  <h2 className="text-2xl sm:text-4xl font-black text-text-primary tracking-tight uppercase">
-                    KOHI OFFICIAL MERCH
-                  </h2>
-                  <p className="text-xs sm:text-sm text-text-secondary mt-1">
-                    Koleksi merchandise resmi Kohi Sekai untuk melengkapi dukunganmu di setiap panggung.
-                  </p>
-                </div>
-
-                {/* Sub-Filter Kategori Merchandise & Keranjang Shortcut */}
-                <div className="flex items-center gap-2 flex-wrap shrink-0 self-start sm:self-auto">
+              
+              {/* Toolbar satu baris di atas grid: Filter Kategori di kiri, Tombol Keranjang di kanan */}
+              <div className="flex items-center justify-between gap-3 pb-2 border-b border-border">
+                {/* Filter Kategori */}
+                <div className="p-1 rounded-2xl bg-surface border border-border inline-flex gap-1 shadow-sm">
                   <button
                     type="button"
-                    onClick={openCart}
-                    className="px-3.5 py-1.5 rounded-2xl bg-surface border border-primary/30 text-primary hover:bg-primary hover:text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md active:scale-95"
-                    title="Buka Keranjang Belanja"
+                    onClick={() => setMerchCategoryFilter('all')}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      merchCategoryFilter === 'all'
+                        ? 'bg-primary text-white font-black shadow-sm'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-background'
+                    }`}
                   >
-                    <FaShoppingBag size={12} />
-                    <span>Keranjang</span>
-                    {totalItems > 0 && (
-                      <span className="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-mono font-black flex items-center justify-center">
-                        {totalItems}
-                      </span>
-                    )}
+                    Semua
                   </button>
-
-                  <div className="p-1 rounded-2xl bg-surface border border-border inline-flex gap-1 shadow-md">
-                    <button
-                      type="button"
-                      onClick={() => setMerchCategoryFilter('all')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${merchCategoryFilter === 'all'
-                          ? 'bg-primary text-white font-black shadow-sm'
-                          : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                        }`}
-                    >
-                      Semua
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMerchCategoryFilter('baju')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${merchCategoryFilter === 'baju'
-                          ? 'bg-primary text-white font-black shadow-sm'
-                          : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                        }`}
-                    >
-                      T-Shirt & Jersey
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMerchCategoryFilter('aksesoris')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${merchCategoryFilter === 'aksesoris'
-                          ? 'bg-primary text-white font-black shadow-sm'
-                          : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                        }`}
-                    >
-                      Lanyard, Ganci & Aksesoris
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMerchCategoryFilter('baju')}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      merchCategoryFilter === 'baju'
+                        ? 'bg-primary text-white font-black shadow-sm'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-background'
+                    }`}
+                  >
+                    T-Shirt & Jersey
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMerchCategoryFilter('aksesoris')}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      merchCategoryFilter === 'aksesoris'
+                        ? 'bg-primary text-white font-black shadow-sm'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-background'
+                    }`}
+                  >
+                    Aksesoris
+                  </button>
                 </div>
+
+                {/* Tombol Keranjang (+ Jumlah) */}
+                <button
+                  type="button"
+                  onClick={openCart}
+                  className="px-4 py-2 rounded-2xl bg-surface border border-primary/30 text-primary hover:bg-primary hover:text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-sm active:scale-95 shrink-0"
+                  title="Buka Keranjang Belanja"
+                >
+                  <FaShoppingBag size={13} />
+                  <span>Keranjang</span>
+                  {totalItems > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-mono font-black flex items-center justify-center">
+                      {totalItems}
+                    </span>
+                  )}
+                </button>
               </div>
 
-              {/* Mobile Merch Layout (md:hidden) — 2 Columns! */}
-              <div className="md:hidden grid grid-cols-2 gap-2.5">
+              {/* Desktop Merch Grid (4 Kolom Seragam) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {displayMerch.map((item, idx) => {
-                  const isPreOrder = !item.stok || item.stok === 0
+                  const isPreOrder = item.is_po || !item.stok || item.stok === 0
                   const isClosed = item.available === false
                   const itemImg = item.gambar_url ? getAssetPath(item.gambar_url) : null
-
-                  return (
-                    <motion.div
-                      key={`mob-merch-${item.id || idx}`}
-                      initial={{ opacity: 0, y: 15 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: idx * 0.05 }}
-                      onClick={() => handleOpenMerch(item)}
-                      className="group relative rounded-2xl overflow-hidden bg-surface border border-border flex flex-col justify-between cursor-pointer active:scale-95 transition-transform"
-                    >
-                      <div className="relative aspect-square overflow-hidden bg-background">
-                        {itemImg ? (
-                          <img
-                            src={itemImg}
-                            alt={item.nama}
-                            className="w-full h-full object-contain p-3"
-                            onError={(e) => {
-                              e.target.onerror = null
-                              e.target.src = getAssetPath('/images/merch/jersey.svg')
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                            <FaBox className="text-3xl text-primary/40" />
-                          </div>
-                        )}
-
-                        {/* Status Badge */}
-                        <div className="absolute top-2 left-2">
-                          {isClosed ? (
-                            <span className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-zinc-700">
-                              Closed
-                            </span>
-                          ) : isPreOrder ? (
-                            <span className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider bg-accent/20 text-accent border border-accent/30">
-                              Pre-Order
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider bg-success/20 text-success border border-success/30">
-                              Tersedia
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="p-2.5 space-y-2 border-t border-border flex flex-col justify-between flex-1">
-                        <div>
-                          <h4 className="text-xs font-black text-text-primary uppercase tracking-tight line-clamp-1 leading-tight">
-                            {item.nama}
-                          </h4>
-                          <p className="text-xs font-black text-primary mt-1">
-                            Rp {Number(item.harga || 0).toLocaleString('id-ID')}
-                          </p>
-                        </div>
-
-                        <button
-                          type="button"
-                          className="w-full py-1.5 px-2 rounded-full bg-primary/20 border border-primary/40 hover:bg-primary text-primary hover:text-white font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-1"
-                        >
-                          <FaShoppingBag size={10} />
-                          <span>Detail & Pesan</span>
-                        </button>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
-
-              {/* Desktop Merch Layout (hidden md:grid md:grid-cols-3 lg:grid-cols-4) */}
-              <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {displayMerch.map((item, idx) => {
-                  const isPreOrder = !item.stok || item.stok === 0
-                  const isClosed = item.available === false
-                  const itemImg = item.gambar_url ? getAssetPath(item.gambar_url) : null
+                  const hasSizes = item.sizes && Array.isArray(item.sizes) && item.sizes.length > 0
+                  const isLowStock = !isClosed && item.stok !== undefined && item.stok !== null && item.stok > 0 && item.stok <= 10
 
                   return (
                     <motion.div
                       key={`desk-merch-${item.id || idx}`}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 15 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ delay: idx * 0.06 }}
+                      transition={{ delay: idx * 0.04 }}
                       onClick={() => handleOpenMerch(item)}
                       className="group relative rounded-3xl overflow-hidden bg-surface border border-border hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col justify-between cursor-pointer"
                     >
@@ -1481,52 +1410,66 @@ const KSShopPage = () => {
                           </div>
                         )}
 
+                        {/* Stock Badges: Hanya muncul jika Closed, Stok <= 10, atau PO */}
                         <div className="absolute top-3 left-3">
                           {isClosed ? (
-                            <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-zinc-700">
-                              Closed
+                            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-zinc-700">
+                              Sold out
+                            </span>
+                          ) : isLowStock ? (
+                            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              Sisa {item.stok}
                             </span>
                           ) : isPreOrder ? (
-                            <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-accent/20 text-accent border border-accent/30">
+                            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-accent/20 text-accent border border-accent/30">
                               Pre-Order
                             </span>
-                          ) : (
-                            <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-success/20 text-success border border-success/30">
-                              Tersedia ({item.stok} stok)
-                            </span>
-                          )}
+                          ) : null}
                         </div>
                       </div>
 
-                      <div className="p-5 space-y-3 border-t border-border flex flex-col justify-between flex-1">
+                      <div className="p-4 space-y-3 border-t border-border flex flex-col justify-between flex-1">
                         <div>
-                          <h4 className="text-sm font-black text-text-primary uppercase tracking-tight line-clamp-1">
+                          <h4 className="text-xs font-black text-text-primary uppercase tracking-tight line-clamp-2 min-h-[2rem] leading-tight">
                             {item.nama}
                           </h4>
                           {item.deskripsi && (
-                            <p className="text-xs text-text-secondary line-clamp-2 mt-1 leading-relaxed">
+                            <p className="text-[11px] text-text-secondary line-clamp-2 mt-1 leading-relaxed">
                               {item.deskripsi}
                             </p>
                           )}
                         </div>
 
-                        <div className="space-y-3 pt-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] uppercase tracking-wider text-text-secondary font-bold">
-                              Harga Satuan
-                            </span>
-                            <span className="text-base font-black text-primary">
-                              Rp {Number(item.harga || 0).toLocaleString('id-ID')}
-                            </span>
-                          </div>
+                        <div className="pt-2 border-t border-border/60 flex items-center justify-between gap-2">
+                          <span className="text-base font-black text-primary font-mono leading-none">
+                            Rp {Number(item.harga || 0).toLocaleString('id-ID')}
+                          </span>
 
-                          <button
-                            type="button"
-                            className="w-full py-2.5 px-4 rounded-full bg-primary/20 border border-primary/40 hover:bg-primary text-primary hover:text-white font-bold text-xs uppercase tracking-wider shadow-sm transition-all flex items-center justify-center gap-2"
-                          >
-                            <FaShoppingBag size={12} />
-                            <span>Detail & Pesan</span>
-                          </button>
+                          {hasSizes ? (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleOpenMerch(item)
+                              }}
+                              className="py-1.5 px-3 rounded-xl bg-surface border border-primary/40 hover:bg-primary hover:text-white text-primary font-bold text-[11px] uppercase tracking-wider transition-all shadow-sm shrink-0"
+                            >
+                              Pilih Ukuran
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                const rect = e.currentTarget.getBoundingClientRect()
+                                addToCart(item, '', 1, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
+                              }}
+                              className="py-1.5 px-3 rounded-xl bg-primary hover:bg-primary-hover text-white font-bold text-[11px] uppercase tracking-wider transition-all shadow-sm flex items-center gap-1.5 shrink-0"
+                            >
+                              <FaPlus size={9} />
+                              <span>+ Keranjang</span>
+                            </button>
+                          )}
                         </div>
                       </div>
                     </motion.div>
@@ -1534,25 +1477,6 @@ const KSShopPage = () => {
                 })}
               </div>
 
-              {/* Shortcut Banner back to Cheki Tickets */}
-              <div className="mt-12 p-6 rounded-3xl bg-surface border border-primary/30 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/20 text-primary flex items-center justify-center text-xl shrink-0">
-                    <FaTicketAlt />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-black text-text-primary uppercase">Mau Pesan Tiket 2-Shot Cheki?</h3>
-                    <p className="text-xs text-text-secondary mt-0.5">Pilih tanggal event dan foto polaroid bersama idolamu.</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveShopTab('cheki')}
-                  className="px-6 py-3 rounded-full bg-primary text-white font-black text-xs uppercase tracking-wider shadow-md hover:bg-primary-hover transition shrink-0"
-                >
-                  Lihat Tiket Cheki →
-                </button>
-              </div>
             </section>
           )}
 
