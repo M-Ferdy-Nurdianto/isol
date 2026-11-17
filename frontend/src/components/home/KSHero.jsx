@@ -42,25 +42,18 @@ const KSHero = ({ config = {}, events = [] }) => {
       </div>
 
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-4 sm:pt-20 pb-8 sm:pb-16">
-        {/* Mobile Japanese Accent Tagline - Symmetrically Centered & Balanced */}
-        <div className="flex sm:hidden items-center justify-center gap-2 mb-3 text-[10px] font-bold tracking-[0.25em] text-text-secondary/70 uppercase font-mono">
-          <span>{config?.corner_left_1 || 'コーヒーの世界へ'}</span>
-          <span className="text-primary/50 font-black">·</span>
-          <span className="text-primary/80">{config?.corner_right_1 || 'ラテ · マキアート'}</span>
-        </div>
-
         {/* Pre-title */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center justify-center gap-3 mb-4 sm:mb-6"
+          className="flex items-center justify-center gap-3 mb-3 sm:mb-6"
         >
-          <div className="h-px w-8 sm:w-12 bg-primary/50" />
-          <span className="text-[10px] sm:text-xs font-black tracking-[0.35em] text-primary uppercase">
-            {config?.tagline || 'コーヒーの世界へようこそ'}
+          <span className="h-[1px] w-8 sm:w-12 bg-primary inline-block opacity-60" />
+          <span className="text-[10px] sm:text-xs font-black tracking-[0.35em] text-primary uppercase font-mono">
+            {config?.tagline || 'WE ARE'}
           </span>
-          <div className="h-px w-8 sm:w-12 bg-primary/50" />
+          <span className="h-[1px] w-8 sm:w-12 bg-primary inline-block opacity-60" />
         </motion.div>
 
         {/* Main Title */}
@@ -68,16 +61,21 @@ const KSHero = ({ config = {}, events = [] }) => {
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tight leading-none text-text-primary mb-2 sm:mb-3"
+          className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tight leading-none text-text-primary mb-3 sm:mb-4 text-center"
         >
-          {config?.title ? (
-            config.title
-          ) : (
-            <>
-              KOHI<br className="sm:hidden" />
-              <span className="text-primary"> SEKAI</span>
-            </>
-          )}
+          {(() => {
+            const titleStr = config?.title || 'KOHI SEKAI'
+            const parts = titleStr.split(' ')
+            if (parts.length > 1) {
+              const last = parts.pop()
+              return (
+                <>
+                  {parts.join(' ')} <span className="text-primary">{last}</span>
+                </>
+              )
+            }
+            return titleStr
+          })()}
         </motion.h1>
 
         {/* Katakana accent */}
@@ -86,7 +84,7 @@ const KSHero = ({ config = {}, events = [] }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-xs sm:text-base md:text-xl font-black tracking-[0.25em] text-primary/70 uppercase mt-1 mb-4 sm:mb-6"
+            className="text-xs sm:text-base md:text-xl font-black tracking-[0.25em] text-primary/70 uppercase mt-1 mb-4 sm:mb-6 text-center"
           >
             {config.bottom_title_accent}
           </motion.p>
@@ -97,7 +95,7 @@ const KSHero = ({ config = {}, events = [] }) => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-xs sm:text-base text-text-secondary max-w-lg mx-auto leading-relaxed mb-6 sm:mb-10 px-2"
+          className="text-xs sm:text-base text-text-secondary max-w-sm sm:max-w-lg mx-auto leading-relaxed mb-6 sm:mb-10 px-4 text-center text-balance"
         >
           {config?.subtitle || 'Tiga rasa, satu dunia. Kohi Sekai hadir membawa energi idol yang hangat, kuat, dan penuh semangat.'}
         </motion.p>
@@ -107,18 +105,18 @@ const KSHero = ({ config = {}, events = [] }) => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-none mx-auto"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-[280px] sm:max-w-none mx-auto"
         >
           <Link
             to={config?.cta_1_link || "/shop"}
-            className="w-full sm:w-auto min-h-[46px] group flex items-center justify-center gap-2.5 bg-primary hover:bg-primary/90 text-white font-black text-xs uppercase tracking-widest px-7 py-3 rounded-full transition-all duration-200 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 active:scale-95"
+            className="w-full sm:w-auto min-h-[46px] group flex items-center justify-center gap-2.5 bg-primary hover:bg-primary/90 text-white font-black text-xs uppercase tracking-widest px-7 py-3 rounded-full transition-all duration-200 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 active:scale-95"
           >
             {config?.cta_1_text || "Lihat Jadwal"}
             <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
             to={config?.cta_2_link || "/about"}
-            className="w-full sm:w-auto min-h-[46px] flex items-center justify-center gap-2.5 border border-border hover:border-primary text-text-primary hover:text-primary font-bold text-xs uppercase tracking-widest px-7 py-3 rounded-full transition-all duration-200 hover:-translate-y-0.5 active:scale-95 bg-surface/50"
+            className="w-full sm:w-auto min-h-[46px] flex items-center justify-center gap-2.5 border border-border hover:border-primary text-text-primary hover:text-primary font-bold text-xs uppercase tracking-widest px-7 py-3 rounded-full transition-all duration-200 active:scale-95 bg-surface/50"
           >
             {config?.cta_2_text || "Kenali Kami"}
           </Link>
@@ -130,10 +128,10 @@ const KSHero = ({ config = {}, events = [] }) => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6 }}
-            className="mt-6 sm:mt-10 inline-flex items-center gap-2.5 bg-surface border border-border rounded-full px-4 py-2 max-w-[95%] truncate text-left"
+            className="mt-6 sm:mt-10 inline-flex items-center justify-center gap-2 bg-surface border border-border rounded-full px-4 py-2 max-w-[90%] sm:max-w-md mx-auto truncate"
           >
             <span className="w-2 h-2 rounded-full bg-accent animate-pulse shrink-0" />
-            <span className="text-[11px] font-bold text-text-secondary truncate">
+            <span className="text-[11px] font-bold text-text-secondary shrink-0">
               Event Terdekat:
             </span>
             <span className="text-[11px] font-black text-text-primary truncate">
