@@ -44,16 +44,33 @@
       }
     },
     {
-      "source": "/(.*\\.[a-zA-Z0-9]+)",
-      "destination": {
-        "service": "frontend"
-      }
+      "source": "/checkout/merch",
+      "destination": "/merch-checkout"
+    },
+    {
+      "source": "/checkout/:eventId",
+      "destination": "/checkout"
+    },
+    {
+      "source": "/checkout/:eventId/(.*)",
+      "destination": "/checkout"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/admin"
+    },
+    {
+      "source": "/reset-password/:path*",
+      "destination": "/reset-password"
+    },
+    {
+      "source": "/magic-login/:path*",
+      "destination": "/magic-login"
     },
     {
       "source": "/(.*)",
       "destination": {
-        "service": "frontend",
-        "path": "/index.html"
+        "service": "frontend"
       }
     }
   ],

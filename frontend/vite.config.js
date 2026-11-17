@@ -13,6 +13,7 @@ const SPA_ROUTES = [
   'about',
   'shop',
   'checkout',
+  'checkout/merch',
   'merch-checkout',
   'music',
   'profile',
