@@ -1,16 +1,9 @@
-import React, { lazy, Suspense } from 'react'
+import React from 'react'
 import { usePlatformLayout } from '../shared/hooks/usePlatformLayout'
-import LoadingSpinner from '../components/LoadingSpinner'
-
-const AdminPageDesktop = lazy(() => import('../desktop/pages/AdminPageDesktop'))
-const AdminPageMobile = lazy(() => import('../mobile/pages/AdminPageMobile'))
+import AdminPageDesktop from '../desktop/pages/AdminPageDesktop'
+import AdminPageMobile from '../mobile/pages/AdminPageMobile'
 
 export default function AdminPage(props) {
   const { isMobile } = usePlatformLayout()
-
-  return (
-    <Suspense fallback={<LoadingSpinner />}>
-      {isMobile ? <AdminPageMobile {...props} /> : <AdminPageDesktop {...props} />}
-    </Suspense>
-  )
+  return isMobile ? <AdminPageMobile {...props} /> : <AdminPageDesktop {...props} />
 }

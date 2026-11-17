@@ -45,10 +45,10 @@ const KSHeader = () => {
       {/* =========================================================================
           DESKTOP FLOATING ISLAND NAVBAR (hidden md:flex)
           ========================================================================= */}
-      <header className="hidden md:flex fixed top-0 inset-x-0 z-50 justify-center px-6 pt-3 pb-3 bg-[#FAF7F2] dark:bg-[#1A1512] border-b border-[#E8DDD0] dark:border-[#3A2E24] shadow-md shadow-black/20">
+      <header className="hidden md:flex fixed top-0 inset-x-0 z-50 justify-center px-6 pt-3 pb-3 bg-[#F5EDE2] dark:bg-[#28211B] border-b border-[#E8DDD0] dark:border-[#3E3228] shadow-md shadow-black/20">
         <div className="relative w-full max-w-4xl lg:max-w-5xl">
           <nav 
-            className="w-full rounded-full border px-6 h-14 flex items-center justify-between transition-all duration-300 relative z-50 bg-white dark:bg-[#251E19] border-[#E8DDD0] dark:border-[#3E3228] shadow-sm"
+            className="w-full rounded-full border px-6 h-14 flex items-center justify-between transition-all duration-300 relative z-50 bg-white dark:bg-[#342B23] border-[#E8DDD0] dark:border-[#46392F] shadow-sm"
           >
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
@@ -67,7 +67,7 @@ const KSHeader = () => {
 
             {/* Desktop Navigation - Centered Pill Group */}
             <div 
-              className="flex items-center gap-1 p-1 rounded-full border transition-all duration-200 bg-[#F2E8DC] dark:bg-[#1A1512] border-[#E2D4C3] dark:border-[#352A21]"
+              className="flex items-center gap-1 p-1 rounded-full border transition-all duration-200 bg-[#EADBCC] dark:bg-[#28211B] border-[#DFD1BF] dark:border-[#3E3228]"
             >
               {navLinks.map((link) => {
                 const active = isActive(link.href)
@@ -95,7 +95,7 @@ const KSHeader = () => {
                 type="button"
                 data-cart-icon
                 onClick={openCart}
-                className="relative w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border bg-[#F2E8DC] dark:bg-[#1A1512] border-[#E2D4C3] dark:border-[#352A21] text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
+                className="relative w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border bg-[#EADBCC] dark:bg-[#28211B] border-[#DFD1BF] dark:border-[#3E3228] text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
                 aria-label="Keranjang Belanja"
                 title="Buka Keranjang"
               >
@@ -110,7 +110,7 @@ const KSHeader = () => {
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
-                className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border bg-[#F2E8DC] dark:bg-[#1A1512] border-[#E2D4C3] dark:border-[#352A21] text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border bg-[#EADBCC] dark:bg-[#28211B] border-[#DFD1BF] dark:border-[#3E3228] text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? <FaSun size={14} /> : <FaMoon size={14} />}
@@ -119,7 +119,7 @@ const KSHeader = () => {
               {/* Fan User Button */}
               <Link
                 to={isLoggedIn ? "/profile" : "/login"}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border bg-[#F2E8DC] dark:bg-[#1A1512] border-[#E2D4C3] dark:border-[#352A21] hover:bg-black/5 dark:hover:bg-white/10 overflow-hidden ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border bg-[#EADBCC] dark:bg-[#28211B] border-[#DFD1BF] dark:border-[#3E3228] hover:bg-black/5 dark:hover:bg-white/10 overflow-hidden ${
                   isLoggedIn 
                     ? 'text-primary' 
                     : 'text-[#736253] dark:text-white hover:text-[#2B2420]'
@@ -144,8 +144,9 @@ const KSHeader = () => {
       {/* =========================================================================
           MOBILE TOP BAR (md:hidden)
           Brand Logo di kiri + Tombol Ganti Tema di ATAS KANAN SAJA
+          Warna Selaras & Sedikit Lebih Terang (#28211B)
           ========================================================================= */}
-      <header className="md:hidden fixed top-0 inset-x-0 z-50 flex items-center justify-between px-4 pt-3 pb-2.5 bg-[#FAF7F2] dark:bg-[#1A1512] border-b border-[#E8DDD0] dark:border-[#3A2E24] shadow-sm">
+      <header className="md:hidden fixed top-0 inset-x-0 z-50 flex items-center justify-between px-4 pt-3 pb-2.5 bg-[#F5EDE2] dark:bg-[#28211B] border-b border-[#E8DDD0] dark:border-[#3E3228] shadow-sm">
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
           <div className="relative">
@@ -165,7 +166,7 @@ const KSHeader = () => {
               type="button"
               data-cart-icon
               onClick={openCart}
-              className="relative w-9 h-9 rounded-full flex items-center justify-center border bg-[#F2E8DC] dark:bg-[#251E19] border-[#E2D4C3] dark:border-[#3E3228] text-primary active:scale-95 transition-transform"
+              className="relative w-9 h-9 rounded-full flex items-center justify-center border bg-[#EADBCC] dark:bg-[#342B23] border-[#DFD1BF] dark:border-[#46392F] text-primary active:scale-95 transition-transform"
               aria-label="Keranjang Belanja"
             >
               <FaShoppingBag size={13} />
@@ -179,7 +180,7 @@ const KSHeader = () => {
           <button
             type="button"
             onClick={toggleTheme}
-            className="w-9 h-9 rounded-full flex items-center justify-center border bg-[#F2E8DC] dark:bg-[#251E19] border-[#E2D4C3] dark:border-[#3E3228] text-[#736253] dark:text-[#B0A599] active:scale-95 transition-transform shadow-sm"
+            className="w-9 h-9 rounded-full flex items-center justify-center border bg-[#EADBCC] dark:bg-[#342B23] border-[#DFD1BF] dark:border-[#46392F] text-[#736253] dark:text-[#B0A599] active:scale-95 transition-transform shadow-sm"
             aria-label="Ganti Tema"
             title="Ganti Tema"
           >
@@ -191,6 +192,7 @@ const KSHeader = () => {
       {/* =========================================================================
           MOBILE FLOATING CIRCLE CAPSULE BOTTOM NAVBAR (md:hidden)
           Icon Only (Tanpa Teks) + Shop Icon Store + Safe Area Padding
+          Warna Selaras & Sedikit Lebih Terang (#28211B)
           ========================================================================= */}
       <div 
         className="md:hidden fixed bottom-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
@@ -198,7 +200,7 @@ const KSHeader = () => {
       >
         <nav
           aria-label="Mobile Navigation"
-          className="pointer-events-auto w-full max-w-[320px] rounded-full p-1.5 flex items-center justify-between border bg-white dark:bg-[#251E19] border-[#E8DDD0] dark:border-[#3E3228] shadow-2xl shadow-black/60"
+          className="pointer-events-auto w-full max-w-[320px] rounded-full p-1.5 flex items-center justify-between border bg-[#F5EDE2] dark:bg-[#28211B] border-[#E8DDD0] dark:border-[#3E3228] shadow-2xl shadow-black/60"
         >
           {bottomTabs.map((tab) => {
             const active = isTabActive(tab)

@@ -56,6 +56,18 @@ function App() {
       easing: 'ease-out-cubic',
       offset: 100,
     })
+
+    // Preload main public page chunks in background for instantaneous seamless navigation
+    if (typeof window !== 'undefined') {
+      const schedule = window.requestIdleCallback || ((cb) => setTimeout(cb, 100))
+      schedule(() => {
+        import('./pages/KSHomePage')
+        import('./pages/KSAboutPage')
+        import('./pages/KSShopPage')
+        import('./pages/KSMusicPage')
+        import('./pages/KSProfilePage')
+      })
+    }
   }, [])
 
   return (

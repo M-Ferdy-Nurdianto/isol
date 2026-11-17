@@ -42,9 +42,10 @@ const KSHero = ({ config = {}, events = [] }) => {
       </div>
 
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-4 sm:pt-20 pb-8 sm:pb-16">
-        {/* Mobile Corner Accent Tagline (Menampilkan Aset Asli Desktop di Mobile) */}
-        <div className="flex sm:hidden items-center justify-between w-full max-w-xs mx-auto mb-3 px-1 text-[9px] font-bold tracking-[0.25em] text-text-secondary/70 uppercase font-mono">
+        {/* Mobile Japanese Accent Tagline - Symmetrically Centered & Balanced */}
+        <div className="flex sm:hidden items-center justify-center gap-2 mb-3 text-[10px] font-bold tracking-[0.25em] text-text-secondary/70 uppercase font-mono">
           <span>{config?.corner_left_1 || 'コーヒーの世界へ'}</span>
+          <span className="text-primary/50 font-black">·</span>
           <span className="text-primary/80">{config?.corner_right_1 || 'ラテ · マキアート'}</span>
         </div>
 

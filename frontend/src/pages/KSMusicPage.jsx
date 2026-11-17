@@ -1,16 +1,9 @@
-import React, { lazy, Suspense } from 'react'
+import React from 'react'
 import { usePlatformLayout } from '../shared/hooks/usePlatformLayout'
-import LoadingSpinner from '../components/LoadingSpinner'
-
-const KSMusicPageDesktop = lazy(() => import('../desktop/pages/KSMusicPageDesktop'))
-const KSMusicPageMobile = lazy(() => import('../mobile/pages/KSMusicPageMobile'))
+import KSMusicPageDesktop from '../desktop/pages/KSMusicPageDesktop'
+import KSMusicPageMobile from '../mobile/pages/KSMusicPageMobile'
 
 export default function KSMusicPage(props) {
   const { isMobile } = usePlatformLayout()
-
-  return (
-    <Suspense fallback={<LoadingSpinner />}>
-      {isMobile ? <KSMusicPageMobile {...props} /> : <KSMusicPageDesktop {...props} />}
-    </Suspense>
-  )
+  return isMobile ? <KSMusicPageMobile {...props} /> : <KSMusicPageDesktop {...props} />
 }
