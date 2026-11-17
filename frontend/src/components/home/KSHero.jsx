@@ -7,7 +7,7 @@ const KSHero = ({ config = {}, events = [] }) => {
   const nextEvent = events[0] || null
 
   return (
-    <section className="relative min-h-[90svh] sm:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-background bg-pattern-cross pt-4 sm:pt-0">
+    <section className="relative min-h-[92svh] sm:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-background bg-pattern-cross pt-16 sm:pt-0">
 
 
       {/* Structural Vertical Framing Guides */}
@@ -22,7 +22,7 @@ const KSHero = ({ config = {}, events = [] }) => {
 
 
 
-      {/* Corner accent label (Desktop only - hidden on mobile to prevent clutter) */}
+      {/* Corner accent label (Desktop: pojok layar; Mobile: rapi di atas hero tanpa buang aset) */}
       <div className="absolute top-24 sm:top-28 left-4 sm:left-8 z-10 hidden sm:block">
         <span className="text-[9px] sm:text-[10px] font-black tracking-[0.4em] text-text-secondary/50 uppercase block">
           {config?.corner_left_1 || 'コーヒーの世界へ'}
@@ -41,7 +41,13 @@ const KSHero = ({ config = {}, events = [] }) => {
         </span>
       </div>
 
-      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-6 sm:pt-20 pb-8 sm:pb-16">
+      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-4 sm:pt-20 pb-8 sm:pb-16">
+        {/* Mobile Corner Accent Tagline (Menampilkan Aset Asli Desktop di Mobile) */}
+        <div className="flex sm:hidden items-center justify-between w-full max-w-xs mx-auto mb-3 px-1 text-[9px] font-bold tracking-[0.25em] text-text-secondary/70 uppercase font-mono">
+          <span>{config?.corner_left_1 || 'コーヒーの世界へ'}</span>
+          <span className="text-primary/80">{config?.corner_right_1 || 'ラテ · マキアート'}</span>
+        </div>
+
         {/* Pre-title */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}

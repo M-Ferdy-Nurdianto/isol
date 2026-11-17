@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { FaHome, FaUsers, FaTicketAlt, FaMusic, FaUser, FaSun, FaMoon, FaShoppingBag } from 'react-icons/fa'
+import { FaHome, FaUsers, FaStore, FaMusic, FaUser, FaSun, FaMoon, FaShoppingBag } from 'react-icons/fa'
 import { useTheme } from '../context/ThemeContext'
 import { useFanAuth } from '../context/FanAuthContext'
 import { useMerchCart } from '../context/MerchCartContext'
@@ -23,7 +23,7 @@ const KSHeader = () => {
   const bottomTabs = [
     { name: 'Home', href: '/', icon: FaHome },
     { name: 'About', href: '/about', icon: FaUsers },
-    { name: 'Shop', href: '/shop', icon: FaTicketAlt },
+    { name: 'Shop', href: '/shop', icon: FaStore },
     { name: 'Music', href: '/music', icon: FaMusic },
     { name: 'Profil', href: isLoggedIn ? '/profile' : '/login', icon: FaUser },
   ]
@@ -142,13 +142,63 @@ const KSHeader = () => {
       </header>
 
       {/* =========================================================================
-          MOBILE FLOATING CIRCLE CAPSULE BOTTOM NAVBAR (md:hidden)
-          Melayang sedikit (bottom-4) + Rounded-full circle kayak desktop + Pill active
+          MOBILE TOP BAR (md:hidden)
+          Brand Logo di kiri + Tombol Ganti Tema di ATAS KANAN SAJA
           ========================================================================= */}
-      <div className="md:hidden fixed bottom-4 inset-x-0 z-50 flex justify-center px-3 pointer-events-none">
+      <header className="md:hidden fixed top-0 inset-x-0 z-50 flex items-center justify-between px-4 pt-3 pb-2.5 bg-[#FAF7F2] dark:bg-[#1A1512] border-b border-[#E8DDD0] dark:border-[#3A2E24] shadow-sm">
+        {/* Brand Logo */}
+        <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
+          <div className="relative">
+            <span className="text-lg font-black tracking-tighter text-text-primary">
+              KOHI <span className="text-primary">SEKAI</span>
+            </span>
+          </div>
+          <span className="text-[9px] font-bold tracking-widest text-text-secondary/70 uppercase font-mono">
+            コーヒー
+          </span>
+        </Link>
+
+        {/* Top Right Controls: Theme Toggle Button (+ Cart jika ada item) */}
+        <div className="flex items-center gap-2">
+          {totalItems > 0 && (
+            <button
+              type="button"
+              data-cart-icon
+              onClick={openCart}
+              className="relative w-9 h-9 rounded-full flex items-center justify-center border bg-[#F2E8DC] dark:bg-[#251E19] border-[#E2D4C3] dark:border-[#3E3228] text-primary active:scale-95 transition-transform"
+              aria-label="Keranjang Belanja"
+            >
+              <FaShoppingBag size={13} />
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#E8944A] text-white text-[9px] font-mono font-black flex items-center justify-center shadow-md">
+                {totalItems}
+              </span>
+            </button>
+          )}
+
+          {/* Tombol Ganti Tema - Di Atas Kanan Saja */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="w-9 h-9 rounded-full flex items-center justify-center border bg-[#F2E8DC] dark:bg-[#251E19] border-[#E2D4C3] dark:border-[#3E3228] text-[#736253] dark:text-[#B0A599] active:scale-95 transition-transform shadow-sm"
+            aria-label="Ganti Tema"
+            title="Ganti Tema"
+          >
+            {theme === 'dark' ? <FaSun size={14} className="text-[#E8944A]" /> : <FaMoon size={14} className="text-[#736253]" />}
+          </button>
+        </div>
+      </header>
+
+      {/* =========================================================================
+          MOBILE FLOATING CIRCLE CAPSULE BOTTOM NAVBAR (md:hidden)
+          Icon Only (Tanpa Teks) + Shop Icon Store + Safe Area Padding
+          ========================================================================= */}
+      <div 
+        className="md:hidden fixed bottom-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
         <nav
           aria-label="Mobile Navigation"
-          className="pointer-events-auto w-full max-w-[360px] rounded-full p-1.5 flex items-center justify-between border bg-white dark:bg-[#251E19] border-[#E8DDD0] dark:border-[#3E3228] shadow-2xl shadow-black/60"
+          className="pointer-events-auto w-full max-w-[320px] rounded-full p-1.5 flex items-center justify-between border bg-white dark:bg-[#251E19] border-[#E8DDD0] dark:border-[#3E3228] shadow-2xl shadow-black/60"
         >
           {bottomTabs.map((tab) => {
             const active = isTabActive(tab)
@@ -158,65 +208,33 @@ const KSHeader = () => {
               <Link
                 key={tab.name}
                 to={tab.href}
+                aria-label={tab.name}
+                title={tab.name}
                 style={active ? { backgroundColor: 'var(--primary)', color: '#ffffff' } : {}}
-                className={`flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-full transition-all duration-200 ${
+                className={`w-11 h-11 flex items-center justify-center rounded-full transition-all duration-200 active:scale-95 ${
                   active
                     ? 'shadow-md shadow-primary/30 text-white font-black'
-                    : 'text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 font-bold'
+                    : 'text-[#736253] dark:text-[#B0A599] hover:text-[#2B2420] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10'
                 }`}
               >
                 {tab.name === 'Profil' && isLoggedIn && fanUser?.image_url ? (
-                  <div className="w-4 h-4 rounded-full overflow-hidden border border-current shrink-0">
+                  <div className="w-6 h-6 rounded-full overflow-hidden border border-current shrink-0">
                     <img 
                       src={getAssetPath(fanUser.image_url)} 
                       alt="PP" 
                       className="w-full h-full object-cover" 
                       onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.style.display = 'block'; }}
                     />
-                    <Icon size={16} style={{ display: 'none' }} />
+                    <Icon size={18} style={{ display: 'none' }} />
                   </div>
                 ) : (
-                  <Icon size={16} />
+                  <Icon size={18} />
                 )}
-                <span className="text-[9px] mt-0.5 uppercase tracking-wider leading-none">
-                  {tab.name}
-                </span>
               </Link>
             )
           })}
-
-          {/* Theme Toggle Button inside the pill */}
-          <button
-            onClick={toggleTheme}
-            className="w-9 h-9 rounded-full flex items-center justify-center border bg-[#F2E8DC] dark:bg-[#1A1512] border-[#E2D4C3] dark:border-[#352A21] text-[#736253] dark:text-[#B0A599] shrink-0 ml-1 active:scale-95 transition-transform"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <FaSun size={13} /> : <FaMoon size={13} />}
-          </button>
         </nav>
       </div>
-
-      {/* =========================================================================
-          MOBILE FLOATING CART BUTTON (md:hidden)
-          Muncul melayang di atas bottom navbar saat ada item di cart atau di halaman shop
-          ========================================================================= */}
-      {totalItems > 0 && (
-        <div className="md:hidden fixed bottom-20 right-4 z-40">
-          <button
-            type="button"
-            data-cart-icon
-            onClick={openCart}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#E8944A] text-white shadow-2xl shadow-black/80 font-black text-xs uppercase tracking-wider active:scale-95 transition-transform border border-white/20"
-            aria-label="Buka Keranjang"
-          >
-            <FaShoppingBag size={13} />
-            <span>Keranjang</span>
-            <span className="w-5 h-5 rounded-full bg-black/30 text-white text-[10px] font-mono font-black flex items-center justify-center">
-              {totalItems}
-            </span>
-          </button>
-        </div>
-      )}
 
       {/* Global Modals for Fan Authentication & Order History */}
       <FanAuthModal />

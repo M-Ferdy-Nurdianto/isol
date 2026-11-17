@@ -72,8 +72,8 @@ export default defineConfig({
         name: 'Kohi Sekai Official',
         short_name: 'KS Official',
         description: 'Official website of Kohi Sekai Idol Group',
-        theme_color: '#EC4899',
-        background_color: '#ffffff',
+        theme_color: '#1A1512',
+        background_color: '#1A1512',
         display: 'standalone',
         icons: [
           {
