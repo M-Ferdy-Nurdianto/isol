@@ -49,7 +49,20 @@ const INDO_MONTHS = [
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
 ]
 
-const DAY_NAMES = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
+const EN_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+]
+
+const CALENDAR_DAYS = [
+  { id: 'Min', en: 'Sun' },
+  { id: 'Sen', en: 'Mon' },
+  { id: 'Sel', en: 'Tue' },
+  { id: 'Rab', en: 'Wed' },
+  { id: 'Kam', en: 'Thu' },
+  { id: 'Jum', en: 'Fri' },
+  { id: 'Sab', en: 'Sat' },
+]
 
 const DEFAULT_OFFICIAL_MERCH = [
   {
@@ -754,10 +767,21 @@ const KSShopPage = () => {
                       </div>
                       <div>
                         <h2 className="text-xl sm:text-3xl font-black text-text-primary tracking-tight">
-                          {INDO_MONTHS[currentMonthIndex]} {currentYear}
+                          <span className="sm:hidden">{INDO_MONTHS[currentMonthIndex]} {currentYear}</span>
+                          <span className="hidden sm:inline">{EN_MONTHS[currentMonthIndex]} {currentYear}</span>
                         </h2>
                         <p className="text-[11px] sm:text-xs text-text-secondary">
-                          {events.filter(e => INDO_MONTHS.indexOf(e.bulan) === currentMonthIndex && e.tahun === currentYear).length} event dijadwalkan bulan ini
+                          <span className="sm:hidden">
+                            {events.filter(e => INDO_MONTHS.indexOf(e.bulan) === currentMonthIndex && e.tahun === currentYear).length} event dijadwalkan bulan ini
+                          </span>
+                          <span className="hidden sm:inline">
+                            {(() => {
+                              const count = events.filter(e => INDO_MONTHS.indexOf(e.bulan) === currentMonthIndex && e.tahun === currentYear).length
+                              return count === 0
+                                ? 'No events scheduled this month'
+                                : `${count} ${count === 1 ? 'event' : 'events'} scheduled this month`
+                            })()}
+                          </span>
                         </p>
                       </div>
                     </div>
@@ -768,19 +792,22 @@ const KSShopPage = () => {
                         onClick={handleJumpToToday}
                         className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-background border border-border text-xs font-bold text-text-secondary hover:text-primary hover:border-primary/40 transition-colors"
                       >
-                        Hari Ini
+                        <span className="sm:hidden">Hari Ini</span>
+                        <span className="hidden sm:inline">Today</span>
                       </button>
                       <button
                         onClick={handlePrevMonth}
                         className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-background border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/40 transition-colors"
-                        aria-label="Bulan Sebelumnya"
+                        aria-label="Previous Month"
+                        title="Previous Month"
                       >
                         <FaChevronLeft size={12} />
                       </button>
                       <button
                         onClick={handleNextMonth}
                         className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-background border border-border flex items-center justify-center text-text-secondary hover:text-primary hover:border-primary/40 transition-colors"
-                        aria-label="Bulan Berikutnya"
+                        aria-label="Next Month"
+                        title="Next Month"
                       >
                         <FaChevronRight size={12} />
                       </button>
@@ -789,13 +816,15 @@ const KSShopPage = () => {
 
                   {/* Day of Week Headers */}
                   <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2 text-center">
-                    {DAY_NAMES.map((day, idx) => (
+                    {CALENDAR_DAYS.map((day, idx) => (
                       <div
-                        key={day}
-                        className={`py-1 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-wider ${idx === 0 ? 'text-accent' : 'text-text-secondary/70'
-                          }`}
+                        key={day.id}
+                        className={`py-1 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-wider ${
+                          idx === 0 ? 'text-accent' : 'text-text-secondary/70'
+                        }`}
                       >
-                        {day}
+                        <span className="sm:hidden">{day.id}</span>
+                        <span className="hidden sm:inline">{day.en}</span>
                       </div>
                     ))}
                   </div>
@@ -882,7 +911,7 @@ const KSShopPage = () => {
                               ))}
                               {dayEvents.length > 2 && (
                                 <span className="text-[8px] font-bold text-text-secondary block pl-1">
-                                  +{dayEvents.length - 2} event lagi
+                                  +{dayEvents.length - 2} more events
                                 </span>
                               )}
                             </div>
@@ -897,7 +926,8 @@ const KSShopPage = () => {
                     <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2 text-[11px] sm:text-xs">
                       <span className="flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-                        <span>Ada Event</span>
+                        <span className="sm:hidden">Ada Event</span>
+                        <span className="hidden sm:inline">Event Scheduled</span>
                       </span>
                       <span className="flex items-center gap-1.5">
                         <FaStar className="text-purple-400 text-[11px]" />
@@ -905,11 +935,13 @@ const KSShopPage = () => {
                       </span>
                       <span className="flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-full bg-primary/20 border border-primary" />
-                        <span>Tanggal Terpilih</span>
+                        <span className="sm:hidden">Tanggal Terpilih</span>
+                        <span className="hidden sm:inline">Selected Date</span>
                       </span>
                     </div>
                     <p className="text-[11px] text-text-secondary/70 text-center sm:text-right">
-                      Klik tanggal bertanda untuk melihat detail event.
+                      <span className="sm:hidden">Klik tanggal bertanda untuk melihat detail event.</span>
+                      <span className="hidden sm:inline">Click on a marked date to view event details.</span>
                     </p>
                   </div>
                 </div>
@@ -919,7 +951,10 @@ const KSShopPage = () => {
               <section id="event-detail" className="mb-16 sm:mb-20">
                 {eventsOnSelectedDate.length > 1 && (
                   <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
-                    <span className="text-xs font-bold text-text-secondary whitespace-nowrap">Pilih Event:</span>
+                    <span className="text-xs font-bold text-text-secondary whitespace-nowrap">
+                      <span className="sm:hidden">Pilih Event:</span>
+                      <span className="hidden sm:inline">Select Event:</span>
+                    </span>
                     {eventsOnSelectedDate.map((ev) => (
                       <button
                         key={ev.id}
@@ -948,7 +983,8 @@ const KSShopPage = () => {
                       <div className="flex-1 space-y-3.5 sm:space-y-4">
                         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                           <span className="px-3 py-0.5 sm:px-3.5 sm:py-1 rounded-full bg-primary/10 border border-border text-primary text-[10px] sm:text-xs font-black uppercase tracking-wider">
-                            EVENT TERPILIH · TIKET OPEN
+                            <span className="sm:hidden">EVENT TERPILIH · TIKET OPEN</span>
+                            <span className="hidden sm:inline">SELECTED EVENT · TICKETS OPEN</span>
                           </span>
                           {currentEvent.is_special && (
                             <span className="px-3 py-0.5 sm:px-3.5 sm:py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
@@ -970,9 +1006,15 @@ const KSShopPage = () => {
                           <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-background border border-border">
                             <FaCalendarAlt className="text-primary text-base flex-shrink-0" />
                             <div>
-                              <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">Tanggal Event</p>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">
+                                <span className="sm:hidden">Tanggal Event</span>
+                                <span className="hidden sm:inline">Event Date</span>
+                              </p>
                               <p className="text-xs sm:text-sm font-bold text-text-primary">
-                                {currentEvent.tanggal} {currentEvent.bulan} {currentEvent.tahun}
+                                <span className="sm:hidden">{currentEvent.tanggal} {currentEvent.bulan} {currentEvent.tahun}</span>
+                                <span className="hidden sm:inline">
+                                  {currentEvent.tanggal} {EN_MONTHS[INDO_MONTHS.indexOf(currentEvent.bulan)] || currentEvent.bulan} {currentEvent.tahun}
+                                </span>
                               </p>
                             </div>
                           </div>
@@ -980,7 +1022,10 @@ const KSShopPage = () => {
                           <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-background border border-border">
                             <FaClock className="text-primary text-base flex-shrink-0" />
                             <div>
-                              <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">Waktu & Sesi</p>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">
+                                <span className="sm:hidden">Waktu & Sesi</span>
+                                <span className="hidden sm:inline">Time & Session</span>
+                              </p>
                               <p className="text-xs sm:text-sm font-bold text-text-primary">
                                 {currentEvent.cheki_time || currentEvent.event_time || '15:00 - 18:00 WIB'}
                               </p>
@@ -990,7 +1035,10 @@ const KSShopPage = () => {
                           <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-background border border-border">
                             <FaMapMarkerAlt className="text-primary text-base flex-shrink-0" />
                             <div>
-                              <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">Lokasi / Venue</p>
+                              <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">
+                                <span className="sm:hidden">Lokasi / Venue</span>
+                                <span className="hidden sm:inline">Location / Venue</span>
+                              </p>
                               <p className="text-xs sm:text-sm font-bold text-text-primary truncate">
                                 {currentEvent.lokasi}
                               </p>
@@ -1001,12 +1049,16 @@ const KSShopPage = () => {
 
                       {/* CTA Button to Order for this Event */}
                       <div className="lg:w-auto flex flex-col justify-center items-start lg:items-end border-t lg:border-t-0 lg:border-l border-border pt-6 lg:pt-0 lg:pl-8 space-y-3">
-                        <span className="text-xs text-text-secondary font-medium block">Sudah punya akun Fan ID?</span>
+                        <span className="text-xs text-text-secondary font-medium block">
+                          <span className="sm:hidden">Sudah punya akun Fan ID?</span>
+                          <span className="hidden sm:inline">Ready to book with Fan ID?</span>
+                        </span>
                         <button
                           onClick={() => handleBookCurrentEvent()}
                           className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-primary hover:bg-primary-hover text-white font-black text-xs sm:text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 min-h-[48px]"
                         >
-                          <span>Pesan Tiket Event Ini</span>
+                          <span className="sm:hidden">Pesan Tiket Event Ini</span>
+                          <span className="hidden sm:inline">Book Tickets for This Event</span>
                           <FaArrowRight size={14} />
                         </button>
                       </div>
