@@ -38,6 +38,7 @@ import FanOrderHistoryModal from '../../components/auth/FanOrderHistoryModal'
 import SizeChartModal from '../../components/ui/SizeChartModal'
 import { useFanAuth } from '../../context/FanAuthContext'
 import { useMerchCart } from '../../context/MerchCartContext'
+import { useHideBottomNav } from '../../context/UIContext'
 import api from '../../lib/api'
 import { getAssetPath } from '../../lib/pathUtils'
 import ImageUploadDropzone from '../../components/ui/ImageUploadDropzone'
@@ -162,6 +163,9 @@ const KSShopPage = () => {
 
   // Merchandise Modal States
   const [merchQty, setMerchQty] = useState(1)
+
+  // Hide mobile bottom navigation whenever merchandise detail modal is open
+  useHideBottomNav(Boolean(selectedMerch))
 
   // Calendar states
   const today = useMemo(() => new Date(), [])
@@ -1492,7 +1496,7 @@ const KSShopPage = () => {
       ============================================================ */}
       <AnimatePresence>
         {selectedMerch && (
-          <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
+          <div className="fixed inset-0 z-[70] flex items-end md:items-center justify-center">
             {/* Solid Dark Backdrop (Anti-Blur per AGENTS.md) */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -1519,18 +1523,11 @@ const KSShopPage = () => {
                 <div className="w-12 h-1 rounded-full bg-white/20" />
               </div>
 
-              {/* Mobile Header with Category and Close Button */}
+              {/* Mobile Header with Clean Title and Close Button */}
               <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#3A2E24] shrink-0">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#E8944A]/15 text-[#E8944A] border border-[#E8944A]/30">
-                    Official Merch
-                  </span>
-                  {selectedMerch.kategori && (
-                    <span className="text-[10px] uppercase font-bold text-text-secondary">
-                      {selectedMerch.kategori === 'baju' ? 'Apparel' : 'Aksesoris'}
-                    </span>
-                  )}
-                </div>
+                <span className="text-xs font-black uppercase text-text-primary tracking-wider">
+                  Detail Produk
+                </span>
                 <button
                   type="button"
                   onClick={() => setSelectedMerch(null)}
@@ -1544,11 +1541,11 @@ const KSShopPage = () => {
               {/* Scrollable Content Body */}
               <div className="p-5 overflow-y-auto space-y-4">
                 {/* Product Image */}
-                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-[#1A1512] border border-[#3A2E24]">
+                <div className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-[#1A1512] border border-[#3A2E24] flex items-center justify-center shrink-0">
                   <img
                     src={selectedMerch.gambar_url ? getAssetPath(selectedMerch.gambar_url) : getAssetPath('/images/merch/jersey.svg')}
                     alt={selectedMerch.nama}
-                    className="w-full h-full object-contain p-4"
+                    className="w-full h-full object-contain p-3"
                     onError={(e) => {
                       e.target.onerror = null
                       e.target.src = getAssetPath('/images/merch/jersey.svg')
@@ -1573,6 +1570,9 @@ const KSShopPage = () => {
 
                 {/* Info Text */}
                 <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#E8944A] block mb-1">
+                    {selectedMerch.kategori === 'baju' ? 'Apparel' : (selectedMerch.kategori || 'Official Merchandise')}
+                  </span>
                   <h3 className="text-base font-black text-text-primary uppercase tracking-tight leading-snug">
                     {selectedMerch.nama}
                   </h3>
@@ -1589,21 +1589,23 @@ const KSShopPage = () => {
                   )}
                 </div>
 
-                {/* Size Selector (if apparel) */}
-                {selectedMerch.sizes && selectedMerch.sizes.length > 0 && (
+                {/* Size Selector (only if multiple sizes/variants exist) */}
+                {selectedMerch.sizes && selectedMerch.sizes.length > 1 && (
                   <div className="space-y-2 pt-2 border-t border-[#3A2E24]">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
                         Pilih Ukuran
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => setShowSizeChart(true)}
-                        className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#E8944A] hover:underline"
-                      >
-                        <FaRulerCombined size={10} />
-                        <span>Panduan Ukuran</span>
-                      </button>
+                      {(selectedMerch.kategori === 'baju' || /jersey|t-shirt|kaos|apparel/i.test(selectedMerch.nama || '')) && (
+                        <button
+                          type="button"
+                          onClick={() => setShowSizeChart(true)}
+                          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#E8944A] hover:underline"
+                        >
+                          <FaRulerCombined size={10} />
+                          <span>Panduan Ukuran</span>
+                        </button>
+                      )}
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {selectedMerch.sizes.map(size => (
@@ -1664,8 +1666,8 @@ const KSShopPage = () => {
                 </div>
               </div>
 
-              {/* Mobile Sticky Bottom Actions */}
-              <div className="p-3 bg-[#1A1512] border-t border-[#3A2E24] grid grid-cols-2 gap-2 shrink-0">
+              {/* Mobile Sticky Bottom Actions with Safe-Area Padding */}
+              <div className="p-3.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] bg-[#1A1512] border-t border-[#3A2E24] grid grid-cols-2 gap-2.5 shrink-0">
                 <button
                   type="button"
                   onClick={handleAddToCartFromModal}

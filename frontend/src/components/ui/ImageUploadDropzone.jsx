@@ -24,6 +24,7 @@ const ImageUploadDropzone = ({
   previewUrl,
   onRemove,
   label,
+  emptyText,
   hint = 'Format didukung: JPG, PNG, WebP (Auto-kompres WebP)',
   compact = false,
   aspectRatio = 'aspect-square',
@@ -239,7 +240,7 @@ const ImageUploadDropzone = ({
                 ? 'Mengompres gambar ke WebP...'
                 : isDragging
                 ? 'Lepas foto di sini untuk upload'
-                : 'Drag & drop foto ke sini, atau klik untuk pilih'}
+                : (emptyText || 'Drag & drop foto ke sini, atau klik untuk pilih')}
             </p>
             {hint && (
               <p className="text-[10px] text-text-secondary mt-0.5 font-medium">

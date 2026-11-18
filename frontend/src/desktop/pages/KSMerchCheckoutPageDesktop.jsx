@@ -25,11 +25,13 @@ import { useFanAuth } from '../../context/FanAuthContext'
 import { kohiToast } from '../../components/ui/KohiToast'
 import ImageUploadDropzone from '../../components/ui/ImageUploadDropzone'
 import { getAssetPath } from '../../lib/pathUtils'
+import { useHideBottomNav } from '../../context/UIContext'
 import api from '../../lib/api'
 
 const KSMerchCheckoutPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  useHideBottomNav(true)
   const { fanUser, isLoggedIn, openAuthModal } = useFanAuth()
   const { cart, clearCart, updateQuantity, removeFromCart, totalItems: cartTotalItems, totalPrice: cartTotalPrice } = useMerchCart()
 
@@ -191,7 +193,7 @@ const KSMerchCheckoutPage = () => {
     <div className="min-h-screen bg-[#1A1512] text-text-primary bg-pattern-dots overflow-x-hidden relative flex flex-col justify-between">
       <KSHeader />
 
-      <main className="pt-28 sm:pt-36 pb-24 relative z-10 flex-1">
+      <main className="pt-16 sm:pt-36 pb-28 relative z-10 flex-1">
         <div className="container mx-auto max-w-[1200px] px-4 sm:px-6">
 
           {/* =========================================================================
@@ -784,10 +786,10 @@ const KSMerchCheckoutPage = () => {
                 {/* =========================================================================
                     MOBILE SINGLE COLUMN LAYOUT (md:hidden)
                     ========================================================================= */}
-                <div className="md:hidden space-y-5">
+                <div className="md:hidden space-y-5 pb-28">
                   {/* Item Recap Pill */}
                   <div className="p-4 rounded-2xl bg-[#241E19] border border-[#3A2E24] space-y-2.5">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between pb-2 border-b border-[#3A2E24]">
                       <span className="text-xs font-black uppercase text-text-primary flex items-center gap-1.5">
                         <FaShoppingBag className="text-[#E8944A]" />
                         <span>Item Dipesan ({totalItemCount})</span>
@@ -797,18 +799,85 @@ const KSMerchCheckoutPage = () => {
                       </span>
                     </div>
 
-                    <div className="space-y-2 max-h-48 overflow-y-auto pt-1">
-                      {checkoutItems.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between text-xs py-1 border-b border-[#3A2E24]/50 last:border-0">
-                          <span className="text-text-primary font-bold truncate max-w-[200px]">
-                            {item.nama} {item.size ? `(${item.size})` : ''} x{item.quantity}
-                          </span>
-                          <span className="font-mono text-text-secondary text-[11px]">
-                            Rp {(Number(item.harga || 0) * (item.quantity || 1)).toLocaleString('id-ID')}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                    {checkoutItems.length === 0 ? (
+                      <div className="py-4 text-center space-y-2">
+                        <p className="text-xs text-text-secondary">Keranjang belanja kosong.</p>
+                        <Link
+                          to="/shop?tab=merch"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#E8944A] text-white text-[11px] font-black uppercase"
+                        >
+                          <FaShoppingBag size={10} />
+                          <span>Lihat Merch</span>
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 pt-1">
+                        {checkoutItems.map((item) => {
+                          const itemKey = item.cartId || `${item.id}-${item.size || 'default'}`
+                          return (
+                            <div key={itemKey} className="p-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] flex gap-2.5 items-center">
+                              <div className="w-12 h-12 rounded-lg bg-[#241E19] border border-[#3A2E24] overflow-hidden shrink-0 flex items-center justify-center">
+                                <img
+                                  src={item.gambar_url ? getAssetPath(item.gambar_url) : getAssetPath('/images/merch/jersey.svg')}
+                                  alt={item.nama}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.target.onerror = null
+                                    e.target.src = getAssetPath('/images/merch/jersey.svg')
+                                  }}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-xs font-bold text-text-primary line-clamp-2 uppercase leading-snug">
+                                  {item.nama}
+                                </h4>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  {item.size && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#241E19] border border-[#3A2E24] text-text-secondary font-mono">
+                                      {item.size}
+                                    </span>
+                                  )}
+                                  <span className="text-xs font-black text-[#E8944A] font-mono">
+                                    Rp {(Number(item.harga || 0) * (item.quantity || 1)).toLocaleString('id-ID')}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <div className="flex items-center bg-[#241E19] border border-[#3A2E24] rounded-lg">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleItemQtyChange(item, -1)}
+                                    className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-text-primary transition"
+                                    aria-label="Kurangi jumlah"
+                                  >
+                                    <FaMinus size={9} />
+                                  </button>
+                                  <span className="w-6 text-center text-xs font-black font-mono text-text-primary">
+                                    {item.quantity || 1}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleItemQtyChange(item, 1)}
+                                    className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-text-primary transition"
+                                    aria-label="Tambah jumlah"
+                                  >
+                                    <FaPlus size={9} />
+                                  </button>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleItemRemove(item)}
+                                  className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-red-400 transition"
+                                  aria-label="Hapus item"
+                                >
+                                  <FaTrash size={11} />
+                                </button>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   {/* Mobile Form Section: Data Penerima */}
@@ -831,30 +900,32 @@ const KSMerchCheckoutPage = () => {
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-[11px] font-bold text-text-secondary mb-1">
-                        No. WhatsApp <span className="text-[10px] text-text-secondary font-normal">(opsional)</span>
-                      </label>
-                      <input
-                        type="tel"
-                        value={buyer.whatsapp}
-                        onChange={(e) => setBuyer({ ...buyer, whatsapp: e.target.value })}
-                        placeholder="08xxxxxxxxxx (Opsional)"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
-                      />
-                    </div>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[11px] font-bold text-text-secondary mb-1">
+                          No. WhatsApp <span className="text-[10px] text-text-secondary font-normal">(opsional)</span>
+                        </label>
+                        <input
+                          type="tel"
+                          value={buyer.whatsapp}
+                          onChange={(e) => setBuyer({ ...buyer, whatsapp: e.target.value })}
+                          placeholder="08xxxxxxxxxx"
+                          className="w-full px-3 py-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
+                        />
+                      </div>
 
-                    <div>
-                      <label className="block text-[11px] font-bold text-text-secondary mb-1">
-                        Instagram <span className="text-[10px] text-text-secondary font-normal">(opsional)</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={buyer.instagram}
-                        onChange={(e) => setBuyer({ ...buyer, instagram: e.target.value })}
-                        placeholder="@username (Opsional)"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
-                      />
+                      <div>
+                        <label className="block text-[11px] font-bold text-text-secondary mb-1">
+                          Instagram <span className="text-[10px] text-text-secondary font-normal">(opsional)</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={buyer.instagram}
+                          onChange={(e) => setBuyer({ ...buyer, instagram: e.target.value })}
+                          placeholder="@username"
+                          className="w-full px-3 py-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
+                        />
+                      </div>
                     </div>
 
                     {(!buyer.whatsapp || !buyer.whatsapp.trim()) && (
@@ -995,17 +1066,20 @@ const KSMerchCheckoutPage = () => {
                     </div>
 
                     {paymentMethod === 'tf' && (
-                      <div className="p-3.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] flex items-center justify-between gap-2">
+                      <div className="p-3.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] flex items-center justify-between gap-3">
                         <div>
-                          <p className="text-[10px] font-mono text-text-secondary">BCA {bankConfig.rekening}</p>
-                          <p className="text-xs font-bold text-text-primary">a.n. {bankConfig.atas_nama}</p>
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Transfer Bank BCA</p>
+                          <p className="text-lg sm:text-xl font-mono font-black text-text-primary tracking-wider mt-0.5">
+                            {bankConfig.rekening}
+                          </p>
+                          <p className="text-xs font-bold text-text-secondary mt-0.5">a.n. {bankConfig.atas_nama}</p>
                         </div>
                         <button
                           type="button"
                           onClick={handleCopyRekening}
-                          className="px-3 py-1.5 rounded-lg bg-[#241E19] border border-[#3A2E24] text-[#E8944A] text-xs font-bold flex items-center gap-1"
+                          className="min-h-[44px] min-w-[76px] px-3.5 py-2.5 rounded-xl bg-[#241E19] hover:bg-[#3A2E24] border border-[#3A2E24] text-[#E8944A] text-xs font-black flex items-center justify-center gap-1.5 transition active:scale-95 shrink-0"
                         >
-                          <FaCopy size={10} />
+                          <FaCopy size={12} />
                           <span>{copiedRekening ? 'Tersalin' : 'Salin'}</span>
                         </button>
                       </div>
@@ -1024,6 +1098,8 @@ const KSMerchCheckoutPage = () => {
                       <ImageUploadDropzone
                         label="Bukti Pembayaran (opsional)"
                         previewUrl={proofPreview}
+                        emptyText="Ketuk untuk pilih foto bukti transfer"
+                        hint="Format didukung: JPG, PNG, WebP (Auto-kompres WebP)"
                         onImageChange={(file, url) => {
                           setProofFile(file)
                           setProofPreview(url)
@@ -1037,29 +1113,31 @@ const KSMerchCheckoutPage = () => {
                     </div>
                   </div>
 
-                  {/* Mobile Sticky Bottom Checkout Bar */}
-                  <div className="p-4 rounded-2xl bg-[#241E19] border border-[#3A2E24] space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-text-secondary uppercase font-bold">Total Pembayaran</span>
-                      <span className="text-base font-black text-[#E8944A] font-mono">
+                  {/* Fixed Sticky Bottom Checkout Bar (Single Bar Only) */}
+                  <div className="fixed bottom-0 inset-x-0 z-40 bg-[#241E19] border-t border-[#3A2E24] p-3.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] shadow-2xl flex items-center justify-between gap-3">
+                    <div>
+                      <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider block">
+                        Total Pembayaran
+                      </span>
+                      <span className="text-base sm:text-lg font-black text-[#E8944A] font-mono leading-tight">
                         Rp {subtotalPrice.toLocaleString('id-ID')}
                       </span>
                     </div>
 
                     <button
                       type="submit"
-                      disabled={submitting}
-                      className="w-full py-3.5 px-4 rounded-xl bg-[#E8944A] hover:bg-[#E8944A]/90 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition disabled:opacity-50 active:scale-95"
+                      disabled={submitting || checkoutItems.length === 0}
+                      className="py-3 px-5 rounded-xl bg-[#E8944A] hover:bg-[#E8944A]/90 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition disabled:opacity-50 active:scale-95 shrink-0"
                     >
                       {submitting ? (
                         <>
                           <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                          <span>Memproses Pesanan...</span>
+                          <span>Memproses...</span>
                         </>
                       ) : (
                         <>
                           <FaCheck size={11} />
-                          <span>Konfirmasi & Bayar Pesanan</span>
+                          <span>Konfirmasi & Bayar</span>
                         </>
                       )}
                     </button>

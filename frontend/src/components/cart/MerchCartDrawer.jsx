@@ -3,11 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { FaTimes, FaTrash, FaMinus, FaPlus, FaShoppingBag, FaArrowRight, FaBox } from 'react-icons/fa'
 import { useMerchCart } from '../../context/MerchCartContext'
+import { useHideBottomNav } from '../../context/UIContext'
 import { getAssetPath } from '../../lib/pathUtils'
 
 const MerchCartDrawer = () => {
   const navigate = useNavigate()
   const { cart, isCartOpen, closeCart, updateQuantity, removeFromCart, totalItems, totalPrice } = useMerchCart()
+
+  // Suppress mobile bottom nav when cart drawer is open
+  useHideBottomNav(isCartOpen)
 
   // Close on Escape key press
   useEffect(() => {
@@ -30,7 +34,7 @@ const MerchCartDrawer = () => {
   return (
     <AnimatePresence>
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0 z-[70] overflow-hidden">
           {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -119,7 +123,9 @@ const MerchCartDrawer = () => {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-black text-text-primary truncate">{item.nama}</p>
+                      <p className="text-xs font-black text-text-primary line-clamp-2 uppercase leading-snug">
+                        {item.nama}
+                      </p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-xs font-black text-[#E8944A]">
                           Rp {Number(item.harga || 0).toLocaleString('id-ID')}
@@ -167,9 +173,9 @@ const MerchCartDrawer = () => {
               )}
             </div>
 
-            {/* Mobile Footer Checkout Bar */}
+            {/* Mobile Footer Checkout Bar with Safe Area */}
             {cart.length > 0 && (
-              <div className="p-4 border-t border-[#3A2E24] bg-[#241E19] space-y-3">
+              <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] border-t border-[#3A2E24] bg-[#241E19] space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">Total</span>
                   <span className="text-base font-black text-[#E8944A]">
@@ -180,9 +186,9 @@ const MerchCartDrawer = () => {
                 <button
                   type="button"
                   onClick={handleGoToCheckout}
-                  className="w-full py-3 px-4 rounded-xl bg-[#E8944A] hover:bg-[#E8944A]/90 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
+                  className="w-full py-3.5 px-4 rounded-xl bg-[#E8944A] hover:bg-[#E8944A]/90 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
                 >
-                  <span>Lanjut ke Checkout ({totalItems})</span>
+                  <span>Halaman Checkout ({totalItems} item)</span>
                   <FaArrowRight size={11} />
                 </button>
               </div>

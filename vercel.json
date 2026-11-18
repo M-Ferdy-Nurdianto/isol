@@ -13,11 +13,15 @@
   "rewrites": [
     {
       "source": "/sitemap.xml",
-      "destination": "/sitemap.xml"
+      "destination": {
+        "service": "frontend"
+      }
     },
     {
       "source": "/robots.txt",
-      "destination": "/robots.txt"
+      "destination": {
+        "service": "frontend"
+      }
     },
     {
       "source": "/api",
@@ -44,33 +48,16 @@
       }
     },
     {
-      "source": "/checkout/merch",
-      "destination": "/merch-checkout"
-    },
-    {
-      "source": "/checkout/:eventId",
-      "destination": "/checkout"
-    },
-    {
-      "source": "/checkout/:eventId/(.*)",
-      "destination": "/checkout"
-    },
-    {
-      "source": "/admin/:path*",
-      "destination": "/admin"
-    },
-    {
-      "source": "/reset-password/:path*",
-      "destination": "/reset-password"
-    },
-    {
-      "source": "/magic-login/:path*",
-      "destination": "/magic-login"
+      "source": "/(.*\\.[a-zA-Z0-9]+)",
+      "destination": {
+        "service": "frontend"
+      }
     },
     {
       "source": "/(.*)",
       "destination": {
-        "service": "frontend"
+        "service": "frontend",
+        "path": "/index.html"
       }
     }
   ],

@@ -3,6 +3,7 @@ import { FaHome, FaUsers, FaStore, FaMusic, FaUser, FaSun, FaMoon, FaShoppingBag
 import { useTheme } from '../context/ThemeContext'
 import { useFanAuth } from '../context/FanAuthContext'
 import { useMerchCart } from '../context/MerchCartContext'
+import { useUI } from '../context/UIContext'
 import { getAssetPath } from '../lib/pathUtils'
 import FanAuthModal from './auth/FanAuthModal'
 import FanOrderHistoryModal from './auth/FanOrderHistoryModal'
@@ -11,7 +12,14 @@ const KSHeader = () => {
   const location = useLocation()
   const { theme, toggleTheme } = useTheme()
   const { isLoggedIn, fanUser } = useFanAuth()
-  const { openCart, totalItems } = useMerchCart()
+  const { isCartOpen, openCart, totalItems } = useMerchCart()
+  const { isBottomNavHidden } = useUI()
+
+  const shouldHideBottomNav =
+    isBottomNavHidden ||
+    isCartOpen ||
+    location.pathname.startsWith('/checkout') ||
+    location.pathname.startsWith('/merch-checkout')
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -193,9 +201,9 @@ const KSHeader = () => {
           MOBILE FLOATING CIRCLE CAPSULE BOTTOM NAVBAR (md:hidden)
           Icon Only (Tanpa Teks) + Shop Icon Store + Safe Area Padding
           Warna Selaras & Sedikit Lebih Terang (#28211B)
-          Disembunyikan khusus di halaman checkout agar tidak menumpuk bar bayar
+          Disembunyikan otomatis bila ada sheet, checkout, atau overlay aksi aktif
           ========================================================================= */}
-      {!location.pathname.startsWith('/checkout') && !location.pathname.startsWith('/merch-checkout') && (
+      {!shouldHideBottomNav && (
         <div 
           className="md:hidden fixed bottom-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}

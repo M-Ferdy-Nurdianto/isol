@@ -28,9 +28,11 @@ import { useCheckout } from '../../shared/context/CheckoutContext'
 import { getAssetPath } from '../../lib/pathUtils'
 import ImageUploadDropzone from '../../components/ui/ImageUploadDropzone'
 import { webAlert } from '../../lib/webAlert'
+import { useHideBottomNav } from '../../context/UIContext'
 import '../styles/mobile.css'
 
 export default function KSCheckoutPageMobile() {
+  useHideBottomNav(true)
   const navigate = useNavigate()
   const {
     event,
@@ -825,6 +827,7 @@ export default function KSCheckoutPageMobile() {
                     </label>
                     <ImageUploadDropzone
                       previewUrl={filePreview}
+                      emptyText="Ketuk untuk pilih foto bukti transfer"
                       onImageChange={(compressedWebpFile, blobUrl) => {
                         setFile(compressedWebpFile)
                         setFilePreview(blobUrl)
@@ -833,7 +836,7 @@ export default function KSCheckoutPageMobile() {
                         setFile(null)
                         setFilePreview(null)
                       }}
-                      hint="Ketuk untuk memilih foto bukti transfer"
+                      hint="Format: JPG, PNG, WebP (Auto-kompres WebP)"
                     />
                   </div>
                 </div>
