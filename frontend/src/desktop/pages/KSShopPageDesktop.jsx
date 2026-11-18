@@ -440,6 +440,15 @@ const KSShopPage = () => {
     return events[0] || null
   }, [selectedEventId, selectedDateKey, events, eventsByDateKey])
 
+  const currentMonthEventsCount = useMemo(() => {
+    return events.filter(e => INDO_MONTHS.indexOf(e.bulan) === currentMonthIndex && e.tahun === currentYear).length
+  }, [events, currentMonthIndex, currentYear])
+
+  const currentMonthEventsTextEn = useMemo(() => {
+    if (currentMonthEventsCount === 0) return 'No events scheduled this month'
+    return `${currentMonthEventsCount} ${currentMonthEventsCount === 1 ? 'event' : 'events'} scheduled this month`
+  }, [currentMonthEventsCount])
+
   // Events on the selected date
   const eventsOnSelectedDate = useMemo(() => {
     if (!selectedDateKey) return []
@@ -772,15 +781,10 @@ const KSShopPage = () => {
                         </h2>
                         <p className="text-[11px] sm:text-xs text-text-secondary">
                           <span className="sm:hidden">
-                            {events.filter(e => INDO_MONTHS.indexOf(e.bulan) === currentMonthIndex && e.tahun === currentYear).length} event dijadwalkan bulan ini
+                            {currentMonthEventsCount} event dijadwalkan bulan ini
                           </span>
                           <span className="hidden sm:inline">
-                            {(() => {
-                              const count = events.filter(e => INDO_MONTHS.indexOf(e.bulan) === currentMonthIndex && e.tahun === currentYear).length
-                              return count === 0
-                                ? 'No events scheduled this month'
-                                : `${count} ${count === 1 ? 'event' : 'events'} scheduled this month`
-                            })()}
+                            {currentMonthEventsTextEn}
                           </span>
                         </p>
                       </div>
@@ -816,17 +820,18 @@ const KSShopPage = () => {
 
                   {/* Day of Week Headers */}
                   <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2 text-center">
-                    {CALENDAR_DAYS.map((day, idx) => (
-                      <div
-                        key={day.id}
-                        className={`py-1 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-wider ${
-                          idx === 0 ? 'text-accent' : 'text-text-secondary/70'
-                        }`}
-                      >
-                        <span className="sm:hidden">{day.id}</span>
-                        <span className="hidden sm:inline">{day.en}</span>
-                      </div>
-                    ))}
+                    {CALENDAR_DAYS.map((day, idx) => {
+                      const dayColor = idx === 0 ? 'text-accent' : 'text-text-secondary/70'
+                      return (
+                        <div
+                          key={day.id}
+                          className={`py-1 sm:py-2 text-[10px] sm:text-xs font-black uppercase tracking-wider ${dayColor}`}
+                        >
+                          <span className="sm:hidden">{day.id}</span>
+                          <span className="hidden sm:inline">{day.en}</span>
+                        </div>
+                      )
+                    })}
                   </div>
 
                   {/* Calendar Days Grid */}
@@ -841,30 +846,33 @@ const KSShopPage = () => {
                         today.getMonth() === dayObj.month &&
                         today.getFullYear() === dayObj.year
 
+                      let cellStyle = 'bg-background/60 border-border/60 hover:border-border'
+                      if (!dayObj.isCurrentMonth) {
+                        cellStyle = 'opacity-25 bg-transparent border-transparent pointer-events-none'
+                      } else if (isSelected) {
+                        cellStyle = 'bg-primary/20 border-primary shadow-sm shadow-primary/20 ring-1 ring-primary'
+                      } else if (hasEvents) {
+                        cellStyle = 'bg-background border-primary/40 hover:border-primary shadow-sm'
+                      }
+
+                      const dayBadgeStyle = isToday
+                        ? 'bg-primary text-white shadow-sm'
+                        : isSelected
+                          ? 'bg-primary text-white'
+                          : 'text-text-primary'
+
                       return (
                         <motion.button
                           key={i}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => handleSelectDay(dayObj)}
-                          className={`relative min-h-[48px] sm:min-h-[96px] md:min-h-[110px] p-1 sm:p-2.5 rounded-xl sm:rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between items-center sm:items-stretch ${!dayObj.isCurrentMonth
-                              ? 'opacity-25 bg-transparent border-transparent pointer-events-none'
-                              : isSelected
-                                ? 'bg-primary/20 border-primary shadow-sm shadow-primary/20 ring-1 ring-primary'
-                                : hasEvents
-                                  ? 'bg-background border-primary/40 hover:border-primary shadow-sm'
-                                  : 'bg-background/60 border-border/60 hover:border-border'
-                            }`}
+                          className={`relative min-h-[48px] sm:min-h-[96px] md:min-h-[110px] p-1 sm:p-2.5 rounded-xl sm:rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between items-center sm:items-stretch ${cellStyle}`}
                         >
                           {/* Top Date Header in cell */}
                           <div className="flex items-center justify-center sm:justify-between w-full">
                             <span
-                              className={`inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full text-[11px] sm:text-xs font-black ${isToday
-                                  ? 'bg-primary text-white shadow-sm'
-                                  : isSelected
-                                    ? 'bg-primary text-white'
-                                    : 'text-text-primary'
-                                }`}
+                              className={`inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full text-[11px] sm:text-xs font-black ${dayBadgeStyle}`}
                             >
                               {dayObj.date}
                             </span>
