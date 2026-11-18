@@ -93,7 +93,7 @@ const KSMusicPage = () => {
     <div className="min-h-screen bg-background text-text-primary overflow-x-hidden">
       <KSHeader />
 
-      <main className="pt-20 sm:pt-24">
+      <main className="pt-20 sm:pt-28">
         {/* Hero */}
         <section className="relative py-10 sm:py-32 px-4 overflow-hidden bg-background bg-pattern-grid">
           <div className="container mx-auto max-w-7xl relative z-10">

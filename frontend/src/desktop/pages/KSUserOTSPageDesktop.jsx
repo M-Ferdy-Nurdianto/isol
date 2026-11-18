@@ -85,7 +85,7 @@ const KSUserOTSPage = () => {
     <div className="min-h-screen bg-[var(--background)] text-[var(--text-primary)] font-outfit overflow-hidden flex flex-col transition-colors duration-500 pb-20 md:pb-0">
       <KSHeader />
 
-      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-7xl mx-auto w-full">
+      <main className="flex-1 px-4 sm:px-6 lg:px-8 pt-6 sm:pt-28 pb-6 sm:pb-10 max-w-7xl mx-auto w-full">
         {/* Breadcrumb / Back */}
         <button
           type="button"

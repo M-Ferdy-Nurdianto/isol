@@ -1201,7 +1201,7 @@ const KSProfilePage = () => {
     <div className="min-h-screen bg-background bg-pattern-cross text-text-primary font-outfit overflow-hidden flex flex-col transition-colors duration-500 pb-20 md:pb-0">
       <KSHeader />
 
-      <main className="flex-grow pt-8 sm:pt-24 pb-8 relative z-10 container mx-auto px-4 max-w-6xl">
+      <main className="flex-grow pt-8 sm:pt-28 pb-8 relative z-10 container mx-auto px-4 max-w-6xl">
         {/* HERO / HEADER CARD */}
         <div className="bg-surface border border-border rounded-3xl shadow-sm overflow-hidden mb-6 sm:mb-8">
           

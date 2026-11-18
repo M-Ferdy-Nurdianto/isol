@@ -106,7 +106,7 @@ const KSCheckoutPageDesktop = () => {
     <div className="min-h-screen bg-background bg-pattern-dots text-text-primary selection:bg-primary/30">
       <KSHeader />
 
-      <main className="pt-24 pb-20">
+      <main className="pt-24 sm:pt-28 pb-20">
         <div className="container mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 space-y-6">
 
           {/* === NAVIGATION BREADCRUMB & HEADER === */}
