@@ -168,22 +168,23 @@ const KSHeader = () => {
           </span>
         </Link>
 
-        {/* Top Right Controls: Theme Toggle Button (+ Cart jika ada item) */}
+        {/* Top Right Controls: Cart Button (always visible on mobile) & Theme Toggle */}
         <div className="flex items-center gap-2">
-          {totalItems > 0 && (
-            <button
-              type="button"
-              data-cart-icon
-              onClick={openCart}
-              className="relative w-9 h-9 rounded-full flex items-center justify-center border bg-[#EADBCC] dark:bg-[#342B23] border-[#DFD1BF] dark:border-[#46392F] text-primary active:scale-95 transition-transform"
-              aria-label="Keranjang Belanja"
-            >
-              <FaShoppingBag size={13} />
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#E8944A] text-white text-[9px] font-mono font-black flex items-center justify-center shadow-md">
+          <button
+            type="button"
+            data-cart-icon
+            onClick={openCart}
+            className="relative w-9 h-9 rounded-full flex items-center justify-center border bg-[#EADBCC] dark:bg-[#342B23] border-[#DFD1BF] dark:border-[#46392F] text-primary active:scale-95 transition-transform shadow-sm"
+            aria-label="Keranjang Belanja"
+            title="Keranjang Belanja"
+          >
+            <FaShoppingBag size={13} />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#E8944A] text-white text-[9px] font-mono font-black flex items-center justify-center shadow-md animate-pulse">
                 {totalItems}
               </span>
-            </button>
-          )}
+            )}
+          </button>
 
           {/* Tombol Ganti Tema - Di Atas Kanan Saja */}
           <button

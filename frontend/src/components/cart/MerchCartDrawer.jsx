@@ -5,6 +5,7 @@ import { FaTimes, FaTrash, FaMinus, FaPlus, FaShoppingBag, FaArrowRight, FaBox }
 import { useMerchCart } from '../../context/MerchCartContext'
 import { useHideBottomNav } from '../../context/UIContext'
 import { getAssetPath } from '../../lib/pathUtils'
+import Price from '../ui/Price'
 
 const MerchCartDrawer = () => {
   const navigate = useNavigate()
@@ -127,9 +128,7 @@ const MerchCartDrawer = () => {
                         {item.nama}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs font-black text-[#E8944A]">
-                          Rp {Number(item.harga || 0).toLocaleString('id-ID')}
-                        </span>
+                        <Price value={item.harga} size="item" />
                         {item.size && (
                           <span className="px-1.5 py-0.5 rounded bg-[#241E19] border border-[#3A2E24] text-[9px] font-mono font-bold text-text-secondary uppercase">
                             Size: {item.size}
@@ -178,9 +177,7 @@ const MerchCartDrawer = () => {
               <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] border-t border-[#3A2E24] bg-[#241E19] space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">Total</span>
-                  <span className="text-base font-black text-[#E8944A]">
-                    Rp {totalPrice.toLocaleString('id-ID')}
-                  </span>
+                  <Price value={totalPrice} size="total" />
                 </div>
 
                 <button

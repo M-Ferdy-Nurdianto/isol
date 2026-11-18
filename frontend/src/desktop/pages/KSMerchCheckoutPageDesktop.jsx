@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   FaArrowLeft,
   FaShoppingBag,
@@ -20,6 +20,7 @@ import {
 } from 'react-icons/fa'
 import KSHeader from '../../components/KSHeader'
 import KSFooter from '../../components/KSFooter'
+import Price from '../../components/ui/Price'
 import { useMerchCart } from '../../context/MerchCartContext'
 import { useFanAuth } from '../../context/FanAuthContext'
 import { kohiToast } from '../../components/ui/KohiToast'
@@ -32,6 +33,8 @@ const KSMerchCheckoutPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   useHideBottomNav(true)
+  const shippingFormRef = useRef(null)
+  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const { fanUser, isLoggedIn, openAuthModal } = useFanAuth()
   const { cart, clearCart, updateQuantity, removeFromCart, totalItems: cartTotalItems, totalPrice: cartTotalPrice } = useMerchCart()
 
@@ -794,9 +797,6 @@ const KSMerchCheckoutPage = () => {
                         <FaShoppingBag className="text-[#E8944A]" />
                         <span>Item Dipesan ({totalItemCount})</span>
                       </span>
-                      <span className="text-xs font-mono font-black text-[#E8944A]">
-                        Rp {subtotalPrice.toLocaleString('id-ID')}
-                      </span>
                     </div>
 
                     {checkoutItems.length === 0 ? (
@@ -811,67 +811,72 @@ const KSMerchCheckoutPage = () => {
                         </Link>
                       </div>
                     ) : (
-                      <div className="space-y-2 pt-1">
+                      <div className="space-y-2.5 pt-1">
                         {checkoutItems.map((item) => {
                           const itemKey = item.cartId || `${item.id}-${item.size || 'default'}`
                           return (
-                            <div key={itemKey} className="p-2.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] flex gap-2.5 items-center">
-                              <div className="w-12 h-12 rounded-lg bg-[#241E19] border border-[#3A2E24] overflow-hidden shrink-0 flex items-center justify-center">
-                                <img
-                                  src={item.gambar_url ? getAssetPath(item.gambar_url) : getAssetPath('/images/merch/jersey.svg')}
-                                  alt={item.nama}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    e.target.onerror = null
-                                    e.target.src = getAssetPath('/images/merch/jersey.svg')
-                                  }}
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-xs font-bold text-text-primary line-clamp-2 uppercase leading-snug">
-                                  {item.nama}
-                                </h4>
-                                <div className="flex items-center gap-2 mt-0.5">
+                            <div key={itemKey} className="p-3 rounded-xl bg-[#1A1512] border border-[#3A2E24] space-y-2.5">
+                              {/* Baris 1: thumbnail + nama (2 baris) + chip varian */}
+                              <div className="flex items-start gap-2.5">
+                                <div className="w-12 h-12 rounded-lg bg-[#241E19] border border-[#3A2E24] overflow-hidden shrink-0 flex items-center justify-center">
+                                  <img
+                                    src={item.gambar_url ? getAssetPath(item.gambar_url) : getAssetPath('/images/merch/jersey.svg')}
+                                    alt={item.nama}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      e.target.onerror = null
+                                      e.target.src = getAssetPath('/images/merch/jersey.svg')
+                                    }}
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-xs font-bold text-text-primary line-clamp-2 uppercase leading-snug">
+                                    {item.nama}
+                                  </h4>
                                   {item.size && (
-                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#241E19] border border-[#3A2E24] text-text-secondary font-mono">
-                                      {item.size}
+                                    <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded bg-[#241E19] border border-[#3A2E24] text-text-secondary font-mono">
+                                      Varian: {item.size}
                                     </span>
                                   )}
-                                  <span className="text-xs font-black text-[#E8944A] font-mono">
-                                    Rp {(Number(item.harga || 0) * (item.quantity || 1)).toLocaleString('id-ID')}
-                                  </span>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1.5 shrink-0">
-                                <div className="flex items-center bg-[#241E19] border border-[#3A2E24] rounded-lg">
+
+                              {/* Baris 2: harga di kiri, stepper + tombol hapus di kanan */}
+                              <div className="flex items-center justify-between pt-2 border-t border-[#3A2E24]/60">
+                                <Price value={Number(item.harga || 0) * (item.quantity || 1)} size="item" />
+
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <div className="flex items-center bg-[#241E19] border border-[#3A2E24] rounded-lg">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleItemQtyChange(item, -1)}
+                                      className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-text-primary transition active:scale-95"
+                                      aria-label="Kurangi jumlah"
+                                    >
+                                      <FaMinus size={9} />
+                                    </button>
+                                    <span className="w-6 text-center text-xs font-black font-mono text-text-primary">
+                                      {item.quantity || 1}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleItemQtyChange(item, 1)}
+                                      className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-text-primary transition active:scale-95"
+                                      aria-label="Tambah jumlah"
+                                    >
+                                      <FaPlus size={9} />
+                                    </button>
+                                  </div>
+
                                   <button
                                     type="button"
-                                    onClick={() => handleItemQtyChange(item, -1)}
-                                    className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-text-primary transition"
-                                    aria-label="Kurangi jumlah"
+                                    onClick={() => handleItemRemove(item)}
+                                    className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-red-400 transition active:scale-95"
+                                    aria-label="Hapus item"
                                   >
-                                    <FaMinus size={9} />
-                                  </button>
-                                  <span className="w-6 text-center text-xs font-black font-mono text-text-primary">
-                                    {item.quantity || 1}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleItemQtyChange(item, 1)}
-                                    className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-text-primary transition"
-                                    aria-label="Tambah jumlah"
-                                  >
-                                    <FaPlus size={9} />
+                                    <FaTrash size={11} />
                                   </button>
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleItemRemove(item)}
-                                  className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-red-400 transition"
-                                  aria-label="Hapus item"
-                                >
-                                  <FaTrash size={11} />
-                                </button>
                               </div>
                             </div>
                           )
@@ -947,11 +952,11 @@ const KSMerchCheckoutPage = () => {
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
-                        onClick={() => setBuyer({ ...buyer, delivery_method: 'pickup_event' })}
-                        className={`p-3 rounded-xl border text-left transition-all ${
+                        onClick={() => setBuyer((prev) => ({ ...prev, delivery_method: 'pickup_event' }))}
+                        className={`p-3 rounded-xl border text-left transition-all duration-200 active:scale-[0.98] ${
                           buyer.delivery_method === 'pickup_event'
                             ? 'bg-[#E8944A] text-white border-[#E8944A]'
-                            : 'bg-[#1A1512] text-text-secondary border-[#3A2E24]'
+                            : 'bg-[#1A1512] text-text-secondary border-[#3A2E24] hover:border-[#E8944A]/40'
                         }`}
                       >
                         <FaStore className="mb-1 text-sm" />
@@ -961,11 +966,16 @@ const KSMerchCheckoutPage = () => {
 
                       <button
                         type="button"
-                        onClick={() => setBuyer({ ...buyer, delivery_method: 'shipping' })}
-                        className={`p-3 rounded-xl border text-left transition-all ${
+                        onClick={() => {
+                          setBuyer((prev) => ({ ...prev, delivery_method: 'shipping' }))
+                          setTimeout(() => {
+                            shippingFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                          }, 120)
+                        }}
+                        className={`p-3 rounded-xl border text-left transition-all duration-200 active:scale-[0.98] ${
                           buyer.delivery_method === 'shipping'
                             ? 'bg-[#E8944A] text-white border-[#E8944A]'
-                            : 'bg-[#1A1512] text-text-secondary border-[#3A2E24]'
+                            : 'bg-[#1A1512] text-text-secondary border-[#3A2E24] hover:border-[#E8944A]/40'
                         }`}
                       >
                         <FaTruck className="mb-1 text-sm" />
@@ -974,51 +984,64 @@ const KSMerchCheckoutPage = () => {
                       </button>
                     </div>
 
-                    {buyer.delivery_method === 'shipping' && (
-                      <div className="space-y-2.5 p-3 rounded-xl bg-[#1A1512] border border-[#E8944A]/30">
-                        <div>
-                          <label className="block text-[11px] font-bold text-text-secondary mb-1">
-                            Alamat Lengkap <span className="text-red-400">*</span>
-                          </label>
-                          <textarea
-                            rows={3}
-                            required={buyer.delivery_method === 'shipping'}
-                            value={buyer.shipping_address}
-                            onChange={(e) => setBuyer({ ...buyer, shipping_address: e.target.value })}
-                            placeholder="Jalan, nomor rumah, RT/RW, kelurahan, kecamatan"
-                            className="w-full px-3 py-2 rounded-xl bg-[#241E19] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
-                          />
-                        </div>
+                    {/* Smooth Expand/Collapse Address Form with AnimatePresence */}
+                    <AnimatePresence initial={false}>
+                      {buyer.delivery_method === 'shipping' && (
+                        <motion.div
+                          key="shipping-address-container"
+                          ref={shippingFormRef}
+                          initial={prefersReducedMotion ? { opacity: 1, height: 'auto' } : { opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={prefersReducedMotion ? { opacity: 0, height: 0 } : { opacity: 0, height: 0 }}
+                          transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: 'easeOut' }}
+                          className="overflow-hidden"
+                        >
+                          <div className="space-y-2.5 p-3 rounded-xl bg-[#1A1512] border border-[#E8944A]/30 pt-3">
+                            <div>
+                              <label className="block text-[11px] font-bold text-text-secondary mb-1">
+                                Alamat Lengkap <span className="text-red-400">*</span>
+                              </label>
+                              <textarea
+                                rows={3}
+                                required={buyer.delivery_method === 'shipping'}
+                                value={buyer.shipping_address}
+                                onChange={(e) => setBuyer({ ...buyer, shipping_address: e.target.value })}
+                                placeholder="Jalan, nomor rumah, RT/RW, kelurahan, kecamatan"
+                                className="w-full px-3 py-2 rounded-xl bg-[#241E19] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
+                              />
+                            </div>
 
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="block text-[11px] font-bold text-text-secondary mb-1">
-                              Kota / Kab <span className="text-red-400">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              required={buyer.delivery_method === 'shipping'}
-                              value={buyer.shipping_city}
-                              onChange={(e) => setBuyer({ ...buyer, shipping_city: e.target.value })}
-                              placeholder="Kota"
-                              className="w-full px-3 py-2 rounded-xl bg-[#241E19] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
-                            />
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[11px] font-bold text-text-secondary mb-1">
+                                  Kota / Kab <span className="text-red-400">*</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  required={buyer.delivery_method === 'shipping'}
+                                  value={buyer.shipping_city}
+                                  onChange={(e) => setBuyer({ ...buyer, shipping_city: e.target.value })}
+                                  placeholder="Kota"
+                                  className="w-full px-3 py-2 rounded-xl bg-[#241E19] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[11px] font-bold text-text-secondary mb-1">
+                                  Kode Pos
+                                </label>
+                                <input
+                                  type="text"
+                                  value={buyer.shipping_postal_code}
+                                  onChange={(e) => setBuyer({ ...buyer, shipping_postal_code: e.target.value })}
+                                  placeholder="12345"
+                                  className="w-full px-3 py-2 rounded-xl bg-[#241E19] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
+                                />
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <label className="block text-[11px] font-bold text-text-secondary mb-1">
-                              Kode Pos
-                            </label>
-                            <input
-                              type="text"
-                              value={buyer.shipping_postal_code}
-                              onChange={(e) => setBuyer({ ...buyer, shipping_postal_code: e.target.value })}
-                              placeholder="12345"
-                              className="w-full px-3 py-2 rounded-xl bg-[#241E19] border border-[#3A2E24] text-xs text-text-primary focus:outline-none focus:border-[#E8944A]"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     <div>
                       <label className="block text-[11px] font-bold text-text-secondary mb-1">
@@ -1119,9 +1142,12 @@ const KSMerchCheckoutPage = () => {
                       <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider block">
                         Total Pembayaran
                       </span>
-                      <span className="text-base sm:text-lg font-black text-[#E8944A] font-mono leading-tight">
-                        Rp {subtotalPrice.toLocaleString('id-ID')}
-                      </span>
+                      <Price value={subtotalPrice} size="total" />
+                      {buyer.delivery_method === 'pickup_event' && (
+                        <span className="text-[10px] text-emerald-400 font-bold block leading-tight mt-0.5">
+                          Ongkir: Gratis di Event
+                        </span>
+                      )}
                     </div>
 
                     <button
