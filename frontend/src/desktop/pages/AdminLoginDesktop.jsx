@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { kohiToast } from '../../components/ui/KohiToast'
+import TurnstileWidget from '../../components/ui/TurnstileWidget'
 import api from '../../lib/api'
 import { getAssetPath } from '../../lib/pathUtils'
 import { FaSpinner, FaSignInAlt, FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa'
@@ -15,6 +16,8 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [logoClickCount, setLogoClickCount] = useState(0)
+  const [turnstileToken, setTurnstileToken] = useState(null)
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0)
 
   useEffect(() => {
     document.documentElement.classList.add('dark')
@@ -32,11 +35,11 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
 
     // CHECK FOR GUEST PLAYGROUND CREDENTIALS (GS123 / GS321)
     if (formData.username?.trim() === 'GS123' && formData.password === 'GS321') {
       try {
+        setLoading(true)
         localStorage.setItem('is_guest_mode', 'true')
         localStorage.setItem('admin_token', 'demo_guest_token_rb_2026')
         localStorage.setItem('admin_user', JSON.stringify({
@@ -55,8 +58,25 @@ const AdminLogin = () => {
       }
     }
 
+    if (!turnstileToken) {
+      kohiToast.error('Silakan selesaikan verifikasi Cloudflare Turnstile terlebih dahulu.')
+      return
+    }
+
+    setLoading(true)
+
     try {
-      const response = await api.post('/auth/login', formData)
+      // 1. Verify Turnstile via backend
+      const cfRes = await api.post('/auth/verify-turnstile', { token: turnstileToken })
+      if (!cfRes.data?.success) {
+        throw new Error(cfRes.data?.error || 'Verifikasi Cloudflare Turnstile gagal.')
+      }
+
+      // 2. Submit Login Credentials
+      const response = await api.post('/auth/login', {
+        ...formData,
+        turnstileToken
+      })
       
       if (response.data.success) {
         localStorage.removeItem('is_guest_mode')
@@ -69,7 +89,9 @@ const AdminLogin = () => {
       }
     } catch (error) {
       console.error('Login error:', error)
-      kohiToast.error(error.response?.data?.error || 'Username atau password salah')
+      kohiToast.error(error.response?.data?.error || error.message || 'Username atau password salah')
+      setTurnstileResetKey(prev => prev + 1)
+      setTurnstileToken(null)
     } finally {
       setLoading(false)
     }
@@ -167,6 +189,14 @@ const AdminLogin = () => {
                 {showPassword ? <FaEyeSlash className="text-lg" /> : <FaEye className="text-lg" />}
               </button>
             </div>
+          </div>
+
+          {/* Cloudflare Turnstile Verification */}
+          <div className="pt-1">
+            <TurnstileWidget
+              onVerify={(token) => setTurnstileToken(token)}
+              resetKey={turnstileResetKey}
+            />
           </div>
 
           <button

@@ -121,8 +121,17 @@ const KSFooter = ({ config: propConfig }) => {
           </div>
         </div>
 
-        <div className="mt-6 sm:mt-10 pt-4 sm:pt-6 border-t border-[#E8DDD0] dark:border-[#3E3228] flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-xs text-text-secondary/60 font-medium">
-          <p>{config?.copyright_text || '© 2026 KOHI SEKAI. ALL RIGHTS RESERVED.'}</p>
+        <div className="mt-6 sm:mt-10 pt-4 sm:pt-6 border-t border-[#E8DDD0] dark:border-[#3E3228] flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-xs text-text-secondary/60 font-medium">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3">
+            <p>{config?.copyright_text || '© 2026 KOHI SEKAI. ALL RIGHTS RESERVED.'}</p>
+            <span className="opacity-40">·</span>
+            <Link
+              to="/admin/login"
+              className="text-text-secondary/70 hover:text-primary transition-colors font-medium hover:underline"
+            >
+              Login Staff
+            </Link>
+          </div>
           <p className="text-primary/60 font-black tracking-widest">コーヒーの世界</p>
         </div>
       </div>

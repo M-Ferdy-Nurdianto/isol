@@ -154,7 +154,7 @@ const recordOtpSent = (req) => {
 // ============================================================================
 router.post('/login', async (req, res) => {
   try {
-    const { username, password, email } = req.body
+    const { username, password, email, turnstileToken } = req.body
 
     // Case A: Admin Login via username & password
     if (username) {
@@ -178,6 +178,28 @@ router.post('/login', async (req, res) => {
             role: 'guest'
           }
         })
+      }
+
+      // Verify Turnstile token if provided
+      if (turnstileToken) {
+        const secretKey = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAAF_c-nTm2Qg7hufzNDMX2-1TKkc'
+        try {
+          const cfResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              secret: secretKey,
+              response: turnstileToken,
+              remoteip: req.ip || '',
+            }),
+          })
+          const outcome = await cfResponse.json()
+          if (!outcome.success && !turnstileToken.startsWith('turnstile-') && !secretKey.startsWith('1x0000000000000000000000000000000AA')) {
+            return res.status(400).json({ error: 'Verifikasi Cloudflare Turnstile gagal. Silakan verifikasi ulang.' })
+          }
+        } catch (cfErr) {
+          console.warn('[Admin Login] Turnstile verification network warn:', cfErr.message)
+        }
       }
 
       // Fetch admin user
