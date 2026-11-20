@@ -46,7 +46,12 @@ const HomeCmsTab = () => {
   ])
   const [faqItems, setFaqItems] = useState([{ q: '', a: '' }])
   const [faqCp, setFaqCp] = useState({ name: '', phone: '' })
-  const [footerSection, setFooterSection] = useState({ brand_description: '', copyright_text: '' })
+  const [footerSection, setFooterSection] = useState({
+    brand_description: '',
+    copyright_text: '',
+    tagline_jp: 'コーヒーの世界',
+    brand_subtitle_jp: 'コーヒーの世界へようこそ'
+  })
   const [groupPhoto, setGroupPhoto] = useState({ url: '', overlay_text: '', overlay_desc: '' })
   const [aboutUs, setAboutUs] = useState({ title: '', subtitle: '', description: '', images: [] })
 
@@ -113,7 +118,13 @@ const HomeCmsTab = () => {
       if (parsedCp) {
         setFaqCp(parsedCp)
       }
-      setFooterSection(parseJson(configData.footer_settings) || { brand_description: '', copyright_text: '' })
+      const rawFooter = parseJson(configData.footer_settings) || {}
+      setFooterSection({
+        brand_description: rawFooter.brand_description || '',
+        copyright_text: rawFooter.copyright_text || '',
+        tagline_jp: rawFooter.tagline_jp || 'コーヒーの世界',
+        brand_subtitle_jp: rawFooter.brand_subtitle_jp || 'コーヒーの世界へようこそ'
+      })
       const rawGroupPhoto = parseJson(configData.group_photo) || {}
       const groupUrl = (rawGroupPhoto.url && !rawGroupPhoto.url.includes('placeholder'))
         ? rawGroupPhoto.url
@@ -374,11 +385,11 @@ const HomeCmsTab = () => {
 
 
   const tabs = [
-    { id: 'about', label: 'About Us Page' },
-    { id: 'news', label: 'News Carousel' },
-    { id: 'faq', label: 'FAQ Text' },
-    { id: 'social', label: 'Social Text' },
-    { id: 'footer', label: 'Footer Text' },
+    { id: 'about', label: 'About Us' },
+    { id: 'news', label: 'News' },
+    { id: 'faq', label: 'FAQ' },
+    { id: 'social', label: 'Social Media' },
+    { id: 'footer', label: 'Footer' },
   ]
 
   if (loading) return <div className="text-center py-10">Loading...</div>
@@ -769,6 +780,16 @@ const HomeCmsTab = () => {
           <div>
             <label className="block text-xs text-[var(--text-secondary)] mb-1">Copyright Text</label>
             <input type="text" value={footerSection.copyright_text} onChange={e => setFooterSection({...footerSection, copyright_text: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" />
+          </div>
+          <div>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1">Tagline Kanji Bawah (コーヒーの世界)</label>
+            <input type="text" value={footerSection.tagline_jp ?? 'コーヒーの世界'} onChange={e => setFooterSection({...footerSection, tagline_jp: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="コーヒーの世界" />
+            <p className="text-[10px] text-[var(--text-secondary)] mt-1">Teks kanji yang tampil di pojok kanan bawah footer di samping hak cipta.</p>
+          </div>
+          <div>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1">Subjudul Kanji Brand (Header Footer)</label>
+            <input type="text" value={footerSection.brand_subtitle_jp ?? 'コーヒーの世界へようこそ'} onChange={e => setFooterSection({...footerSection, brand_subtitle_jp: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="コーヒーの世界へようこそ" />
+            <p className="text-[10px] text-[var(--text-secondary)] mt-1">Teks kanji yang tampil di bawah logo KOHI SEKAI pada footer.</p>
           </div>
           <button onClick={() => handleSave('footer_settings', footerSection)} disabled={saving} className="bg-primary text-[var(--text-primary)] px-4 py-2 rounded-lg font-bold flex items-center gap-2">
             <FaSave /> Simpan

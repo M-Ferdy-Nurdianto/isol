@@ -70,7 +70,9 @@ const KSFooter = ({ config: propConfig }) => {
               <h3 className="text-2xl font-black tracking-tighter text-text-primary">
                 KOHI<span className="text-primary">SEKAI</span>
               </h3>
-              <p className="text-primary/80 text-xs font-bold tracking-widest mt-1">コーヒーの世界へようこそ</p>
+              <p className="text-primary/80 text-xs font-bold tracking-widest mt-1">
+                {config?.brand_subtitle_jp || 'コーヒーの世界へようこそ'}
+              </p>
             </div>
             <p className="text-text-secondary text-sm leading-relaxed max-w-xs">
               {config?.brand_description || 'Grup idol dengan jiwa kopi — hangat, kuat, dan penuh karakter.\nSelamat datang di dunia Kohi Sekai.'}
@@ -132,7 +134,9 @@ const KSFooter = ({ config: propConfig }) => {
               Login Staff
             </Link>
           </div>
-          <p className="text-primary/60 font-black tracking-widest">コーヒーの世界</p>
+          <p className="text-primary/60 font-black tracking-widest">
+            {config?.tagline_jp || 'コーヒーの世界'}
+          </p>
         </div>
       </div>
     </footer>

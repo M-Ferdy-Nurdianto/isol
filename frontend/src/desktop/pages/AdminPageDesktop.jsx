@@ -919,7 +919,7 @@ const AdminPage = () => {
 
   const moreItems = [
     { id: 'members', label: 'Members', icon: FaUsers },
-    { id: 'home-cms', label: 'Home CMS', icon: FaHome },
+    { id: 'home-cms', label: 'Home', icon: FaHome },
     { id: 'music', label: 'Music', icon: FaMusic },
     { id: 'users', label: 'Fan Users', icon: FaUserFriends },
     { id: 'settings', label: 'Settings', icon: FaEdit },
@@ -944,7 +944,7 @@ const AdminPage = () => {
               { id: 'events', label: 'Events', icon: FaCalendar },
               { id: 'members', label: 'Members', icon: FaUsers },
               { id: 'merch', label: 'Merchandise', icon: FaBox },
-              { id: 'home-cms', label: 'Home CMS', icon: FaHome },
+              { id: 'home-cms', label: 'Home', icon: FaHome },
               { id: 'music', label: 'Music', icon: FaMusic },
               { id: 'users', label: 'Fan Users', icon: FaUserFriends },
               { id: 'recap', label: 'Recap', icon: FaChartBar },

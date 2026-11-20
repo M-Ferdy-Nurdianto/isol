@@ -55,27 +55,37 @@ router.post('/payment-proof', upload.single('file'), handleMulterError, async (r
       mimetype: req.file.mimetype
     })
 
-    // Compress image using sharp to WebP
-    const compressedBuffer = await sharp(req.file.buffer)
-      .resize(1920, 1920, { // Max 1920x1920, maintain aspect ratio
-        fit: 'inside',
-        withoutEnlargement: true
-      })
-      .webp({ quality: 85 })
-      .toBuffer()
+    let compressedBuffer = req.file.buffer
+    let mimeType = 'image/webp'
+    let ext = 'webp'
 
-    console.log('[Upload] Compressed:', {
-      originalSize: `${(req.file.size / 1024).toFixed(2)} KB`,
-      compressedSize: `${(compressedBuffer.length / 1024).toFixed(2)} KB`,
-      reduction: `${(((req.file.size - compressedBuffer.length) / req.file.size) * 100).toFixed(1)}%`
-    })
+    try {
+      compressedBuffer = await sharp(req.file.buffer)
+        .resize(1920, 1920, { // Max 1920x1920, maintain aspect ratio
+          fit: 'inside',
+          withoutEnlargement: true
+        })
+        .webp({ quality: 85 })
+        .toBuffer()
+
+      console.log('[Upload] Compressed:', {
+        originalSize: `${(req.file.size / 1024).toFixed(2)} KB`,
+        compressedSize: `${(compressedBuffer.length / 1024).toFixed(2)} KB`,
+        reduction: `${(((req.file.size - compressedBuffer.length) / req.file.size) * 100).toFixed(1)}%`
+      })
+    } catch (sharpErr) {
+      console.warn('[Upload Payment Proof] Sharp conversion warning, falling back to original:', sharpErr.message)
+      mimeType = req.file.mimetype || 'image/jpeg'
+      ext = req.file.mimetype?.split('/')[1] || 'jpg'
+    }
 
     const sanitizedName = req.file.originalname.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()
-    const fileName = `payment_${Date.now()}_${sanitizedName}.webp`
+    const fileName = `payment_${Date.now()}_${sanitizedName}.${ext}`
     const result = await uploadToSupabaseStorage(
       compressedBuffer,
       fileName,
-      'image/webp'
+      mimeType,
+      'payment-proofs'
     )
 
     res.json({
@@ -292,16 +302,26 @@ router.post('/qris-image', authMiddleware, upload.single('file'), handleMulterEr
       return res.status(400).json({ success: false, error: 'No file uploaded.' })
     }
 
-    const compressedBuffer = await sharp(req.file.buffer)
-      .resize(600, 600, { fit: 'inside', withoutEnlargement: true })
-      .webp({ quality: 90 })
-      .toBuffer()
+    let compressedBuffer = req.file.buffer
+    let mimeType = 'image/webp'
+    let ext = 'webp'
 
-    const fileName = `qris/qris_${Date.now()}.webp`
+    try {
+      compressedBuffer = await sharp(req.file.buffer)
+        .resize(1000, 1000, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 90 })
+        .toBuffer()
+    } catch (sharpErr) {
+      console.warn('[Upload QRIS] Sharp conversion warning, falling back to original:', sharpErr.message)
+      mimeType = req.file.mimetype || 'image/png'
+      ext = req.file.mimetype?.split('/')[1] || 'png'
+    }
+
+    const fileName = `qris/qris_${Date.now()}.${ext}`
     const result = await uploadToSupabaseStorage(
       compressedBuffer,
       fileName,
-      'image/webp',
+      mimeType,
       'media'
     )
 

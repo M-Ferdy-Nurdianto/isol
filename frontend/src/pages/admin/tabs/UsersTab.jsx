@@ -91,6 +91,7 @@ const UsersTab = () => {
               </>
             )}
           </button>
+          {/* Tombol Reset Dummy dinonaktifkan sementara (disimpan jika sewaktu-waktu dibutuhkan):
           <button
             onClick={() => setShowWipeModal(true)}
             className="px-3.5 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 text-xs font-bold transition flex items-center gap-1.5"
@@ -98,6 +99,7 @@ const UsersTab = () => {
           >
             <FaTrashAlt className="text-xs" /> Reset Dummy
           </button>
+          */}
           <span className="hidden sm:inline-block px-3 py-1.5 rounded-xl bg-[var(--primary)]/10 border border-[var(--primary)]/30 text-xs font-mono font-bold text-[var(--primary)]">
             {totalCount} Akun Terdaftar
           </span>
