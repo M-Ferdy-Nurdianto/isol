@@ -1402,70 +1402,41 @@ const KSShopPage = () => {
           {activeShopTab === 'merch' && (
             <section id="official-merchandise" className="space-y-6">
               
-              {/* Toolbar satu baris di atas grid: Filter Kategori di kiri, Counter & Tombol Keranjang di kanan */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border">
-                {/* Filter Kategori Container with clean scrollable tabs */}
-                <div className="flex items-center gap-2 overflow-x-auto max-w-full snap-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5">
-                  <div className="p-1 rounded-2xl bg-surface border border-border inline-flex gap-1 shadow-sm shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setMerchCategoryFilter('all')}
-                      className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
-                        merchCategoryFilter === 'all'
-                          ? 'bg-primary text-white font-black shadow-sm'
-                          : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                      }`}
-                    >
-                      Semua
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMerchCategoryFilter('baju')}
-                      className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
-                        merchCategoryFilter === 'baju'
-                          ? 'bg-primary text-white font-black shadow-sm'
-                          : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                      }`}
-                    >
-                      T-Shirt & Jersey
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMerchCategoryFilter('aksesoris')}
-                      className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
-                        merchCategoryFilter === 'aksesoris'
-                          ? 'bg-primary text-white font-black shadow-sm'
-                          : 'text-text-secondary hover:text-text-primary hover:bg-background'
-                      }`}
-                    >
-                      Aksesoris
-                    </button>
-                  </div>
-
-                  {/* Counter Badge */}
-                  <span className="text-[11px] font-mono font-bold text-text-secondary whitespace-nowrap px-2.5 py-1 rounded-xl bg-surface border border-border shrink-0">
-                    {displayMerch.length} Produk
-                  </span>
-                </div>
-
-                {/* Tombol Keranjang: Akses cepat baik di Mobile maupun Desktop */}
-                <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
-                  <span className="sm:hidden text-[11px] text-text-secondary font-medium">
-                    Koleksi Merchandise Resmi
-                  </span>
+              {/* Toolbar Filter Kategori */}
+              <div className="flex items-center justify-start pb-3 border-b border-border overflow-x-auto max-w-full snap-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5">
+                <div className="p-1 rounded-2xl bg-surface border border-border inline-flex gap-1 shadow-sm shrink-0">
                   <button
                     type="button"
-                    onClick={openCart}
-                    className="flex px-3.5 py-2 rounded-2xl bg-surface border border-primary/30 text-primary hover:bg-primary hover:text-white text-xs font-black uppercase tracking-wider items-center gap-2 transition-all shadow-sm active:scale-95 shrink-0"
-                    title="Buka Keranjang Belanja"
+                    onClick={() => setMerchCategoryFilter('all')}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+                      merchCategoryFilter === 'all'
+                        ? 'bg-primary text-white font-black shadow-sm'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-background'
+                    }`}
                   >
-                    <FaShoppingBag size={12} />
-                    <span>Keranjang</span>
-                    {totalItems > 0 && (
-                      <span className="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-mono font-black flex items-center justify-center">
-                        {totalItems}
-                      </span>
-                    )}
+                    Semua
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMerchCategoryFilter('baju')}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+                      merchCategoryFilter === 'baju'
+                        ? 'bg-primary text-white font-black shadow-sm'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-background'
+                    }`}
+                  >
+                    T-Shirt & Jersey
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMerchCategoryFilter('aksesoris')}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+                      merchCategoryFilter === 'aksesoris'
+                        ? 'bg-primary text-white font-black shadow-sm'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-background'
+                    }`}
+                  >
+                    Aksesoris
                   </button>
                 </div>
               </div>
