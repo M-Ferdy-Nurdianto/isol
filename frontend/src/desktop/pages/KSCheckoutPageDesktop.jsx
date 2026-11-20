@@ -96,7 +96,7 @@ const KSCheckoutPageDesktop = () => {
   // Active member preview photo for dashed live preview
   const activeSelectedPhoto = ticketType === 'group'
     ? '/images/members/group.webp'
-    : (selectedMember?.shop_image_url || selectedMember?.image_url || '/images/members/placeholder.svg')
+    : (selectedMember?.shop_image_url || selectedMember?.image_url || '/images/members/placeholder.webp')
 
   const activeSelectedName = ticketType === 'group'
     ? 'Cheki Grup (Semua Member)'
@@ -337,7 +337,7 @@ const KSCheckoutPageDesktop = () => {
                       {/* Individual Members */}
                       {filteredMembers.map((m) => {
                         const isSelected = ticketType === 'member' && (selectedMember?.id === m.id || selectedMember?.member_id === m.member_id)
-                        const photoSrc = m.shop_image_url || m.image_url || '/images/members/placeholder.svg'
+                        const photoSrc = m.shop_image_url || m.image_url || '/images/members/placeholder.webp'
 
                         return (
                           <button
@@ -365,7 +365,7 @@ const KSCheckoutPageDesktop = () => {
                                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                                 onError={(e) => {
                                   e.target.onerror = null
-                                  e.target.src = getAssetPath('/images/members/placeholder.svg')
+                                  e.target.src = getAssetPath('/images/members/placeholder.webp')
                                 }}
                               />
                               <div className="absolute inset-x-0 bottom-0 py-2 px-2.5 bg-black/85 text-left border-t border-white/10">
@@ -655,7 +655,7 @@ const KSCheckoutPageDesktop = () => {
                               className="w-full h-full object-cover object-top"
                               onError={(e) => {
                                 e.target.onerror = null
-                                e.target.src = getAssetPath('/images/members/placeholder.svg')
+                                e.target.src = getAssetPath('/images/members/placeholder.webp')
                               }}
                             />
                           </div>
@@ -688,7 +688,7 @@ const KSCheckoutPageDesktop = () => {
                                   className="w-full h-full object-cover object-top"
                                   onError={(e) => {
                                     e.target.onerror = null
-                                    e.target.src = getAssetPath('/images/members/placeholder.svg')
+                                    e.target.src = getAssetPath('/images/members/placeholder.webp')
                                   }}
                                 />
                               </div>

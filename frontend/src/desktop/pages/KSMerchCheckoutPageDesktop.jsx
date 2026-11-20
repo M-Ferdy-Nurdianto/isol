@@ -592,7 +592,7 @@ const KSMerchCheckoutPage = () => {
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     e.target.onerror = null
-                                    e.target.src = getAssetPath('/images/members/placeholder.svg')
+                                    e.target.src = getAssetPath('/images/members/placeholder.webp')
                                   }}
                                 />
                               ) : (
@@ -820,12 +820,12 @@ const KSMerchCheckoutPage = () => {
                               <div className="flex items-start gap-2.5">
                                 <div className="w-12 h-12 rounded-lg bg-[#241E19] border border-[#3A2E24] overflow-hidden shrink-0 flex items-center justify-center">
                                   <img
-                                    src={item.gambar_url ? getAssetPath(item.gambar_url) : getAssetPath('/images/merch/jersey.svg')}
+                                    src={item.gambar_url ? getAssetPath(item.gambar_url) : 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80'}
                                     alt={item.nama}
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
                                       e.target.onerror = null
-                                      e.target.src = getAssetPath('/images/merch/jersey.svg')
+                                      e.target.src = 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80'
                                     }}
                                   />
                                 </div>

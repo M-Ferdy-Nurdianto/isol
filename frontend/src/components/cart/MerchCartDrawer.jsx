@@ -113,7 +113,7 @@ const MerchCartDrawer = () => {
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             e.target.onerror = null
-                            e.target.src = getAssetPath('/images/members/placeholder.svg')
+                            e.target.src = getAssetPath('/images/members/placeholder.webp')
                           }}
                         />
                       ) : (
@@ -263,7 +263,7 @@ const MerchCartDrawer = () => {
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             e.target.onerror = null
-                            e.target.src = getAssetPath('/images/members/placeholder.svg')
+                            e.target.src = getAssetPath('/images/members/placeholder.webp')
                           }}
                         />
                       ) : (

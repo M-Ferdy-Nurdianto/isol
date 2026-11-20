@@ -257,7 +257,7 @@ export function CheckoutProvider({ children }) {
 
     const memberPhoto = isGroup
       ? '/images/members/group.webp'
-      : (selectedMember?.shop_image_url || selectedMember?.image_url || '/images/members/placeholder.svg')
+      : (selectedMember?.shop_image_url || selectedMember?.image_url || '/images/members/placeholder.webp')
 
     const newItem = {
       id: Date.now() + Math.random(),

@@ -109,7 +109,7 @@ export const generateGuestMockResponse = (config) => {
         success: true,
         message: 'Upload berhasil (Simulasi Demo)',
         data: {
-          url: '/images/members/placeholder.svg',
+          url: '/images/members/placeholder.webp',
           file_name: 'demo_upload.webp'
         }
       }

@@ -57,7 +57,7 @@ const resolveMemberImage = (url, memberId, stageName) => {
   if (clean === 'group' || clean === 'kohisekai') return getAssetPath('/images/members/group.webp')
   if (clean === 'aca' || clean === 'acaa') return getAssetPath('/images/members/aca.webp')
   if (clean) return getAssetPath(`/images/members/${clean}.webp`)
-  return getAssetPath('/images/members/placeholder.svg')
+  return getAssetPath('/images/members/placeholder.webp')
 }
 
 // Helper to resolve shop images safely with local fallbacks
@@ -73,7 +73,7 @@ const resolveMemberShopImage = (url, memberId, stageName) => {
   if (clean === 'group' || clean === 'kohisekai') return getAssetPath('/images/members/group.webp')
   if (clean === 'aca' || clean === 'acaa') return getAssetPath('/images/shop/aca.webp')
   if (clean) return getAssetPath(`/images/shop/${clean}.webp`)
-  return getAssetPath('/images/members/placeholder.svg')
+  return getAssetPath('/images/members/placeholder.webp')
 }
 
 const MembersTab = ({ members = [], onRefresh }) => {
@@ -519,7 +519,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
             let heroPhoto = payload.is_secret && finalSilhouetteUrl
               ? finalSilhouetteUrl
-              : (finalAvatarUrl || getAssetPath('/images/members/placeholder.svg'))
+              : (finalAvatarUrl || getAssetPath('/images/members/placeholder.webp'))
 
             if (payload.hadir === false) {
               // Jika dinonaktifkan di form, hapus dari hero_settings
@@ -608,7 +608,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
             if (!exists) {
               const photo = member.is_secret && member.silhouette_image_url
                 ? member.silhouette_image_url
-                : (member.image_url || getAssetPath('/images/members/placeholder.svg'))
+                : (member.image_url || getAssetPath('/images/members/placeholder.webp'))
               heroConfig.members.push({
                 id: mSlug,
                 name: member.is_secret ? '???' : (member.nama_panggung || 'MEMBER').toUpperCase(),
@@ -1220,7 +1220,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                             className="w-full h-full object-cover object-top"
                             onError={(e) => {
                               e.target.onerror = null
-                              e.target.src = getAssetPath('/images/members/placeholder.svg')
+                              e.target.src = getAssetPath('/images/members/placeholder.webp')
                             }}
                           />
                           <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-opacity ${isDraggingThisSlot ? 'hidden' : ''}`}>
@@ -1458,7 +1458,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                             onError={(e) => {
                               e.target.onerror = null
-                              e.target.src = getAssetPath('/images/members/placeholder.svg')
+                              e.target.src = getAssetPath('/images/members/placeholder.webp')
                             }}
                           />
                         ) : (
@@ -1917,7 +1917,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
                                 className="w-full h-full object-cover object-top hover:scale-110 transition-transform duration-300"
                                 onError={(e) => {
                                   e.target.onerror = null
-                                  e.target.src = getAssetPath('/images/members/placeholder.svg')
+                                  e.target.src = getAssetPath('/images/members/placeholder.webp')
                                 }}
                               />
                             ) : (

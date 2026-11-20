@@ -1688,7 +1688,7 @@ const KSProfilePage = () => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                             onError={(e) => {
                               e.target.onerror = null
-                              e.target.src = getAssetPath('/images/members/placeholder.svg')
+                              e.target.src = getAssetPath('/images/members/placeholder.webp')
                             }}
                           />
                         )}
@@ -1787,7 +1787,7 @@ const KSProfilePage = () => {
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               e.target.onerror = null
-                              e.target.src = getAssetPath('/images/members/placeholder.svg')
+                              e.target.src = getAssetPath('/images/members/placeholder.webp')
                             }}
                           />
                         )}

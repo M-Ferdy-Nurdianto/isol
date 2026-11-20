@@ -35,7 +35,7 @@ const GroupPhotoCarousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  const displayImages = images && images.length > 0 ? images.map(img => getAssetPath(img)) : [getAssetPath('/images/members/placeholder.svg')];
+  const displayImages = images && images.length > 0 ? images.map(img => getAssetPath(img)) : [getAssetPath('/images/members/placeholder.webp')];
 
   useEffect(() => {
     if (displayImages.length <= 1 || isHovered) return;
@@ -296,7 +296,7 @@ const MemberGridCard = ({ member, onClick, index }) => {
             className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {
               e.target.onerror = null
-              e.target.src = getAssetPath('/images/members/placeholder.svg')
+              e.target.src = getAssetPath('/images/members/placeholder.webp')
             }}
           />
         ) : (

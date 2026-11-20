@@ -509,7 +509,7 @@ const ManualMerchOrderModal = ({
                                     src={item.gambar_url}
                                     alt={item.nama}
                                     className="w-10 h-10 object-cover rounded-lg border border-[var(--border)] shrink-0"
-                                    onError={e => { e.target.src = '/images/members/placeholder.svg' }}
+                                    onError={e => { e.target.src = '/images/members/placeholder.webp' }}
                                   />
                                 ) : (
                                   <div className="w-10 h-10 rounded-lg bg-[var(--background)] border border-[var(--border)] flex items-center justify-center text-[var(--text-secondary)] shrink-0">

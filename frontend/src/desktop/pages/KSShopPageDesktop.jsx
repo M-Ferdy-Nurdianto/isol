@@ -74,7 +74,7 @@ const DEFAULT_OFFICIAL_MERCH = [
     available: true,
     sizes: ['S', 'M', 'L', 'XL', 'XXL', '3XL'],
     kategori: 'baju',
-    gambar_url: '/images/merch/jersey.svg'
+    gambar_url: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'merch-tshirt-01',
@@ -85,7 +85,7 @@ const DEFAULT_OFFICIAL_MERCH = [
     available: true,
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     kategori: 'baju',
-    gambar_url: '/images/merch/tshirt.svg'
+    gambar_url: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'merch-lanyard-01',
@@ -96,7 +96,7 @@ const DEFAULT_OFFICIAL_MERCH = [
     available: true,
     sizes: ['Standard'],
     kategori: 'aksesoris',
-    gambar_url: '/images/merch/lanyard.svg'
+    gambar_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'merch-ganci-01',
@@ -107,7 +107,7 @@ const DEFAULT_OFFICIAL_MERCH = [
     available: true,
     sizes: ['Standard'],
     kategori: 'aksesoris',
-    gambar_url: '/images/merch/ganci.svg'
+    gambar_url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'merch-totebag-01',
@@ -118,7 +118,7 @@ const DEFAULT_OFFICIAL_MERCH = [
     available: true,
     sizes: ['All Size'],
     kategori: 'aksesoris',
-    gambar_url: '/images/merch/totebag.svg'
+    gambar_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'merch-lightstick-01',
@@ -129,7 +129,7 @@ const DEFAULT_OFFICIAL_MERCH = [
     available: true,
     sizes: ['Standard'],
     kategori: 'aksesoris',
-    gambar_url: '/images/merch/lightstick.svg'
+    gambar_url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'merch-photocard-01',
@@ -140,7 +140,7 @@ const DEFAULT_OFFICIAL_MERCH = [
     available: true,
     sizes: ['1 Pack (5 Cards)'],
     kategori: 'aksesoris',
-    gambar_url: '/images/merch/photocard.svg'
+    gambar_url: 'https://kohisekai.carrd.co/assets/images/card.jpg?v=7b0174a6'
   },
   {
     id: 'merch-acrylic-01',
@@ -151,7 +151,7 @@ const DEFAULT_OFFICIAL_MERCH = [
     available: true,
     sizes: ['Standard'],
     kategori: 'aksesoris',
-    gambar_url: '/images/merch/standee.svg'
+    gambar_url: 'https://kohisekai.carrd.co/assets/images/image03.jpg?v=7b0174a6'
   }
 ]
 
@@ -1225,7 +1225,7 @@ const KSShopPage = () => {
                                       else if (name.includes('macchiato')) e.target.src = '/images/members/macchiato.webp'
                                       else if (name.includes('affogato')) e.target.src = '/images/members/affogato.webp'
                                       else if (name.includes('group') || name.includes('kohi')) e.target.src = '/images/members/group.webp'
-                                      else e.target.src = '/images/members/placeholder.svg'
+                                      else e.target.src = '/images/members/placeholder.webp'
                                     }}
                                     className="w-full h-full object-cover object-top"
                                   />
@@ -1305,7 +1305,7 @@ const KSShopPage = () => {
                                       else if (name.includes('macchiato')) e.target.src = '/images/members/macchiato.webp'
                                       else if (name.includes('affogato')) e.target.src = '/images/members/affogato.webp'
                                       else if (name.includes('group') || name.includes('kohi')) e.target.src = '/images/members/group.webp'
-                                      else e.target.src = '/images/members/placeholder.svg'
+                                      else e.target.src = '/images/members/placeholder.webp'
                                     }}
                                     className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                                   />
@@ -1477,7 +1477,7 @@ const KSShopPage = () => {
                             className="w-full h-full object-contain p-3 sm:p-4 group-hover:scale-105 transition-transform duration-500"
                             onError={(e) => {
                               e.target.onerror = null
-                              e.target.src = getAssetPath('/images/merch/jersey.svg')
+                              e.target.src = 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80'
                             }}
                           />
                         ) : (
@@ -1613,12 +1613,12 @@ const KSShopPage = () => {
                 {/* Product Image */}
                 <div className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-[#1A1512] border border-[#3A2E24] flex items-center justify-center shrink-0">
                   <img
-                    src={selectedMerch.gambar_url ? getAssetPath(selectedMerch.gambar_url) : getAssetPath('/images/merch/jersey.svg')}
+                    src={selectedMerch.gambar_url ? getAssetPath(selectedMerch.gambar_url) : 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80'}
                     alt={selectedMerch.nama}
                     className="w-full h-full object-contain p-3"
                     onError={(e) => {
                       e.target.onerror = null
-                      e.target.src = getAssetPath('/images/merch/jersey.svg')
+                      e.target.src = 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80'
                     }}
                   />
                   <div className="absolute top-2.5 left-2.5">
@@ -1779,12 +1779,12 @@ const KSShopPage = () => {
                 <div className="col-span-5 bg-[#1A1512] border-r border-[#3A2E24] p-7 flex flex-col items-center justify-center relative">
                   <div className="relative w-full aspect-square rounded-2xl overflow-hidden border border-[#3A2E24] bg-[#241E19]">
                     <img
-                      src={selectedMerch.gambar_url ? getAssetPath(selectedMerch.gambar_url) : getAssetPath('/images/merch/jersey.svg')}
+                      src={selectedMerch.gambar_url ? getAssetPath(selectedMerch.gambar_url) : 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80'}
                       alt={selectedMerch.nama}
                       className="w-full h-full object-contain p-6 hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         e.target.onerror = null
-                        e.target.src = getAssetPath('/images/merch/jersey.svg')
+                        e.target.src = 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80'
                       }}
                     />
                     <div className="absolute top-3 left-3">

@@ -469,7 +469,7 @@ const OTSOrderInlineForm = ({
                           alt={member.nama_panggung}
                           onError={(e) => {
                             e.target.onerror = null
-                            e.target.src = '/images/members/placeholder.svg'
+                            e.target.src = '/images/members/placeholder.webp'
                           }}
                           className="w-6 h-6 rounded-full object-cover shrink-0 border border-[var(--border)]"
                         />

@@ -30,7 +30,7 @@ const MemberCard = ({ member, index }) => {
               className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
               onError={(e) => {
                 e.target.onerror = null
-                e.target.src = getAssetPath('/images/members/placeholder.svg')
+                e.target.src = getAssetPath('/images/members/placeholder.webp')
               }}
             />
           ) : (
@@ -134,7 +134,7 @@ const KSMemberPreview = ({ members = [], config = {} }) => {
                         className="w-full h-full object-cover object-top"
                         onError={(e) => {
                           e.target.onerror = null
-                          e.target.src = getAssetPath('/images/members/placeholder.svg')
+                          e.target.src = getAssetPath('/images/members/placeholder.webp')
                         }}
                       />
                     ) : (
