@@ -989,91 +989,102 @@ const KSShopPage = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="bg-surface border border-border rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-10 shadow-sm relative overflow-hidden"
+                    className="group relative rounded-3xl sm:rounded-[2.5rem] bg-surface border border-border hover:border-primary/40 transition-all duration-300 p-6 sm:p-8 md:p-10 shadow-xl overflow-hidden flex flex-col justify-between"
                   >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
-                      {/* Event Information */}
-                      <div className="flex-1 space-y-3.5 sm:space-y-4">
+                    {/* BARIS ATAS: Kiri (Info Event) & Kanan (Blok CTA) */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-8 pb-6 sm:pb-8">
+                      {/* Kiri: Badge, Judul, Deskripsi */}
+                      <div className="flex-1 space-y-3 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-                          <span className="px-3 py-0.5 sm:px-3.5 sm:py-1 rounded-full bg-primary/10 border border-border text-primary text-[10px] sm:text-xs font-black uppercase tracking-wider">
+                          <span className="px-3.5 py-1 rounded-full bg-primary/10 border border-border text-primary text-xs font-black uppercase tracking-wider">
                             <span className="sm:hidden">EVENT TERPILIH · TIKET OPEN</span>
                             <span className="hidden sm:inline">SELECTED EVENT · TICKETS OPEN</span>
                           </span>
                           {currentEvent.is_special && (
-                            <span className="px-3 py-0.5 sm:px-3.5 sm:py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                            <span className="px-3.5 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
                               <FaStar size={10} className="text-purple-400" /> SPECIAL STAGE
                             </span>
                           )}
                         </div>
 
-                        <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black uppercase text-text-primary tracking-tight leading-tight">
+                        <h2 className="text-2xl sm:text-3xl md:text-[clamp(1.75rem,2.2vw,2.6rem)] font-black uppercase text-text-primary tracking-tight leading-[1.15] [text-wrap:balance] max-w-3xl">
                           {currentEvent.nama}
                         </h2>
 
-                        <p className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-2xl font-medium">
+                        <p className="text-xs sm:text-sm text-text-secondary leading-relaxed font-medium max-w-2xl">
                           {currentEvent.deskripsi || currentEvent.description || 'Panggung pertunjukan dan sesi interaktif 2-Shot Cheki bersama member idol Kohi Sekai.'}
                         </p>
-
-                        {/* Metadata Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4 pt-2">
-                          <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-background border border-border">
-                            <FaCalendarAlt className="text-primary text-base flex-shrink-0" />
-                            <div>
-                              <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">
-                                <span className="sm:hidden">Tanggal Event</span>
-                                <span className="hidden sm:inline">Event Date</span>
-                              </p>
-                              <p className="text-xs sm:text-sm font-bold text-text-primary">
-                                <span className="sm:hidden">{currentEvent.tanggal} {currentEvent.bulan} {currentEvent.tahun}</span>
-                                <span className="hidden sm:inline">
-                                  {currentEvent.tanggal} {EN_MONTHS[INDO_MONTHS.indexOf(currentEvent.bulan)] || currentEvent.bulan} {currentEvent.tahun}
-                                </span>
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-background border border-border">
-                            <FaClock className="text-primary text-base flex-shrink-0" />
-                            <div>
-                              <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">
-                                <span className="sm:hidden">Waktu & Sesi</span>
-                                <span className="hidden sm:inline">Time & Session</span>
-                              </p>
-                              <p className="text-xs sm:text-sm font-bold text-text-primary">
-                                {currentEvent.cheki_time || currentEvent.event_time || '15:00 - 18:00 WIB'}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-background border border-border">
-                            <FaMapMarkerAlt className="text-primary text-base flex-shrink-0" />
-                            <div>
-                              <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">
-                                <span className="sm:hidden">Lokasi / Venue</span>
-                                <span className="hidden sm:inline">Location / Venue</span>
-                              </p>
-                              <p className="text-xs sm:text-sm font-bold text-text-primary truncate">
-                                {currentEvent.lokasi}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
                       </div>
 
-                      {/* CTA Button to Order for this Event */}
-                      <div className="lg:w-auto flex flex-col justify-center items-start lg:items-end border-t lg:border-t-0 lg:border-l border-border pt-6 lg:pt-0 lg:pl-8 space-y-3">
-                        <span className="text-xs text-text-secondary font-medium block">
+                      {/* Kanan: Blok CTA */}
+                      <div className="w-full md:w-[300px] lg:w-[320px] shrink-0 flex flex-col items-center justify-center text-center space-y-2">
+                        <span className="text-[11px] sm:text-xs text-text-secondary font-bold uppercase tracking-wider block">
                           <span className="sm:hidden">Sudah punya akun Fan ID?</span>
                           <span className="hidden sm:inline">Ready to book with Fan ID?</span>
                         </span>
                         <button
+                          type="button"
                           onClick={() => handleBookCurrentEvent()}
-                          className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-primary hover:bg-primary-hover text-white font-black text-xs sm:text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 min-h-[48px]"
+                          className="w-full px-8 py-3.5 sm:py-4 rounded-full bg-primary hover:bg-primary-hover text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 min-h-[48px] shadow-md shadow-primary/20 active:scale-[0.98]"
                         >
-                          <span className="sm:hidden">Pesan Tiket Event Ini</span>
+                          <span className="sm:hidden">Pesan Tiket / Order</span>
                           <span className="hidden sm:inline">Book Tickets for This Event</span>
                           <FaArrowRight size={14} />
                         </button>
+                      </div>
+                    </div>
+
+                    {/* BARIS BAWAH: Tiga kartu info memenuhi SELURUH lebar kartu (1fr 1fr 1.5fr) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-[1fr_1fr_1.5fr] items-stretch gap-3 sm:gap-4 pt-5 sm:pt-6 border-t border-border/60">
+                      {/* Kartu 1: Tanggal Event */}
+                      <div className="flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-background border border-border min-w-0 h-full">
+                        <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center shrink-0">
+                          <FaCalendarAlt className="text-primary text-sm shrink-0" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">
+                            <span className="sm:hidden">Tanggal Event</span>
+                            <span className="hidden sm:inline">Event Date</span>
+                          </p>
+                          <p className="text-xs sm:text-sm font-bold text-text-primary [overflow-wrap:anywhere] break-words">
+                            <span className="sm:hidden">{currentEvent.tanggal} {currentEvent.bulan} {currentEvent.tahun}</span>
+                            <span className="hidden sm:inline">
+                              {currentEvent.tanggal} {EN_MONTHS[INDO_MONTHS.indexOf(currentEvent.bulan)] || currentEvent.bulan} {currentEvent.tahun}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Kartu 2: Waktu & Sesi */}
+                      <div className="flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-background border border-border min-w-0 h-full">
+                        <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center shrink-0">
+                          <FaClock className="text-primary text-sm shrink-0" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">
+                            <span className="sm:hidden">Waktu & Sesi</span>
+                            <span className="hidden sm:inline">Time & Session</span>
+                          </p>
+                          <p className="text-xs sm:text-sm font-bold text-text-primary [overflow-wrap:anywhere] break-words">
+                            {currentEvent.cheki_time || currentEvent.event_time || '15:00 - 18:00 WIB'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Kartu 3: Lokasi / Venue (1.5fr - Terlebar, wrap 2 baris jika perlu, tidak overflow) */}
+                      <div className="flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl bg-background border border-border min-w-0 h-full">
+                        <div className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center shrink-0">
+                          <FaMapMarkerAlt className="text-primary text-sm shrink-0" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] font-black uppercase tracking-wider text-text-secondary/70">
+                            <span className="sm:hidden">Lokasi / Venue</span>
+                            <span className="hidden sm:inline">Location / Venue</span>
+                          </p>
+                          <p className="text-xs sm:text-sm font-bold text-text-primary [overflow-wrap:anywhere] break-words line-clamp-2 leading-snug">
+                            {currentEvent.lokasi}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
