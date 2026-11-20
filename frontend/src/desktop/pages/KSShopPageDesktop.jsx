@@ -188,6 +188,11 @@ const KSShopPage = () => {
   const [selectedDateKey, setSelectedDateKey] = useState(null) // 'YYYY-MM-DD'
   const [selectedEventId, setSelectedEventId] = useState(null)
 
+  const handleSwitchTab = (tab) => {
+    setActiveShopTab(tab)
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+
   const handleScrollToCalendar = () => {
     kohiToast.info('Silakan pilih tanggal & event pada kalender di bawah untuk memesan tiket cheki.')
     const el = document.getElementById('monthly-calendar') || document.getElementById('event-detail')
@@ -729,7 +734,7 @@ const KSShopPage = () => {
               <div className="p-1 rounded-2xl bg-surface border border-border inline-flex gap-1.5 shadow-lg h-11 items-center">
                 <button
                   type="button"
-                  onClick={() => setActiveShopTab('cheki')}
+                  onClick={() => handleSwitchTab('cheki')}
                   className={`h-full flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider whitespace-nowrap transition-all ${activeShopTab === 'cheki'
                       ? 'bg-primary text-white shadow-md shadow-primary/25'
                       : 'text-text-secondary hover:text-text-primary hover:bg-background'
@@ -742,7 +747,7 @@ const KSShopPage = () => {
 
                 <button
                   type="button"
-                  onClick={() => setActiveShopTab('merch')}
+                  onClick={() => handleSwitchTab('merch')}
                   className={`h-full flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider whitespace-nowrap transition-all ${activeShopTab === 'merch'
                       ? 'bg-primary text-white shadow-md shadow-primary/25 font-black'
                       : 'text-text-secondary hover:text-text-primary hover:bg-background'
@@ -1372,7 +1377,7 @@ const KSShopPage = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveShopTab('merch')}
+                  onClick={() => handleSwitchTab('merch')}
                   className="px-6 py-3 rounded-full bg-primary text-white font-black text-xs uppercase tracking-wider shadow-md hover:bg-primary-hover transition shrink-0"
                 >
                   Lihat Merch Kohi Sekai →

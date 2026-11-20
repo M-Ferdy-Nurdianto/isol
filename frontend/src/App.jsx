@@ -34,6 +34,7 @@ import { MaintenanceProvider, useMaintenance } from './context/MaintenanceContex
 import MaintenanceScreen from './components/MaintenanceScreen'
 import MaintenanceAdminBadge from './components/MaintenanceAdminBadge'
 import { getValidAdminToken } from './lib/authSession'
+import ScrollToTop from './components/common/ScrollToTop'
 
 function MaintenanceGuard({ children }) {
   const { isMaintenance, maintenanceMessage, maintenanceEstimatedEnd, loading } = useMaintenance()
@@ -78,6 +79,7 @@ function App() {
             <FlyToCartProvider>
               <MerchCartProvider>
                 <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                  <ScrollToTop />
                   <MaintenanceAdminBadge />
                   <MerchCartDrawer />
                   <RBToastContainer />

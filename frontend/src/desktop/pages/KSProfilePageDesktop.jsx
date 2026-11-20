@@ -1216,13 +1216,15 @@ const KSProfilePage = () => {
               />
             ) : (
               /* Dedicated Default Banner: Distinct Roasted Espresso with Kohi Brand Watermark */
-              <div className="w-full h-full bg-[#120E0C] relative flex items-center justify-between px-6 sm:px-10 overflow-hidden select-none">
-                {/* Subtle Amber Top Accent Line (Solid Color) */}
-                <div className="absolute top-0 inset-x-0 h-1 bg-primary/70" />
+              <div className="w-full h-full bg-[#120E0C] relative flex items-center justify-between px-5 sm:px-10 overflow-hidden select-none">
+                {/* Top Accent Line */}
+                <div className="absolute top-0 inset-x-0 h-[2px] bg-primary/80" />
+                {/* Bottom Accent Line */}
+                <div className="absolute bottom-0 inset-x-0 h-px bg-border/60" />
 
-                {/* Grid Pattern with distinct contrast */}
+                {/* Dot Grid Pattern */}
                 <div 
-                  className="absolute inset-0 opacity-25 pointer-events-none" 
+                  className="absolute inset-0 opacity-20 pointer-events-none" 
                   style={{ 
                     backgroundImage: 'radial-gradient(circle at 2px 2px, var(--primary) 1.5px, transparent 0)', 
                     backgroundSize: '20px 20px' 
@@ -1230,22 +1232,25 @@ const KSProfilePage = () => {
                 />
 
                 {/* Left Side: Coffee Brand Emblem */}
-                <div className="relative z-0 flex items-center gap-3 opacity-60">
-                  <div className="w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center text-primary font-black text-base shadow-inner">
+                <div className="relative z-10 flex items-center gap-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-surface border border-primary/30 flex items-center justify-center text-primary font-black text-base sm:text-lg shadow-inner shrink-0">
                     KS
                   </div>
                   <div>
-                    <span className="text-[9px] uppercase tracking-[0.25em] font-mono text-primary font-bold block">
+                    <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] font-mono text-primary font-bold block">
                       Official Fan Space
                     </span>
-                    <span className="text-sm font-black tracking-wider text-text-primary">
+                    <span className="text-sm sm:text-base font-black tracking-wider text-text-primary">
                       KOHI SEKAI
+                    </span>
+                    <span className="text-[8px] text-text-secondary font-mono tracking-wider block mt-0.5 sm:hidden">
+                      コーヒーの世界
                     </span>
                   </div>
                 </div>
 
-                {/* Right Side: Japanese Typography Watermark */}
-                <div className="relative z-0 text-right opacity-30 hidden sm:block">
+                {/* Right Side: Japanese Typography Watermark (desktop & tablet) */}
+                <div className="relative z-10 text-right opacity-35 hidden sm:block">
                   <span className="text-2xl lg:text-3xl font-black tracking-tighter text-text-primary font-mono block">
                     コーヒーの世界
                   </span>
@@ -1253,11 +1258,17 @@ const KSProfilePage = () => {
                     Kohi Sekai Yogyakarta
                   </span>
                 </div>
+
+                {/* Mobile Right: subtle decorative text stack */}
+                <div className="relative z-10 text-right opacity-25 sm:hidden flex flex-col items-end gap-0.5">
+                  <span className="text-lg font-black tracking-tight text-text-primary font-mono">世界</span>
+                  <span className="text-[7px] uppercase tracking-widest text-primary font-mono font-bold">YGK</span>
+                </div>
               </div>
             )}
 
-            {/* Cover Overlay Button */}
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100">
+            {/* Cover Overlay Button — mobile: tap-only via opacity-0 + active:opacity-100, desktop: hover */}
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 opacity-0 active:opacity-100 md:opacity-0 md:group-hover:opacity-100">
               <button 
                 type="button"
                 onClick={handleOpenBannerPicker}
