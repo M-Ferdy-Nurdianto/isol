@@ -184,17 +184,23 @@ router.post('/login', async (req, res) => {
       if (turnstileToken) {
         const secretKey = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAAF_c-nTm2Qg7hufzNDMX2-1TKkc'
         try {
+          const bodyParams = new URLSearchParams({
+            secret: secretKey,
+            response: turnstileToken,
+          })
+          const cfIp = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+          if (cfIp) {
+            bodyParams.append('remoteip', cfIp)
+          }
+
           const cfResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-              secret: secretKey,
-              response: turnstileToken,
-              remoteip: req.ip || '',
-            }),
+            body: bodyParams,
           })
           const outcome = await cfResponse.json()
           if (!outcome.success && !turnstileToken.startsWith('turnstile-') && !secretKey.startsWith('1x0000000000000000000000000000000AA')) {
+            console.error('[Admin Login] Turnstile failed:', outcome['error-codes'])
             return res.status(400).json({ error: 'Verifikasi Cloudflare Turnstile gagal. Silakan verifikasi ulang.' })
           }
         } catch (cfErr) {
@@ -1002,17 +1008,22 @@ router.post('/verify-turnstile', async (req, res) => {
 
     const secretKey = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAAF_c-nTm2Qg7hufzNDMX2-1TKkc'
 
+    const bodyParams = new URLSearchParams({
+      secret: secretKey,
+      response: token,
+    })
+    const cfIp = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+    if (cfIp) {
+      bodyParams.append('remoteip', cfIp)
+    }
+
     // Call Cloudflare siteverify endpoint
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        secret: secretKey,
-        response: token,
-        remoteip: req.ip || '',
-      }),
+      body: bodyParams,
     })
 
     const outcome = await response.json()

@@ -66,13 +66,7 @@ const AdminLogin = () => {
     setLoading(true)
 
     try {
-      // 1. Verify Turnstile via backend
-      const cfRes = await api.post('/auth/verify-turnstile', { token: turnstileToken })
-      if (!cfRes.data?.success) {
-        throw new Error(cfRes.data?.error || 'Verifikasi Cloudflare Turnstile gagal.')
-      }
-
-      // 2. Submit Login Credentials
+      // Submit Login Credentials with Turnstile token
       const response = await api.post('/auth/login', {
         ...formData,
         turnstileToken

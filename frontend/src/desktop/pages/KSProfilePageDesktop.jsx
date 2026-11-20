@@ -865,7 +865,7 @@ const KSProfilePage = () => {
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface/60'
               }`}
             >
-              <span>PO Online</span>
+              <span>PO</span>
               <span
                 className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
                   orderTypeFilter === 'po'
@@ -886,7 +886,7 @@ const KSProfilePage = () => {
                   : 'text-text-secondary hover:text-text-primary hover:bg-surface/60'
               }`}
             >
-              <span>OTS Venue</span>
+              <span>OTS</span>
               <span
                 className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
                   orderTypeFilter === 'ots'
@@ -1123,7 +1123,7 @@ const KSProfilePage = () => {
               </h3>
               <p className="text-text-secondary text-xs max-w-sm mb-6 leading-relaxed">
                 {orderTypeFilter === 'ots' 
-                  ? 'Kamu belum memiliki transaksi tiket OTS di lokasi venue dengan akun ini.' 
+                  ? 'Kamu belum memiliki transaksi tiket OTS dengan akun ini.' 
                   : 'Mari dukung oshi kamu dengan memesan tiket Cheki atau merchandise eksklusif!'}
               </p>
               <button 
@@ -1160,11 +1160,11 @@ const KSProfilePage = () => {
                       <div className="flex items-center gap-2 flex-wrap">
                         {isOts ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-background text-text-secondary border border-border">
-                            <FaQrcode size={10} /> OTS Venue
+                            <FaQrcode size={10} /> OTS
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-background text-text-secondary border border-border">
-                            <FaTicketAlt size={10} /> Pre-Order (PO)
+                            <FaTicketAlt size={10} /> PO
                           </span>
                         )}
                         {isOts && (order.created_by === 'admin' || !order.created_by) ? (

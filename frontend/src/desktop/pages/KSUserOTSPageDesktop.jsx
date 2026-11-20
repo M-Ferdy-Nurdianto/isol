@@ -145,7 +145,7 @@ const KSUserOTSPage = () => {
             <div>
               <p className="text-sm font-bold text-[var(--text-primary)]">Riwayat di Profil</p>
               <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">
-                Semua order OTS kamu bisa dilihat di menu <strong>Profil → tab OTS Venue</strong>.
+                Semua order OTS kamu bisa dilihat di menu <strong>Profil → tab OTS</strong>.
               </p>
             </div>
           </div>
