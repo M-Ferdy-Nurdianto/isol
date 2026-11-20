@@ -1,4 +1,4 @@
-﻿// Guest Sandbox & Data Masking Utilities for Kohi Sekai Admin
+// Guest Sandbox & Data Masking Utilities for Kohi Sekai Admin
 
 export const isGuestMode = () => {
   if (typeof window === 'undefined') return false

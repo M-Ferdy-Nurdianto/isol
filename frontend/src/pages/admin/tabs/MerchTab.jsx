@@ -75,7 +75,7 @@ const MerchTab = ({
                                   className="w-full h-full object-contain rounded-lg"
                                   onError={(e) => {
                                     e.target.onerror = null
-                                    e.target.src = 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80'
+                                    e.target.src = '/images/merch/jersey.webp'
                                   }}
                                 />
                               ) : (
