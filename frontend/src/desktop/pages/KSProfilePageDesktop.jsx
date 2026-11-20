@@ -10,7 +10,7 @@ import {
   FaReceipt, FaCamera, FaSpinner, FaEdit, FaSave, FaTimes, FaShoppingBag,
   FaCheckCircle, FaCopy, FaCalendarAlt, FaQrcode, FaDownload, FaCrown, FaTrophy,
   FaBox, FaTruck, FaStore, FaMapMarkerAlt, FaImage, FaPalette,
-  FaLock, FaKey, FaShieldAlt, FaEye, FaEyeSlash
+  FaLock, FaKey, FaShieldAlt, FaEye, FaEyeSlash, FaUserEdit
 } from 'react-icons/fa'
 import { useFanAuth } from '../../context/FanAuthContext'
 import KSHeader from '../../components/KSHeader'
@@ -60,7 +60,8 @@ const KSProfilePage = () => {
       })
   }, [])
   
-  const [activeTab, setActiveTab] = useState('profile') // 'profile' or 'history'
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [activeTab, setActiveTab] = useState('history') // default to history
   const [selectedReceiptOrder, setSelectedReceiptOrder] = useState(null)
   const [orderTypeFilter, setOrderTypeFilter] = useState('po') // 'po', 'ots', 'merch'
   const [copiedId, setCopiedId] = useState(null)
@@ -201,6 +202,17 @@ const KSProfilePage = () => {
 
   if (!isLoggedIn && !currentUser) return null
 
+  const handleOpenProfileModal = () => {
+    setProfileForm({
+      nama: currentUser?.nama || '',
+      whatsapp: currentUser?.whatsapp || '',
+      instagram: currentUser?.instagram || ''
+    })
+    setIsEditingProfile(true)
+    setShowChangePassword(false)
+    setShowProfileModal(true)
+  }
+
   const handleSaveProfile = async () => {
     try {
       setSavingProfile(true)
@@ -218,6 +230,7 @@ const KSProfilePage = () => {
       if (res.data?.success) {
         updateProfile(cleanForm)
         setIsEditingProfile(false)
+        setShowProfileModal(false)
         kohiToast.success('Profil berhasil diperbarui')
       }
     } catch (err) {
@@ -440,119 +453,109 @@ const KSProfilePage = () => {
     }
   }
 
-  const renderProfileInfo = () => (
-    <div className="bg-surface border border-border rounded-2xl shadow-sm overflow-hidden h-full">
-      <div className="flex items-center justify-between border-b border-border p-5">
-        <h2 className="text-lg font-black flex items-center gap-2 text-text-primary tracking-tight">
-          <FaUser className="text-primary" />
-          Informasi Profil
-        </h2>
-        {!isEditingProfile ? (
-          <button 
-            onClick={() => setIsEditingProfile(true)}
-            className="text-sm font-bold text-primary hover:text-primary/80 flex items-center gap-1.5 transition-colors"
-          >
-            <FaEdit /> Edit
-          </button>
-        ) : (
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => {
-                setIsEditingProfile(false)
-                setProfileForm({
-                  nama: fanUser?.nama || '',
-                  whatsapp: fanUser?.whatsapp || '',
-                  instagram: fanUser?.instagram || ''
-                })
-              }}
-              disabled={savingProfile}
-              className="text-sm font-bold text-text-secondary hover:text-text-primary flex items-center gap-1.5 transition-colors"
-            >
-              <FaTimes /> Batal
-            </button>
-            <button 
-              onClick={handleSaveProfile}
-              disabled={savingProfile}
-              className="text-sm font-bold text-primary hover:text-primary/80 flex items-center gap-1.5 ml-2 transition-colors"
-            >
-              {savingProfile ? <FaSpinner className="animate-spin" /> : <FaSave />} Simpan
-            </button>
+  const renderProfileModal = () => {
+    if (!showProfileModal) return null
+
+    const profileBodyContent = (
+      <div className="space-y-5">
+        {/* Fan Identity Highlight Banner */}
+        <div className="p-3.5 sm:p-4 bg-background border border-border rounded-2xl flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white font-black text-xl shrink-0 overflow-hidden">
+              {currentUser?.image_url && !avatarLoadError ? (
+                <img
+                  src={getAssetPath(currentUser.image_url)}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span>{currentUser?.nama?.charAt(0) || 'K'}</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-black text-text-primary truncate">
+                {currentUser?.nama || 'Fan'}
+              </p>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <span className="text-text-secondary text-xs font-mono">
+                  ID: {currentUser?.fan_id ? String(currentUser.fan_id).padStart(4, '0') : (currentUser?.id?.split('-')[1] || currentUser?.id?.substring(0,8) || 'Member')}
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-success/10 text-success border border-success/20 rounded-full text-[9px] font-bold uppercase tracking-wider">
+                  <FaCheck className="text-[8px]" /> Terverifikasi
+                </span>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
-      
-      <div className="p-5 grid grid-cols-1 gap-5">
-        <div className="space-y-1.5 group">
-          <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
-            <FaUser className="opacity-70" /> Nama Lengkap
-          </label>
-          {isEditingProfile ? (
+        </div>
+
+        {/* Personal Info Form Fields */}
+        <div className="space-y-4">
+          {/* Nama Lengkap */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
+              <FaUser className="text-primary text-xs" /> Nama Lengkap
+            </label>
             <input 
               type="text"
               value={profileForm.nama}
               onChange={(e) => setProfileForm({...profileForm, nama: e.target.value})}
-              className="w-full p-3 bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-medium text-text-primary outline-none transition-all"
+              placeholder="Masukkan nama lengkap Anda"
+              className="w-full p-3 bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-medium text-text-primary text-sm outline-none transition-all"
             />
-          ) : (
-            <div className="p-3 bg-background border border-border rounded-xl font-medium text-text-primary">
-              {currentUser?.nama || '-'}
-            </div>
-          )}
-        </div>
-        
-        <div className="space-y-1.5 group">
-          <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
-            <FaEnvelope className="opacity-70" /> Email
-          </label>
-          <div className="p-3 bg-background/50 border border-border rounded-xl font-medium text-text-secondary truncate cursor-not-allowed" title="Email tidak dapat diubah">
-            {currentUser?.email || '-'}
           </div>
-        </div>
 
-        <div className="space-y-1.5 group">
-          <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
-            <FaWhatsapp className="opacity-70" /> WhatsApp
-          </label>
-          {isEditingProfile ? (
+          {/* Email (Readonly) */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <FaEnvelope className="text-primary text-xs" /> Email Akun
+              </span>
+              <span className="text-[10px] text-text-secondary/70 lowercase font-normal">
+                (tidak dapat diubah)
+              </span>
+            </label>
+            <div className="p-3 bg-background/50 border border-border rounded-xl font-medium text-text-secondary text-sm truncate cursor-not-allowed" title="Email akun terdaftar tidak dapat diubah">
+              {currentUser?.email || '-'}
+            </div>
+          </div>
+
+          {/* Nomor WhatsApp */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
+              <FaWhatsapp className="text-primary text-xs" /> Nomor WhatsApp
+            </label>
             <input 
-              type="text"
+              type="tel"
               value={profileForm.whatsapp}
               onChange={(e) => setProfileForm({...profileForm, whatsapp: e.target.value})}
-              className="w-full p-3 bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-medium text-text-primary outline-none transition-all"
+              placeholder="Contoh: 081234567890"
+              className="w-full p-3 bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-medium text-text-primary text-sm outline-none transition-all"
             />
-          ) : (
-            <div className="p-3 bg-background border border-border rounded-xl font-medium text-text-primary">
-              {currentUser?.whatsapp || '-'}
-            </div>
-          )}
-        </div>
+          </div>
 
-        <div className="space-y-1.5 group">
-          <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
-            <FaInstagram className="opacity-70" /> Instagram
-          </label>
-          {isEditingProfile ? (
+          {/* Instagram */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
+              <FaInstagram className="text-primary text-xs" /> Username Instagram
+            </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary font-bold">@</span>
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary font-bold text-sm">@</span>
               <input 
                 type="text"
                 value={profileForm.instagram}
-                onChange={(e) => setProfileForm({...profileForm, instagram: e.target.value})}
-                className="w-full p-3 pl-8 bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-medium text-text-primary outline-none transition-all"
+                onChange={(e) => setProfileForm({...profileForm, instagram: e.target.value.replace(/^@/, '')})}
+                placeholder="username_instagram"
+                className="w-full p-3 pl-8 bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-xl font-medium text-text-primary text-sm outline-none transition-all"
               />
             </div>
-          ) : (
-            <div className="p-3 bg-background border border-border rounded-xl font-medium text-text-primary">
-              {currentUser?.instagram ? `@${currentUser.instagram}` : '-'}
-            </div>
-          )}
+          </div>
         </div>
 
-        {/* Keamanan & Edit Password */}
+        {/* Keamanan & Ganti Password */}
         <div className="pt-4 border-t border-border space-y-3">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-2">
-              <FaShieldAlt className="opacity-70 text-primary" /> Keamanan & Password
+              <FaShieldAlt className="text-primary" /> Keamanan & Password
             </label>
             {!showChangePassword ? (
               <button
@@ -571,7 +574,7 @@ const KSProfilePage = () => {
                 }}
                 className="text-xs font-bold text-text-secondary hover:text-text-primary flex items-center gap-1 transition-colors"
               >
-                <FaTimes size={11} /> Tutup
+                <FaTimes size={11} /> Tutup Form Password
               </button>
             )}
           </div>
@@ -700,8 +703,129 @@ const KSProfilePage = () => {
           )}
         </div>
       </div>
-    </div>
-  )
+    )
+
+    return (
+      <>
+        {/* DESKTOP MODAL (hidden md:flex) - SOLID DIALOG OVERLAY */}
+        <div 
+          onClick={(e) => { if (e.target === e.currentTarget) setShowProfileModal(false) }}
+          className="hidden md:flex fixed inset-0 z-50 bg-black/85 items-center justify-center p-4 sm:p-6 animate-fade-in"
+        >
+          <div className="bg-surface border border-border rounded-3xl shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden text-text-primary animate-scale-up">
+            {/* Fixed Header */}
+            <div className="bg-surface border-b border-border px-6 py-4 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <FaUserEdit size={18} />
+                </div>
+                <div>
+                  <h2 className="text-base font-black text-text-primary tracking-tight uppercase">
+                    Informasi Pribadi & Profil
+                  </h2>
+                  <p className="text-xs text-text-secondary">
+                    Kelola data identitas dan kontak akun fan Anda
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowProfileModal(false)}
+                className="w-9 h-9 rounded-xl bg-background border border-border text-text-secondary hover:text-text-primary flex items-center justify-center transition hover:border-primary/40"
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            {/* Scrollable Body */}
+            <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+              {profileBodyContent}
+            </div>
+
+            {/* Fixed Footer */}
+            <div className="bg-surface border-t border-border px-6 py-4 flex items-center justify-between shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowProfileModal(false)}
+                className="px-5 py-2.5 rounded-xl bg-background border border-border text-xs font-bold text-text-secondary hover:text-text-primary transition"
+              >
+                Tutup
+              </button>
+              <button
+                type="button"
+                disabled={savingProfile}
+                onClick={handleSaveProfile}
+                className="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg transition active:scale-95 disabled:opacity-50"
+              >
+                {savingProfile ? <FaSpinner className="animate-spin" /> : <FaSave />}
+                <span>Simpan Perubahan</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* MOBILE DRAWER (md:hidden) - BOTTOM-SHEET MODAL */}
+        <div 
+          onClick={(e) => { if (e.target === e.currentTarget) setShowProfileModal(false) }}
+          className="md:hidden fixed inset-0 z-50 bg-black/85 flex flex-col justify-end animate-fade-in"
+        >
+          <div className="bg-surface border-t border-border rounded-t-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up">
+            {/* Drag Handle Bar */}
+            <div className="w-12 h-1.5 bg-border rounded-full mx-auto my-3 shrink-0" />
+
+            {/* Header */}
+            <div className="px-5 pb-3 border-b border-border flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <FaUserEdit size={14} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-text-primary uppercase tracking-tight">
+                    Informasi Pribadi
+                  </h3>
+                  <p className="text-[10px] text-text-secondary">
+                    Perbarui profil & nomor kontak
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowProfileModal(false)}
+                className="w-8 h-8 rounded-lg bg-background border border-border text-text-secondary hover:text-text-primary flex items-center justify-center"
+              >
+                <FaTimes size={12} />
+              </button>
+            </div>
+
+            {/* Scrollable Form Body */}
+            <div className="p-5 overflow-y-auto custom-scrollbar flex-1">
+              {profileBodyContent}
+            </div>
+
+            {/* Sticky Bottom Action Bar */}
+            <div className="sticky bottom-0 bg-surface border-t border-border p-4 flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowProfileModal(false)}
+                className="flex-1 py-3 rounded-xl bg-background border border-border text-xs font-bold text-text-secondary text-center active:scale-95 transition"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                disabled={savingProfile}
+                onClick={handleSaveProfile}
+                className="flex-1 py-3 rounded-xl bg-primary text-white text-xs font-black uppercase tracking-wider text-center flex items-center justify-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50 transition"
+              >
+                {savingProfile ? <FaSpinner className="animate-spin" /> : <FaSave />}
+                <span>Simpan</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
 
   const renderOrderHistory = () => {
     const poCount = orders.filter(o => !(o.is_ots || o.order_number?.startsWith('KS-OTS'))).length
@@ -1402,67 +1526,44 @@ const KSProfilePage = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Mobile Button: Informasi Pribadi */}
+                <div className="md:hidden mt-3 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleOpenProfileModal}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-background border border-primary/40 text-primary text-xs font-bold shadow-sm active:scale-95 transition-all"
+                  >
+                    <FaUserEdit size={13} />
+                    <span>Informasi Pribadi</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Desktop Button: Informasi Pribadi */}
+              <div className="hidden md:flex items-center md:pt-16 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleOpenProfileModal}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface hover:bg-background border border-border hover:border-primary/50 text-text-primary hover:text-primary text-xs font-bold transition-all shadow-sm active:scale-95"
+                >
+                  <FaUserEdit className="text-primary text-sm" />
+                  <span>Informasi Pribadi</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* MOBILE TABS (Segmented Control) */}
-        <div className="md:hidden mb-6 bg-surface p-1 rounded-xl border border-border flex">
-          <button 
-            onClick={() => setActiveTab('profile')}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-colors ${activeTab === 'profile' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary'}`}
-          >
-            Informasi Profil
-          </button>
-          <button 
-            onClick={() => setActiveTab('history')}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-colors ${activeTab === 'history' ? 'bg-primary text-white shadow-sm' : 'text-text-secondary'}`}
-          >
-            Riwayat Pesanan
-          </button>
+        {/* CONTENT LAYOUT - Riwayat Pesanan Sebagai Poin Utama */}
+        {/* Desktop Layout - Riwayat Pesanan Full Width */}
+        <div className="hidden md:block w-full">
+          {renderOrderHistory()}
         </div>
 
-        {/* CONTENT LAYOUT */}
-        {/* Desktop: 2 Columns. Mobile: Conditional Render based on activeTab */}
-        
-        {/* Desktop Layout */}
-        <div className="hidden md:grid grid-cols-12 gap-6 h-full items-start">
-          <div className="col-span-5 lg:col-span-4 h-full sticky top-24">
-            {renderProfileInfo()}
-          </div>
-          <div className="col-span-7 lg:col-span-8 h-full">
-            {renderOrderHistory()}
-          </div>
-        </div>
-
-        {/* Mobile Layout */}
+        {/* Mobile Layout - Riwayat Pesanan Full Width */}
         <div className="md:hidden space-y-6">
-          <AnimatePresence mode="wait">
-            {activeTab === 'profile' && (
-              <motion.div
-                key="profile"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-                transition={{ duration: 0.2 }}
-              >
-                {renderProfileInfo()}
-              </motion.div>
-            )}
-            
-            {activeTab === 'history' && (
-              <motion.div
-                key="history"
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                {renderOrderHistory()}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {renderOrderHistory()}
 
           {/* Mobile Sign Out Button */}
           <div className="pt-6">
@@ -1518,6 +1619,9 @@ const KSProfilePage = () => {
       </div>
 
       </main>
+
+      {/* INFORMASI PRIBADI MODAL (DESKTOP DIALOG & MOBILE BOTTOM-SHEET) */}
+      {renderProfileModal()}
 
       {/* =========================================================================
           MODAL 1: OFFICIAL AVATAR PICKER (DESKTOP FULLSCREEN & MOBILE BOTTOM-SHEET)
