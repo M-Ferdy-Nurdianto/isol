@@ -161,7 +161,7 @@ let cachedShopData = null
 const KSShopPage = () => {
   const navigate = useNavigate()
   const { fanUser, isLoggedIn, openAuthModal } = useFanAuth()
-  const { addToCart, openCart, totalItems } = useMerchCart()
+  const { addToCart, openCart, totalItems, totalPrice } = useMerchCart()
 
   // Data states
   const [events, setEvents] = useState(() => cachedShopData?.events || [])
@@ -637,6 +637,7 @@ const KSShopPage = () => {
     } : null
 
     addToCart(selectedMerch, selectedSize, merchQty, startPos)
+    setSelectedMerch(null)
   }
 
   const handleBuyNowFromModal = () => {
@@ -701,7 +702,7 @@ const KSShopPage = () => {
             <h1 className="text-2xl sm:text-5xl md:text-6xl font-black tracking-tight text-text-primary leading-none uppercase mb-2">
               KOHI <span className="text-primary">{activeShopTab === 'cheki' ? 'TICKETS' : 'OFFICIAL MERCH'}</span>
             </h1>
-            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-2xl mx-auto line-clamp-1 sm:line-clamp-none">
+            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-2xl mx-auto line-clamp-2 sm:line-clamp-none">
               {activeShopTab === 'cheki'
                 ? 'Pilih tanggal event pada kalender bulanan, tentukan member idol favoritmu, dan langsung pesan tiket 2-Shot Cheki tanpa perlu sistem keranjang.'
                 : 'Koleksi merchandise resmi Kohi Sekai untuk melengkapi dukunganmu di setiap panggung pertunjukan.'}
@@ -1401,15 +1402,15 @@ const KSShopPage = () => {
           {activeShopTab === 'merch' && (
             <section id="official-merchandise" className="space-y-6">
               
-              {/* Toolbar satu baris di atas grid: Filter Kategori di kiri (horizontal scroll on mobile), Tombol Keranjang di kanan (desktop only) */}
-              <div className="relative flex items-center justify-between gap-3 pb-2 border-b border-border">
-                {/* Filter Kategori Container with Right Fade Gradient on mobile */}
-                <div className="relative flex-1 min-w-0">
-                  <div className="p-1 rounded-2xl bg-surface border border-border inline-flex gap-1 shadow-sm overflow-x-auto max-w-full snap-x snap-proximity [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+              {/* Toolbar satu baris di atas grid: Filter Kategori di kiri, Counter & Tombol Keranjang di kanan */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border">
+                {/* Filter Kategori Container with clean scrollable tabs */}
+                <div className="flex items-center gap-2 overflow-x-auto max-w-full snap-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5">
+                  <div className="p-1 rounded-2xl bg-surface border border-border inline-flex gap-1 shadow-sm shrink-0">
                     <button
                       type="button"
                       onClick={() => setMerchCategoryFilter('all')}
-                      className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 snap-start ${
+                      className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
                         merchCategoryFilter === 'all'
                           ? 'bg-primary text-white font-black shadow-sm'
                           : 'text-text-secondary hover:text-text-primary hover:bg-background'
@@ -1420,7 +1421,7 @@ const KSShopPage = () => {
                     <button
                       type="button"
                       onClick={() => setMerchCategoryFilter('baju')}
-                      className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 snap-start ${
+                      className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
                         merchCategoryFilter === 'baju'
                           ? 'bg-primary text-white font-black shadow-sm'
                           : 'text-text-secondary hover:text-text-primary hover:bg-background'
@@ -1431,7 +1432,7 @@ const KSShopPage = () => {
                     <button
                       type="button"
                       onClick={() => setMerchCategoryFilter('aksesoris')}
-                      className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 snap-start ${
+                      className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
                         merchCategoryFilter === 'aksesoris'
                           ? 'bg-primary text-white font-black shadow-sm'
                           : 'text-text-secondary hover:text-text-primary hover:bg-background'
@@ -1440,28 +1441,36 @@ const KSShopPage = () => {
                       Aksesoris
                     </button>
                   </div>
-                  {/* Subtle Right Fade indicator for horizontal scroll */}
-                  <div className="sm:hidden pointer-events-none absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent" />
+
+                  {/* Counter Badge */}
+                  <span className="text-[11px] font-mono font-bold text-text-secondary whitespace-nowrap px-2.5 py-1 rounded-xl bg-surface border border-border shrink-0">
+                    {displayMerch.length} Produk
+                  </span>
                 </div>
 
-                {/* Tombol Keranjang Desktop Only (Satu Keranjang Saja: Mobile pakai ikon di header) */}
-                <button
-                  type="button"
-                  onClick={openCart}
-                  className="hidden md:flex px-4 py-2 rounded-2xl bg-surface border border-primary/30 text-primary hover:bg-primary hover:text-white text-xs font-black uppercase tracking-wider items-center gap-2 transition-all shadow-sm active:scale-95 shrink-0"
-                  title="Buka Keranjang Belanja"
-                >
-                  <FaShoppingBag size={13} />
-                  <span>Keranjang</span>
-                  {totalItems > 0 && (
-                    <span className="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-mono font-black flex items-center justify-center">
-                      {totalItems}
-                    </span>
-                  )}
-                </button>
+                {/* Tombol Keranjang: Akses cepat baik di Mobile maupun Desktop */}
+                <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+                  <span className="sm:hidden text-[11px] text-text-secondary font-medium">
+                    Koleksi Merchandise Resmi
+                  </span>
+                  <button
+                    type="button"
+                    onClick={openCart}
+                    className="flex px-3.5 py-2 rounded-2xl bg-surface border border-primary/30 text-primary hover:bg-primary hover:text-white text-xs font-black uppercase tracking-wider items-center gap-2 transition-all shadow-sm active:scale-95 shrink-0"
+                    title="Buka Keranjang Belanja"
+                  >
+                    <FaShoppingBag size={12} />
+                    <span>Keranjang</span>
+                    {totalItems > 0 && (
+                      <span className="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-mono font-black flex items-center justify-center">
+                        {totalItems}
+                      </span>
+                    )}
+                  </button>
+                </div>
               </div>
 
-              {/* Merch Grid: 2 Kolom di Mobile (gap 12px), 4 Kolom di Desktop */}
+              {/* Merch Grid: 2 Kolom di Mobile (gap 3), 4 Kolom di Desktop */}
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                 {displayMerch.map((item, idx) => {
                   const isPreOrder = item.is_po || !item.stok || item.stok === 0
@@ -1480,12 +1489,12 @@ const KSShopPage = () => {
                       onClick={() => handleOpenMerch(item)}
                       className="group relative rounded-2xl sm:rounded-3xl overflow-hidden bg-surface border border-border hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col justify-between cursor-pointer h-full"
                     >
-                      <div className="relative aspect-square overflow-hidden bg-background">
+                      <div className="relative aspect-square overflow-hidden bg-[#181310] border-b border-border/60">
                         {itemImg ? (
                           <img
                             src={itemImg}
                             alt={item.nama}
-                            className="w-full h-full object-contain p-3 sm:p-4 group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-contain p-2.5 sm:p-4 group-hover:scale-105 transition-transform duration-500"
                             onError={(e) => {
                               e.target.onerror = null
                               e.target.src = '/images/merch/jersey.webp'
@@ -1497,26 +1506,29 @@ const KSShopPage = () => {
                           </div>
                         )}
 
-                        {/* Stock Badges: Hanya muncul jika Closed, Stok <= 10, atau PO */}
+                        {/* Stock Badges: Solid colors only per AGENTS.md */}
                         <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
                           {isClosed ? (
-                            <span className="px-2 py-0.5 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-zinc-700">
+                            <span className="px-2 py-0.5 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-surface text-text-secondary border border-border">
                               Sold out
                             </span>
                           ) : isLowStock ? (
-                            <span className="px-2 py-0.5 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            <span className="px-2 py-0.5 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-warning/20 text-warning border border-warning/30">
                               Sisa {item.stok}
                             </span>
                           ) : isPreOrder ? (
-                            <span className="px-2 py-0.5 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-accent/20 text-accent border border-accent/30">
+                            <span className="px-2 py-0.5 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-surface text-primary border border-border">
                               Pre-Order
                             </span>
                           ) : null}
                         </div>
                       </div>
 
-                      <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 border-t border-border flex flex-col justify-between flex-1">
+                      <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 flex flex-col justify-between flex-1">
                         <div>
+                          <span className="text-[10px] font-black uppercase tracking-wider text-primary/90 block truncate mb-0.5">
+                            {item.kategori === 'baju' ? 'Apparel' : (item.kategori || 'Official Goods')}
+                          </span>
                           <h4 className="text-xs font-black text-text-primary uppercase tracking-tight line-clamp-2 min-h-[2rem] leading-tight">
                             {item.nama}
                           </h4>
@@ -1527,8 +1539,14 @@ const KSShopPage = () => {
                           )}
                         </div>
 
-                        <div className="pt-2 border-t border-border/60 flex items-center justify-between gap-1.5">
-                          <Price value={item.harga} size="item" />
+                        {/* Price & Action: Stacks cleanly on Mobile, Side-by-side on Desktop */}
+                        <div className="pt-2 border-t border-border/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="flex items-baseline justify-between sm:justify-start gap-1">
+                            <Price value={item.harga} size="item" className="text-sm font-black text-primary" />
+                            {item.is_po && (
+                              <span className="text-[9px] text-text-secondary font-mono sm:hidden">PO</span>
+                            )}
+                          </div>
 
                           {hasSizes ? (
                             <button
@@ -1537,9 +1555,9 @@ const KSShopPage = () => {
                                 e.stopPropagation()
                                 handleOpenMerch(item)
                               }}
-                              className="py-1 px-2.5 sm:py-1.5 sm:px-3 rounded-lg sm:rounded-xl bg-surface border border-primary/40 hover:bg-primary hover:text-white text-primary font-bold text-[10px] sm:text-[11px] uppercase tracking-wider transition-all shadow-sm shrink-0 whitespace-nowrap"
+                              className="w-full sm:w-auto py-1.5 px-3 rounded-xl bg-surface border border-primary/40 hover:bg-primary hover:text-white text-primary font-black text-[11px] uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-1 active:scale-95 min-h-[34px]"
                             >
-                              Pilih Ukuran
+                              <span>Pilih Ukuran</span>
                             </button>
                           ) : (
                             <button
@@ -1549,9 +1567,9 @@ const KSShopPage = () => {
                                 const rect = e.currentTarget.getBoundingClientRect()
                                 addToCart(item, '', 1, { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
                               }}
-                              className="py-1 px-2 sm:py-1.5 sm:px-3 rounded-lg sm:rounded-xl bg-primary hover:bg-primary-hover text-white font-bold text-[10px] sm:text-[11px] uppercase tracking-wider transition-all shadow-sm flex items-center gap-1 shrink-0 whitespace-nowrap"
+                              className="w-full sm:w-auto py-1.5 px-3 rounded-xl bg-primary hover:bg-primary-hover text-white font-black text-[11px] uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-1.5 active:scale-95 min-h-[34px]"
                             >
-                              <FaPlus size={8} />
+                              <FaPlus size={9} />
                               <span>+ Keranjang</span>
                             </button>
                           )}
@@ -1568,6 +1586,39 @@ const KSShopPage = () => {
 
         </div>
       </main>
+
+      {/* ============================================================
+          MOBILE FLOATING CART ACTION BAR
+          Muncul saat ada item di keranjang & detail modal sedang tertutup
+      ============================================================ */}
+      <AnimatePresence>
+        {totalItems > 0 && !selectedMerch && activeShopTab === 'merch' && (
+          <motion.div
+            initial={{ y: 60, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 60, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-[74px] inset-x-4 z-40 md:hidden pointer-events-auto"
+          >
+            <button
+              type="button"
+              onClick={openCart}
+              className="w-full p-3.5 rounded-2xl bg-primary hover:bg-primary-hover text-white shadow-2xl shadow-primary/30 flex items-center justify-between font-black text-xs uppercase tracking-wider border border-white/20 active:scale-[0.98] transition-all"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-black/25 flex items-center justify-center">
+                  <FaShoppingBag size={13} />
+                </div>
+                <span>{totalItems} Item di Keranjang</span>
+              </div>
+              <div className="flex items-center gap-2 font-mono">
+                <span>Rp {totalPrice.toLocaleString('id-ID')}</span>
+                <FaArrowRight size={11} />
+              </div>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <KSFooter />
 
@@ -1634,15 +1685,15 @@ const KSShopPage = () => {
                   />
                   <div className="absolute top-2.5 left-2.5">
                     {selectedMerch.available === false ? (
-                      <span className="px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-zinc-700">
+                      <span className="px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-surface text-text-secondary border border-border">
                         Closed
                       </span>
                     ) : (!selectedMerch.stok || selectedMerch.stok === 0) ? (
-                      <span className="px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-[#FF85AC]/20 text-[#FF85AC] border border-[#FF85AC]/30">
+                      <span className="px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-surface text-primary border border-border">
                         Pre-Order
                       </span>
                     ) : (
-                      <span className="px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-[#6FAE73]/20 text-[#6FAE73] border border-[#6FAE73]/30">
+                      <span className="px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-success/20 text-success border border-success/30">
                         Tersedia ({selectedMerch.stok} stok)
                       </span>
                     )}
@@ -1744,23 +1795,35 @@ const KSShopPage = () => {
               </div>
 
               {/* Mobile Sticky Bottom Actions with Safe-Area Padding */}
-              <div className="p-3.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] bg-[#1A1512] border-t border-[#3A2E24] grid grid-cols-2 gap-2.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={handleAddToCartFromModal}
-                  className="py-3 px-3 rounded-2xl bg-[#241E19] border border-[#E8944A]/40 hover:bg-[#3A2E24] text-[#E8944A] font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition active:scale-95 shadow-md"
-                >
-                  <FaShoppingBag size={12} />
-                  <span>+ Keranjang</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleBuyNowFromModal}
-                  className="py-3 px-3 rounded-2xl bg-[#E8944A] hover:bg-[#D48037] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg shadow-[#E8944A]/20"
-                >
-                  <span>Beli Sekarang</span>
-                  <FaArrowLeft className="rotate-180" size={10} />
-                </button>
+              <div className="p-3.5 pb-[calc(0.875rem+env(safe-area-inset-bottom,0px))] bg-[#1A1512] border-t border-[#3A2E24] shrink-0">
+                {selectedMerch.available === false ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="w-full py-3 px-4 rounded-2xl bg-surface border border-border text-text-secondary font-black text-xs uppercase tracking-wider flex items-center justify-center cursor-not-allowed opacity-60"
+                  >
+                    Barang Tidak Tersedia / Sold Out
+                  </button>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={handleAddToCartFromModal}
+                      className="py-3 px-3 rounded-2xl bg-[#241E19] border border-primary/40 hover:bg-[#3A2E24] text-primary font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition active:scale-95 shadow-md"
+                    >
+                      <FaShoppingBag size={12} />
+                      <span>+ Keranjang</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleBuyNowFromModal}
+                      className="py-3 px-3 rounded-2xl bg-primary hover:bg-primary-hover text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg shadow-primary/20"
+                    >
+                      <span>Beli Sekarang</span>
+                      <FaArrowLeft className="rotate-180" size={10} />
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
 
@@ -1800,15 +1863,15 @@ const KSShopPage = () => {
                     />
                     <div className="absolute top-3 left-3">
                       {selectedMerch.available === false ? (
-                        <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-zinc-700">
+                        <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-surface text-text-secondary border border-border">
                           Closed
                         </span>
                       ) : (!selectedMerch.stok || selectedMerch.stok === 0) ? (
-                        <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-[#FF85AC]/20 text-[#FF85AC] border border-[#FF85AC]/30">
+                        <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-surface text-primary border border-border">
                           Pre-Order
                         </span>
                       ) : (
-                        <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-[#6FAE73]/20 text-[#6FAE73] border border-[#6FAE73]/30">
+                        <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-success/20 text-success border border-success/30">
                           Tersedia ({selectedMerch.stok} stok)
                         </span>
                       )}
