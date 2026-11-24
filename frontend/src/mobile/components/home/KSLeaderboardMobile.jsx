@@ -71,6 +71,21 @@ const KSLeaderboardMobile = ({ members = [] }) => {
 
   const activeMemberRef = useRef(null)
   const activePeriodRef = useRef(null)
+  const memberScrollRef = useRef(null)
+  const periodScrollRef = useRef(null)
+  const isFirstMemberRender = useRef(true)
+  const isFirstPeriodRender = useRef(true)
+
+  const scrollActiveIntoContainer = (container, activeEl) => {
+    if (!container || !activeEl) return
+    const containerRect = container.getBoundingClientRect()
+    const activeRect = activeEl.getBoundingClientRect()
+    const diff = activeRect.left - containerRect.left - (containerRect.width / 2) + (activeRect.width / 2)
+    container.scrollBy({
+      left: diff,
+      behavior: 'smooth'
+    })
+  }
 
   const fetchLeaderboard = async () => {
     try {
@@ -106,24 +121,24 @@ const KSLeaderboardMobile = ({ members = [] }) => {
     fetchLeaderboard()
   }, [period, memberId])
 
-  // Auto-scroll active tab into center view smoothly
+  // Auto-scroll active tab into center view smoothly (only container scroll, never page scroll, skipped on mount)
   useEffect(() => {
-    if (activeMemberRef.current) {
-      activeMemberRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'center'
-      })
+    if (isFirstMemberRender.current) {
+      isFirstMemberRender.current = false
+      return
+    }
+    if (memberScrollRef.current && activeMemberRef.current) {
+      scrollActiveIntoContainer(memberScrollRef.current, activeMemberRef.current)
     }
   }, [memberId])
 
   useEffect(() => {
-    if (activePeriodRef.current) {
-      activePeriodRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'center'
-      })
+    if (isFirstPeriodRender.current) {
+      isFirstPeriodRender.current = false
+      return
+    }
+    if (periodScrollRef.current && activePeriodRef.current) {
+      scrollActiveIntoContainer(periodScrollRef.current, activePeriodRef.current)
     }
   }, [period])
 
@@ -170,6 +185,7 @@ const KSLeaderboardMobile = ({ members = [] }) => {
               />
 
               <div 
+                ref={memberScrollRef}
                 className="flex items-center gap-1.5 overflow-x-auto scroll-smooth py-0.5 px-1 hide-scrollbar"
                 style={{ 
                   scrollSnapType: 'x proximity', 
@@ -235,6 +251,7 @@ const KSLeaderboardMobile = ({ members = [] }) => {
               />
 
               <div 
+                ref={periodScrollRef}
                 className="flex items-center gap-1.5 overflow-x-auto scroll-smooth py-0.5 px-1 hide-scrollbar"
                 style={{ 
                   scrollSnapType: 'x proximity', 

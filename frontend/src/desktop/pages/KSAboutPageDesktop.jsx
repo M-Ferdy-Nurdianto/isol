@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaHeart, FaBirthdayCake, FaInstagram, FaTwitter, FaLock, FaArrowLeft, FaArrowRight } from 'react-icons/fa'
+import { FaHeart, FaBirthdayCake, FaInstagram, FaTwitter, FaLock, FaArrowLeft, FaArrowRight, FaUsers, FaCalendarAlt, FaMusic, FaHistory } from 'react-icons/fa'
 import KSHeader from '../../components/KSHeader'
 import KSFooter from '../../components/KSFooter'
 import api from '../../lib/api'
@@ -35,7 +35,7 @@ const GroupPhotoCarousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  const displayImages = images && images.length > 0 ? images.map(img => getAssetPath(img)) : [getAssetPath('/images/members/placeholder.webp')];
+  const displayImages = images && images.length > 0 ? images.map(img => getAssetPath(img)) : [getAssetPath('/images/members/group.webp')];
 
   useEffect(() => {
     if (displayImages.length <= 1 || isHovered) return;
@@ -441,30 +441,51 @@ const KSAboutPage = () => {
           </div>
         </section>
 
-        {/* Milestones strip */}
-        <section className="py-12 px-4 bg-surface/60 border-y border-white/5 bg-pattern-grid overflow-hidden">
-          <div className="container mx-auto max-w-7xl">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
+        {/* Milestones strip - Solid Deep Coffee Stat Cards */}
+        <section className="py-10 sm:py-16 px-4 bg-surface/40 border-y border-white/5 bg-pattern-grid overflow-hidden">
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6">
               {[
-                { label: 'Member', value: stats.members },
-                { label: 'Event', value: stats.events },
-                { label: 'Lagu', value: stats.music },
-                { label: 'Since', value: aboutUs.since || '2026', isString: true },
-              ].map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="text-center"
-                >
-                  <p className="text-4xl sm:text-5xl font-black text-primary leading-none">
-                    {stat.isString ? stat.value : <AnimatedCounter from={0} to={stat.value} />}
-                  </p>
-                  <p className="text-xs font-black tracking-widest text-text-secondary uppercase mt-2">{stat.label}</p>
-                </motion.div>
-              ))}
+                { label: 'Member', value: stats.members, icon: FaUsers, sub: 'Talenta Aktif' },
+                { label: 'Event', value: stats.events, icon: FaCalendarAlt, sub: 'Panggung & Live' },
+                { label: 'Lagu', value: stats.music, icon: FaMusic, sub: 'Rilisan Single' },
+                { label: 'Since', value: aboutUs.since || '2026', icon: FaHistory, sub: 'Yogyakarta', isString: true },
+              ].map((stat, i) => {
+                const IconComponent = stat.icon
+                return (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.08, duration: 0.4 }}
+                    className="bg-surface border border-border hover:border-primary/40 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center relative group transition-colors shadow-sm"
+                  >
+                    {/* Top subtle highlight */}
+                    <div className="absolute top-0 inset-x-4 h-px bg-primary/20 group-hover:bg-primary/50 transition-colors" />
+
+                    {/* Icon Badge */}
+                    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-background border border-border flex items-center justify-center text-primary mb-3 shadow-inner group-hover:border-primary/40 transition-colors shrink-0">
+                      <IconComponent className="text-sm sm:text-base" />
+                    </div>
+
+                    {/* Number / Value */}
+                    <p className="text-2xl sm:text-4xl md:text-5xl font-black text-primary leading-none tracking-tight">
+                      {stat.isString ? stat.value : <AnimatedCounter from={0} to={stat.value} />}
+                    </p>
+
+                    {/* Stat Label */}
+                    <p className="text-xs sm:text-sm font-black tracking-wider text-text-primary uppercase mt-2">
+                      {stat.label}
+                    </p>
+
+                    {/* Micro subtext */}
+                    <p className="text-[10px] sm:text-xs text-text-secondary mt-1 font-medium">
+                      {stat.sub}
+                    </p>
+                  </motion.div>
+                )
+              })}
             </div>
           </div>
         </section>

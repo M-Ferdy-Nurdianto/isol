@@ -15,6 +15,7 @@ import {
 import { useFanAuth } from '../../context/FanAuthContext'
 import KSHeader from '../../components/KSHeader'
 import { kohiToast } from '../../components/ui/KohiToast'
+import { webAlert } from '../../lib/webAlert'
 import { getAssetPath } from '../../lib/pathUtils'
 import api from '../../lib/api'
 
@@ -292,9 +293,18 @@ const KSProfilePage = () => {
     }
   }
 
-  const handleLogout = () => {
-    logout()
-    navigate('/')
+  const handleLogout = async () => {
+    const confirmed = await webAlert.confirm({
+      title: 'Keluar dari Akun',
+      text: 'Apakah Anda yakin ingin keluar dari akun Anda?',
+      confirmText: 'Ya, Keluar',
+      cancelText: 'Batal',
+      isDanger: true
+    })
+    if (confirmed) {
+      logout()
+      navigate('/')
+    }
   }
 
   const handleOpenAvatarPicker = () => {
@@ -1402,16 +1412,6 @@ const KSProfilePage = () => {
                 <span>Pilih Banner Cover</span>
               </button>
             </div>
-            
-            {/* Desktop Sign Out Button (Top Right over cover) */}
-            <div className="absolute top-4 right-4 hidden md:block z-10">
-              <button 
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-black/80 hover:bg-danger text-white border border-white/20 rounded-full text-sm font-bold transition-colors shadow-lg"
-              >
-                <FaSignOutAlt /> Sign Out
-              </button>
-            </div>
           </div>
 
           {/* Profile Details Container */}
@@ -1527,7 +1527,7 @@ const KSProfilePage = () => {
                   </div>
                 )}
 
-                {/* Mobile Button: Informasi Pribadi */}
+                {/* Mobile Action Buttons: Informasi Pribadi & Logout */}
                 <div className="md:hidden mt-3 flex items-center gap-2">
                   <button
                     type="button"
@@ -1537,11 +1537,21 @@ const KSProfilePage = () => {
                     <FaUserEdit size={13} />
                     <span>Informasi Pribadi</span>
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-danger/10 border border-danger/30 text-danger text-xs font-bold shadow-sm active:scale-95 transition-all"
+                    title="Keluar dari akun"
+                  >
+                    <FaSignOutAlt size={11} />
+                    <span>Keluar</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Desktop Button: Informasi Pribadi */}
-              <div className="hidden md:flex items-center md:pt-16 shrink-0">
+              {/* Desktop Action Buttons: Informasi Pribadi & Logout */}
+              <div className="hidden md:flex items-center gap-2.5 md:pt-16 shrink-0">
                 <button
                   type="button"
                   onClick={handleOpenProfileModal}
@@ -1549,6 +1559,16 @@ const KSProfilePage = () => {
                 >
                   <FaUserEdit className="text-primary text-sm" />
                   <span>Informasi Pribadi</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-surface hover:bg-danger/10 border border-danger/30 text-danger text-xs font-bold transition-all shadow-sm active:scale-95"
+                  title="Keluar dari akun"
+                >
+                  <FaSignOutAlt className="text-xs" />
+                  <span>Keluar</span>
                 </button>
               </div>
             </div>
@@ -1564,16 +1584,6 @@ const KSProfilePage = () => {
         {/* Mobile Layout - Riwayat Pesanan Full Width */}
         <div className="md:hidden space-y-6">
           {renderOrderHistory()}
-
-          {/* Mobile Sign Out Button */}
-          <div className="pt-6">
-            <button 
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-background hover:bg-danger/10 text-danger border border-danger/30 rounded-xl font-bold transition-colors shadow-sm"
-            >
-              <FaSignOutAlt /> Keluar dari Akun
-            </button>
-          </div>
         </div>
 
       
