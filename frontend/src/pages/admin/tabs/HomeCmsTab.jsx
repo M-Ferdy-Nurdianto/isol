@@ -50,10 +50,12 @@ const HomeCmsTab = () => {
     brand_description: '',
     copyright_text: '',
     tagline_jp: 'コーヒーの世界',
-    brand_subtitle_jp: 'コーヒーの世界へようこそ'
+    brand_subtitle_jp: 'コーヒーの世界へようこそ',
+    creator_text: 'Created by @ikifer',
+    creator_url: 'https://instagram.com/ikifer'
   })
   const [groupPhoto, setGroupPhoto] = useState({ url: '', overlay_text: '', overlay_desc: '' })
-  const [aboutUs, setAboutUs] = useState({ title: '', subtitle: '', description: '', images: [] })
+  const [aboutUs, setAboutUs] = useState({ title: '', subtitle: '', description: '', since: '2026', images: [], members_badge: '', members_title: '', members_desc: '' })
 
   useEffect(() => {
     fetchConfig()
@@ -123,7 +125,9 @@ const HomeCmsTab = () => {
         brand_description: rawFooter.brand_description || '',
         copyright_text: rawFooter.copyright_text || '',
         tagline_jp: rawFooter.tagline_jp || 'コーヒーの世界',
-        brand_subtitle_jp: rawFooter.brand_subtitle_jp || 'コーヒーの世界へようこそ'
+        brand_subtitle_jp: rawFooter.brand_subtitle_jp || 'コーヒーの世界へようこそ',
+        creator_text: rawFooter.creator_text || 'Created by @ikifer',
+        creator_url: rawFooter.creator_url || 'https://instagram.com/ikifer'
       })
       const rawGroupPhoto = parseJson(configData.group_photo) || {}
       const groupUrl = (rawGroupPhoto.url && !rawGroupPhoto.url.includes('placeholder'))
@@ -569,6 +573,44 @@ const HomeCmsTab = () => {
               <input type="text" value={aboutUs.since || '2026'} onChange={e => setAboutUs({...aboutUs, since: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="2026" />
             </div>
 
+            <div className="pt-4 border-t border-border space-y-3">
+              <h3 className="font-bold text-sm text-primary">Seksi Daftar Member (About Us)</h3>
+              <p className="text-[10px] text-[var(--text-secondary)]">Kustomisasi judul dan deskripsi seksi member pada halaman Tentang Kami.</p>
+
+              <div>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Badge Kategori (Kecil di atas)</label>
+                <input 
+                  type="text" 
+                  value={aboutUs.members_badge || ''} 
+                  onChange={e => setAboutUs({...aboutUs, members_badge: e.target.value})} 
+                  className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-sm text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" 
+                  placeholder="Members" 
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Judul Utama (Gunakan baris baru untuk warna aksen)</label>
+                <textarea 
+                  value={aboutUs.members_title || ''} 
+                  onChange={e => setAboutUs({...aboutUs, members_title: e.target.value})} 
+                  className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 h-16 text-sm text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" 
+                  placeholder={"TIGA\nRASA KOPI"} 
+                />
+                <p className="text-[10px] text-[var(--text-secondary)] mt-1">Baris pertama berwarna krem, baris kedua berwarna amber (aksen brand).</p>
+              </div>
+
+              <div>
+                <label className="block text-xs text-[var(--text-secondary)] mb-1">Deskripsi Tambahan</label>
+                <input 
+                  type="text" 
+                  value={aboutUs.members_desc || ''} 
+                  onChange={e => setAboutUs({...aboutUs, members_desc: e.target.value})} 
+                  className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-sm text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" 
+                  placeholder="Klik pada member untuk melihat profil lengkap." 
+                />
+              </div>
+            </div>
+
             <div className="pt-4 border-t border-border">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold">Carousel Foto Grup (Maksimal 3 Gambar)</h3>
@@ -790,6 +832,14 @@ const HomeCmsTab = () => {
             <label className="block text-xs text-[var(--text-secondary)] mb-1">Subjudul Kanji Brand (Header Footer)</label>
             <input type="text" value={footerSection.brand_subtitle_jp ?? 'コーヒーの世界へようこそ'} onChange={e => setFooterSection({...footerSection, brand_subtitle_jp: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="コーヒーの世界へようこそ" />
             <p className="text-[10px] text-[var(--text-secondary)] mt-1">Teks kanji yang tampil di bawah logo KOHI SEKAI pada footer.</p>
+          </div>
+          <div>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1">Creator Website Credit (Teks)</label>
+            <input type="text" value={footerSection.creator_text ?? 'Created by @ikifer'} onChange={e => setFooterSection({...footerSection, creator_text: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Created by @ikifer" />
+          </div>
+          <div>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1">Creator Website URL</label>
+            <input type="text" value={footerSection.creator_url ?? 'https://instagram.com/ikifer'} onChange={e => setFooterSection({...footerSection, creator_url: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="https://instagram.com/ikifer" />
           </div>
           <button onClick={() => handleSave('footer_settings', footerSection)} disabled={saving} className="bg-primary text-[var(--text-primary)] px-4 py-2 rounded-lg font-bold flex items-center gap-2">
             <FaSave /> Simpan

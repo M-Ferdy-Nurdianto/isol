@@ -127,6 +127,15 @@ const KSFooter = ({ config: propConfig }) => {
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3">
             <p>{config?.copyright_text || '© 2026 KOHI SEKAI. ALL RIGHTS RESERVED.'}</p>
             <span className="opacity-40">·</span>
+            <a
+              href={config?.creator_url || 'https://instagram.com/ikifer'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-text-secondary/60 hover:text-primary transition-colors hover:underline text-[11px]"
+            >
+              {config?.creator_text || 'Created by @ikifer'}
+            </a>
+            <span className="opacity-40">·</span>
             <Link
               to="/admin/login"
               className="text-text-secondary/70 hover:text-primary transition-colors font-medium hover:underline"

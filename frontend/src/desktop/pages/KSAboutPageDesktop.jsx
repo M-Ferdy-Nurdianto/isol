@@ -499,12 +499,27 @@ const KSAboutPage = () => {
               viewport={{ once: true }}
               className="mb-12 sm:mb-16 text-center flex flex-col items-center"
             >
-              <p className="text-xs font-black tracking-[0.5em] text-primary uppercase mb-3">Members</p>
+              <p className="text-xs font-black tracking-[0.5em] text-primary uppercase mb-3">
+                {aboutUs.members_badge || 'Members'}
+              </p>
               <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter text-text-primary leading-none text-center">
-                TIGA<br /><span className="text-primary">RASA KOPI</span>
+                {aboutUs.members_title ? (
+                  aboutUs.members_title.includes('\n') ? (
+                    aboutUs.members_title.split('\n').map((line, idx) => (
+                      <span key={idx}>
+                        {idx > 0 && <br />}
+                        <span className={idx % 2 === 1 ? 'text-primary' : ''}>{line}</span>
+                      </span>
+                    ))
+                  ) : (
+                    aboutUs.members_title
+                  )
+                ) : (
+                  <>TIGA<br /><span className="text-primary">RASA KOPI</span></>
+                )}
               </h2>
               <p className="text-text-secondary mt-4 max-w-md text-center">
-                Klik pada member untuk melihat profil lengkap.
+                {aboutUs.members_desc || 'Klik pada member untuk melihat profil lengkap.'}
               </p>
             </motion.div>
 
