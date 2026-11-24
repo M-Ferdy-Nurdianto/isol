@@ -131,9 +131,9 @@ const KSFooter = ({ config: propConfig }) => {
               href={config?.creator_url || 'https://instagram.com/ikifer'}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-text-secondary/60 hover:text-primary transition-colors hover:underline text-[11px]"
+              className="text-[10px] text-text-secondary/35 hover:text-text-secondary/70 transition-colors"
             >
-              {config?.creator_text || 'Created by @ikifer'}
+              {(!config?.creator_text || config.creator_text === 'Created by @ikifer') ? '@ikifer' : config.creator_text}
             </a>
             <span className="opacity-40">·</span>
             <Link

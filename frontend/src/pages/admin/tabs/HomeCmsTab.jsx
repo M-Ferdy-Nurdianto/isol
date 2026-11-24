@@ -51,7 +51,7 @@ const HomeCmsTab = () => {
     copyright_text: '',
     tagline_jp: 'コーヒーの世界',
     brand_subtitle_jp: 'コーヒーの世界へようこそ',
-    creator_text: 'Created by @ikifer',
+    creator_text: '@ikifer',
     creator_url: 'https://instagram.com/ikifer'
   })
   const [groupPhoto, setGroupPhoto] = useState({ url: '', overlay_text: '', overlay_desc: '' })
@@ -126,7 +126,7 @@ const HomeCmsTab = () => {
         copyright_text: rawFooter.copyright_text || '',
         tagline_jp: rawFooter.tagline_jp || 'コーヒーの世界',
         brand_subtitle_jp: rawFooter.brand_subtitle_jp || 'コーヒーの世界へようこそ',
-        creator_text: rawFooter.creator_text || 'Created by @ikifer',
+        creator_text: rawFooter.creator_text || '@ikifer',
         creator_url: rawFooter.creator_url || 'https://instagram.com/ikifer'
       })
       const rawGroupPhoto = parseJson(configData.group_photo) || {}
@@ -835,7 +835,7 @@ const HomeCmsTab = () => {
           </div>
           <div>
             <label className="block text-xs text-[var(--text-secondary)] mb-1">Creator Website Credit (Teks)</label>
-            <input type="text" value={footerSection.creator_text ?? 'Created by @ikifer'} onChange={e => setFooterSection({...footerSection, creator_text: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="Created by @ikifer" />
+            <input type="text" value={footerSection.creator_text ?? '@ikifer'} onChange={e => setFooterSection({...footerSection, creator_text: e.target.value})} className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" placeholder="@ikifer" />
           </div>
           <div>
             <label className="block text-xs text-[var(--text-secondary)] mb-1">Creator Website URL</label>
