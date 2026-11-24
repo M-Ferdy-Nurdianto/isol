@@ -55,7 +55,16 @@ const HomeCmsTab = () => {
     creator_url: 'https://instagram.com/ikifer'
   })
   const [groupPhoto, setGroupPhoto] = useState({ url: '', overlay_text: '', overlay_desc: '' })
-  const [aboutUs, setAboutUs] = useState({ title: '', subtitle: '', description: '', since: '2026', images: [], members_badge: '', members_title: '', members_desc: '' })
+  const [aboutUs, setAboutUs] = useState({ 
+    title: '', 
+    subtitle: '', 
+    description: '', 
+    since: '2026', 
+    images: [], 
+    members_badge: 'Members', 
+    members_title: 'TIGA\nRASA KOPI', 
+    members_desc: 'Klik pada member untuk melihat profil lengkap.' 
+  })
 
   useEffect(() => {
     fetchConfig()
@@ -138,7 +147,17 @@ const HomeCmsTab = () => {
         overlay_text: rawGroupPhoto.overlay_text || 'KOHI SEKAI',
         overlay_desc: rawGroupPhoto.overlay_desc || 'Tiga rasa kopi yang berbeda, satu dunia...'
       })
-      setAboutUs(parseJson(configData.about_us) || { title: '', subtitle: '', description: '', images: [] })
+      const rawAbout = parseJson(configData.about_us) || {}
+      setAboutUs({
+        title: rawAbout.title || '',
+        subtitle: rawAbout.subtitle || '',
+        description: rawAbout.description || '',
+        since: rawAbout.since || '2026',
+        images: Array.isArray(rawAbout.images) ? rawAbout.images : [],
+        members_badge: rawAbout.members_badge || 'Members',
+        members_title: rawAbout.members_title || 'TIGA\nRASA KOPI',
+        members_desc: rawAbout.members_desc || 'Klik pada member untuk melihat profil lengkap.'
+      })
 
       setConfig(configData)
     } catch (err) {
@@ -581,7 +600,7 @@ const HomeCmsTab = () => {
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Badge Kategori (Kecil di atas)</label>
                 <input 
                   type="text" 
-                  value={aboutUs.members_badge || ''} 
+                  value={aboutUs.members_badge ?? 'Members'} 
                   onChange={e => setAboutUs({...aboutUs, members_badge: e.target.value})} 
                   className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-sm text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" 
                   placeholder="Members" 
@@ -591,7 +610,7 @@ const HomeCmsTab = () => {
               <div>
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Judul Utama (Gunakan baris baru untuk warna aksen)</label>
                 <textarea 
-                  value={aboutUs.members_title || ''} 
+                  value={aboutUs.members_title ?? 'TIGA\nRASA KOPI'} 
                   onChange={e => setAboutUs({...aboutUs, members_title: e.target.value})} 
                   className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 h-16 text-sm text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" 
                   placeholder={"TIGA\nRASA KOPI"} 
@@ -603,7 +622,7 @@ const HomeCmsTab = () => {
                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Deskripsi Tambahan</label>
                 <input 
                   type="text" 
-                  value={aboutUs.members_desc || ''} 
+                  value={aboutUs.members_desc ?? 'Klik pada member untuk melihat profil lengkap.'} 
                   onChange={e => setAboutUs({...aboutUs, members_desc: e.target.value})} 
                   className="w-full bg-[var(--input-bg)] border border-[var(--border)] rounded-lg p-2 text-sm text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors" 
                   placeholder="Klik pada member untuk melihat profil lengkap." 
