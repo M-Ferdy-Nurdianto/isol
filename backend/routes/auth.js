@@ -8,6 +8,13 @@ import { JWT_SECRET, signToken, verifyToken } from '../config/jwt.js'
 
 const router = express.Router()
 
+// Hitung sisa detik hingga tanggal 1 bulan berikutnya pukul 00:00 WIB (Asia/Jakarta)
+const getSecondsUntilNextMonthWIB = () => {
+  const nowWib = new Date(Date.now() + 7 * 60 * 60 * 1000)
+  const nextFirstUtcMs = Date.UTC(nowWib.getUTCFullYear(), nowWib.getUTCMonth() + 1, 1, 0, 0, 0) - 7 * 60 * 60 * 1000
+  return Math.max(60, Math.floor((nextFirstUtcMs - Date.now()) / 1000))
+}
+
 // In-memory OTP store for Registration
 const otpStore = new Map()
 
@@ -166,7 +173,7 @@ router.post('/login', async (req, res) => {
       if (username.trim() === 'GS123' && password === 'GS321') {
         const token = signToken(
           { id: 'guest-demo-user', username: 'GS123', role: 'guest' },
-          { expiresIn: '1d' }
+          { expiresIn: '7d' }
         )
         return res.json({
           success: true,
@@ -227,7 +234,7 @@ router.post('/login', async (req, res) => {
       const token = jwt.sign(
         { id: admin.id, username: admin.username, role: 'admin' },
         JWT_SECRET,
-        { expiresIn: '1d' }
+        { expiresIn: '7d' }
       )
 
       return res.json({
@@ -326,7 +333,7 @@ router.post('/login', async (req, res) => {
           role: fanUser.role || 'fan'
         },
         JWT_SECRET,
-        { expiresIn: '30d' }
+        { expiresIn: getSecondsUntilNextMonthWIB() }
       )
 
       return res.json({
@@ -505,7 +512,7 @@ router.post('/register', async (req, res) => {
         const magicToken = jwt.sign(
           { id: savedUser.id, email: savedUser.email, purpose: 'magic_login' },
           JWT_SECRET,
-          { expiresIn: '30d' }
+          { expiresIn: getSecondsUntilNextMonthWIB() }
         )
         const frontendBaseUrl = getFrontendBaseUrl(req)
         magicLink = `${frontendBaseUrl}/magic-login?token=${magicToken}`
@@ -624,7 +631,7 @@ router.post('/register', async (req, res) => {
         role: savedUser.role || 'fan'
       },
       JWT_SECRET,
-      { expiresIn: '30d' }
+      { expiresIn: getSecondsUntilNextMonthWIB() }
     )
 
     res.status(201).json({
@@ -696,7 +703,7 @@ router.post('/magic-login', async (req, res) => {
         role: user.role || 'fan'
       },
       JWT_SECRET,
-      { expiresIn: '30d' }
+      { expiresIn: getSecondsUntilNextMonthWIB() }
     )
 
     return res.json({
@@ -848,7 +855,7 @@ router.post('/fan/login', async (req, res) => {
         role: fanRecord.role || 'fan'
       },
       JWT_SECRET,
-      { expiresIn: '30d' }
+      { expiresIn: getSecondsUntilNextMonthWIB() }
     )
 
     res.json({

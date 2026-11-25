@@ -20,6 +20,21 @@ const FanAuthContext = createContext({
 })
 
 const STORAGE_KEY = 'ks_fan_user'
+const SESSION_MONTH_KEY = 'ks_fan_session_month'
+
+const getCurrentJakartaMonthKey = () => {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit'
+  }).format(new Date()).slice(0, 7)
+}
+
+const clearFanStorage = () => {
+  localStorage.removeItem(STORAGE_KEY)
+  localStorage.removeItem('ks_fan_token')
+  localStorage.removeItem(SESSION_MONTH_KEY)
+}
 
 export const FanAuthProvider = ({ children }) => {
   const navigate = useNavigate()
@@ -27,7 +42,14 @@ export const FanAuthProvider = ({ children }) => {
   const [fanUser, setFanUser] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
-      return saved ? JSON.parse(saved) : null
+      if (!saved) return null
+      const savedMonth = localStorage.getItem(SESSION_MONTH_KEY)
+      const currentMonth = getCurrentJakartaMonthKey()
+      if (savedMonth !== currentMonth) {
+        clearFanStorage()
+        return null
+      }
+      return JSON.parse(saved)
     } catch {
       return null
     }
@@ -42,6 +64,9 @@ export const FanAuthProvider = ({ children }) => {
     try {
       if (fanUser) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(fanUser))
+        if (!localStorage.getItem(SESSION_MONTH_KEY)) {
+          localStorage.setItem(SESSION_MONTH_KEY, getCurrentJakartaMonthKey())
+        }
       } else {
         localStorage.removeItem(STORAGE_KEY)
       }
@@ -50,9 +75,21 @@ export const FanAuthProvider = ({ children }) => {
     }
   }, [fanUser])
 
-  // On mount: sync latest user data (including updated avatar and banner) from server
+  // On mount & tab focus: clear session if month rolled over to the 1st, or sync profile
   useEffect(() => {
+    const checkMonthlyReset = () => {
+      const savedMonth = localStorage.getItem(SESSION_MONTH_KEY)
+      const currentMonth = getCurrentJakartaMonthKey()
+      if (savedMonth && savedMonth !== currentMonth) {
+        clearFanStorage()
+        setFanUser(null)
+        return true
+      }
+      return false
+    }
+
     const syncLatestProfile = async () => {
+      if (checkMonthlyReset()) return
       try {
         const token = localStorage.getItem('ks_fan_token')
         if (!token) return
@@ -64,10 +101,23 @@ export const FanAuthProvider = ({ children }) => {
           setFanUser(prev => ({ ...(prev || {}), ...res.data.user }))
         }
       } catch (err) {
-        // Silent catch if offline or token expired
+        if (err?.response?.status === 401) {
+          clearFanStorage()
+          setFanUser(null)
+        }
       }
     }
+
     syncLatestProfile()
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') checkMonthlyReset()
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    window.addEventListener('focus', checkMonthlyReset)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+      window.removeEventListener('focus', checkMonthlyReset)
+    }
   }, [])
 
   const login = async (userData) => {
@@ -85,6 +135,7 @@ export const FanAuthProvider = ({ children }) => {
 
       if (res.data?.success && res.data?.user) {
         const user = res.data.user
+        localStorage.setItem(SESSION_MONTH_KEY, getCurrentJakartaMonthKey())
         setFanUser(user)
         if (res.data.token) {
           localStorage.setItem('ks_fan_token', res.data.token)
@@ -103,6 +154,7 @@ export const FanAuthProvider = ({ children }) => {
       whatsapp: whatsapp.trim(),
       instagram: instagram ? instagram.trim().replace(/^@/, '') : '',
     }
+    localStorage.setItem(SESSION_MONTH_KEY, getCurrentJakartaMonthKey())
     setFanUser(localUser)
     return { success: true, user: localUser }
   }
@@ -114,6 +166,7 @@ export const FanAuthProvider = ({ children }) => {
 
     const res = await api.post('/auth/login', payload)
     if (res.data?.success && res.data?.user) {
+      localStorage.setItem(SESSION_MONTH_KEY, getCurrentJakartaMonthKey())
       setFanUser(res.data.user)
       if (res.data.token) {
         localStorage.setItem('ks_fan_token', res.data.token)
@@ -128,6 +181,7 @@ export const FanAuthProvider = ({ children }) => {
       localStorage.setItem('ks_fan_token', token)
     }
     if (user) {
+      localStorage.setItem(SESSION_MONTH_KEY, getCurrentJakartaMonthKey())
       localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
       setFanUser(user)
     }
@@ -135,8 +189,7 @@ export const FanAuthProvider = ({ children }) => {
 
   const logout = () => {
     setFanUser(null)
-    localStorage.removeItem(STORAGE_KEY)
-    localStorage.removeItem('ks_fan_token')
+    clearFanStorage()
   }
 
   const updateProfile = (data) => {
