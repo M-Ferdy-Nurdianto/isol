@@ -747,27 +747,40 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
     const otsOrders = orders.filter(o => o.is_ots)
     const poOrders = orders.filter(o => !o.is_ots)
 
+    const normalizeMemberName = (rawName) => {
+      const cleaned = String(rawName || '').replace(/[^a-zA-Z0-9\s()]/gu, '').trim()
+      const lower = cleaned.toLowerCase()
+      if (lower.includes('all member') || lower.includes('grup') || lower.includes('group')) {
+        return 'Cheki Grup'
+      }
+      const normalized = cleaned
+        .replace(/\((?:16:9|169|regular|wide(?:\s*169)?|pre-order|ots)\)/gi, ' ')
+        .replace(/\b(?:regular|wide|2shot|ots|cheki|polaroid|16:9|169)\b/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+      return normalized || cleaned || '-'
+    }
+
     const memberStats = {}
     paidOrders.forEach(order => {
       order.order_items?.forEach(item => {
-        let name = String(item.item_name || '')
-          .replace('Cheki ', '')
-          .replace(' (Pre-Order)', '')
-          .replace(/[^a-zA-Z0-9\s()]/gu, '')
-          .trim()
-        if (name.toLowerCase().includes('all member') || name.toLowerCase().includes('group')) {
-          name = 'All Member (Group)'
+        const raw = String(item.item_name || '')
+        const name = normalizeMemberName(raw)
+        const isWide = item.cheki_type === 'wide' || /\bwide\b|16:?9/i.test(raw)
+        if (!memberStats[name]) {
+          memberStats[name] = { qty: 0, regularQty: 0, wideQty: 0, otsQty: 0, poQty: 0, revenue: 0 }
         }
-        if (!memberStats[name]) memberStats[name] = { qty: 0, otsQty: 0, poQty: 0, revenue: 0 }
         const qty = item.quantity || 0
         memberStats[name].qty += qty
-        
+        if (isWide) memberStats[name].wideQty += qty
+        else memberStats[name].regularQty += qty
+
         if (order.is_ots) {
           memberStats[name].otsQty += qty
         } else {
           memberStats[name].poQty += qty
         }
-        
+
         memberStats[name].revenue += (qty * (item.price || 0))
       })
     })
@@ -781,7 +794,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
 
     const subtitleRow = worksheet.addRow([`OFFICIAL SALES SUMMARY / ${new Date().toLocaleDateString('id-ID')}`])
     mergeRow(subtitleRow.number, 'A', 'J', subtitleRow.getCell(1).value, {
-      font: { bold: true, size: 10, color: { argb: 'FF166534' } },
+      font: { bold: true, size: 10, color: { argb: 'FFB45309' } },
       alignment: { vertical: 'middle', horizontal: 'left' }
     })
 
@@ -803,10 +816,10 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
     const summaryLabelRow = worksheet.addRow([])
     const summaryValueRow = worksheet.addRow([])
     const summaryBlocks = [
-      { start: 'A', end: 'B', label: 'KEUNTUNGAN', value: formatCurrency(totalRevenue), color: 'FF166534' },
-      { start: 'C', end: 'D', label: 'TOTAL POLAROID', value: `${totalPolaroid} units`, color: 'FF16A34A' },
-      { start: 'E', end: 'F', label: 'OTS ORDERS', value: `${otsOrders.length} orders`, color: 'FF059669' },
-      { start: 'G', end: 'H', label: 'PO ORDERS', value: `${poOrders.length} orders`, color: 'FF22C55E' },
+      { start: 'A', end: 'B', label: 'KEUNTUNGAN', value: formatCurrency(totalRevenue), color: 'FFB45309' },
+      { start: 'C', end: 'D', label: 'TOTAL POLAROID', value: `${totalPolaroid} units`, color: 'FFE8944A' },
+      { start: 'E', end: 'F', label: 'OTS ORDERS', value: `${otsOrders.length} orders`, color: 'FFD97706' },
+      { start: 'G', end: 'H', label: 'PO ORDERS', value: `${poOrders.length} orders`, color: 'FF5C4433' },
     ]
 
     summaryBlocks.forEach(block => {
@@ -816,8 +829,8 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
       const valueCell = worksheet.getCell(`${block.start}${summaryValueRow.number}`)
       labelCell.value = block.label
       valueCell.value = block.value
-      labelCell.font = { bold: true, color: { argb: 'FF166534' } }
-      labelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } }
+      labelCell.font = { bold: true, color: { argb: 'FFB45309' } }
+      labelCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } }
       labelCell.alignment = { vertical: 'middle', horizontal: 'center' }
       valueCell.font = { bold: true, color: { argb: block.color } }
       valueCell.alignment = { vertical: 'middle', horizontal: 'center' }
@@ -831,33 +844,33 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
     const memberTitleRow = worksheet.addRow(['MEMBER PERFORMANCE (A-Z)'])
     mergeRow(memberTitleRow.number, 'A', 'J', 'MEMBER PERFORMANCE (A-Z)', {
       font: { bold: true, color: { argb: 'FFFFFFFF' } },
-      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF079108' } },
+      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF241E19' } },
       alignment: { vertical: 'middle', horizontal: 'left' }
     })
 
-    const memberHeaderRow = worksheet.addRow(['Member / Lineup', 'Total Qty', 'OTS Qty', 'PO Qty', 'Revenue', '', '', '', '', ''])
-    memberHeaderRow.font = { bold: true }
-    for (let i = 1; i <= 5; i++) {
+    const memberHeaderRow = worksheet.addRow(['Member', 'Regular', 'Wide', 'OTS', 'PO', 'Total Qty', 'Revenue', '', '', ''])
+    memberHeaderRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+    for (let i = 1; i <= 7; i++) {
       const cell = memberHeaderRow.getCell(i)
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } }
-      cell.alignment = { vertical: 'middle', horizontal: i === 5 ? 'right' : 'center' }
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8944A' } }
+      cell.alignment = { vertical: 'middle', horizontal: i === 7 ? 'right' : 'center' }
     }
     applyBorders(memberHeaderRow)
 
     const sortedMembers = Object.keys(memberStats).sort((a, b) => a.localeCompare(b))
     if (sortedMembers.length === 0) {
-      const emptyRow = worksheet.addRow(['-', '-', '-', '-', '-', '', '', '', '', ''])
+      const emptyRow = worksheet.addRow(['-', '-', '-', '-', '-', '-', '-', '', '', ''])
       applyBorders(emptyRow)
     } else {
       sortedMembers.forEach(name => {
         const stats = memberStats[name]
-        const row = worksheet.addRow([name, stats.qty, stats.otsQty, stats.poQty, stats.revenue, '', '', '', '', ''])
-        row.getCell(5).numFmt = '"Rp" #,##0'
-        
-        row.getCell(2).alignment = { vertical: 'middle', horizontal: 'center' }
-        row.getCell(3).alignment = { vertical: 'middle', horizontal: 'center' }
-        row.getCell(4).alignment = { vertical: 'middle', horizontal: 'center' }
-        row.getCell(5).alignment = { vertical: 'middle', horizontal: 'right' }
+        const row = worksheet.addRow([name, stats.regularQty, stats.wideQty, stats.otsQty, stats.poQty, stats.qty, stats.revenue, '', '', ''])
+        row.getCell(7).numFmt = '"Rp" #,##0'
+
+        for (let c = 2; c <= 6; c++) {
+          row.getCell(c).alignment = { vertical: 'middle', horizontal: 'center' }
+        }
+        row.getCell(7).alignment = { vertical: 'middle', horizontal: 'right' }
         applyBorders(row)
       })
     }
@@ -867,7 +880,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
     const detailsTitleRow = worksheet.addRow(['TRANSACTION DETAILS'])
     mergeRow(detailsTitleRow.number, 'A', 'J', 'TRANSACTION DETAILS', {
       font: { bold: true, color: { argb: 'FFFFFFFF' } },
-      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF065F46' } },
+      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF241E19' } },
       alignment: { vertical: 'middle', horizontal: 'left' }
     })
 

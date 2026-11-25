@@ -5,19 +5,26 @@ import { getValidAdminToken } from './authSession'
 
 export const stripEmoji = (text) => String(text || '').replace(/[^a-zA-Z0-9\s()]/gu, '').trim()
 
+const buildScopedExportParams = ({ scope, value, params }) => {
+  const exportParams = { ...(params || {}) }
+  if (scope === 'event' && value) {
+    exportParams.event_id = value
+    delete exportParams.dateFrom
+    delete exportParams.dateTo
+  } else if (scope === 'month' && value) {
+    const [y, m] = String(value).split('-').map(Number)
+    const firstDay = new Date(y, (m || 1) - 1, 1, 0, 0, 0, 0)
+    const lastDay = new Date(y, m || 1, 0, 23, 59, 59, 999)
+    exportParams.dateFrom = firstDay.toISOString()
+    exportParams.dateTo = lastDay.toISOString()
+    delete exportParams.event_id
+  }
+  return exportParams
+}
+
 export const generateExcel = async ({ scope, value, params, events, api }) => {
   try {
-    const exportParams = { ...params }
-
-    if (scope === 'event') {
-      exportParams.event_id = value
-    } else if (scope === 'month') {
-      const date = new Date(value)
-      const firstDay = new Date(date.getFullYear(), date.getMonth(), 1)
-      const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-      exportParams.dateFrom = firstDay.toISOString()
-      exportParams.dateTo = lastDay.toISOString()
-    }
+    const exportParams = buildScopedExportParams({ scope, value, params })
 
     const queryString = new URLSearchParams(exportParams).toString()
     const token = getValidAdminToken()
@@ -189,20 +196,21 @@ export const generateMerchPDF = async ({ api, statusFilter, searchQuery }) => {
 export const generatePDF = async ({ api, scope, value, params, events }) => {
   try {
     Swal.fire({ title: 'Generating PDF...', allowOutsideClick: false, didOpen: () => Swal.showLoading() })
-    const exportParams = { ...params }
-    if (scope === 'event') exportParams.event_id = value
-    else if (scope === 'month') {
-      const date = new Date(value); const firstDay = new Date(date.getFullYear(), date.getMonth(), 1); const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-      exportParams.dateFrom = firstDay.toISOString(); exportParams.dateTo = lastDay.toISOString()
-    }
+    const exportParams = buildScopedExportParams({ scope, value, params })
 
     const res = await api.get('/orders', { params: exportParams })
     const orders = res.data.data
     if (!orders || orders.length === 0) throw new Error('Tidak ada data untuk diexport.')
 
-    const eventId = scope === 'event' ? value : exportParams.event_id
+    const eventId = scope === 'event' ? value : (scope === 'month' ? null : exportParams.event_id)
     const eventInfo = eventId ? events.find(e => e.id === eventId) : null
-    const eventLabel = eventInfo ? `${eventInfo.nama} - ${eventInfo.bulan} ${eventInfo.tahun}` : 'Semua Event'
+    const monthLabel = scope === 'month' && value
+      ? (() => {
+          const [y, m] = String(value).split('-').map(Number)
+          return `Bulan ${new Date(y, (m || 1) - 1, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`
+        })()
+      : null
+    const eventLabel = monthLabel || (eventInfo ? `${eventInfo.nama} - ${eventInfo.bulan} ${eventInfo.tahun}` : 'Semua Event')
     const monthIndexMap = {
       januari: 0, februari: 1, maret: 2, april: 3, mei: 4, juni: 5, juli: 6,
       agustus: 7, september: 8, oktober: 9, november: 10, desember: 11,
