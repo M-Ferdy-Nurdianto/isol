@@ -932,9 +932,9 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
       })
     }
 
-    addOrderSection('OTS ORDERS', 'FF059669', otsOrders)
+    addOrderSection('OTS ORDERS', 'FFE8944A', otsOrders)
     worksheet.addRow([])
-    addOrderSection('PO ORDERS', 'FF16A34A', poOrders)
+    addOrderSection('PO ORDERS', 'FF5C4433', poOrders)
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.setHeader('Content-Disposition', `attachment; filename=KohiSekai_Report_${Date.now()}.xlsx`)

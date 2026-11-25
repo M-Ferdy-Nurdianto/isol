@@ -504,7 +504,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
     // Style Header
     const headerRow = worksheet.getRow(1)
     headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
-    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF079108' } }
+    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8944A' } }
     headerRow.alignment = { vertical: 'middle', horizontal: 'center' }
 
     const itemSummary = {} // { product_name: { total: 0, sizes: { 'M': 1, ... } } }
