@@ -1425,7 +1425,7 @@ const KSShopPage = () => {
                         : 'text-text-secondary hover:text-text-primary hover:bg-background'
                     }`}
                   >
-                    T-Shirt & Jersey
+                    Apparel
                   </button>
                   <button
                     type="button"

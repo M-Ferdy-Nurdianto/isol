@@ -35,7 +35,7 @@ router.get('/stats', async (req, res) => {
       { count: eventsCount }, 
       { count: musicCount }
     ] = await Promise.all([
-      supabase.from('members').select('*', { count: 'exact', head: true }).neq('member_id', 'group').neq('member_id', 'kohisekai').eq('is_secret', false),
+      supabase.from('members').select('*', { count: 'exact', head: true }).neq('member_id', 'group').neq('member_id', 'kohisekai'),
       supabase.from('events').select('*', { count: 'exact', head: true }), // Assuming we just count all events or eq('status', 'published')
       supabase.from('music_items').select('*', { count: 'exact', head: true }).eq('platform', 'spotify')
     ])

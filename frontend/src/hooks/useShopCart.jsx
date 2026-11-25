@@ -81,7 +81,7 @@ export const useShopCart = (hargaMember, hargaGrup, {
 
     const itemName = (isGrup || finalType === 'grup')
       ? 'Cheki Grup (Semua Member)'
-      : (member.is_secret ? `${labelPrefix} Mystery (Secret Member)` : `${labelPrefix} ${member.nama_panggung}`)
+      : `${labelPrefix} ${member.nama_panggung}`
 
     // Unique id = member + cheki_type (sehingga same member bisa punya 2 item: regular + wide terpisah)
     const uniqueId = (isGrup || finalType === 'grup')
@@ -93,7 +93,6 @@ export const useShopCart = (hargaMember, hargaGrup, {
       cheki_type: finalType,
       member_id: (isGrup || finalType === 'grup') ? 'grup' : member.id,
       name: itemName,
-      is_secret: Boolean(member?.is_secret),
       price,
       quantity: 1,
       image: imageUrl

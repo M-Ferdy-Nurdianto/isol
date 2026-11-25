@@ -73,11 +73,11 @@ const MemberCard = ({
             style={{ backgroundColor: inLineup ? accentColor : '#94a3b8' }}
           />
           <h4 className="text-xs sm:text-base font-black uppercase tracking-tight text-white truncate leading-none drop-shadow-lg">
-            {member.is_secret ? '??? (SECRET)' : formatMemberName(member.nama_panggung)}
+            {formatMemberName(member.nama_panggung)}
           </h4>
         </div>
         <p className="text-[8px] sm:text-[9px] font-bold text-white/70 uppercase tracking-widest pl-3 sm:pl-4">
-          {member.is_secret ? 'Mystery Member' : member.tagline || 'Kohi Sekai Idol'}
+          {member.tagline || 'Kohi Sekai Idol'}
         </p>
       </div>
 

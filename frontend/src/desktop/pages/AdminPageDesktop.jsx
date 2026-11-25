@@ -151,6 +151,13 @@ const AdminPage = () => {
     }
   }, [notifBoxOpen])
 
+  const latestCallbacksRef = useRef({
+    fetchOrders: () => {},
+    fetchMerchOrders: () => {},
+    fetchPendingNotifications: () => {},
+    refreshActiveTab: () => {}
+  })
+
   useEffect(() => {
     checkAuth()
     fetchAll()
@@ -164,8 +171,8 @@ const AdminPage = () => {
       subscription = supabase
         .channel('public:orders')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
-          fetchOrders()
-          fetchPendingNotifications()
+          latestCallbacksRef.current.fetchOrders({ silent: true })
+          latestCallbacksRef.current.fetchPendingNotifications()
           if (payload.eventType === 'INSERT' && payload.new.created_by === 'customer') {
             showToast.info(payload.new.nama_lengkap, 'Order Cheki Baru!')
           }
@@ -175,8 +182,8 @@ const AdminPage = () => {
       merchSubscription = supabase
         .channel('public:merch_orders')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'merch_orders' }, (payload) => {
-          fetchMerchOrders()
-          fetchPendingNotifications()
+          latestCallbacksRef.current.fetchMerchOrders({ silent: true })
+          latestCallbacksRef.current.fetchPendingNotifications()
           if (payload.eventType === 'INSERT') {
             showToast.info(payload.new.nama_lengkap || payload.new.order_number, 'Order Merch Baru!')
           }
@@ -184,12 +191,23 @@ const AdminPage = () => {
         .subscribe()
     }
 
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === 'visible') {
+        latestCallbacksRef.current.refreshActiveTab()
+        latestCallbacksRef.current.fetchPendingNotifications()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityOrFocus)
+    window.addEventListener('focus', handleVisibilityOrFocus)
+
     const notifInterval = setInterval(() => {
-      fetchPendingNotifications()
+      latestCallbacksRef.current.fetchPendingNotifications()
     }, 30000)
 
     return () => {
       clearInterval(notifInterval)
+      document.removeEventListener('visibilitychange', handleVisibilityOrFocus)
+      window.removeEventListener('focus', handleVisibilityOrFocus)
       if (supabase && subscription) {
         supabase.removeChannel(subscription)
       }
@@ -213,6 +231,15 @@ const AdminPage = () => {
       if (orderSubTab === 'merch') {
         fetchMerchOrders()
       }
+    } else if (activeTab === 'events') {
+      fetchEvents()
+    } else if (activeTab === 'members') {
+      fetchMembers()
+    } else if (activeTab === 'merch') {
+      fetchMerch()
+    } else if (activeTab === 'recap') {
+      fetchOrders({ silent: true })
+      fetchEvents()
     }
   }, [statusFilter, otsFilter, eventFilter, dateFilter, dateFrom, dateTo, searchQuery, activeTab, orderSubTab])
 
@@ -407,6 +434,27 @@ const AdminPage = () => {
       console.error(error)
     } finally {
       if (!isSilent) setLoadingMerchOrders(false)
+    }
+  }
+
+  latestCallbacksRef.current = {
+    fetchOrders,
+    fetchMerchOrders,
+    fetchPendingNotifications,
+    refreshActiveTab: () => {
+      if (activeTab === 'orders') {
+        fetchOrders({ silent: true })
+        if (orderSubTab === 'merch') fetchMerchOrders({ silent: true })
+      } else if (activeTab === 'events') {
+        fetchEvents()
+      } else if (activeTab === 'members') {
+        fetchMembers()
+      } else if (activeTab === 'merch') {
+        fetchMerch()
+      } else if (activeTab === 'recap') {
+        fetchOrders({ silent: true })
+        fetchEvents()
+      }
     }
   }
 

@@ -221,7 +221,7 @@ router.post('/', async (req, res) => {
       })
     }
 
-    const orderNumber = `RB${Date.now()}`
+    const orderNumber = `KS${Date.now()}`
 
     // Generate auto email from timestamp
     const autoEmail = `order-${Date.now()}@kohisekai.com`
@@ -382,7 +382,7 @@ router.post('/ots', authMiddleware, async (req, res) => {
     }
 
     // ── 4. Insert ORDER (checked=lunas, created_by=admin, is_ots=true) ─
-    const orderNumber = `RB-OTS${Date.now()}`
+    const orderNumber = `KS-OTS${Date.now()}`
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -571,7 +571,7 @@ router.post('/ots-user', async (req, res) => {
     }
 
     // ── 6. Insert ORDER (pending, created_by='customer', is_ots=true) ──
-    const orderNumber = `RB-OTSU${Date.now()}`
+    const orderNumber = `KS-OTSU${Date.now()}`
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({

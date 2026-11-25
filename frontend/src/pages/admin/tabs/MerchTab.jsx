@@ -85,11 +85,8 @@ const MerchTab = ({
                             <div>
                               <div className="flex items-center gap-2">
                                 <p className="font-bold text-[var(--text-primary)] text-sm">{item.nama}</p>
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${item.kategori === 'aksesoris'
-                                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/25'
-                                    : 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/25'
-                                  }`}>
-                                  {item.kategori === 'aksesoris' ? 'Lanyard / Ganci / Aksesoris' : 'T-Shirt & Jersey'}
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold border bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]">
+                                  {item.kategori === 'aksesoris' ? 'Aksesoris' : 'Apparel'}
                                 </span>
                               </div>
                               {item.deskripsi && <p className="text-xs text-[var(--text-secondary)] max-w-xs truncate whitespace-pre-line mt-0.5">{item.deskripsi}</p>}
@@ -160,35 +157,29 @@ const MerchTab = ({
                     <button
                       type="button"
                       onClick={() => setMerchForm({ ...merchForm, kategori: 'baju' })}
-                      className={`p-3 rounded-xl border flex items-center gap-2.5 text-xs font-bold transition-all ${(merchForm.kategori || 'baju') === 'baju'
+                      className={`p-3 rounded-xl border text-left text-xs font-bold transition-all ${(merchForm.kategori || 'baju') === 'baju'
                           ? 'bg-[var(--primary)] text-white border-[var(--primary)] shadow-md'
                           : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40 hover:text-[var(--text-primary)]'
                         }`}
                     >
-                      <FaTshirt className="text-base shrink-0" />
-                      <div className="text-left">
-                        <p className="leading-tight font-black">T-Shirt & Jersey</p>
-                        <p className={`text-[10px] font-normal leading-tight mt-0.5 ${(merchForm.kategori || 'baju') === 'baju' ? 'text-white/80' : 'text-[var(--text-secondary)]'}`}>
-                          Kaos, jersey, hoodie, apparel
-                        </p>
-                      </div>
+                      <p className="leading-tight font-black">Apparel</p>
+                      <p className={`text-[10px] font-normal leading-tight mt-0.5 ${(merchForm.kategori || 'baju') === 'baju' ? 'text-white/80' : 'text-[var(--text-secondary)]'}`}>
+                        Kaos, jersey, hoodie
+                      </p>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setMerchForm({ ...merchForm, kategori: 'aksesoris' })}
-                      className={`p-3 rounded-xl border flex items-center gap-2.5 text-xs font-bold transition-all ${merchForm.kategori === 'aksesoris'
+                      className={`p-3 rounded-xl border text-left text-xs font-bold transition-all ${merchForm.kategori === 'aksesoris'
                           ? 'bg-[var(--primary)] text-white border-[var(--primary)] shadow-md'
                           : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40 hover:text-[var(--text-primary)]'
                         }`}
                     >
-                      <FaGem className="text-base shrink-0" />
-                      <div className="text-left">
-                        <p className="leading-tight font-black">Lanyard, Ganci & Aksesoris</p>
-                        <p className={`text-[10px] font-normal leading-tight mt-0.5 ${merchForm.kategori === 'aksesoris' ? 'text-white/80' : 'text-[var(--text-secondary)]'}`}>
-                          Lanyard, ganci, totebag, lightstick, standee
-                        </p>
-                      </div>
+                      <p className="leading-tight font-black">Aksesoris</p>
+                      <p className={`text-[10px] font-normal leading-tight mt-0.5 ${merchForm.kategori === 'aksesoris' ? 'text-white/80' : 'text-[var(--text-secondary)]'}`}>
+                        Lanyard, ganci, totebag, lightstick, standee
+                      </p>
                     </button>
                   </div>
                 </div>
@@ -246,23 +237,13 @@ const MerchTab = ({
                   </div>
                 </div>
 
-                {/* Section Ukuran Tersedia & Status Tampil */}
+                {/* Section Ukuran Tersedia */}
                 <div className="pt-3 border-t border-[var(--border)] space-y-3">
-                  <div className="flex items-center justify-between">
+                  {merchForm.kategori !== 'aksesoris' && (
                     <label className="block text-xs text-[var(--text-secondary)] font-bold">
-                      {merchForm.kategori === 'aksesoris' ? 'Pengaturan Produk' : 'Ukuran tersedia'}
+                      Ukuran tersedia
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        id="merch-available"
-                        checked={merchForm.available}
-                        onChange={e => setMerchForm({ ...merchForm, available: e.target.checked })}
-                        className="w-4 h-4 accent-[var(--primary)] cursor-pointer"
-                      />
-                      <span className="text-xs font-bold text-[var(--text-secondary)]">Tampilkan di Shop</span>
-                    </label>
-                  </div>
+                  )}
 
                   {merchForm.kategori === 'aksesoris' ? (
                     <div className="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs text-[var(--text-secondary)] flex items-center gap-2.5">

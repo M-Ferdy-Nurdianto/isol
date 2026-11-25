@@ -105,7 +105,7 @@ const GroupPhotoCarousel = ({ images }) => {
 
 // === Member Detail Modal ===
 const MemberDetail = ({ member, members, onNavigate, onClose }) => {
-  const isSecret = member.is_secret;
+  const isSecret = false;
   const name = isSecret ? '???' : (member.nama_panggung || 'Member');
   const imageUrl = member.image_url ? getAssetPath(member.image_url) : null;
   const currentIndex = members.findIndex(m => (m.id || m.member_id) === (member.id || member.member_id));
@@ -273,7 +273,7 @@ const MemberDetail = ({ member, members, onNavigate, onClose }) => {
 
 // === Member Grid Card (Clean Deep Coffee Aesthetic) ===
 const MemberGridCard = ({ member, onClick, index }) => {
-  const isSecret = member.is_secret
+  const isSecret = false
   const name = isSecret ? 'Secret Member' : (member.nama_panggung || 'Member')
   const imageUrl = member.image_url ? getAssetPath(member.image_url) : null
   const tagline = isSecret ? 'Coming Soon' : (member.tagline || member.role || '')

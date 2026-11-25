@@ -101,17 +101,12 @@ const OTSOrderInlineForm = ({
   const [fanSearchLoading, setFanSearchLoading] = useState(false)
   const [selectedFan, setSelectedFan] = useState(null)
   const [showFanDropdown, setShowFanDropdown] = useState(false)
-  const fanSearchRef = useRef(null)
-  const fanDropdownRef = useRef(null)
   const fanSearchDebounce = useRef(null)
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside (uses data attribute so both md:hidden & desktop blocks work)
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (
-        fanDropdownRef.current && !fanDropdownRef.current.contains(e.target) &&
-        fanSearchRef.current && !fanSearchRef.current.contains(e.target)
-      ) {
+      if (!e.target?.closest?.('[data-fan-search="true"]')) {
         setShowFanDropdown(false)
       }
     }
@@ -648,14 +643,26 @@ const OTSOrderInlineForm = ({
 
     if (selectedFan) {
       return (
-        <div className="flex items-center gap-2.5 px-3.5 py-2.5 bg-[var(--primary)]/10 border border-[var(--primary)]/50 rounded-xl">
-          {renderFanAvatar(selectedFan, 'w-8 h-8', 'text-xs')}
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 bg-emerald-500/10 border border-emerald-500/50 rounded-xl">
+          {renderFanAvatar(selectedFan, 'w-9 h-9', 'text-xs')}
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-[var(--text-primary)] truncate">{selectedFan.nama}</p>
-            <p className="text-[10px] text-[var(--text-secondary)] truncate">Fan #{selectedFan.fan_code}{selectedFan.whatsapp ? ` · ${selectedFan.whatsapp}` : ''}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-xs font-bold text-[var(--text-primary)] truncate">{selectedFan.nama}</p>
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-1.5 py-0.5 rounded-md shrink-0">
+                <FaCheckCircle className="text-[9px]" /> Terhubung
+              </span>
+            </div>
+            <p className="text-[10px] text-[var(--text-secondary)] truncate mt-0.5">
+              Fan #{selectedFan.fan_code}{selectedFan.whatsapp ? ` · ${selectedFan.whatsapp}` : ''}
+            </p>
           </div>
-          <button type="button" onClick={handleClearFan} className="text-[var(--text-secondary)] hover:text-red-400 transition shrink-0 p-1" title="Ganti akun">
-            <FaTimesCircle className="text-sm" />
+          <button
+            type="button"
+            onClick={handleClearFan}
+            className="h-8 px-2.5 rounded-lg bg-[var(--surface)] hover:bg-[var(--danger)]/15 text-[var(--text-secondary)] hover:text-[var(--danger)] border border-[var(--border)] text-[11px] font-bold flex items-center gap-1 transition active:scale-95 shrink-0"
+            title="Ganti akun"
+          >
+            <FaTimes className="text-[10px]" /> Ganti
           </button>
         </div>
       )
@@ -663,7 +670,7 @@ const OTSOrderInlineForm = ({
 
     return (
       <div className="space-y-1.5">
-        <div className="relative" ref={fanSearchRef}>
+        <div className="relative" data-fan-search="true">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] pointer-events-none">
             {fanSearchLoading ? (
               <span className="w-3 h-3 border border-[var(--primary)] border-t-transparent rounded-full animate-spin block" />
@@ -680,13 +687,13 @@ const OTSOrderInlineForm = ({
             className="w-full pl-8 pr-3 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] text-xs rounded-xl placeholder-[var(--text-secondary)]/50 focus:border-[var(--primary)] focus:outline-none transition"
           />
           {showFanDropdown && fanSearchResults.length > 0 && (
-            <div ref={fanDropdownRef} className="absolute top-full left-0 right-0 mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl z-50 overflow-hidden max-h-52 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl z-50 overflow-hidden max-h-52 overflow-y-auto">
               {fanSearchResults.map((fan) => (
                 <button
                   key={fan.id}
                   type="button"
                   onClick={() => handleSelectFan(fan)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[var(--primary)]/10 transition text-left border-b border-[var(--border)] last:border-0"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[var(--primary)]/10 active:bg-[var(--primary)]/20 transition text-left border-b border-[var(--border)] last:border-0"
                 >
                   {renderFanAvatar(fan, 'w-7 h-7', 'text-[10px]')}
                   <div className="flex-1 min-w-0">
@@ -695,7 +702,7 @@ const OTSOrderInlineForm = ({
                       Fan #{fan.fan_code}{fan.whatsapp ? ` · ${fan.whatsapp}` : ''}
                     </p>
                   </div>
-                  <span className="text-[10px] text-[var(--primary)] font-bold shrink-0">Pilih</span>
+                  <span className="text-[10px] text-[var(--primary)] bg-[var(--primary)]/15 border border-[var(--primary)]/30 px-2.5 py-1 rounded-lg font-bold shrink-0">Pilih</span>
                 </button>
               ))}
             </div>

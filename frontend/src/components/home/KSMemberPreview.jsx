@@ -4,7 +4,7 @@ import { FaArrowRight, FaLock } from 'react-icons/fa'
 import { getAssetPath } from '../../lib/pathUtils'
 
 const MemberCard = ({ member, index }) => {
-  const isSecret = member.is_secret
+  const isSecret = false
   const name = isSecret ? 'Secret Member' : (member.nama_panggung || member.name || 'Member')
   const tagline = isSecret ? 'Coming Soon' : (member.tagline || member.role || '')
   const imageUrl = member.image_url ? getAssetPath(member.image_url) : null
@@ -107,7 +107,7 @@ const KSMemberPreview = ({ members = [], config = {} }) => {
         {/* Mobile View: Manual Responsive (md:hidden) — UI/UX Pro Max Stack */}
         <div className="md:hidden space-y-2.5">
           {displayMembers.map((member, i) => {
-            const isSecret = member.is_secret
+            const isSecret = false
             const name = isSecret ? 'Secret Member' : (member.nama_panggung || member.name || 'Member')
             const tagline = isSecret ? 'Coming Soon' : (member.tagline || member.role || '')
             const imageUrl = member.image_url ? getAssetPath(member.image_url) : null

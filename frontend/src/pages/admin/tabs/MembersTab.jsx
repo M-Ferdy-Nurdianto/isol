@@ -101,37 +101,26 @@ const MembersTab = ({ members = [], onRefresh }) => {
     hadir: true,
     image_url: '',
     shop_image_url: '',
-    banner_image_url: '',
-    is_secret: false,
-    silhouette_image_url: ''
+    banner_image_url: ''
   })
 
-  const [gallery, setGallery] = useState(['', '', ''])
   const [avatarPreview, setAvatarPreview] = useState('')
   const [avatarFile, setAvatarFile] = useState(null)
   const [shopAvatarPreview, setShopAvatarPreview] = useState('')
   const [shopAvatarFile, setShopAvatarFile] = useState(null)
   const [bannerPreview, setBannerPreview] = useState('')
   const [bannerFile, setBannerFile] = useState(null)
-  const [silhouettePreview, setSilhouettePreview] = useState('')
-  const [silhouetteFile, setSilhouetteFile] = useState(null)
 
   // Drag and drop states for photo uploads
   const [isDraggingAvatar, setIsDraggingAvatar] = useState(false)
   const [isDraggingShopAvatar, setIsDraggingShopAvatar] = useState(false)
   const [isDraggingBanner, setIsDraggingBanner] = useState(false)
-  const [isDraggingSilhouette, setIsDraggingSilhouette] = useState(false)
-  const [draggingGallerySlot, setDraggingGallerySlot] = useState(null)
 
-  const [galleryFiles, setGalleryFiles] = useState([null, null, null])
-  const [galleryPreviews, setGalleryPreviews] = useState(['', '', ''])
   const [saving, setSaving] = useState(false)
 
   const avatarInputRef = useRef(null)
   const shopAvatarInputRef = useRef(null)
   const bannerInputRef = useRef(null)
-  const silhouetteInputRef = useRef(null)
-  const galleryInputRefs = [useRef(null), useRef(null), useRef(null)]
 
   // Open Full Page Editor
   const handleOpenEditor = (member = null) => {
@@ -150,17 +139,8 @@ const MembersTab = ({ members = [], onRefresh }) => {
         hadir: member.hadir !== undefined ? member.hadir : true,
         image_url: member.image_url || '',
         shop_image_url: member.shop_image_url || '',
-        banner_image_url: member.banner_image_url || '',
-        is_secret: Boolean(member.is_secret),
-        silhouette_image_url: member.silhouette_image_url || ''
+        banner_image_url: member.banner_image_url || ''
       })
-
-      const initialGallery = [0, 1, 2].map(idx => {
-        return member.member_gallery?.[idx]?.image_url || ''
-      })
-      setGallery(initialGallery)
-      setGalleryPreviews(initialGallery)
-      setGalleryFiles([null, null, null])
 
       setAvatarPreview(resolveMemberImage(member.image_url, member.member_id, member.nama_panggung))
       setAvatarFile(null)
@@ -170,9 +150,6 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
       setBannerPreview(member.banner_image_url || '')
       setBannerFile(null)
-
-      setSilhouettePreview(member.silhouette_image_url || '')
-      setSilhouetteFile(null)
     } else {
       setEditingMember(null)
       setFormData({
@@ -188,21 +165,14 @@ const MembersTab = ({ members = [], onRefresh }) => {
         hadir: true,
         image_url: '',
         shop_image_url: '',
-        banner_image_url: '',
-        is_secret: false,
-        silhouette_image_url: ''
+        banner_image_url: ''
       })
-      setGallery(['', '', ''])
-      setGalleryPreviews(['', '', ''])
-      setGalleryFiles([null, null, null])
       setAvatarPreview('')
       setAvatarFile(null)
       setShopAvatarPreview('')
       setShopAvatarFile(null)
       setBannerPreview('')
       setBannerFile(null)
-      setSilhouettePreview('')
-      setSilhouetteFile(null)
     }
 
     setViewMode('editor')
@@ -214,11 +184,8 @@ const MembersTab = ({ members = [], onRefresh }) => {
     setEditingMember(null)
     setAvatarFile(null)
     setShopAvatarFile(null)
-    setSilhouetteFile(null)
     setIsDraggingAvatar(false)
     setIsDraggingShopAvatar(false)
-    setIsDraggingSilhouette(false)
-    setDraggingGallerySlot(null)
   }
 
   // Upload handler for member profile picture
@@ -329,103 +296,6 @@ const MembersTab = ({ members = [], onRefresh }) => {
     }
   }
 
-  // Upload handler for secret member silhouette teaser
-  const handleSilhouetteChange = (e) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setSilhouetteFile(file)
-      setSilhouettePreview(URL.createObjectURL(file))
-    }
-  }
-
-  // Drag & drop handlers for Silhouette Teaser
-  const handleSilhouetteDragOver = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-  const handleSilhouetteDragEnter = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDraggingSilhouette(true)
-  }
-  const handleSilhouetteDragLeave = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.currentTarget.contains(e.relatedTarget)) return
-    setIsDraggingSilhouette(false)
-  }
-  const handleSilhouetteDrop = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDraggingSilhouette(false)
-    const file = e.dataTransfer?.files?.[0]
-    if (file && file.type.startsWith('image/')) {
-      setSilhouetteFile(file)
-      setSilhouettePreview(URL.createObjectURL(file))
-    }
-  }
-
-  const handleGalleryChange = (idx, e) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const newFiles = [...galleryFiles]
-      newFiles[idx] = file
-      setGalleryFiles(newFiles)
-
-      const newPreviews = [...galleryPreviews]
-      newPreviews[idx] = URL.createObjectURL(file)
-      setGalleryPreviews(newPreviews)
-    }
-  }
-
-  // Drag & drop handlers for Gallery slots
-  const handleGalleryDragOver = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-  const handleGalleryDragEnter = (idx, e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDraggingGallerySlot(idx)
-  }
-  const handleGalleryDragLeave = (idx, e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.currentTarget.contains(e.relatedTarget)) return
-    if (draggingGallerySlot === idx) {
-      setDraggingGallerySlot(null)
-    }
-  }
-  const handleGalleryDrop = (idx, e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDraggingGallerySlot(null)
-    const file = e.dataTransfer?.files?.[0]
-    if (file && file.type.startsWith('image/')) {
-      const newFiles = [...galleryFiles]
-      newFiles[idx] = file
-      setGalleryFiles(newFiles)
-
-      const newPreviews = [...galleryPreviews]
-      newPreviews[idx] = URL.createObjectURL(file)
-      setGalleryPreviews(newPreviews)
-    }
-  }
-
-  const handleRemoveGalleryItem = (idx) => {
-    const newPreviews = [...galleryPreviews]
-    newPreviews[idx] = ''
-    setGalleryPreviews(newPreviews)
-
-    const newFiles = [...galleryFiles]
-    newFiles[idx] = null
-    setGalleryFiles(newFiles)
-
-    const newGallery = [...gallery]
-    newGallery[idx] = ''
-    setGallery(newGallery)
-  }
-
   const uploadFile = async (file, type = 'avatars') => {
     const form = new FormData()
     form.append('file', file)
@@ -446,7 +316,6 @@ const MembersTab = ({ members = [], onRefresh }) => {
       let finalAvatarUrl = formData.image_url
       let finalShopImageUrl = formData.shop_image_url
       let finalBannerImageUrl = formData.banner_image_url
-      let finalSilhouetteUrl = formData.silhouette_image_url
 
       // 1. Upload avatar if selected
       if (avatarFile) {
@@ -466,32 +335,11 @@ const MembersTab = ({ members = [], onRefresh }) => {
         finalBannerImageUrl = await uploadFile(bannerFile, 'banner')
       }
 
-      // 4. Upload silhouette if selected
-      if (silhouetteFile) {
-        showToast.info('Mengunggah foto siluet teaser...')
-        finalSilhouetteUrl = await uploadFile(silhouetteFile, 'silhouette')
-      }
-
-      // 4. Upload gallery files if selected
-      const finalGalleryUrls = [...gallery]
-      for (let i = 0; i < 3; i++) {
-        if (galleryFiles[i]) {
-          showToast.info(`Mengunggah foto galeri slot ${i + 1}...`)
-          const uploadedUrl = await uploadFile(galleryFiles[i], 'gallery')
-          finalGalleryUrls[i] = uploadedUrl
-        } else if (galleryPreviews[i] === '') {
-          finalGalleryUrls[i] = ''
-        }
-      }
-
       const payload = {
         ...formData,
         image_url: finalAvatarUrl,
         shop_image_url: finalShopImageUrl,
-        banner_image_url: finalBannerImageUrl,
-        silhouette_image_url: finalSilhouetteUrl,
-        is_secret: Boolean(formData.is_secret),
-        gallery: finalGalleryUrls.filter(u => Boolean(u && u.trim()))
+        banner_image_url: finalBannerImageUrl
       }
 
       let savedMember = null
@@ -517,9 +365,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
             const memberSlug = String(payload.member_id || '').toLowerCase().trim()
             const existingIdx = heroConfig.members.findIndex(m => String(m.id).toLowerCase() === memberSlug)
 
-            let heroPhoto = payload.is_secret && finalSilhouetteUrl
-              ? finalSilhouetteUrl
-              : (finalAvatarUrl || getAssetPath('/images/members/placeholder.webp'))
+            let heroPhoto = finalAvatarUrl || getAssetPath('/images/members/placeholder.webp')
 
             if (payload.hadir === false) {
               // Jika dinonaktifkan di form, hapus dari hero_settings
@@ -531,15 +377,15 @@ const MembersTab = ({ members = [], onRefresh }) => {
             } else if (existingIdx >= 0) {
               heroConfig.members[existingIdx] = {
                 ...heroConfig.members[existingIdx],
-                name: payload.is_secret ? '???' : payload.nama_panggung.toUpperCase(),
+                name: payload.nama_panggung.toUpperCase(),
                 // Pertahankan warna hero khusus yang sudah diatur di Tab Hero (jangan ditimpa warna kartu member)
                 color: heroConfig.members[existingIdx].color || 'bg-[#3A2E24]',
-                photo: (payload.is_secret && finalSilhouetteUrl) ? finalSilhouetteUrl : (heroConfig.members[existingIdx].photo || heroPhoto)
+                photo: heroConfig.members[existingIdx].photo || heroPhoto
               }
             } else {
               heroConfig.members.push({
-                id: memberSlug,
-                name: payload.is_secret ? '???' : payload.nama_panggung.toUpperCase(),
+                id: mSlug || memberSlug,
+                name: payload.nama_panggung.toUpperCase(),
                 color: 'bg-[#3A2E24]', // Default Hero tint
                 photo: heroPhoto,
                 posX: 50,
@@ -606,15 +452,12 @@ const MembersTab = ({ members = [], onRefresh }) => {
               return hId === mSlug || hName === mName
             })
             if (!exists) {
-              const photo = member.is_secret && member.silhouette_image_url
-                ? member.silhouette_image_url
-                : (member.image_url || getAssetPath('/images/members/placeholder.webp'))
+              const photo = member.image_url || getAssetPath('/images/members/placeholder.webp')
               heroConfig.members.push({
                 id: mSlug,
-                name: member.is_secret ? '???' : (member.nama_panggung || 'MEMBER').toUpperCase(),
+                name: (member.nama_panggung || 'MEMBER').toUpperCase(),
                 color: member.color || 'bg-[#3A2E24]',
                 photo: photo,
-                is_secret: Boolean(member.is_secret),
                 posX: 50,
                 posY: 30,
                 scale: 1.8,
@@ -1182,101 +1025,6 @@ const MembersTab = ({ members = [], onRefresh }) => {
             </div>
 
             {/* 3 Gallery Photos Card */}
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-                    3 Slot Galeri Foto
-                  </label>
-                  <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Tampil pada popup detail profil member di halaman publik</p>
-                </div>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]">
-                  600 × 800 px (3:4)
-                </span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                {[0, 1, 2].map((idx) => {
-                  const previewUrl = galleryPreviews[idx]
-                  const isDraggingThisSlot = draggingGallerySlot === idx
-                  return (
-                    <div
-                      key={idx}
-                      onDragOver={handleGalleryDragOver}
-                      onDragEnter={(e) => handleGalleryDragEnter(idx, e)}
-                      onDragLeave={(e) => handleGalleryDragLeave(idx, e)}
-                      onDrop={(e) => handleGalleryDrop(idx, e)}
-                      className={`relative aspect-[3/4] bg-[var(--background)] border-2 rounded-xl overflow-hidden flex flex-col items-center justify-center group shadow-md transition-all ${
-                        isDraggingThisSlot
-                          ? 'border-dashed border-[var(--primary)] bg-[var(--primary)]/10 ring-2 ring-[var(--primary)]/20 scale-105'
-                          : 'border-[var(--border)]'
-                      }`}
-                    >
-                      {previewUrl ? (
-                        <>
-                          <img
-                            src={previewUrl.startsWith('http') || previewUrl.startsWith('blob:') ? previewUrl : getAssetPath(previewUrl)}
-                            alt={`Galeri Slot ${idx + 1}`}
-                            className="w-full h-full object-cover object-top"
-                            onError={(e) => {
-                              e.target.onerror = null
-                              e.target.src = getAssetPath('/images/members/placeholder.webp')
-                            }}
-                          />
-                          <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-opacity ${isDraggingThisSlot ? 'hidden' : ''}`}>
-                            <button
-                              type="button"
-                              onClick={() => galleryInputRefs[idx].current?.click()}
-                              className="p-2 bg-[var(--primary)] hover:bg-[var(--primary)]/85 rounded-lg text-[var(--text-primary)] text-xs transition"
-                              title="Ganti Foto"
-                            >
-                              <FaUpload />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveGalleryItem(idx)}
-                              className="p-2 bg-red-600/80 hover:bg-red-600 rounded-lg text-[var(--text-primary)] text-xs transition"
-                              title="Hapus Foto"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/60 text-[var(--text-primary)] rounded text-[9px] font-mono">
-                            Slot {idx + 1}
-                          </span>
-                        </>
-                      ) : (
-                        <div
-                          onClick={() => galleryInputRefs[idx].current?.click()}
-                          className="w-full h-full flex flex-col items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-secondary)] cursor-pointer p-2 text-center transition hover:bg-[var(--border)]"
-                        >
-                          <FaCamera className="text-xl mb-1 text-[var(--text-secondary)]" />
-                          <span className="text-[10px] font-bold">Slot {idx + 1}</span>
-                          <span className="hidden md:block text-[8px] text-[var(--text-secondary)]">Drag & drop / klik</span>
-                          <span className="md:hidden text-[8px] text-[var(--text-secondary)]">Ketuk upload</span>
-                        </div>
-                      )}
-
-                      {/* Dragging active overlay on this slot */}
-                      {isDraggingThisSlot && (
-                        <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-[var(--primary)] text-xs font-bold gap-1 z-20 pointer-events-none">
-                          <FaUpload className="text-xl animate-bounce" />
-                          <span className="text-[10px]">Lepas Foto</span>
-                        </div>
-                      )}
-
-                      <input
-                        type="file"
-                        ref={galleryInputRefs[idx]}
-                        onChange={(e) => handleGalleryChange(idx, e)}
-                        accept="image/*"
-                        className="hidden"
-                      />
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
           </div>
 
           {/* Right Column: Bio, Identity, and CMS Details */}
@@ -1388,146 +1136,6 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 </div>
               </div>
             </div>
-
-            {/* Secret / Teaser Member Card */}
-            {!isGroup && (
-              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
-                  <div className="flex items-center gap-2">
-                    <FaUserSecret className="text-[var(--primary)] text-base" />
-                    <div>
-                      <h3 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">
-                        Mode Secret / Siluet Teaser Member
-                      </h3>
-                      <p className="text-[10px] text-[var(--text-secondary)]">
-                        Untuk member baru atau trainee yang identitas aslinya masih dirahasiakan
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, is_secret: !formData.is_secret })}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        formData.is_secret ? 'bg-[var(--primary)]' : 'bg-zinc-700'
-                      }`}
-                    >
-                      <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                          formData.is_secret ? 'translate-x-5' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                    <span className={`text-xs font-bold ${formData.is_secret ? 'text-[var(--primary)]' : 'text-[var(--text-secondary)]'}`}>
-                      {formData.is_secret ? 'SECRET AKTIF' : 'NORMAL'}
-                    </span>
-                  </div>
-                </div>
-
-                {formData.is_secret && (
-                  <div className="space-y-3 pt-1">
-                    <div className="p-3 bg-[var(--background)] border border-[var(--border)] rounded-xl text-[11px] text-[var(--text-secondary)] flex items-start gap-2">
-                      <FaEyeSlash className="text-[var(--primary)] shrink-0 mt-0.5 text-xs" />
-                      <span>
-                        Ketika aktif: Foto di <strong>Hero Beranda, Toko Shop Cheki, dan Daftar Member</strong> akan otomatis digantikan oleh <strong>Foto Siluet</strong> ini. Nama panggung di panggung Hero akan otomatis disamarkan sebagai <strong>"???"</strong> hingga Anda menonaktifkan status secret ini.
-                      </span>
-                    </div>
-
-                    <div
-                      onDragOver={handleSilhouetteDragOver}
-                      onDragEnter={handleSilhouetteDragEnter}
-                      onDragLeave={handleSilhouetteDragLeave}
-                      onDrop={handleSilhouetteDrop}
-                      className={`flex flex-col sm:flex-row items-center gap-5 p-4 bg-[var(--background)] border-2 rounded-xl transition-all ${
-                        isDraggingSilhouette
-                          ? 'border-dashed border-[var(--primary)] bg-[var(--primary)]/10 ring-2 ring-[var(--primary)]/20'
-                          : 'border-[var(--border)]'
-                      }`}
-                    >
-                      <div
-                        className={`relative w-28 h-36 md:w-32 md:h-40 rounded-2xl overflow-hidden border-2 border-dashed border-[var(--border)] cursor-pointer group shadow-xl shrink-0 bg-black/60 transition-all ${
-                          isDraggingSilhouette ? 'scale-105 border-[var(--primary)]' : ''
-                        }`}
-                        onClick={() => silhouetteInputRef.current?.click()}
-                      >
-                        {silhouettePreview ? (
-                          <img
-                            src={silhouettePreview}
-                            alt="Preview Siluet"
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                            onError={(e) => {
-                              e.target.onerror = null
-                              e.target.src = getAssetPath('/images/members/placeholder.webp')
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center text-[var(--text-secondary)] p-2 text-center">
-                            <FaQuestion className="text-3xl mb-1 text-[var(--primary)]/80" />
-                            <span className="text-[10px] text-[var(--primary)] font-bold">Pilih Foto Siluet</span>
-                          </div>
-                        )}
-                        <div className={`absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[var(--text-primary)] text-xs font-semibold gap-1.5 text-center p-2 ${isDraggingSilhouette ? 'hidden' : ''}`}>
-                          <FaUpload /> Ganti Siluet
-                        </div>
-
-                        {/* Dragging active overlay on silhouette */}
-                        {isDraggingSilhouette && (
-                          <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center text-[var(--primary)] text-xs font-bold gap-1 z-20 pointer-events-none">
-                            <FaUpload className="text-2xl animate-bounce" />
-                            <span>Lepas di Sini</span>
-                          </div>
-                        )}
-
-                        <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 text-[var(--text-secondary)] rounded text-[9px] font-bold">
-                          SILUET
-                        </span>
-                      </div>
-
-                      <div className="space-y-2 text-center sm:text-left flex-1">
-                        <div className="flex items-center justify-center sm:justify-start gap-2">
-                          <p className="text-xs text-[var(--text-secondary)] font-medium">
-                            {silhouetteFile ? silhouetteFile.name : (formData.silhouette_image_url ? 'Foto siluet tersimpan' : 'Belum ada foto siluet khusus')}
-                          </p>
-                          {isDraggingSilhouette && (
-                            <span className="px-2 py-0.5 rounded bg-[var(--primary)]/20 border border-[var(--primary)]/40 text-[var(--primary)] text-[10px] font-bold animate-pulse">
-                              Lepas untuk Unggah
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="hidden md:block text-[11px] text-[var(--text-secondary)]">
-                          Unggah foto siluet gelap berlatar transparan atau gelap untuk teaser idol. Drag & drop foto ke kotak ini atau klik tombol di bawah.
-                        </p>
-                        <p className="md:hidden text-[11px] text-[var(--text-secondary)]">
-                          Ketuk tombol untuk memilih foto siluet teaser idol.
-                        </p>
-
-                        <input
-                          type="file"
-                          ref={silhouetteInputRef}
-                          onChange={handleSilhouetteChange}
-                          accept="image/*"
-                          className="hidden"
-                        />
-                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => silhouetteInputRef.current?.click()}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)]/20 hover:bg-[var(--primary)]/30 border border-[var(--primary)]/40 text-xs font-bold text-[var(--primary)] transition"
-                          >
-                            <FaUpload /> Unggah Foto Siluet
-                          </button>
-                          <span className="hidden md:inline-block text-[10px] text-[var(--text-secondary)]">
-                            atau seret foto langsung ke area ini
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* CMS Sorting & Status Settings */}
             <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
@@ -1742,7 +1350,6 @@ const MembersTab = ({ members = [], onRefresh }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredMembers.map((member) => {
             const memberColor = member.color || '#10B981'
-            const galleryCount = member.member_gallery?.length || 0
 
             return (
               <div
@@ -1802,11 +1409,6 @@ const MembersTab = ({ members = [], onRefresh }) => {
                           <h4 className="font-bold text-base text-[var(--text-primary)] truncate group-hover:text-[var(--primary)] transition-colors">
                             {member.nama_panggung}
                           </h4>
-                          {member.is_secret && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)] text-[9px] font-black uppercase tracking-wider shrink-0">
-                              <FaUserSecret className="text-[10px]" /> SECRET
-                            </span>
-                          )}
                         </div>
                         <span
                           className="px-2 py-0.5 rounded-full text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider shrink-0 shadow-sm"
@@ -1840,10 +1442,6 @@ const MembersTab = ({ members = [], onRefresh }) => {
                         <span className="text-[var(--primary)] font-mono">{member.instagram}</span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-[var(--text-secondary)] flex items-center gap-1"><FaImages /> Galeri:</span>
-                      <span className="text-[var(--text-secondary)] font-medium">{galleryCount} / 3 foto terpasang</span>
-                    </div>
                   </div>
 
                   {/* 16:9 Landscape Banner Status / Preview */}
@@ -1899,37 +1497,6 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       </button>
                     )}
                   </div>
-
-                  {/* Gallery Thumbnails Preview */}
-                  {galleryCount > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mt-3">
-                      {[0, 1, 2].map((idx) => {
-                        const img = member.member_gallery?.[idx]?.image_url
-                        return (
-                          <div
-                            key={idx}
-                            className="aspect-[3/4] rounded-xl overflow-hidden bg-black/40 border border-[var(--border)] shadow-sm"
-                          >
-                            {img ? (
-                              <img
-                                src={img.startsWith('http') ? img : getAssetPath(img)}
-                                alt={`Slot ${idx + 1}`}
-                                className="w-full h-full object-cover object-top hover:scale-110 transition-transform duration-300"
-                                onError={(e) => {
-                                  e.target.onerror = null
-                                  e.target.src = getAssetPath('/images/members/placeholder.webp')
-                                }}
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-[9px] text-[var(--text-secondary)]">
-                                Kosong
-                              </div>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
                 </div>
 
                 {/* Card Footer: Status & Actions */}

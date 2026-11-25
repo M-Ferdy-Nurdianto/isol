@@ -2,23 +2,6 @@ import React from 'react'
 import { FaEye, FaTrash, FaImage, FaFileAlt, FaSpinner } from 'react-icons/fa'
 import CustomSelect from './CustomSelect'
 
-// ─── Status badge helper ───────────────────────────────────────────────────────
-const StatusBadge = ({ status }) => {
-  const map = {
-    pending: { label: 'Unchecked', cls: 'bg-amber-500/15 text-amber-300 border-amber-500/30' },
-    checked: { label: 'Checked', cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
-    paid:      { label: 'Checked',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
-    approved:  { label: 'Checked',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
-    completed: { label: 'Completed', cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' },
-  }
-  const s = map[status] || { label: status, cls: 'bg-[var(--border)] text-[var(--text-secondary)] border-[var(--border)]' }
-  return (
-    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${s.cls}`}>
-      {s.label}
-    </span>
-  )
-}
-
 // ─── Mobile Card ───────────────────────────────────────────────────────────────
 const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
   const isSpecial = order.events?.type === 'special' || !!order.events?.theme_color
@@ -37,75 +20,82 @@ const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
   const paymentMethod = order.payment_proof_url?.startsWith('data:') || order.payment_proof_url?.startsWith('http')
     ? 'Cash'
     : (order.payment_proof_url || 'Cash')
-  // Determine source for OTS orders
-  const otsSourceBadge = order.is_ots
-    ? (order.created_by === 'customer'
-      ? { label: 'OTS - User', cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' }
-      : { label: 'OTS - Admin', cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' })
-    : null
-  const paymentBadge = order.is_ots
-    ? { label: paymentMethod === 'QR' ? 'QRIS' : paymentMethod, cls: 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]' }
-    : null
+  const paymentLabel = paymentMethod === 'QR' ? 'QRIS' : paymentMethod
+  const otsSourceLabel = order.created_by === 'customer' ? 'OTS - User' : 'OTS - Admin'
+
+  const formattedDate = new Date(order.created_at).toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
 
   return (
     <div
       className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-lg"
       style={borderStyle}
     >
-      {/* ── TOP ── */}
-      <div className="flex items-start justify-between gap-2 px-4 pt-4 pb-2">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-mono text-xs font-bold text-[var(--text-secondary)]">
-              {order.order_number}
-            </span>
+      {/* ── TOP: Order Code + Source/Proof ── */}
+      <div className="px-3.5 pt-3.5 pb-2.5">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-mono text-[11px] font-bold text-[var(--text-secondary)] whitespace-nowrap truncate">
+            {order.order_number}
+          </span>
+
+          <div className="shrink-0 flex items-center gap-1.5">
             {isSpecial && (
-              <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md border"
-                style={{ color: themeColor, borderColor: themeColor, background: `${themeColor}15` }}>
+              <span
+                className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md border"
+                style={{ color: themeColor, borderColor: themeColor, background: `${themeColor}15` }}
+              >
                 Special
               </span>
             )}
+            {order.is_ots ? (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)] whitespace-nowrap">
+                {otsSourceLabel} • {paymentLabel}
+              </span>
+            ) : order.payment_proof_url ? (
+              <a
+                href={order.payment_proof_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[10px] text-[var(--primary)] bg-[var(--background)] border border-[var(--border)] px-2 py-0.5 rounded-md font-bold active:scale-95 transition"
+              >
+                <FaImage className="text-[9px]" /> Bukti
+              </a>
+            ) : null}
           </div>
-          <div className="text-sm font-black text-[var(--text-primary)] mt-0.5 truncate">
-            {order.nama_lengkap}
-          </div>
-          {contactLine && (
-            <div className="text-[11px] text-[var(--text-secondary)] mt-0.5">{contactLine}</div>
-          )}
         </div>
 
-        <div className="shrink-0 flex items-center gap-1.5 flex-wrap justify-end">
-          {otsSourceBadge && (
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${otsSourceBadge.cls}`}>
-              {otsSourceBadge.label}
-            </span>
-          )}
-          {!order.is_ots && order.payment_proof_url ? (
-            <a
-              href={order.payment_proof_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[10px] text-[var(--primary)] bg-[var(--background)] border border-[var(--border)] px-2 py-0.5 rounded-lg font-bold transition hover:bg-[var(--surface)]"
-            >
-              <FaImage className="text-[9px]" /> Bukti
-            </a>
-          ) : paymentBadge ? (
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${paymentBadge.cls}`}>
-              {paymentBadge.label}
-            </span>
-          ) : null}
-          <StatusBadge status={order.status} />
+        {/* ── Buyer Name + Total Price ── */}
+        <div className="flex items-baseline justify-between gap-3 mt-1.5">
+          <div className="text-[15px] font-black text-[var(--text-primary)] truncate">
+            {order.nama_lengkap}
+          </div>
+          <div className="text-[15px] font-black text-[var(--primary)] shrink-0 tabular-nums">
+            Rp {order.total_harga?.toLocaleString('id-ID')}
+          </div>
+        </div>
+
+        {/* ── Contact + Date Meta ── */}
+        <div className="flex items-center justify-between gap-2 mt-0.5 text-[11px] text-[var(--text-secondary)]">
+          <span className="truncate">{contactLine || formattedDate}</span>
+          {contactLine && <span className="shrink-0">{formattedDate}</span>}
         </div>
       </div>
 
-      {/* ── MIDDLE ── */}
-      <div className="px-4 py-2 border-t border-[var(--border)]">
-        <div className="space-y-0.5">
+      {/* ── MIDDLE: Items ── */}
+      <div className="px-3.5 py-2.5 border-t border-[var(--border)] bg-[var(--background)]/40">
+        <div className="space-y-1">
           {order.order_items?.length > 0
             ? order.order_items.map((item, idx) => (
-              <div key={idx} className="text-xs text-[var(--text-secondary)] flex items-center gap-1">
-                <span className="font-medium">{item.item_name}</span>
-                <span className="text-[var(--text-secondary)] font-bold">×{item.quantity}</span>
+              <div key={idx} className="text-xs flex items-baseline justify-between gap-3">
+                <span className="text-[var(--text-secondary)] font-medium leading-snug">
+                  {item.item_name}
+                </span>
+                <span className="font-mono text-xs font-bold text-[var(--text-primary)] shrink-0 tabular-nums">
+                  ×{item.quantity}
+                </span>
               </div>
             ))
             : <span className="text-[var(--text-secondary)] text-xs">Tidak ada item</span>
@@ -119,20 +109,9 @@ const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
         )}
       </div>
 
-      {/* ── BOTTOM ── */}
-      <div className="px-4 py-3 border-t border-[var(--border)] flex items-center justify-between gap-2 bg-[var(--background)]">
-        <div>
-          <div className="text-base font-black text-[var(--primary)]">
-            Rp {order.total_harga?.toLocaleString('id-ID')}
-          </div>
-          <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">
-            {new Date(order.created_at).toLocaleDateString('id-ID', {
-              day: '2-digit', month: 'short', year: 'numeric'
-            })}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 shrink-0">
+      {/* ── BOTTOM: Touch-Friendly Actions ── */}
+      <div className="px-3.5 py-2.5 border-t border-[var(--border)] bg-[var(--background)] flex items-center gap-2">
+        <div className="flex-1 min-w-0">
           <CustomSelect
             value={order.status === 'paid' || order.status === 'approved' ? 'checked' : order.status}
             onChange={(e) => onStatusChange(order.id, e.target.value)}
@@ -144,21 +123,24 @@ const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
               { value: 'completed', label: 'Completed' },
             ]}
           />
-          <button
-            onClick={() => onView(order)}
-            className="w-8 h-8 flex items-center justify-center rounded-xl bg-[var(--border)] hover:bg-[var(--primary)]/15 text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors border border-[var(--border)]"
-            title="Detail Order"
-          >
-            <FaEye className="text-xs" />
-          </button>
-          <button
-            onClick={() => onDelete(order.id)}
-            className="w-8 h-8 flex items-center justify-center rounded-xl bg-[var(--danger)]/10 hover:bg-[var(--danger)]/20 text-[var(--danger)] transition-colors border border-[var(--danger)]/20"
-            title="Hapus Order"
-          >
-            <FaTrash className="text-xs" />
-          </button>
         </div>
+        <button
+          type="button"
+          onClick={() => onView(order)}
+          className="h-9 px-3 flex items-center justify-center gap-1.5 rounded-xl bg-[var(--surface)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors border border-[var(--border)] text-xs font-bold active:scale-95 shrink-0"
+          title="Detail Order"
+        >
+          <FaEye className="text-xs" />
+          <span>Detail</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => onDelete(order.id)}
+          className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--danger)]/10 hover:bg-[var(--danger)]/20 text-[var(--danger)] transition-colors border border-[var(--danger)]/25 active:scale-95 shrink-0"
+          title="Hapus Order"
+        >
+          <FaTrash className="text-xs" />
+        </button>
       </div>
     </div>
   )
@@ -168,13 +150,26 @@ const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
 const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatingOrderIds, onView, onDelete, onStatusChange }) => {
   return (
     <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-xl overflow-hidden mb-6">
-      {/* Header */}
-      <div className="p-4 md:p-5 border-b border-[var(--border)] flex flex-wrap items-center justify-between gap-3 bg-[var(--background)]">
+      {/* Header Mobile (1 baris sejajar, simple & mudah dipencet) */}
+      <div className="md:hidden px-3.5 py-3 border-b border-[var(--border)] flex items-center justify-between gap-2 bg-[var(--background)]">
         <div className="flex items-center gap-2 min-w-0">
-          <h3 className="text-base md:text-lg font-bold text-[var(--text-primary)] truncate">
+          <h3 className="text-sm font-bold text-[var(--text-primary)] truncate">
             {title}
           </h3>
-          <span className="text-[11px] md:text-xs font-semibold px-2 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] border border-[var(--primary)]/30 shrink-0">
+          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30 shrink-0 tabular-nums">
+            {data.length}
+          </span>
+        </div>
+        {action && <div className="shrink-0">{action}</div>}
+      </div>
+
+      {/* Header Desktop */}
+      <div className="hidden md:flex p-5 border-b border-[var(--border)] flex-wrap items-center justify-between gap-3 bg-[var(--background)]">
+        <div className="flex items-center gap-2 min-w-0">
+          <h3 className="text-lg font-bold text-[var(--text-primary)] truncate">
+            {title}
+          </h3>
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] border border-[var(--primary)]/30 shrink-0">
             {data.length} items
           </span>
         </div>
@@ -313,9 +308,10 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                           href={order.payment_proof_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs text-[var(--primary)] hover:underline bg-[var(--background)] px-2.5 py-1 rounded-lg border border-[var(--border)] font-medium transition-colors"
+                          className="inline-flex items-center gap-1.5 text-xs text-[var(--primary)] hover:underline bg-[var(--background)] px-2.5 py-1 rounded-lg border border-[var(--border)] font-medium transition-colors whitespace-nowrap"
+                          title="Lihat Bukti Pembayaran"
                         >
-                          <FaImage /> Lihat Bukti
+                          <FaImage /> Payment
                         </a>
                       ) : order.is_ots ? (
                         <div className="flex flex-col gap-1 items-start">

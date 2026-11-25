@@ -197,7 +197,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
 
             <div>
               <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Tanggal event</label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-[68px_1fr_84px] md:grid-cols-3 gap-2">
                 <input
                   type="number"
                   placeholder="Tgl"
@@ -211,6 +211,7 @@ const EventsTab = ({ events, members, onDeleteEvent, onTogglePast, onRefresh }) 
                   value={formData.bulan}
                   onChange={(e) => setFormData({ ...formData, bulan: e.target.value })}
                   placeholder="Bulan"
+                  className="min-w-0 h-full"
                 />
                 <input
                   type="number"

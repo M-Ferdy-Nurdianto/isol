@@ -210,7 +210,7 @@ const KSLeaderboardMobile = ({ members = [] }) => {
                 </button>
 
                 {/* Member Specific Buttons - DOT REMOVED per instruction A */}
-                {members.filter(m => !m.is_secret).map(m => {
+                {members.map(m => {
                   const idVal = m.id || m.member_id
                   const isSelected = memberId === idVal
 

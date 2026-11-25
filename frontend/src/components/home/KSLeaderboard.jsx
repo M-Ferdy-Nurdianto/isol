@@ -148,7 +148,7 @@ const KSLeaderboard = ({ members = [] }) => {
                 <span>All Members</span>
               </button>
 
-              {members.filter(m => !m.is_secret).map(m => {
+              {members.map(m => {
                 const idVal = m.id || m.member_id
                 const isSelected = memberId === idVal
                 const mKey = (m.member_id || m.nama_panggung || '').toLowerCase()
