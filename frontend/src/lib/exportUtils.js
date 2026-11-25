@@ -237,16 +237,38 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
     const otsOrders = orders.filter(o => o.is_ots)
     const poOrders = orders.filter(o => !o.is_ots)
 
+    const normalizeMemberName = (rawName) => {
+      const cleaned = stripEmoji(String(rawName || ''))
+      const lower = cleaned.toLowerCase()
+      if (lower.includes('all member') || lower.includes('grup') || lower.includes('group')) {
+        return 'Cheki Grup'
+      }
+      const normalized = cleaned
+        .replace(/\((?:16:9|169|regular|wide(?:\s*169)?|pre-order|ots)\)/gi, ' ')
+        .replace(/\b(?:regular|wide|2shot|ots|cheki|polaroid|16:9|169)\b/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+      return normalized || cleaned || '-'
+    }
+
     const memberStats = {}
     paidOrders.forEach(order => {
       order.order_items?.forEach(item => {
-        let name = stripEmoji(String(item.item_name || '').replace('Cheki ', '').replace(' (Pre-Order)', ''))
-        if (name.toLowerCase().includes('all member') || name.toLowerCase().includes('group')) name = 'All Member (Group)'
-        if (!memberStats[name]) memberStats[name] = { qty: 0, otsQty: 0, poQty: 0, revenue: 0 }
+        const raw = String(item.item_name || '')
+        const name = normalizeMemberName(raw)
+        const isWide = item.cheki_type === 'wide' || /\bwide\b|16:?9/i.test(raw)
+        if (!memberStats[name]) {
+          memberStats[name] = { qty: 0, regularQty: 0, wideQty: 0, otsQty: 0, poQty: 0, revenue: 0 }
+        }
         const qty = item.quantity || 0
         const price = Number(item.price ?? item.harga ?? 0)
-        
+
         memberStats[name].qty += qty
+        if (isWide) {
+          memberStats[name].wideQty += qty
+        } else {
+          memberStats[name].regularQty += qty
+        }
         if (order.is_ots) {
           memberStats[name].otsQty += qty
         } else {
@@ -351,7 +373,7 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
     })
 
     let currentY = doc.lastAutoTable.finalY + 8
-    doc.setFillColor(180, 83, 9)
+    doc.setFillColor(36, 30, 25)
     doc.rect(14, currentY, 182, 7, 'F')
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(10)
@@ -360,32 +382,42 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
 
     const memberBody = Object.entries(memberStats)
       .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([name, stats]) => [stripEmoji(name), stats.qty, stats.otsQty, stats.poQty, formatCurrency(stats.revenue)])
+      .map(([name, stats]) => [
+        stripEmoji(name),
+        stats.regularQty,
+        stats.wideQty,
+        stats.otsQty,
+        stats.poQty,
+        stats.qty,
+        formatCurrency(stats.revenue)
+      ])
 
     autoTable(doc, {
       startY: currentY,
-      head: [['Member / Lineup', 'Total Qty', 'OTS Qty', 'PO Qty', 'Revenue']],
-      body: memberBody.length ? memberBody : [['-', '-', '-', '-', '-']],
+      head: [['Member', 'Regular', 'Wide', 'OTS', 'PO', 'Total Qty', 'Revenue']],
+      body: memberBody.length ? memberBody : [['-', '-', '-', '-', '-', '-', '-']],
       theme: 'grid',
       headStyles: { fillColor: [232, 148, 74], textColor: 255 },
       styles: { fontSize: 9 },
-      columnStyles: { 
-        1: { halign: 'center', cellWidth: 20 },
-        2: { halign: 'center', cellWidth: 20 },
-        3: { halign: 'center', cellWidth: 20 },
-        4: { halign: 'right' } 
+      columnStyles: {
+        1: { halign: 'center', cellWidth: 18 },
+        2: { halign: 'center', cellWidth: 16 },
+        3: { halign: 'center', cellWidth: 16 },
+        4: { halign: 'center', cellWidth: 16 },
+        5: { halign: 'center', cellWidth: 20, fontStyle: 'bold' },
+        6: { halign: 'right' }
       }
     })
 
     currentY = doc.lastAutoTable.finalY + 8
-    doc.setFillColor(6, 95, 70)
+    doc.setFillColor(36, 30, 25)
     doc.rect(14, currentY, 182, 7, 'F')
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(10)
     doc.text('TRANSACTION DETAILS', 16, currentY + 5)
     currentY += 10
 
-    doc.setFillColor(5, 150, 105)
+    doc.setFillColor(232, 148, 74)
     doc.rect(14, currentY, 182, 6, 'F')
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(9)
@@ -398,12 +430,12 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
       body: buildOrderRows(otsOrders).length ? buildOrderRows(otsOrders) : [['-', '-', '-', '-', '-', '-', '-', '-', '-']],
       theme: 'grid',
       styles: { fontSize: 7, cellPadding: 1, overflow: 'linebreak' },
-      headStyles: { fillColor: [5, 150, 105], textColor: 255 },
+      headStyles: { fillColor: [232, 148, 74], textColor: 255 },
       columnStyles: { 4: { cellWidth: 40 }, 6: { halign: 'right' } }
     })
 
     currentY = doc.lastAutoTable.finalY + 6
-    doc.setFillColor(22, 163, 74)
+    doc.setFillColor(92, 68, 51)
     doc.rect(14, currentY, 182, 6, 'F')
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(9)
@@ -416,7 +448,7 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
       body: buildOrderRows(poOrders).length ? buildOrderRows(poOrders) : [['-', '-', '-', '-', '-', '-', '-', '-', '-']],
       theme: 'grid',
       styles: { fontSize: 7, cellPadding: 1, overflow: 'linebreak' },
-      headStyles: { fillColor: [22, 163, 74], textColor: 255 },
+      headStyles: { fillColor: [92, 68, 51], textColor: 255 },
       columnStyles: { 4: { cellWidth: 40 }, 6: { halign: 'right' } }
     })
 
