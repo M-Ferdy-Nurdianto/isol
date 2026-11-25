@@ -266,21 +266,18 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
         const name = normalizeMemberName(raw)
         const isWide = item.cheki_type === 'wide' || /\bwide\b|16:?9/i.test(raw)
         if (!memberStats[name]) {
-          memberStats[name] = { qty: 0, regularQty: 0, wideQty: 0, otsQty: 0, poQty: 0, revenue: 0 }
+          memberStats[name] = { qty: 0, regPoQty: 0, regOtsQty: 0, widePoQty: 0, wideOtsQty: 0, revenue: 0 }
         }
         const qty = item.quantity || 0
         const price = Number(item.price ?? item.harga ?? 0)
 
         memberStats[name].qty += qty
         if (isWide) {
-          memberStats[name].wideQty += qty
+          if (order.is_ots) memberStats[name].wideOtsQty += qty
+          else memberStats[name].widePoQty += qty
         } else {
-          memberStats[name].regularQty += qty
-        }
-        if (order.is_ots) {
-          memberStats[name].otsQty += qty
-        } else {
-          memberStats[name].poQty += qty
+          if (order.is_ots) memberStats[name].regOtsQty += qty
+          else memberStats[name].regPoQty += qty
         }
         memberStats[name].revenue += (qty * price)
       })
@@ -388,31 +385,51 @@ export const generatePDF = async ({ api, scope, value, params, events }) => {
     doc.text('MEMBER PERFORMANCE (A-Z)', 16, currentY + 5)
     currentY += 10
 
-    const memberBody = Object.entries(memberStats)
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([name, stats]) => [
-        stripEmoji(name),
-        stats.regularQty,
-        stats.wideQty,
-        stats.otsQty,
-        stats.poQty,
-        stats.qty,
-        formatCurrency(stats.revenue)
+    const sortedMembers = Object.entries(memberStats).sort((a, b) => a[0].localeCompare(b[0]))
+    const memberBody = sortedMembers.map(([name, stats]) => [
+      stripEmoji(name),
+      stats.regPoQty,
+      stats.regOtsQty,
+      stats.widePoQty,
+      stats.wideOtsQty,
+      stats.qty,
+      formatCurrency(stats.revenue)
+    ])
+
+    if (sortedMembers.length > 0) {
+      const totals = sortedMembers.reduce((acc, [, s]) => ({
+        regPoQty: acc.regPoQty + s.regPoQty,
+        regOtsQty: acc.regOtsQty + s.regOtsQty,
+        widePoQty: acc.widePoQty + s.widePoQty,
+        wideOtsQty: acc.wideOtsQty + s.wideOtsQty,
+        qty: acc.qty + s.qty,
+        revenue: acc.revenue + s.revenue
+      }), { regPoQty: 0, regOtsQty: 0, widePoQty: 0, wideOtsQty: 0, qty: 0, revenue: 0 })
+
+      memberBody.push([
+        { content: 'TOTAL', styles: { fontStyle: 'bold', fillColor: [254, 243, 199], textColor: [36, 30, 25] } },
+        { content: totals.regPoQty, styles: { fontStyle: 'bold', fillColor: [254, 243, 199], textColor: [36, 30, 25], halign: 'center' } },
+        { content: totals.regOtsQty, styles: { fontStyle: 'bold', fillColor: [254, 243, 199], textColor: [36, 30, 25], halign: 'center' } },
+        { content: totals.widePoQty, styles: { fontStyle: 'bold', fillColor: [254, 243, 199], textColor: [36, 30, 25], halign: 'center' } },
+        { content: totals.wideOtsQty, styles: { fontStyle: 'bold', fillColor: [254, 243, 199], textColor: [36, 30, 25], halign: 'center' } },
+        { content: totals.qty, styles: { fontStyle: 'bold', fillColor: [254, 243, 199], textColor: [36, 30, 25], halign: 'center' } },
+        { content: formatCurrency(totals.revenue), styles: { fontStyle: 'bold', fillColor: [254, 243, 199], textColor: [180, 83, 9], halign: 'right' } }
       ])
+    }
 
     autoTable(doc, {
       startY: currentY,
-      head: [['Member', 'Regular', 'Wide', 'OTS', 'PO', 'Total Qty', 'Revenue']],
+      head: [['Member', 'Reg (PO)', 'Reg (OTS)', 'Wide (PO)', 'Wide (OTS)', 'Total Qty', 'Revenue']],
       body: memberBody.length ? memberBody : [['-', '-', '-', '-', '-', '-', '-']],
       theme: 'grid',
-      headStyles: { fillColor: [232, 148, 74], textColor: 255 },
-      styles: { fontSize: 9 },
+      headStyles: { fillColor: [232, 148, 74], textColor: 255, fontSize: 8 },
+      styles: { fontSize: 8.5 },
       columnStyles: {
         1: { halign: 'center', cellWidth: 18 },
-        2: { halign: 'center', cellWidth: 16 },
-        3: { halign: 'center', cellWidth: 16 },
-        4: { halign: 'center', cellWidth: 16 },
-        5: { halign: 'center', cellWidth: 20, fontStyle: 'bold' },
+        2: { halign: 'center', cellWidth: 19 },
+        3: { halign: 'center', cellWidth: 19 },
+        4: { halign: 'center', cellWidth: 20 },
+        5: { halign: 'center', cellWidth: 19, fontStyle: 'bold' },
         6: { halign: 'right' }
       }
     })

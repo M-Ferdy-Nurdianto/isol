@@ -768,17 +768,16 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
         const name = normalizeMemberName(raw)
         const isWide = item.cheki_type === 'wide' || /\bwide\b|16:?9/i.test(raw)
         if (!memberStats[name]) {
-          memberStats[name] = { qty: 0, regularQty: 0, wideQty: 0, otsQty: 0, poQty: 0, revenue: 0 }
+          memberStats[name] = { qty: 0, regPoQty: 0, regOtsQty: 0, widePoQty: 0, wideOtsQty: 0, revenue: 0 }
         }
         const qty = item.quantity || 0
         memberStats[name].qty += qty
-        if (isWide) memberStats[name].wideQty += qty
-        else memberStats[name].regularQty += qty
-
-        if (order.is_ots) {
-          memberStats[name].otsQty += qty
+        if (isWide) {
+          if (order.is_ots) memberStats[name].wideOtsQty += qty
+          else memberStats[name].widePoQty += qty
         } else {
-          memberStats[name].poQty += qty
+          if (order.is_ots) memberStats[name].regOtsQty += qty
+          else memberStats[name].regPoQty += qty
         }
 
         memberStats[name].revenue += (qty * (item.price || 0))
@@ -848,7 +847,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
       alignment: { vertical: 'middle', horizontal: 'left' }
     })
 
-    const memberHeaderRow = worksheet.addRow(['Member', 'Regular', 'Wide', 'OTS', 'PO', 'Total Qty', 'Revenue', '', '', ''])
+    const memberHeaderRow = worksheet.addRow(['Member', 'Reg (PO)', 'Reg (OTS)', 'Wide (PO)', 'Wide (OTS)', 'Total Qty', 'Revenue', '', '', ''])
     memberHeaderRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
     for (let i = 1; i <= 7; i++) {
       const cell = memberHeaderRow.getCell(i)
@@ -862,9 +861,16 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
       const emptyRow = worksheet.addRow(['-', '-', '-', '-', '-', '-', '-', '', '', ''])
       applyBorders(emptyRow)
     } else {
+      const totals = { regPoQty: 0, regOtsQty: 0, widePoQty: 0, wideOtsQty: 0, qty: 0, revenue: 0 }
       sortedMembers.forEach(name => {
         const stats = memberStats[name]
-        const row = worksheet.addRow([name, stats.regularQty, stats.wideQty, stats.otsQty, stats.poQty, stats.qty, stats.revenue, '', '', ''])
+        totals.regPoQty += stats.regPoQty
+        totals.regOtsQty += stats.regOtsQty
+        totals.widePoQty += stats.widePoQty
+        totals.wideOtsQty += stats.wideOtsQty
+        totals.qty += stats.qty
+        totals.revenue += stats.revenue
+        const row = worksheet.addRow([name, stats.regPoQty, stats.regOtsQty, stats.widePoQty, stats.wideOtsQty, stats.qty, stats.revenue, '', '', ''])
         row.getCell(7).numFmt = '"Rp" #,##0'
 
         for (let c = 2; c <= 6; c++) {
@@ -873,6 +879,14 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
         row.getCell(7).alignment = { vertical: 'middle', horizontal: 'right' }
         applyBorders(row)
       })
+      const totalRow = worksheet.addRow(['TOTAL', totals.regPoQty, totals.regOtsQty, totals.widePoQty, totals.wideOtsQty, totals.qty, totals.revenue, '', '', ''])
+      totalRow.font = { bold: true }
+      totalRow.getCell(7).numFmt = '"Rp" #,##0'
+      for (let c = 1; c <= 7; c++) {
+        totalRow.getCell(c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } }
+        totalRow.getCell(c).alignment = { vertical: 'middle', horizontal: c === 1 ? 'left' : c === 7 ? 'right' : 'center' }
+      }
+      applyBorders(totalRow)
     }
 
     worksheet.addRow([])
