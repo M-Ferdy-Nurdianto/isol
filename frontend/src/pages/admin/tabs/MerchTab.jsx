@@ -47,7 +47,94 @@ const MerchTab = ({
             </button>
           </div>
 
-          <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] shadow-xl overflow-hidden">
+          {/* ── MOBILE: Card List (< md) ── */}
+          <div className="md:hidden space-y-3">
+            {merch.length === 0 ? (
+              <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] py-12 px-4 text-center text-xs text-[var(--text-secondary)]">
+                Belum ada merchandise. Klik &quot;Tambah Merch&quot; untuk menambahkan.
+              </div>
+            ) : (
+              merch.map((item) => (
+                <div key={item.id} className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-3.5 shadow-lg">
+                  <div className="flex items-start gap-3">
+                    <div className="w-16 h-16 rounded-xl bg-[var(--background)] overflow-hidden shrink-0 flex items-center justify-center border border-[var(--border)] p-1">
+                      {item.gambar_url ? (
+                        <img
+                          src={item.gambar_url}
+                          alt={item.nama}
+                          className="w-full h-full object-contain rounded-lg"
+                          onError={(e) => {
+                            e.target.onerror = null
+                            e.target.src = '/images/merch/jersey.webp'
+                          }}
+                        />
+                      ) : (
+                        <FaBox className="text-[var(--primary)] text-xl" />
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="font-black text-[var(--text-primary)] text-sm leading-snug line-clamp-2">
+                        {item.nama}
+                      </p>
+                      <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold border bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)]">
+                          {item.kategori === 'aksesoris' ? 'Aksesoris' : 'Apparel'}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border bg-[var(--background)] border-[var(--border)] ${!item.stok ? 'text-[var(--text-secondary)]' : item.stok <= 5 ? 'text-amber-400' : 'text-[var(--text-secondary)]'}`}>
+                          {!item.stok ? 'Stok: PO' : `Stok: ${item.stok}`}
+                        </span>
+                      </div>
+                      <p className="text-base font-black text-[var(--primary)] mt-1.5 tabular-nums">
+                        Rp {item.harga.toLocaleString('id-ID')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {item.deskripsi && (
+                    <p className="text-[11px] text-[var(--text-secondary)] line-clamp-2 mt-2.5 leading-relaxed">
+                      {item.deskripsi}
+                    </p>
+                  )}
+
+                  <div className="mt-3 pt-2.5 border-t border-[var(--border)] flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onToggleMerchAvailability(item)}
+                      className={`h-9 px-3.5 rounded-xl text-xs font-bold border transition-all active:scale-95 ${item.available
+                          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35'
+                          : 'bg-red-500/10 text-red-400 border-red-500/30'
+                        }`}
+                    >
+                      {item.available ? 'Aktif' : 'Nonaktif'}
+                    </button>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => openMerchForm(item)}
+                        className="h-9 px-3 flex items-center justify-center gap-1.5 rounded-xl bg-[var(--background)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] hover:text-[var(--primary)] border border-[var(--border)] text-xs font-bold transition-colors active:scale-95"
+                      >
+                        <FaEdit className="text-xs" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMerch(item.id, item.nama)}
+                        className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--danger)]/10 hover:bg-[var(--danger)]/20 text-[var(--danger)] border border-[var(--danger)]/25 transition-colors active:scale-95"
+                        title="Hapus Merchandise"
+                      >
+                        <FaTrash className="text-xs" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* ── DESKTOP: Table (≥ md) ── */}
+          <div className="hidden md:block bg-[var(--surface)] rounded-2xl border border-[var(--border)] shadow-xl overflow-hidden">
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-[var(--background)] text-[var(--text-secondary)] uppercase text-[11px] font-bold tracking-wider border-b border-[var(--border)]">

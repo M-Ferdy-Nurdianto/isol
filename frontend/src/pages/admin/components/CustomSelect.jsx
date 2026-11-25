@@ -82,9 +82,14 @@ const CustomSelect = ({
       case 'pending':
         return 'bg-amber-500/15 text-amber-300 border-amber-500/40 hover:bg-amber-500/25'
       case 'checked':
+      case 'paid':
+      case 'packing':
+      case 'shipped':
         return 'bg-[var(--primary)]/15 text-[var(--primary)] border-[var(--primary)]/45 hover:bg-[var(--primary)]/25'
       case 'completed':
         return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 hover:bg-emerald-500/30'
+      case 'cancelled':
+        return 'bg-red-500/15 text-red-400 border-red-500/40 hover:bg-red-500/25'
       default:
         return 'bg-[var(--surface)] text-[var(--text-secondary)] border-[var(--border)] hover:bg-[var(--primary)]/15'
     }
@@ -95,9 +100,14 @@ const CustomSelect = ({
       case 'pending':
         return { dot: 'bg-amber-300', text: 'text-amber-300', border: 'border-amber-400' }
       case 'checked':
+      case 'paid':
+      case 'packing':
+      case 'shipped':
         return { dot: 'bg-[var(--primary)]', text: 'text-[var(--primary)]', border: 'border-[var(--primary)]' }
       case 'completed':
         return { dot: 'bg-emerald-400', text: 'text-emerald-300', border: 'border-emerald-400' }
+      case 'cancelled':
+        return { dot: 'bg-red-400', text: 'text-red-400', border: 'border-red-400' }
       default:
         return { dot: 'bg-[var(--text-secondary)]', text: 'text-[var(--text-primary)]', border: 'border-[var(--primary)]' }
     }

@@ -500,7 +500,152 @@ const OrdersTab = ({
                 <div className="h-full bg-[var(--primary)] animate-pulse w-full" />
               </div>
             )}
-            <div className="overflow-x-auto custom-scrollbar">
+            {/* ── MOBILE: Merch Order Card List (< md) ── */}
+            <div className="md:hidden p-3 space-y-3">
+              {loadingMerchOrders && (!merchOrders || merchOrders.length === 0) ? (
+                <div className="py-12 text-center text-xs text-[var(--text-secondary)]">Loading...</div>
+              ) : !merchOrders || merchOrders.length === 0 ? (
+                <div className="py-12 text-center text-xs text-[var(--text-secondary)]">Belum ada order merch</div>
+              ) : (
+                merchOrders.map((order) => {
+                  const formattedDate = new Date(order.created_at).toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  })
+                  const contactText = [
+                    order.whatsapp ? `WA: ${order.whatsapp}` : null,
+                    order.instagram ? `IG: ${order.instagram}` : null
+                  ].filter(Boolean).join(' • ')
+
+                  return (
+                    <div key={order.id} className="bg-[var(--background)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-lg">
+                      {/* TOP */}
+                      <div className="px-3.5 pt-3.5 pb-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-mono text-[11px] font-bold text-[var(--text-secondary)] whitespace-nowrap truncate">
+                            {order.order_number}
+                          </span>
+                          <div className="shrink-0 flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => openShippingModal(order)}
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${
+                                order.delivery_method === 'shipping'
+                                  ? 'bg-[var(--surface)] text-[var(--primary)] border-[var(--primary)]/30'
+                                  : 'bg-[var(--surface)] text-amber-300 border-amber-500/30'
+                              }`}
+                            >
+                              {order.delivery_method === 'shipping' ? <FaTruck size={9} /> : <FaStore size={9} />}
+                              <span>{order.delivery_method === 'shipping' ? 'Dikirim' : 'Ambil di Event'}</span>
+                            </button>
+                            {order.payment_proof_url && (
+                              <a
+                                href={order.payment_proof_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 text-[10px] text-[var(--primary)] bg-[var(--surface)] border border-[var(--border)] px-2 py-0.5 rounded-md font-bold"
+                              >
+                                <FaEye className="text-[9px]" /> Bukti
+                              </a>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-baseline justify-between gap-3 mt-1.5">
+                          <div className="text-[15px] font-black text-[var(--text-primary)] truncate">
+                            {order.nama_lengkap || '-'}
+                          </div>
+                          <div className="text-[15px] font-black text-[var(--primary)] shrink-0 tabular-nums">
+                            Rp {order.total_harga?.toLocaleString('id-ID')}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 mt-0.5 text-[11px] text-[var(--text-secondary)]">
+                          <span className="truncate">{contactText || formattedDate}</span>
+                          {contactText && <span className="shrink-0">{formattedDate}</span>}
+                        </div>
+                      </div>
+
+                      {/* MIDDLE: Items & Shipping */}
+                      <div className="px-3.5 py-2.5 border-t border-[var(--border)] bg-[var(--surface)]/60 space-y-2">
+                        <div className="space-y-1">
+                          {order.merch_order_items?.map((item, i) => (
+                            <div key={i} className="text-xs flex items-baseline justify-between gap-3">
+                              <span className="text-[var(--text-secondary)] font-medium leading-snug">
+                                {item.item_name}{item.size ? ` (${item.size})` : ''}
+                              </span>
+                              <span className="font-mono text-xs font-bold text-[var(--text-primary)] shrink-0 tabular-nums">
+                                ×{item.quantity}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {order.delivery_method === 'shipping' && order.shipping_address && (
+                          <div className="text-[11px] text-[var(--text-secondary)] bg-[var(--background)] border border-[var(--border)] rounded-lg px-2.5 py-1.5 flex items-start gap-1.5">
+                            <FaMapMarkerAlt className="text-[var(--primary)] shrink-0 mt-0.5" size={10} />
+                            <span className="leading-snug">
+                              {order.shipping_address}{order.shipping_city ? `, ${order.shipping_city}` : ''}{order.shipping_postal_code ? ` (${order.shipping_postal_code})` : ''}
+                            </span>
+                          </div>
+                        )}
+
+                        {(order.shipping_courier || order.tracking_number) && (
+                          <div className="text-[10px] font-mono text-[var(--text-primary)] bg-[var(--background)] border border-[var(--border)] px-2 py-0.5 rounded inline-block">
+                            {order.shipping_courier || 'Kurir'}{order.tracking_number ? `: ${order.tracking_number}` : ''}
+                          </div>
+                        )}
+
+                        {order.catatan && (
+                          <p className="text-[11px] text-[var(--text-secondary)] italic">Catatan: {order.catatan}</p>
+                        )}
+                      </div>
+
+                      {/* BOTTOM: Actions */}
+                      <div className="px-3.5 py-2.5 border-t border-[var(--border)] bg-[var(--surface)] flex items-center gap-2">
+                        <div className="flex-1 min-w-0">
+                          <CustomSelect
+                            value={order.status}
+                            onChange={e => onMerchOrderStatusChange(order.id, e.target.value)}
+                            loading={updatingMerchOrderIds?.has(order.id)}
+                            variant="status"
+                            options={[
+                              { value: 'pending', label: 'Pending' },
+                              { value: 'paid', label: 'Lunas' },
+                              { value: 'packing', label: 'Dikemas' },
+                              { value: 'shipped', label: 'Sudah Dikirim' },
+                              { value: 'completed', label: 'Selesai' },
+                              { value: 'cancelled', label: 'Dibatalkan' }
+                            ]}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => openShippingModal(order)}
+                          className="h-9 px-3 flex items-center justify-center gap-1.5 rounded-xl bg-[var(--background)] hover:bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--border)] text-xs font-bold transition-colors active:scale-95 shrink-0"
+                          title="Ubah Pengiriman & Status"
+                        >
+                          <FaTruck className="text-xs" />
+                          <span>Resi</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDeleteMerchOrder(order.id)}
+                          className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--danger)]/10 hover:bg-[var(--danger)]/20 text-[var(--danger)] border border-[var(--danger)]/25 transition-colors active:scale-95 shrink-0"
+                          title="Hapus Order"
+                        >
+                          <FaTrash className="text-xs" />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+
+            {/* ── DESKTOP: Table (≥ md) ── */}
+            <div className="hidden md:block overflow-x-auto custom-scrollbar">
               <table className="w-full text-left">
                 <thead className="bg-[var(--background)] text-[var(--text-secondary)] uppercase text-[11px] font-bold tracking-wider border-b border-[var(--border)]">
                   <tr>

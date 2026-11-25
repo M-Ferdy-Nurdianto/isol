@@ -179,18 +179,8 @@ export function CheckoutProvider({ children }) {
     }
   }, [isGroupEnabled, ticketType, filteredMembers, selectedMember])
 
-  // Custom Price Options & Config prices
-  const customOptions = useMemo(() => {
-    if (!config?.cheki_custom_options) return []
-    try {
-      const parsed = typeof config.cheki_custom_options === 'string'
-        ? JSON.parse(config.cheki_custom_options)
-        : config.cheki_custom_options
-      return Array.isArray(parsed) ? parsed : []
-    } catch (e) {
-      return []
-    }
-  }, [config])
+  // Custom Price Options removed
+  const customOptions = []
 
   // Auto-select first available chekiVariant when toggles change
   useEffect(() => {

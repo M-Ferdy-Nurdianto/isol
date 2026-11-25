@@ -5,7 +5,6 @@ import { useFanAuth } from '../context/FanAuthContext'
 import { useMerchCart } from '../context/MerchCartContext'
 import { useUI } from '../context/UIContext'
 import { getAssetPath } from '../lib/pathUtils'
-import FanAuthModal from './auth/FanAuthModal'
 import FanOrderHistoryModal from './auth/FanOrderHistoryModal'
 
 const KSHeader = () => {
@@ -251,8 +250,7 @@ const KSHeader = () => {
         </div>
       )}
 
-      {/* Global Modals for Fan Authentication & Order History */}
-      <FanAuthModal />
+      {/* Global Modal for Fan Order History */}
       <FanOrderHistoryModal />
     </>
   )

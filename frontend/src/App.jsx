@@ -75,10 +75,10 @@ function App() {
     <ThemeProvider>
       <UIProvider>
         <MaintenanceProvider>
-          <FanAuthProvider>
-            <FlyToCartProvider>
-              <MerchCartProvider>
-                <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <FanAuthProvider>
+              <FlyToCartProvider>
+                <MerchCartProvider>
                   <ScrollToTop />
                   <MaintenanceAdminBadge />
                   <MerchCartDrawer />
@@ -118,10 +118,10 @@ function App() {
                       <Route path="/admin" element={<AdminPage />} />
                     </Routes>
                   </Suspense>
-                </Router>
-              </MerchCartProvider>
-            </FlyToCartProvider>
-          </FanAuthProvider>
+                </MerchCartProvider>
+              </FlyToCartProvider>
+            </FanAuthProvider>
+          </Router>
         </MaintenanceProvider>
       </UIProvider>
     </ThemeProvider>

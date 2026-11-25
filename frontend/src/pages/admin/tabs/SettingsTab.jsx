@@ -36,7 +36,6 @@ const SettingsTab = ({
   paymentMethod, setPaymentMethod,
   wideChekiEnabled, setWideChekiEnabled,
   regularChekiEnabled = true, setRegularChekiEnabled,
-  chekiCustomOptions = [], setChekiCustomOptions,
   paymentEnableTf, setPaymentEnableTf,
   paymentEnableQris, setPaymentEnableQris,
   paymentQrisImageUrl, setPaymentQrisImageUrl,
@@ -56,30 +55,7 @@ const SettingsTab = ({
   const [qrisPreview, setQrisPreview] = useState(paymentQrisImageUrl || '')
   const [copied, setCopied] = useState(false)
 
-  // Custom option form state
-  const [newOptLabel, setNewOptLabel] = useState('')
-  const [newOptPrice, setNewOptPrice] = useState('')
-
   const handleNumInput = (setter) => (e) => setter(e.target.value.replace(/\D/g, ''))
-
-  // Simulation (only active types)
-  // Wide Cheki sekarang = per member (3x seperti Regular, bukan "semua member")
-  // Cheki Grup = foto semua member = 1x (jika enabled)
-  const numPoMember = num(hargaPerMember)
-  const numPoWide = num(hargaGrup)
-  const numPoGrupCheki = num(hargaChekiGrupPo)
-  const numOtsMember = num(hargaOtsPerMember)
-  const numOtsWide = num(hargaOtsGrup)
-  const numOtsGrupCheki = num(hargaChekiGrupOts)
-  const simPoTotal = (regularChekiEnabled ? numPoMember * 3 : 0)
-    + (wideChekiEnabled ? numPoWide * 3 : 0)
-    + (chekiGrupEnabled ? numPoGrupCheki : 0)
-  const simOtsTotal = (regularChekiEnabled ? numOtsMember * 3 : 0)
-    + (wideChekiEnabled ? numOtsWide * 3 : 0)
-    + (chekiGrupEnabled ? numOtsGrupCheki : 0)
-  const diffRegular = numOtsMember - numPoMember
-  const diffWide = numOtsWide - numPoWide
-  const diffGrup = numOtsGrupCheki - numPoGrupCheki
 
   // ── Save handlers ──────────────────────────────────────────────────────────
   const saveHarga = () => {
@@ -90,7 +66,6 @@ const SettingsTab = ({
       harga_ots_grup: String(num(hargaOtsGrup)),
       wide_cheki_enabled: wideChekiEnabled ? 'true' : 'false',
       regular_cheki_enabled: regularChekiEnabled ? 'true' : 'false',
-      cheki_custom_options: JSON.stringify(chekiCustomOptions),
       cheki_grup_enabled: chekiGrupEnabled ? 'true' : 'false',
       harga_cheki_grup_po: String(num(hargaChekiGrupPo)),
       harga_cheki_grup_ots: String(num(hargaChekiGrupOts)),
@@ -146,25 +121,6 @@ const SettingsTab = ({
   const handleCopyRekening = () => {
     navigator.clipboard.writeText(paymentRekening.replace(/[^0-9]/g, ''))
     setCopied(true); setTimeout(() => setCopied(false), 2000)
-  }
-
-  // Custom pricing helpers
-  const addCustomOption = () => {
-    const label = newOptLabel.trim()
-    const price = num(newOptPrice)
-    if (!label) { showToast.error('Nama opsi wajib diisi'); return }
-    if (!price) { showToast.error('Harga wajib diisi'); return }
-    const newOpt = { id: `custom_${Date.now()}`, label, price }
-    setChekiCustomOptions(prev => [...prev, newOpt])
-    setNewOptLabel(''); setNewOptPrice('')
-  }
-
-  const removeCustomOption = (id) => {
-    setChekiCustomOptions(prev => prev.filter(o => o.id !== id))
-  }
-
-  const updateCustomOption = (id, field, value) => {
-    setChekiCustomOptions(prev => prev.map(o => o.id === id ? { ...o, [field]: field === 'price' ? num(value) : value } : o))
   }
 
   // ── Style helpers ──────────────────────────────────────────────────────────
@@ -286,123 +242,6 @@ const SettingsTab = ({
               <p className="text-[10px] text-[var(--text-secondary)]">On The Spot · 1x foto semua member lineup</p>
             </div>
           </div>
-        </div>
-
-        <div className="border-t border-[var(--border)]" />
-
-        {/* ─ Custom Pricing ─────────────────────────────────────────────── */}
-        <div className="space-y-4">
-          <div>
-            <p className="text-sm font-bold text-[var(--text-primary)]">Opsi Harga Kustom</p>
-            <p className="text-xs text-[var(--text-secondary)] mt-0.5">Tambah tipe cheki dengan nama dan harga bebas. Ditampilkan sebagai opsi tambahan di halaman checkout.</p>
-          </div>
-
-          {/* Existing custom options */}
-          {chekiCustomOptions.length > 0 && (
-            <div className="space-y-2">
-              {chekiCustomOptions.map((opt) => (
-                <div key={opt.id} className="flex items-center gap-3 p-3 bg-[var(--background)] border border-[var(--border)] rounded-xl">
-                  <FaGripVertical className="text-[var(--text-secondary)] shrink-0" />
-                  <input
-                    type="text"
-                    value={opt.label}
-                    onChange={e => updateCustomOption(opt.id, 'label', e.target.value)}
-                    placeholder="Nama opsi (e.g. Polaroid 1-Shot)"
-                    className="flex-1 min-w-0 px-3 py-2 bg-[var(--input-bg)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors"
-                  />
-                  <div className="relative w-36 shrink-0">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] text-xs font-bold pointer-events-none">Rp</span>
-                    <input
-                      type="text"
-                      value={fmt(opt.price)}
-                      onChange={e => updateCustomOption(opt.id, 'price', e.target.value)}
-                      placeholder="50.000"
-                      className="w-full pl-9 pr-3 py-2 bg-[var(--input-bg)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] font-bold focus:border-[var(--primary)] focus:outline-none transition-colors"
-                    />
-                  </div>
-                  <button type="button" onClick={() => removeCustomOption(opt.id)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--danger)]/10 text-[var(--danger)] hover:bg-[var(--danger)]/20 transition shrink-0">
-                    <FaTimes className="text-xs" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Add new */}
-          <div className="flex items-center gap-3 p-3 bg-[var(--background)] border border-dashed border-[var(--border)] rounded-xl">
-            <input
-              type="text"
-              value={newOptLabel}
-              onChange={e => setNewOptLabel(e.target.value)}
-              placeholder="Nama opsi baru..."
-              className="flex-1 min-w-0 px-3 py-2 bg-[var(--input-bg)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] focus:border-[var(--primary)] focus:outline-none transition-colors"
-            />
-            <div className="relative w-36 shrink-0">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] text-xs font-bold pointer-events-none">Rp</span>
-              <input
-                type="text"
-                value={newOptPrice}
-                onChange={e => setNewOptPrice(e.target.value.replace(/\D/g, ''))}
-                placeholder="50.000"
-                className="w-full pl-9 pr-3 py-2 bg-[var(--input-bg)] border border-[var(--border)] rounded-lg text-xs text-[var(--text-primary)] font-bold focus:border-[var(--primary)] focus:outline-none transition-colors"
-              />
-            </div>
-            <button type="button" onClick={addCustomOption}
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--primary)]/15 text-[var(--primary)] hover:bg-[var(--primary)]/25 transition shrink-0">
-              <FaPlus className="text-xs" />
-            </button>
-          </div>
-          {chekiCustomOptions.length === 0 && (
-            <p className="text-[11px] text-[var(--text-secondary)] text-center">Belum ada opsi kustom. Klik + untuk menambah.</p>
-          )}
-        </div>
-
-        <div className="border-t border-[var(--border)]" />
-
-        {/* ─ Simulasi ───────────────────────────────────────────────────── */}
-        <div className="bg-[var(--background)] rounded-xl p-4 border border-[var(--border)] space-y-3">
-          <p className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-wider">
-            Simulasi: {regularChekiEnabled ? '3× Regular' : ''}{(regularChekiEnabled && wideChekiEnabled) ? ' + ' : ''}{wideChekiEnabled ? '3× Wide' : ''}{(regularChekiEnabled || wideChekiEnabled) && chekiGrupEnabled ? ' + ' : ''}{chekiGrupEnabled ? '1× Cheki Grup' : ''}{!regularChekiEnabled && !wideChekiEnabled && !chekiGrupEnabled ? 'Semua nonaktif' : ''}
-          </p>
-          {(regularChekiEnabled || wideChekiEnabled || chekiGrupEnabled) ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="flex justify-between items-center p-2.5 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
-                <span className="text-[var(--primary)] font-medium">Total PO</span>
-                <span className="font-black text-[var(--text-primary)]">Rp {simPoTotal.toLocaleString('id-ID')}</span>
-              </div>
-              <div className="flex justify-between items-center p-2.5 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
-                <span className="text-amber-400 font-medium">Total OTS</span>
-                <span className="font-black text-[var(--text-primary)]">Rp {simOtsTotal.toLocaleString('id-ID')}</span>
-              </div>
-              {regularChekiEnabled && (
-                <div className="flex justify-between items-center p-2.5 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
-                  <span className="text-[var(--text-secondary)]">Selisih Regular (3 member)</span>
-                  <span className={`font-semibold ${diffRegular > 0 ? 'text-amber-400' : diffRegular < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-secondary)]'}`}>
-                    {diffRegular === 0 ? 'Sama' : `${diffRegular > 0 ? '+' : ''}Rp ${(Math.abs(diffRegular) * 3).toLocaleString('id-ID')} di OTS`}
-                  </span>
-                </div>
-              )}
-              {wideChekiEnabled && (
-                <div className="flex justify-between items-center p-2.5 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
-                  <span className="text-[var(--text-secondary)]">Selisih Wide (3 member)</span>
-                  <span className={`font-semibold ${diffWide > 0 ? 'text-amber-400' : diffWide < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-secondary)]'}`}>
-                    {diffWide === 0 ? 'Sama' : `${diffWide > 0 ? '+' : ''}Rp ${(Math.abs(diffWide) * 3).toLocaleString('id-ID')} di OTS`}
-                  </span>
-                </div>
-              )}
-              {chekiGrupEnabled && (
-                <div className="sm:col-span-2 flex justify-between items-center p-2.5 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
-                  <span className="text-[var(--text-secondary)]">Selisih Cheki Grup (1x)</span>
-                  <span className={`font-semibold ${diffGrup > 0 ? 'text-amber-400' : diffGrup < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-secondary)]'}`}>
-                    {diffGrup === 0 ? 'Sama' : `${diffGrup > 0 ? '+' : ''}Rp ${Math.abs(diffGrup).toLocaleString('id-ID')} di OTS`}
-                  </span>
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-xs text-center text-[var(--text-secondary)]">Aktifkan minimal satu tipe cheki untuk melihat simulasi.</p>
-          )}
         </div>
 
         <SaveBtn onClick={saveHarga} label="Simpan Pengaturan Harga" />

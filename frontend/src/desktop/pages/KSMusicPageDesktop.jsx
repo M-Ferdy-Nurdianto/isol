@@ -179,14 +179,15 @@ const KSMusicPage = () => {
                       loading="lazy"
                     ></iframe>
 
-                    {/* Jika admin memilih custom warna selain hitam/asli, beri lapisan tint elegan */}
+                    {/* Jika admin memilih custom warna selain hitam/asli, beri lapisan tint elegan tanpa mewarnai foto cover */}
                     {track.theme_color && track.theme_color !== '#121212' && track.theme_color !== '#000000' && (
                       <div
                         className="absolute inset-1 pointer-events-none rounded-[12px]"
                         style={{
                           backgroundColor: track.theme_color,
                           mixBlendMode: 'color',
-                          opacity: 0.65
+                          opacity: 0.65,
+                          clipPath: 'polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, 16px 16px, 16px 136px, 136px 136px, 136px 16px, 16px 16px)'
                         }}
                       />
                     )}

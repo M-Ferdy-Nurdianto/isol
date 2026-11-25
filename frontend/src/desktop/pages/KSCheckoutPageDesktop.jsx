@@ -23,7 +23,6 @@ import {
   FaInfoCircle
 } from 'react-icons/fa'
 import KSHeader from '../../components/KSHeader'
-import FanAuthModal from '../../components/auth/FanAuthModal'
 import { useCheckout } from '../../shared/context/CheckoutContext'
 import { getAssetPath } from '../../lib/pathUtils'
 import ImageUploadDropzone from '../../components/ui/ImageUploadDropzone'
@@ -867,8 +866,6 @@ const KSCheckoutPageDesktop = () => {
         </div>
       </main>
 
-      {/* Global Fan Authentication Modal */}
-      <FanAuthModal />
     </div>
   )
 }

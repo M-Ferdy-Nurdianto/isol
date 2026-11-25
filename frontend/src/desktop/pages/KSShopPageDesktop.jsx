@@ -34,7 +34,6 @@ import { kohiToast } from '../../components/ui/KohiToast'
 import KSHeader from '../../components/KSHeader'
 import KSFooter from '../../components/KSFooter'
 import Price from '../../components/ui/Price'
-import FanAuthModal from '../../components/auth/FanAuthModal'
 import FanOrderHistoryModal from '../../components/auth/FanOrderHistoryModal'
 import SizeChartModal from '../../components/ui/SizeChartModal'
 import { useFanAuth } from '../../context/FanAuthContext'
@@ -1029,7 +1028,7 @@ const KSShopPage = () => {
                           className="w-full px-8 py-3.5 sm:py-4 rounded-full bg-primary hover:bg-primary-hover text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 min-h-[48px] shadow-md shadow-primary/20 active:scale-[0.98]"
                         >
                           <span className="sm:hidden">Pesan Tiket / Order</span>
-                          <span className="hidden sm:inline">Book Tickets for This Event</span>
+                          <span className="hidden sm:inline whitespace-nowrap">Book Tickets</span>
                           <FaArrowRight size={14} />
                         </button>
                       </div>
@@ -1992,8 +1991,7 @@ const KSShopPage = () => {
         itemName={selectedMerch?.nama}
       />
 
-      {/* Global Modals for Fan Authentication & History */}
-      <FanAuthModal />
+      {/* Global Modal for Fan Order History */}
       <FanOrderHistoryModal />
     </div>
   )

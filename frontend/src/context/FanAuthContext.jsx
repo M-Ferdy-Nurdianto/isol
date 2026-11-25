@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import api from '../lib/api'
+import { kohiToast } from '../components/ui/KohiToast'
 
 const FanAuthContext = createContext({
   fanUser: null,
@@ -20,6 +22,8 @@ const FanAuthContext = createContext({
 const STORAGE_KEY = 'ks_fan_user'
 
 export const FanAuthProvider = ({ children }) => {
+  const navigate = useNavigate()
+  const location = useLocation()
   const [fanUser, setFanUser] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
@@ -139,10 +143,15 @@ export const FanAuthProvider = ({ children }) => {
     setFanUser(prev => ({ ...prev, ...data }))
   }
 
-  const openAuthModal = useCallback((onSuccessCallback = null) => {
-    setPendingCallback(() => onSuccessCallback)
-    setAuthModalOpen(true)
-  }, [])
+  const openAuthModal = useCallback(() => {
+    kohiToast.warning('Kamu belum login. Silakan login atau daftar dulu untuk membeli!')
+    navigate('/login?mode=register', {
+      state: {
+        from: `${location.pathname}${location.search}`,
+        authNotice: 'Kamu belum login. Silakan login atau daftar dulu baru bisa membeli.'
+      }
+    })
+  }, [navigate, location.pathname, location.search])
 
   const closeAuthModal = useCallback(() => {
     setAuthModalOpen(false)

@@ -33,20 +33,22 @@ const KSLoginPage = () => {
   const location = useLocation()
   const { fanUser, isLoggedIn, login, loginByEmail } = useFanAuth()
 
+  const initialRegister = new URLSearchParams(location.search).get('mode') === 'register'
+
   // Mode: 'quick' (Login) vs 'register' (Sign Up)
-  const [authMode, setAuthMode] = useState('quick')
+  const [authMode, setAuthMode] = useState(initialRegister ? 'register' : 'quick')
 
   // Active Instruction Tab in Left Panel: 'register-guide' | 'login-guide' | 'tips'
-  const [activeGuideTab, setActiveGuideTab] = useState('login-guide')
+  const [activeGuideTab, setActiveGuideTab] = useState(initialRegister ? 'register-guide' : 'login-guide')
 
   // Redirect if logged in
   useEffect(() => {
     const token = localStorage.getItem('ks_fan_token')
     const saved = localStorage.getItem('ks_fan_user')
     if (isLoggedIn || (token && saved)) {
-      navigate('/profile', { replace: true })
+      navigate(location.state?.from || '/profile', { replace: true })
     }
-  }, [isLoggedIn, navigate])
+  }, [isLoggedIn, navigate, location.state])
 
   // Synchronized mode switch handlers
   const handleSwitchAuthMode = (mode) => {
@@ -661,6 +663,13 @@ const KSLoginPage = () => {
                   authMode === 'quick' ? 'bg-secondary' : 'bg-primary'
                 }`}
               />
+
+              {location.state?.authNotice && (
+                <div className="mb-5 p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-start gap-2.5">
+                  <FaExclamationTriangle className="text-sm shrink-0 mt-0.5" />
+                  <span>{location.state.authNotice}</span>
+                </div>
+              )}
 
               {/* Form Title Header (Adapts visually per active tab) */}
               <div className="mb-6">

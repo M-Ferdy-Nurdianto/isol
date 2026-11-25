@@ -91,8 +91,6 @@ const AdminPage = () => {
   const [wideChekiEnabled, setWideChekiEnabled] = useState(true)
   // Regular Cheki toggle (independen dari Wide)
   const [regularChekiEnabled, setRegularChekiEnabled] = useState(true)
-  // Custom pricing options (array of {id, label, price})
-  const [chekiCustomOptions, setChekiCustomOptions] = useState([])
   // Payment method toggles
   const [paymentEnableCash, setPaymentEnableCash] = useState(true)
   const [paymentEnableTf, setPaymentEnableTf] = useState(true)
@@ -389,12 +387,6 @@ const AdminPage = () => {
       setWideChekiEnabled(configData.wide_cheki_enabled !== 'false' && configData.wide_cheki_enabled !== false)
       // Regular Cheki toggle
       setRegularChekiEnabled(configData.regular_cheki_enabled !== 'false' && configData.regular_cheki_enabled !== false)
-      // Custom pricing options
-      try {
-        const raw = configData.cheki_custom_options
-        const parsed = typeof raw === 'string' ? JSON.parse(raw || '[]') : (Array.isArray(raw) ? raw : [])
-        setChekiCustomOptions(parsed)
-      } catch { setChekiCustomOptions([]) }
       // Payment toggles
       setPaymentEnableTf(configData.payment_enable_tf !== 'false' && configData.payment_enable_tf !== false)
       setPaymentEnableQris(configData.payment_enable_qris === 'true' || configData.payment_enable_qris === true)
@@ -1419,8 +1411,6 @@ const AdminPage = () => {
             setWideChekiEnabled={setWideChekiEnabled}
             regularChekiEnabled={regularChekiEnabled}
             setRegularChekiEnabled={setRegularChekiEnabled}
-            chekiCustomOptions={chekiCustomOptions}
-            setChekiCustomOptions={setChekiCustomOptions}
             paymentEnableTf={paymentEnableTf}
             setPaymentEnableTf={setPaymentEnableTf}
             paymentEnableQris={paymentEnableQris}

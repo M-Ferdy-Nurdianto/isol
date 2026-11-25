@@ -161,9 +161,16 @@ const MusicTab = () => {
 
   const handleLinkChange = async (e) => {
     const link = e.target.value
-    setFormData(prev => ({ ...prev, link }))
+    const lower = link.toLowerCase()
+    const detectedPlatform = lower.includes('spotify.com')
+      ? 'spotify'
+      : (lower.includes('youtube.com') || lower.includes('youtu.be'))
+        ? 'youtube'
+        : formData.platform
 
-    if (formData.platform === 'youtube') {
+    setFormData(prev => ({ ...prev, link, platform: detectedPlatform }))
+
+    if (detectedPlatform === 'youtube') {
       const videoId = extractYouTubeID(link)
       if (videoId) {
         // Set thumbnail immediately from YouTube's image CDN (no CORS)
@@ -188,7 +195,7 @@ const MusicTab = () => {
       } else {
         setFormData(prev => ({ ...prev, thumbnail_url: '' }))
       }
-    } else if (formData.platform === 'spotify') {
+    } else if (detectedPlatform === 'spotify') {
       if (link.includes('spotify.com')) {
         setFetchingMeta(true)
         try {
@@ -433,18 +440,6 @@ const MusicTab = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-bold text-[var(--text-secondary)]">Judul (Title) <span className="text-red-400">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full bg-black/30 border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
-                  placeholder="Contoh: Close Friend"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <label className="block text-sm font-bold text-[var(--text-secondary)]">Link {formData.platform === 'youtube' ? 'Video' : 'Track/Album'} <span className="text-red-400">*</span></label>
                 <div className="relative">
                   <input
@@ -469,6 +464,18 @@ const MusicTab = () => {
                     <span>&#10003;</span> Judul otomatis terisi: <span className="font-bold truncate max-w-[300px]">{formData.title}</span>
                   </p>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-[var(--text-secondary)]">Judul (Title) <span className="text-red-400">*</span></label>
+                <input
+                  type="text"
+                  required
+                  value={formData.title}
+                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                  className="w-full bg-black/30 border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
+                  placeholder="Contoh: Close Friend (otomatis terisi dari link)"
+                />
               </div>
 
               {formData.platform === 'youtube' && formData.thumbnail_url && (
