@@ -14,6 +14,7 @@ import MembersTab from '../../pages/admin/tabs/MembersTab'
 import HomeCmsTab from '../../pages/admin/tabs/HomeCmsTab'
 import MusicTab from '../../pages/admin/tabs/MusicTab'
 import UsersTab from '../../pages/admin/tabs/UsersTab'
+import GuideTab from '../../pages/admin/tabs/GuideTab'
 
 import OrderDetailModal from '../../pages/admin/modals/OrderDetailModal'
 import OTSOrderModal from '../../pages/admin/modals/OTSOrderModal'
@@ -44,7 +45,8 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaTicketAlt,
-  FaCheck
+  FaCheck,
+  FaBookOpen
 } from 'react-icons/fa'
 
 const AdminPage = () => {
@@ -963,6 +965,7 @@ const AdminPage = () => {
     { id: 'music', label: 'Music', icon: FaMusic },
     { id: 'users', label: 'Fan Users', icon: FaUserFriends },
     { id: 'settings', label: 'Settings', icon: FaEdit },
+    { id: 'guide', label: 'Panduan', icon: FaBookOpen },
   ]
 
   return (
@@ -989,6 +992,7 @@ const AdminPage = () => {
               { id: 'users', label: 'Fan Users', icon: FaUserFriends },
               { id: 'recap', label: 'Recap', icon: FaChartBar },
               { id: 'settings', label: 'Settings', icon: FaEdit },
+              { id: 'guide', label: 'Panduan', icon: FaBookOpen },
             ].map(item => {
               const pendingCount = (pendingChekiOrders.length + pendingMerchOrders.length)
               return (
@@ -1450,6 +1454,10 @@ const AdminPage = () => {
         {activeTab === 'users' && (
           <UsersTab />
         )}
+
+        {activeTab === 'guide' && (
+          <GuideTab setActiveTab={setActiveTab} />
+        )}
       </main>
 
       {showOrderDetailModal && selectedOrder && (
@@ -1557,12 +1565,12 @@ const AdminPage = () => {
             <button
               onClick={() => setShowMoreDrawer(prev => !prev)}
               className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-bold transition-all ${
-                showMoreDrawer || ['members','settings','home-cms','music','users'].includes(activeTab)
+                showMoreDrawer || ['members','settings','home-cms','music','users','guide'].includes(activeTab)
                   ? 'text-[var(--primary)]'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-secondary)]'
               }`}
             >
-              <FaEllipsisH className={`text-lg ${showMoreDrawer || ['members','settings','home-cms','music','users'].includes(activeTab) ? 'text-[var(--primary)]' : ''}`} />
+              <FaEllipsisH className={`text-lg ${showMoreDrawer || ['members','settings','home-cms','music','users','guide'].includes(activeTab) ? 'text-[var(--primary)]' : ''}`} />
               More
             </button>
           </div>
