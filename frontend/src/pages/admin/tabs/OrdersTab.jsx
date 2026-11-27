@@ -86,8 +86,8 @@ const OrdersTab = ({
   // OTS orders include ALL OTS orders (regular + special) so venue admins never lose sight of tickets
   const specialOrders = orders.filter(o => isSpecialOrder(o) && matchesAttendance(o))
   const otsOrders = orders.filter(o => o.is_ots && matchesAttendance(o))
-  const poOrders = orders.filter(o => !o.is_ots && matchesAttendance(o))
-  const tidakHadirOrders = orders.filter(o => orderHasTidakHadir(o))
+  const poHadirOrders = orders.filter(o => !o.is_ots && !orderHasTidakHadir(o) && matchesAttendance(o))
+  const poTidakHadirOrders = orders.filter(o => !o.is_ots && orderHasTidakHadir(o) && matchesAttendance(o))
 
   const filteredDropdownEvents = orderSubTab === 'special'
     ? events.filter(ev => ev.is_special || ev.type === 'special')
@@ -128,10 +128,8 @@ const OrdersTab = ({
         : orderSubTab === 'ots'
           ? otsOrders
           : orderSubTab === 'po'
-            ? poOrders
-            : orderSubTab === 'tidak_hadir'
-              ? tidakHadirOrders
-              : orders.filter(matchesAttendance)
+            ? [...poHadirOrders, ...poTidakHadirOrders]
+            : orders.filter(matchesAttendance)
 
     const pendingQueueOrders = scopeOrders.filter(o => ['checked', 'paid', 'approved'].includes(o.status))
 
@@ -167,7 +165,7 @@ const OrdersTab = ({
     })
 
     return stats
-  }, [members, orders, orderSubTab, specialOrders, otsOrders, poOrders, tidakHadirOrders, attendanceFilter])
+  }, [members, orders, orderSubTab, specialOrders, otsOrders, poHadirOrders, poTidakHadirOrders, attendanceFilter])
 
   const [showExportModal, setShowExportModal] = useState(false)
   const [showInlineOTS, setShowInlineOTS] = useState(false)
@@ -298,39 +296,37 @@ const OrdersTab = ({
       )}
       {/* Sub-tabs */}
       <div className="bg-[var(--surface)] border border-[var(--border)] p-1.5 md:p-2 rounded-2xl shadow-xl overflow-hidden">
-        {/* DESKTOP LAYOUT (hidden md:grid): 6 Kolom presisi penuh tanpa scrollbar */}
-        <div className="hidden md:grid grid-cols-6 gap-2">
+        {/* DESKTOP LAYOUT (hidden md:grid): 5 Kolom presisi penuh tanpa scrollbar */}
+        <div className="hidden md:grid grid-cols-5 gap-2">
           {[
             { id: 'all', label: 'All' },
             { id: 'ots', label: 'OTS' },
             { id: 'po', label: 'PO' },
             { id: 'special', label: 'Special' },
-            { id: 'tidak_hadir', label: 'Tidak Hadir' },
             { id: 'merch', label: 'Merch', onClick: () => { setOrderSubTab('merch'); onFetchMerchOrders() } }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={tab.onClick || (() => setOrderSubTab(tab.id))}
-              className={`w-full py-2.5 px-3 rounded-xl font-bold text-xs transition-colors duration-150 ${orderSubTab === tab.id
+              className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs transition-colors duration-150 ${orderSubTab === tab.id
                 ? 'bg-[var(--primary)] text-white shadow-md font-extrabold'
                 : 'text-[var(--text-secondary)] hover:bg-[var(--background)] hover:text-[var(--text-primary)]'
                 }`}
             >
-              <span className="flex items-center justify-center truncate">
+              <span className="flex items-center justify-center">
                 {tab.label}
               </span>
             </button>
           ))}
         </div>
 
-        {/* MOBILE LAYOUT (md:hidden): 3x2 Grid proporsional tanpa kepotong */}
-        <div className="md:hidden grid grid-cols-3 gap-1">
+        {/* MOBILE LAYOUT (md:hidden): 5 Tombol proporsional pas di genggaman tanpa scroll */}
+        <div className="md:hidden grid grid-cols-5 gap-1">
           {[
             { id: 'all', label: 'All' },
             { id: 'ots', label: 'OTS' },
             { id: 'po', label: 'PO' },
             { id: 'special', label: 'Special' },
-            { id: 'tidak_hadir', label: 'Tidak Hadir' },
             { id: 'merch', label: 'Merch', onClick: () => { setOrderSubTab('merch'); onFetchMerchOrders() } }
           ].map(tab => (
             <button
@@ -477,7 +473,7 @@ const OrdersTab = ({
                 </span>
               </h4>
               <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
-                Menghitung pesanan berstatus Checked (lunas, belum Completed).
+                Status: Checked
               </p>
             </div>
 
@@ -530,20 +526,6 @@ const OrdersTab = ({
       )}
 
       {/* Orders Tables */}
-      {orderSubTab === 'tidak_hadir' && (
-        <RenderTable
-          data={tidakHadirOrders}
-          title="List Tidak Hadir (1-Shot / Nitip Pose)"
-          emptyMessage="Tidak ada pesanan 1-Shot (Tidak Hadir)"
-          loading={loading}
-          updatingOrderIds={updatingOrderIds}
-          onView={onViewOrder}
-          onEditOTS={onEditOTS}
-          onDelete={onDeleteOrder}
-          onStatusChange={onStatusChange}
-        />
-      )}
-
       {orderSubTab === 'special' && (
         <RenderTable
           data={specialOrders}
@@ -584,16 +566,32 @@ const OrdersTab = ({
       )}
 
       {(orderSubTab === 'all' || orderSubTab === 'po') && (
-        <RenderTable
-          data={poOrders}
-          title="Pre-Order (Online)"
-          emptyMessage="Tidak ada data Pre-Order"
-          loading={loading}
-          updatingOrderIds={updatingOrderIds}
-          onView={onViewOrder}
-          onDelete={onDeleteOrder}
-          onStatusChange={onStatusChange}
-        />
+        <>
+          {attendanceFilter !== 'tidak_hadir' && (
+            <RenderTable
+              data={poHadirOrders}
+              title="Pre-Order (Hadir / 2-Shot)"
+              emptyMessage="Tidak ada data Pre-Order Hadir"
+              loading={loading}
+              updatingOrderIds={updatingOrderIds}
+              onView={onViewOrder}
+              onDelete={onDeleteOrder}
+              onStatusChange={onStatusChange}
+            />
+          )}
+          {attendanceFilter !== 'hadir' && (
+            <RenderTable
+              data={poTidakHadirOrders}
+              title="Pre-Order (Tidak Hadir / 1-Shot)"
+              emptyMessage="Tidak ada data Pre-Order Tidak Hadir"
+              loading={loading}
+              updatingOrderIds={updatingOrderIds}
+              onView={onViewOrder}
+              onDelete={onDeleteOrder}
+              onStatusChange={onStatusChange}
+            />
+          )}
+        </>
       )}
 
       {orderSubTab === 'merch' && (
