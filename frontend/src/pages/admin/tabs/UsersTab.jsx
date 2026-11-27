@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import {
   FaUsers,
   FaSearch,
@@ -12,13 +12,23 @@ import {
   FaKey,
   FaIdBadge,
   FaUserPlus,
-  FaChevronDown
+  FaChevronDown,
+  FaImage,
+  FaUpload,
+  FaTrash
 } from 'react-icons/fa'
 import api from '../../../lib/api'
+import { showToast, webAlert } from '../../../lib/toast'
 import UserDetailModal from '../modals/UserDetailModal'
 import UserOTSModal from '../modals/UserOTSModal'
 import WipeDummyDataModal from '../modals/WipeDummyDataModal'
 import { FaTrashAlt } from 'react-icons/fa'
+
+const DEFAULT_FAN_BANNERS = [
+  { id: 'opt-banner-default-espresso', title: 'Espresso Minimalist', url: '/images/banners/default-espresso.svg' },
+  { id: 'opt-banner-default-logo', title: 'Kohi Sekai Official Logo', url: '/images/banners/default-logo.svg' },
+  { id: 'opt-banner-default-crema', title: 'Warm Crema Roast', url: '/images/banners/default-crema.svg' }
+]
 
 const UsersTab = () => {
   const [users, setUsers] = useState([])
@@ -29,6 +39,84 @@ const UsersTab = () => {
   const [showOTSForm, setShowOTSForm] = useState(false)
   const [showWipeModal, setShowWipeModal] = useState(false)
   const [totalCount, setTotalCount] = useState(0)
+
+  // Fan Profile Banner Catalog (16:9)
+  const [fanBanners, setFanBanners] = useState([])
+  const [bannerTitle, setBannerTitle] = useState('')
+  const [bannerUploading, setBannerUploading] = useState(false)
+  const bannerFileRef = useRef(null)
+
+  const fetchFanBanners = useCallback(async () => {
+    try {
+      const res = await api.get('/config', { skipCache: true })
+      const raw = res.data?.data?.fan_banner_options
+      if (raw !== undefined && raw !== null && raw !== '') {
+        const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+        if (Array.isArray(parsed)) {
+          setFanBanners(parsed.filter(b => b && b.url))
+          return
+        }
+      }
+      setFanBanners(DEFAULT_FAN_BANNERS)
+    } catch {
+      setFanBanners(DEFAULT_FAN_BANNERS)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchFanBanners()
+  }, [fetchFanBanners])
+
+  const handleUploadFanBanner = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+
+    setBannerUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const uploadRes = await api.post('/upload/fan-image?type=banner', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      const url = uploadRes.data?.data?.url
+      if (!url) throw new Error('Gagal mendapatkan URL banner')
+
+      const newEntry = {
+        id: `fan-banner-${Date.now()}`,
+        title: bannerTitle.trim() || file.name.replace(/\.[^.]+$/, ''),
+        url
+      }
+      const nextList = [...fanBanners, newEntry]
+      await api.patch('/config', { fan_banner_options: JSON.stringify(nextList) })
+      setFanBanners(nextList)
+      setBannerTitle('')
+      showToast.success('Banner fan berhasil ditambahkan!')
+    } catch (err) {
+      showToast.error(err.message || 'Gagal mengunggah banner fan.')
+    } finally {
+      setBannerUploading(false)
+    }
+  }
+
+  const handleDeleteFanBanner = async (banner) => {
+    const confirmed = await webAlert.confirm({
+      title: 'Hapus Banner?',
+      text: `Banner "${banner.title}" akan dihapus dari pilihan profil fan.`,
+      confirmText: 'Ya, Hapus',
+      cancelText: 'Batal',
+      isDanger: true
+    })
+    if (!confirmed) return
+    try {
+      const nextList = fanBanners.filter(b => b.id !== banner.id && b.url !== banner.url)
+      await api.patch('/config', { fan_banner_options: JSON.stringify(nextList) })
+      setFanBanners(nextList)
+      showToast.delete('Banner fan dihapus.')
+    } catch (err) {
+      showToast.error(err.message || 'Gagal menghapus banner.')
+    }
+  }
 
   const fetchUsers = useCallback(async (query = '') => {
     setLoading(true)
@@ -293,6 +381,73 @@ const UsersTab = () => {
               })}
             </div>
           </>
+        )}
+      </div>
+
+      {/* Katalog Banner Profil Fan (16:9) */}
+      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--border)]">
+          <div>
+            <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+              <FaImage className="text-[var(--primary)]" />
+              <span>Banner Profil Fan</span>
+            </h3>
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+              Unggah banner landscape (16:9) agar dapat dipilih oleh fan di halaman profil mereka.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <input
+              type="text"
+              value={bannerTitle}
+              onChange={(e) => setBannerTitle(e.target.value)}
+              placeholder="Judul banner (opsional)"
+              className="px-3.5 py-2 bg-[var(--background)] border border-[var(--border)] rounded-xl text-xs text-[var(--text-primary)] placeholder-[var(--text-secondary)]/50 focus:outline-none focus:border-[var(--primary)]"
+            />
+            <input
+              ref={bannerFileRef}
+              type="file"
+              accept="image/*"
+              onChange={handleUploadFanBanner}
+              className="hidden"
+            />
+            <button
+              type="button"
+              disabled={bannerUploading}
+              onClick={() => bannerFileRef.current?.click()}
+              className="px-4 py-2 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-white text-xs font-bold flex items-center gap-2 transition-colors disabled:opacity-50"
+            >
+              {bannerUploading ? <FaSpinner className="animate-spin" /> : <FaUpload />}
+              <span>{bannerUploading ? 'Mengunggah...' : 'Unggah Banner'}</span>
+            </button>
+          </div>
+        </div>
+
+        {fanBanners.length === 0 ? (
+          <div className="py-8 text-center text-xs text-[var(--text-secondary)] bg-[var(--background)] border border-[var(--border)] rounded-xl">
+            Belum ada banner tambahan. Saat ini fan menggunakan 3 banner default Kohi Sekai.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {fanBanners.map((b) => (
+              <div key={b.id || b.url} className="bg-[var(--background)] border border-[var(--border)] rounded-xl overflow-hidden flex flex-col">
+                <div className="aspect-[16/9] bg-black/50 overflow-hidden">
+                  <img src={b.url} alt={b.title} className="w-full h-full object-cover" />
+                </div>
+                <div className="p-3 flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-[var(--text-primary)] truncate">{b.title}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteFanBanner(b)}
+                    className="p-1.5 rounded-lg bg-[var(--danger)]/10 hover:bg-[var(--danger)]/20 text-[var(--danger)] border border-[var(--danger)]/25 transition-colors shrink-0"
+                    title="Hapus Banner"
+                  >
+                    <FaTrash className="text-xs" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 

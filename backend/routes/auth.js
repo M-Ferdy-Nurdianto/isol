@@ -13,8 +13,24 @@ const DEFAULT_FAN_BANNERS = [
   '/images/banners/default-logo.svg',
   '/images/banners/default-crema.svg'
 ]
-const getRandomDefaultBanner = () =>
-  DEFAULT_FAN_BANNERS[Math.floor(Math.random() * DEFAULT_FAN_BANNERS.length)]
+const getRandomDefaultBanner = async () => {
+  try {
+    const { data } = await supabase
+      .from('config')
+      .select('value')
+      .eq('key', 'fan_banner_options')
+      .maybeSingle()
+    if (data?.value) {
+      const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value
+      if (Array.isArray(parsed)) {
+        const urls = parsed.map(b => b?.url).filter(Boolean)
+        if (urls.length === 0) return null
+        return urls[Math.floor(Math.random() * urls.length)]
+      }
+    }
+  } catch {}
+  return DEFAULT_FAN_BANNERS[Math.floor(Math.random() * DEFAULT_FAN_BANNERS.length)]
+}
 
 // Hitung sisa detik hingga tanggal 1 bulan berikutnya pukul 00:00 WIB (Asia/Jakarta)
 const getSecondsUntilNextMonthWIB = () => {
@@ -455,7 +471,7 @@ router.post('/register', async (req, res) => {
           email: cleanEmail,
           whatsapp: cleanWhatsapp || null,
           instagram: cleanInstagram,
-          banner_url: getRandomDefaultBanner(),
+          banner_url: await getRandomDefaultBanner(),
           role: 'fan'
         })
         .select()
@@ -794,7 +810,7 @@ router.post('/fan/login', async (req, res) => {
             email: cleanEmail,
             whatsapp: cleanWhatsapp,
             instagram: cleanInstagram ? `@${cleanInstagram}` : null,
-            banner_url: getRandomDefaultBanner(),
+            banner_url: await getRandomDefaultBanner(),
             role: 'fan'
           })
           .select()

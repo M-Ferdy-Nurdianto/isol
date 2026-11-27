@@ -39,6 +39,7 @@ const KSProfilePage = () => {
 
   const [avatarLoadError, setAvatarLoadError] = useState(false)
   const [bannerLoadError, setBannerLoadError] = useState(false)
+  const [customFanBanners, setCustomFanBanners] = useState(null) // null = not configured yet (use defaults), array = configured list
 
   useEffect(() => {
     setAvatarLoadError(false)
@@ -48,7 +49,7 @@ const KSProfilePage = () => {
     setBannerLoadError(false)
   }, [fanUser?.banner_url])
 
-  // Fetch official members for avatar and banner choices
+  // Fetch official members & admin-uploaded fan banners
   useEffect(() => {
     api.get('/members')
       .then(res => {
@@ -59,6 +60,17 @@ const KSProfilePage = () => {
       .catch(err => {
         console.error('Failed to load official members for avatar/banner picker:', err)
       })
+
+    api.get('/config')
+      .then(res => {
+        const raw = res.data?.data?.fan_banner_options
+        if (raw === undefined || raw === null || raw === '') return
+        const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+        if (Array.isArray(parsed)) {
+          setCustomFanBanners(parsed.filter(b => b && b.url))
+        }
+      })
+      .catch(() => {})
   }, [])
   
   const [showProfileModal, setShowProfileModal] = useState(false)
@@ -366,9 +378,9 @@ const KSProfilePage = () => {
     return list
   }, [members])
 
-  // Official Banner Options List (16:9 Landscape)
+  // Official Banner Options List (ONLY real 16:9 banners — never member profile photos)
   const bannerOptions = useMemo(() => {
-    const list = [
+    const defaultBanners = [
       {
         id: 'opt-banner-default-espresso',
         url: '/images/banners/default-espresso.svg',
@@ -386,36 +398,38 @@ const KSProfilePage = () => {
         url: '/images/banners/default-crema.svg',
         title: 'Warm Crema Roast',
         subtitle: 'Default Kohi Sekai'
-      },
-      {
-        id: 'opt-banner-group',
-        url: '/images/members/group.webp',
-        title: 'Kohi Sekai Group',
-        subtitle: 'Official Group Banner',
-        isGroup: true
       }
     ]
 
+    const list = Array.isArray(customFanBanners)
+      ? customFanBanners.map((b, idx) => ({
+          id: b.id || `opt-banner-custom-${idx}`,
+          url: b.url,
+          title: b.title || `Banner Resmi ${idx + 1}`,
+          subtitle: 'Banner Resmi Kohi Sekai',
+          isUploadedLandscape: true
+        }))
+      : defaultBanners
+
+    // Legacy member-specific landscape banners ONLY (strictly banner_image_url, never image_url)
     members.forEach((m) => {
       if (m.member_id === 'group' || (m.nama_panggung || '').toLowerCase().includes('kohi sekai')) {
         return
       }
-
-      const bannerUrl = m.banner_image_url || m.image_url
-      if (bannerUrl) {
+      if (m.banner_image_url) {
         list.push({
           id: `opt-banner-member-${m.id || m.member_id}`,
-          url: bannerUrl,
+          url: m.banner_image_url,
           title: m.nama_panggung,
-          subtitle: m.banner_image_url ? 'Banner Landscape (16:9)' : 'Foto Resmi Member',
-          isUploadedLandscape: Boolean(m.banner_image_url),
+          subtitle: 'Banner Resmi (16:9)',
+          isUploadedLandscape: true,
           color: m.color
         })
       }
     })
 
     return list
-  }, [members])
+  }, [members, customFanBanners])
 
   // Save selected avatar to Supabase
   const handleSaveAvatar = async (forcedUrl) => {
