@@ -1042,7 +1042,7 @@ const AdminPage = () => {
 
         <button 
           onClick={handleLogout} 
-          className="mt-8 w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-sm font-bold text-[var(--danger)] bg-[var(--danger)]/10 border border-[var(--danger)]/20 hover:bg-[var(--danger)]/20 transition-all duration-200"
+          className="mt-8 w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-sm font-bold text-[#D65656] bg-[#D65656]/10 border border-[#D65656]/30 hover:bg-[#D65656] hover:text-white hover:border-[#D65656] active:scale-[0.98] transition-all duration-200 cursor-pointer"
         >
           <FaSignOutAlt /> Logout
         </button>
@@ -1648,7 +1648,7 @@ const AdminPage = () => {
               ))}
               <button
                 onClick={() => { setShowMoreDrawer(false); handleLogout() }}
-                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-all"
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold text-[#D65656] bg-[#D65656]/10 border border-[#D65656]/30 hover:bg-[#D65656] hover:text-white hover:border-[#D65656] active:scale-[0.98] transition-all cursor-pointer"
               >
                 <FaSignOutAlt /> Logout
               </button>

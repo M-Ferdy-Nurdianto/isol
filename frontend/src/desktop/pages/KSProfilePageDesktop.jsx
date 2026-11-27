@@ -1479,7 +1479,7 @@ const KSProfilePage = () => {
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-surface hover:bg-danger/10 border border-danger/30 text-danger text-xs font-bold transition-all shadow-sm active:scale-95 whitespace-nowrap"
+                      className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-[#D65656]/10 hover:bg-[#D65656] border border-[#D65656]/35 hover:border-[#D65656] text-[#D65656] hover:text-white text-xs font-bold transition-all shadow-sm active:scale-95 whitespace-nowrap cursor-pointer"
                       title="Keluar dari akun"
                     >
                       <FaSignOutAlt className="text-xs shrink-0" />
@@ -1533,7 +1533,7 @@ const KSProfilePage = () => {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="inline-flex items-center justify-center gap-1.5 min-h-[44px] w-full px-3 rounded-xl bg-surface hover:bg-danger/10 border border-danger/30 text-danger text-xs font-bold shadow-sm active:scale-95 transition-all"
+                    className="inline-flex items-center justify-center gap-1.5 min-h-[44px] w-full px-3 rounded-xl bg-[#D65656]/10 hover:bg-[#D65656] border border-[#D65656]/35 hover:border-[#D65656] text-[#D65656] hover:text-white text-xs font-bold shadow-sm active:scale-95 transition-all cursor-pointer"
                     title="Keluar dari akun"
                   >
                     <FaSignOutAlt size={12} className="shrink-0" />

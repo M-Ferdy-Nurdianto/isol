@@ -224,7 +224,7 @@ const MobileDrawer = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-left text-xs font-bold text-[var(--danger)] hover:bg-[var(--background)] active:bg-[var(--background)] tap-active min-h-[44px]"
+                  className="w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-left text-xs font-bold text-[#D65656] bg-[#D65656]/10 border border-[#D65656]/25 hover:bg-[#D65656] hover:text-white hover:border-[#D65656] active:scale-[0.98] transition-all tap-active min-h-[44px] cursor-pointer"
                 >
                   <FaSignOutAlt className="text-base shrink-0" />
                   <span>Keluar dari Akun</span>
