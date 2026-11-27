@@ -499,6 +499,7 @@ const KSShopPage = () => {
     const evs = eventsByDateKey[key] || []
     if (evs.length > 0) {
       setSelectedEventId(evs[0].id)
+      navigate(`/checkout/${evs[0].id}?type=member`)
     }
   }
 

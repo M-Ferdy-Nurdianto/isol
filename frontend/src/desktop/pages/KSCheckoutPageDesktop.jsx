@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -20,7 +20,10 @@ import {
   FaShoppingCart,
   FaUserCheck,
   FaEdit,
-  FaInfoCircle
+  FaInfoCircle,
+  FaSearchPlus,
+  FaDownload,
+  FaTimes
 } from 'react-icons/fa'
 import KSHeader from '../../components/KSHeader'
 import { useCheckout } from '../../shared/context/CheckoutContext'
@@ -28,6 +31,9 @@ import { getAssetPath } from '../../lib/pathUtils'
 import ImageUploadDropzone from '../../components/ui/ImageUploadDropzone'
 
 const KSCheckoutPageDesktop = () => {
+  const [showQrisModal, setShowQrisModal] = useState(false)
+  const [downloadingQris, setDownloadingQris] = useState(false)
+
   const {
     event,
     filteredMembers,
@@ -797,21 +803,72 @@ const KSCheckoutPageDesktop = () => {
 
                       {/* QRIS Scan Info */}
                       {paymentMethodSelected === 'qris' && (
-                        <div className="p-4 rounded-2xl bg-background border border-border flex flex-col items-center text-center space-y-2">
+                        <div className="p-4 rounded-2xl bg-background border border-border flex flex-col items-center text-center space-y-3">
                           {qrisImageUrl ? (
-                            <img
-                              src={qrisImageUrl}
-                              alt="QRIS Barcode"
-                              className="w-40 h-40 object-contain rounded-xl border border-border bg-white p-2"
-                            />
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => setShowQrisModal(true)}
+                                className="group relative rounded-xl overflow-hidden border border-border bg-white p-2 cursor-zoom-in focus:outline-none focus:border-primary"
+                                title="Klik untuk memperbesar QRIS"
+                              >
+                                <img
+                                  src={qrisImageUrl}
+                                  alt="QRIS Barcode"
+                                  className="w-40 h-40 object-contain"
+                                />
+                              </button>
+                              {qrisMerchantName && (
+                                <p className="text-[11px] font-black text-text-primary uppercase tracking-wider">{qrisMerchantName}</p>
+                              )}
+                              <div className="flex items-center justify-center gap-2 w-full">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowQrisModal(true)}
+                                  className="flex-1 py-2 px-3 rounded-xl bg-surface border border-border hover:border-primary text-xs font-bold text-text-primary flex items-center justify-center gap-1.5 transition-colors"
+                                >
+                                  <FaSearchPlus size={11} />
+                                  <span>Perbesar</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={downloadingQris}
+                                  onClick={async () => {
+                                    try {
+                                      setDownloadingQris(true)
+                                      const res = await fetch(qrisImageUrl)
+                                      const blob = await res.blob()
+                                      const blobUrl = URL.createObjectURL(blob)
+                                      const a = document.createElement('a')
+                                      a.href = blobUrl
+                                      a.download = `QRIS-Kohi-Sekai.png`
+                                      document.body.appendChild(a)
+                                      a.click()
+                                      a.remove()
+                                      URL.revokeObjectURL(blobUrl)
+                                    } catch {
+                                      window.open(qrisImageUrl, '_blank', 'noopener,noreferrer')
+                                    } finally {
+                                      setDownloadingQris(false)
+                                    }
+                                  }}
+                                  className="flex-1 py-2 px-3 rounded-xl bg-primary hover:bg-primary/85 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                                >
+                                  <FaDownload size={11} />
+                                  <span>{downloadingQris ? 'Mengunduh...' : 'Download QRIS'}</span>
+                                </button>
+                              </div>
+                            </>
                           ) : (
-                            <div className="w-40 h-40 flex flex-col items-center justify-center bg-surface rounded-xl p-3 text-text-secondary border border-dashed border-border">
-                              <FaQrcode size={40} className="mb-2 text-text-secondary" />
-                              <span className="text-[11px] font-black uppercase text-text-primary">QRIS Kohi Sekai</span>
-                            </div>
-                          )}
-                          {qrisMerchantName && (
-                            <p className="text-[11px] font-black text-text-primary uppercase tracking-wider">{qrisMerchantName}</p>
+                            <>
+                              <div className="w-40 h-40 flex flex-col items-center justify-center bg-surface rounded-xl p-3 text-text-secondary border border-dashed border-border">
+                                <FaQrcode size={40} className="mb-2 text-text-secondary" />
+                                <span className="text-[11px] font-black uppercase text-text-primary">QRIS Kohi Sekai</span>
+                              </div>
+                              {qrisMerchantName && (
+                                <p className="text-[11px] font-black text-text-primary uppercase tracking-wider">{qrisMerchantName}</p>
+                              )}
+                            </>
                           )}
                         </div>
                       )}
@@ -865,6 +922,83 @@ const KSCheckoutPageDesktop = () => {
 
         </div>
       </main>
+
+      {/* QRIS Enlarge Modal */}
+      {showQrisModal && qrisImageUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setShowQrisModal(false)}
+        >
+          <div
+            className="bg-surface border border-border rounded-2xl p-5 max-w-md w-full space-y-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-black text-text-primary uppercase tracking-wider">
+                  Scan QRIS
+                </h3>
+                {qrisMerchantName && (
+                  <p className="text-xs text-text-secondary mt-0.5">{qrisMerchantName}</p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowQrisModal(false)}
+                className="p-2 rounded-xl bg-background border border-border text-text-secondary hover:text-text-primary transition-colors"
+                title="Tutup"
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            <div className="bg-white rounded-xl p-3 border border-border flex items-center justify-center">
+              <img
+                src={qrisImageUrl}
+                alt="QRIS Barcode Diperbesar"
+                className="w-full max-h-[65vh] object-contain"
+              />
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setShowQrisModal(false)}
+                className="flex-1 py-2.5 rounded-xl bg-background border border-border text-xs font-bold text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Tutup
+              </button>
+              <button
+                type="button"
+                disabled={downloadingQris}
+                onClick={async () => {
+                  try {
+                    setDownloadingQris(true)
+                    const res = await fetch(qrisImageUrl)
+                    const blob = await res.blob()
+                    const blobUrl = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = blobUrl
+                    a.download = `QRIS-Kohi-Sekai.png`
+                    document.body.appendChild(a)
+                    a.click()
+                    a.remove()
+                    URL.revokeObjectURL(blobUrl)
+                  } catch {
+                    window.open(qrisImageUrl, '_blank', 'noopener,noreferrer')
+                  } finally {
+                    setDownloadingQris(false)
+                  }
+                }}
+                className="flex-[2] py-2.5 rounded-xl bg-primary hover:bg-primary/85 text-xs font-bold text-white flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              >
+                <FaDownload size={12} />
+                <span>{downloadingQris ? 'Mengunduh...' : 'Download QRIS'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )

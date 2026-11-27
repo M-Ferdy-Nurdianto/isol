@@ -876,15 +876,7 @@ const KSProfilePage = () => {
               }`}
             >
               <span>PO</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
-                  orderTypeFilter === 'po'
-                    ? 'bg-white/20 text-white'
-                    : 'bg-surface border border-border/60 text-text-secondary'
-                }`}
-              >
-                {poCount}
-              </span>
+              <span className="text-xs font-bold opacity-80 tabular-nums">({poCount})</span>
             </button>
 
             <button
@@ -897,15 +889,7 @@ const KSProfilePage = () => {
               }`}
             >
               <span>OTS</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
-                  orderTypeFilter === 'ots'
-                    ? 'bg-white/20 text-white'
-                    : 'bg-surface border border-border/60 text-text-secondary'
-                }`}
-              >
-                {otsCount}
-              </span>
+              <span className="text-xs font-bold opacity-80 tabular-nums">({otsCount})</span>
             </button>
 
             <button
@@ -919,15 +903,7 @@ const KSProfilePage = () => {
             >
               <span className="sm:hidden">Merch</span>
               <span className="hidden sm:inline">Merchandise</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
-                  orderTypeFilter === 'merch'
-                    ? 'bg-white/20 text-white'
-                    : 'bg-surface border border-border/60 text-text-secondary'
-                }`}
-              >
-                {merchOrders.length}
-              </span>
+              <span className="text-xs font-bold opacity-80 tabular-nums">({merchOrders.length})</span>
             </button>
           </div>
         </div>
