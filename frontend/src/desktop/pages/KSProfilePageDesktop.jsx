@@ -1,5 +1,5 @@
 import { toPng } from 'html-to-image'
-import { groupTitlesByPeriod } from '../../lib/fanTitleUtils'
+import { groupTitlesByPeriod, sortIndividualTitles, getRankBadgeStyle } from '../../lib/fanTitleUtils'
 import DigitalReceipt from '../../components/shop/DigitalReceipt'
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -104,6 +104,7 @@ const KSProfilePage = () => {
   }
 
   const groupedTitles = groupTitlesByPeriod(fanTitles)
+  const individualTitles = sortIndividualTitles(fanTitles)
 
   const handleDirectDownload = async (order) => {
     const orderId = order.id || order.order_number
@@ -1473,56 +1474,65 @@ const KSProfilePage = () => {
                   </span>
                 </div>
 
-                {/* Line 3: Grouped Title Badges (Render only if titles exist) */}
-                {groupedTitles.length > 0 && (
+                {/* Line 3: Individual Leaderboard Title Badges (Separated per member/period, color-coded by rank) */}
+                {individualTitles.length > 0 && (
                   <div className="mt-2.5">
-                    {/* -- MOBILE SPECIFIC: Maksimal 1 baris chip, sisanya langsung masuk "+N" -- */}
-                    <div className="md:hidden flex items-center gap-1.5 overflow-hidden">
-                      <button
-                        type="button"
-                        onClick={() => setShowTitlesModal(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm bg-amber-500/15 text-amber-300 border-amber-500/40 active:scale-95 transition-transform truncate max-w-[210px]"
-                        title="Klik untuk melihat rincian gelar"
-                      >
-                        <FaCrown className="text-yellow-400 text-xs shrink-0" />
-                        <span className="truncate">{groupedTitles[0].displayLabel}</span>
-                      </button>
+                    {/* -- MOBILE SPECIFIC: Tampilkan hingga 3 chip terpisah, sisanya "+N" -- */}
+                    <div className="md:hidden flex items-center gap-1.5 flex-wrap">
+                      {individualTitles.slice(0, 3).map((item, idx) => {
+                        const rankStyle = getRankBadgeStyle(item.rank)
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setShowTitlesModal(true)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm active:scale-95 transition-transform truncate max-w-[230px] ${rankStyle.badge}`}
+                            title="Klik untuk melihat rincian gelar"
+                          >
+                            <FaCrown className={`${rankStyle.icon} text-xs shrink-0`} />
+                            <span className="truncate">{item.displayLabel}</span>
+                          </button>
+                        )
+                      })}
 
-                      {groupedTitles.length > 1 && (
+                      {individualTitles.length > 3 && (
                         <button
                           type="button"
                           onClick={() => setShowTitlesModal(true)}
                           className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm bg-surface border-primary/40 text-primary hover:bg-primary/10 shrink-0 active:scale-95 transition-transform"
                           title="Lihat semua gelar"
                         >
-                          +{groupedTitles.length - 1}
+                          +{individualTitles.length - 3}
                         </button>
                       )}
                     </div>
 
-                    {/* -- DESKTOP SPECIFIC: Tampilkan hingga 3 chip per periode, sisanya "+N" -- */}
+                    {/* -- DESKTOP SPECIFIC: Tampilkan hingga 6 chip terpisah, sisanya "+N Lainnya" -- */}
                     <div className="hidden md:flex items-center gap-2 flex-wrap">
-                      {groupedTitles.slice(0, 3).map((group, gIdx) => (
-                        <button
-                          key={gIdx}
-                          type="button"
-                          onClick={() => setShowTitlesModal(true)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm bg-amber-500/15 text-amber-300 border-amber-500/40 hover:bg-amber-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer max-w-md truncate"
-                          title="Klik untuk melihat rincian gelar"
-                        >
-                          <FaCrown className="text-yellow-400 text-xs shrink-0" />
-                          <span className="truncate">{group.displayLabel}</span>
-                        </button>
-                      ))}
+                      {individualTitles.slice(0, 6).map((item, idx) => {
+                        const rankStyle = getRankBadgeStyle(item.rank)
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setShowTitlesModal(true)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer max-w-xs truncate ${rankStyle.badge}`}
+                            title="Klik untuk melihat rincian gelar"
+                          >
+                            <FaCrown className={`${rankStyle.icon} text-xs shrink-0`} />
+                            <span className="truncate">{item.displayLabel}</span>
+                          </button>
+                        )
+                      })}
 
-                      {groupedTitles.length > 3 && (
+                      {individualTitles.length > 6 && (
                         <button
                           type="button"
                           onClick={() => setShowTitlesModal(true)}
                           className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm bg-surface border-primary/40 text-primary hover:bg-primary/10 hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
                           title="Lihat semua title"
                         >
-                          +{groupedTitles.length - 3} Lainnya
+                          +{individualTitles.length - 6} Lainnya
                         </button>
                       )}
                     </div>
@@ -2127,7 +2137,7 @@ const KSProfilePage = () => {
                               ? 'bg-yellow-400/20 text-yellow-300 border border-yellow-400/40'
                               : m.rank === 2
                               ? 'bg-zinc-300/20 text-zinc-200 border border-zinc-300/40'
-                              : 'bg-amber-600/20 text-amber-400 border border-amber-600/40'
+                              : 'bg-[#CD7F32]/20 text-[#E5A067] border border-[#CD7F32]/40'
                           }`}>
                             #{m.rank}
                           </span>
@@ -2142,7 +2152,7 @@ const KSProfilePage = () => {
                               {m.chekiCount} Cheki
                             </span>
                           )}
-                          <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/30 text-primary text-[10px] font-bold">
+                          <span className={`px-2 py-0.5 rounded border text-[10px] font-bold ${getRankBadgeStyle(m.rank).badge}`}>
                             {m.title || `Top ${m.rank} ${group.periodName}`}
                           </span>
                         </div>

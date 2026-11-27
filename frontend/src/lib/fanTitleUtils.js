@@ -87,3 +87,57 @@ export function groupTitlesByPeriod(titles) {
 
   return result
 }
+
+/**
+ * Returns solid badge and icon classes for leaderboard rank 1 (gold/yellow), 2 (silver), 3 (bronze).
+ */
+export function getRankBadgeStyle(rank) {
+  if (rank === 1) {
+    return {
+      badge: 'bg-yellow-500/15 text-yellow-300 border-yellow-500/40 hover:bg-yellow-500/25',
+      icon: 'text-yellow-400'
+    }
+  }
+  if (rank === 2) {
+    return {
+      badge: 'bg-zinc-300/15 text-zinc-200 border-zinc-300/40 hover:bg-zinc-300/25',
+      icon: 'text-zinc-300'
+    }
+  }
+  return {
+    badge: 'bg-[#CD7F32]/15 text-[#E5A067] border-[#CD7F32]/40 hover:bg-[#CD7F32]/25',
+    icon: 'text-[#CD7F32]'
+  }
+}
+
+/**
+ * Normalizes and sorts individual fan titles without merging them into one chip.
+ * Sorted by rank (1 -> 2 -> 3), then period priority, then chekiCount descending.
+ */
+export function sortIndividualTitles(titles) {
+  if (!titles || !Array.isArray(titles) || titles.length === 0) return []
+
+  return [...titles]
+    .map((t) => {
+      const rawPeriod = (t.period || 'Lainnya').trim()
+      const periodKey = rawPeriod.toLowerCase()
+      const periodName = rawPeriod.charAt(0).toUpperCase() + rawPeriod.slice(1)
+      const rank = t.rank || 1
+      const memberName = t.memberName || 'Member'
+      return {
+        ...t,
+        rank,
+        periodKey,
+        periodName,
+        memberName,
+        displayLabel: `Top ${rank} ${periodName} · ${memberName}`
+      }
+    })
+    .sort((a, b) => {
+      if (a.rank !== b.rank) return a.rank - b.rank
+      const orderA = PERIOD_PRIORITY[a.periodKey] || 99
+      const orderB = PERIOD_PRIORITY[b.periodKey] || 99
+      if (orderA !== orderB) return orderA - orderB
+      return (b.chekiCount || 0) - (a.chekiCount || 0)
+    })
+}
