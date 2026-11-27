@@ -44,6 +44,7 @@ const UsersTab = () => {
   const [fanBanners, setFanBanners] = useState([])
   const [bannerTitle, setBannerTitle] = useState('')
   const [bannerUploading, setBannerUploading] = useState(false)
+  const [isDraggingBanner, setIsDraggingBanner] = useState(false)
   const bannerFileRef = useRef(null)
 
   const fetchFanBanners = useCallback(async () => {
@@ -67,10 +68,12 @@ const UsersTab = () => {
     fetchFanBanners()
   }, [fetchFanBanners])
 
-  const handleUploadFanBanner = async (e) => {
-    const file = e.target.files?.[0]
-    e.target.value = ''
+  const uploadFanBannerFile = async (file) => {
     if (!file) return
+    if (!file.type?.startsWith('image/')) {
+      showToast.error('File harus berupa gambar (JPG, PNG, WebP).')
+      return
+    }
 
     setBannerUploading(true)
     try {
@@ -97,6 +100,20 @@ const UsersTab = () => {
     } finally {
       setBannerUploading(false)
     }
+  }
+
+  const handleUploadFanBanner = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    await uploadFanBannerFile(file)
+  }
+
+  const handleBannerDrop = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingBanner(false)
+    const file = e.dataTransfer?.files?.[0]
+    if (file) await uploadFanBannerFile(file)
   }
 
   const handleDeleteFanBanner = async (banner) => {
@@ -420,6 +437,38 @@ const UsersTab = () => {
               {bannerUploading ? <FaSpinner className="animate-spin" /> : <FaUpload />}
               <span>{bannerUploading ? 'Mengunggah...' : 'Unggah Banner'}</span>
             </button>
+          </div>
+        </div>
+
+        {/* Drag & Drop Upload Zone */}
+        <div
+          onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingBanner(true) }}
+          onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingBanner(true) }}
+          onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingBanner(false) }}
+          onDrop={handleBannerDrop}
+          onClick={() => !bannerUploading && bannerFileRef.current?.click()}
+          className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-colors ${
+            isDraggingBanner
+              ? 'border-[var(--primary)] bg-[var(--primary)]/10'
+              : 'border-[var(--border)] bg-[var(--background)] hover:border-[var(--primary)]/60'
+          } ${bannerUploading ? 'opacity-60 pointer-events-none' : ''}`}
+        >
+          <div className="flex flex-col items-center gap-1.5">
+            {bannerUploading ? (
+              <FaSpinner className="animate-spin text-xl text-[var(--primary)]" />
+            ) : (
+              <FaUpload className="text-xl text-[var(--primary)]" />
+            )}
+            <p className="text-xs font-bold text-[var(--text-primary)]">
+              {bannerUploading
+                ? 'Mengunggah banner...'
+                : isDraggingBanner
+                  ? 'Lepas gambar di sini untuk mengunggah'
+                  : 'Drag & drop gambar banner ke sini, atau klik untuk memilih file'}
+            </p>
+            <p className="text-[11px] text-[var(--text-secondary)]">
+              Rasio 16:9 (JPG, PNG, WebP)
+            </p>
           </div>
         </div>
 
