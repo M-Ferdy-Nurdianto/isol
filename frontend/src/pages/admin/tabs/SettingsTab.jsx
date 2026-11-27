@@ -159,10 +159,7 @@ const SettingsTab = ({
         <div className="space-y-4">
           {/* Toggle header */}
           <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-            <div>
-              <p className="text-sm font-bold text-[var(--text-primary)]">Regular Cheki (2-Shot per Member)</p>
-              <p className="text-xs text-[var(--text-secondary)] mt-0.5">1x foto 2-Shot dengan member pilihan. Kalau OFF, opsi ini disembunyikan di semua halaman.</p>
-            </div>
+            <p className="text-sm font-bold text-[var(--text-primary)]">Regular Cheki (2-Shot per Member)</p>
             <Toggle checked={regularChekiEnabled} onChange={() => setRegularChekiEnabled(p => !p)} />
           </div>
 
@@ -189,10 +186,7 @@ const SettingsTab = ({
         {/* ─ Wide Cheki (Polaroid 16:9) ─────────────────────────────────── */}
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-            <div>
-              <p className="text-sm font-bold text-[var(--text-primary)]">Wide Cheki (Polaroid 16:9)</p>
-              <p className="text-xs text-[var(--text-secondary)] mt-0.5">1x foto polaroid format 16:9 dengan member pilihan (per member, sama seperti Regular Cheki). Independen dari Regular Cheki. Kalau OFF, ditolak juga di server.</p>
-            </div>
+            <p className="text-sm font-bold text-[var(--text-primary)]">Wide Cheki (Polaroid 16:9)</p>
             <Toggle checked={wideChekiEnabled} onChange={() => setWideChekiEnabled(p => !p)} />
           </div>
 
@@ -219,10 +213,7 @@ const SettingsTab = ({
         {/* ─ Cheki Grup (Foto Semua Member) ───────────────────────────── */}
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-            <div>
-              <p className="text-sm font-bold text-[var(--text-primary)]">Cheki Grup (Foto Bersama Semua Member)</p>
-              <p className="text-xs text-[var(--text-secondary)] mt-0.5">1x foto bersama seluruh member lineup dalam satu frame. Default OFF. Saat OFF: disembunyikan di semua halaman dan ditolak di server.</p>
-            </div>
+            <p className="text-sm font-bold text-[var(--text-primary)]">Cheki Grup (Foto Bersama Semua Member)</p>
             <Toggle checked={chekiGrupEnabled} onChange={() => setChekiGrupEnabled(p => !p)} />
           </div>
 

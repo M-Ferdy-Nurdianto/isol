@@ -35,7 +35,14 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
   const [submitting, setSubmitting] = useState(false)
 
   const presetColors = [
-    '#A855F7', '#9333EA', '#7E22CE', '#C084FC', '#6B21A8'
+    { hex: '#A855F7', label: 'Ungu Spesial' },
+    { hex: '#F97316', label: 'Oren (Halloween)' },
+    { hex: '#EC4899', label: 'Pink (Valentine)' },
+    { hex: '#92400E', label: 'Coklat (Batik)' },
+    { hex: '#EF4444', label: 'Merah' },
+    { hex: '#E8944A', label: 'Amber / Emas' },
+    { hex: '#10B981', label: 'Hijau' },
+    { hex: '#3B82F6', label: 'Biru' }
   ]
 
   const currentYear = new Date().getFullYear()
@@ -313,24 +320,45 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-2">
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: formData.theme_color || '#C084FC' }}>
                           Warna Aksen Tema
                         </label>
                         <div className="flex items-center gap-2.5 flex-wrap">
-                          {presetColors.map((color) => (
+                          {presetColors.map(({ hex, label }) => (
                             <button
-                              key={color}
+                              key={hex}
                               type="button"
-                              onClick={() => setFormData({...formData, theme_color: color})}
-                              className={`w-7 h-7 rounded-xl transition-transform ${formData.theme_color === color ? 'ring-2 ring-offset-2 ring-offset-[var(--surface)] ring-purple-400 scale-110 shadow-lg' : 'hover:scale-105'}`}
-                              style={{ backgroundColor: color }}
+                              title={label}
+                              onClick={() => setFormData({...formData, theme_color: hex})}
+                              className={`w-7 h-7 rounded-xl transition-transform ${formData.theme_color?.toLowerCase() === hex.toLowerCase() ? 'ring-2 ring-offset-2 ring-offset-[var(--surface)] ring-[var(--text-primary)] scale-110 shadow-lg' : 'hover:scale-105'}`}
+                              style={{ backgroundColor: hex }}
                             />
                           ))}
+                          <label
+                            title="Pilih warna custom"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[var(--background)] border border-[var(--border)] hover:border-[var(--primary)] cursor-pointer text-xs font-bold text-[var(--text-primary)] transition-colors"
+                          >
+                            <input
+                              type="color"
+                              value={/^#[0-9A-Fa-f]{6}$/.test(formData.theme_color || '') ? formData.theme_color : '#A855F7'}
+                              onChange={(e) => setFormData({...formData, theme_color: e.target.value})}
+                              className="w-4 h-4 p-0 border-0 bg-transparent cursor-pointer"
+                            />
+                            <span>Custom</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.theme_color || ''}
+                            onChange={(e) => setFormData({...formData, theme_color: e.target.value})}
+                            placeholder="#FF6B00"
+                            maxLength={7}
+                            className="w-24 px-2.5 py-1.5 rounded-xl bg-[var(--background)] border border-[var(--border)] text-xs font-mono text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary)]"
+                          />
                         </div>
                       </div>
 
-                      <p className="text-xs text-purple-300/80 leading-relaxed pt-1">
-                        Tiket cheki pada event bertema khusus ini akan diproses eksklusif sebagai Pre-Order Spesial dengan tampilan bertema ungu.
+                      <p className="text-xs leading-relaxed pt-1" style={{ color: formData.theme_color || '#C084FC' }}>
+                        Tiket cheki pada event bertema khusus ini akan diproses eksklusif sebagai Pre-Order Spesial sesuai warna tema pilihan.
                       </p>
                     </div>
                   )}
@@ -596,17 +624,30 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                     required
                   />
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-purple-300 font-bold">Warna:</span>
-                  {presetColors.map((color) => (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold" style={{ color: formData.theme_color || '#C084FC' }}>Warna:</span>
+                  {presetColors.map(({ hex, label }) => (
                     <button
-                      key={color}
+                      key={hex}
                       type="button"
-                      onClick={() => setFormData({...formData, theme_color: color})}
-                      className={`w-6 h-6 rounded-lg ${formData.theme_color === color ? 'ring-2 ring-purple-400 scale-110' : ''}`}
-                      style={{ backgroundColor: color }}
+                      title={label}
+                      onClick={() => setFormData({...formData, theme_color: hex})}
+                      className={`w-6 h-6 rounded-lg ${formData.theme_color?.toLowerCase() === hex.toLowerCase() ? 'ring-2 ring-[var(--text-primary)] scale-110' : ''}`}
+                      style={{ backgroundColor: hex }}
                     />
                   ))}
+                  <label
+                    title="Pilih warna custom"
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-[11px] font-bold text-[var(--text-primary)] cursor-pointer"
+                  >
+                    <input
+                      type="color"
+                      value={/^#[0-9A-Fa-f]{6}$/.test(formData.theme_color || '') ? formData.theme_color : '#A855F7'}
+                      onChange={(e) => setFormData({...formData, theme_color: e.target.value})}
+                      className="w-3.5 h-3.5 p-0 border-0 bg-transparent cursor-pointer"
+                    />
+                    <span>Custom</span>
+                  </label>
                 </div>
               </div>
             )}
