@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -16,7 +16,10 @@ import {
   FaUserCheck,
   FaTrash,
   FaMinus,
-  FaPlus
+  FaPlus,
+  FaSearchPlus,
+  FaDownload,
+  FaTimes
 } from 'react-icons/fa'
 import KSHeader from '../../components/KSHeader'
 import KSFooter from '../../components/KSFooter'
@@ -90,18 +93,64 @@ const KSMerchCheckoutPage = () => {
   })
 
   const [paymentMethod, setPaymentMethod] = useState('tf') // 'tf' | 'qris'
+  const [siteConfig, setSiteConfig] = useState(null)
+  const [showQrisModal, setShowQrisModal] = useState(false)
+  const [downloadingQris, setDownloadingQris] = useState(false)
   const [proofFile, setProofFile] = useState(null)
   const [proofPreview, setProofPreview] = useState('')
   const [copiedRekening, setCopiedRekening] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [successOrder, setSuccessOrder] = useState(null)
 
-  // Config fallback (Bank info & QRIS)
+  useEffect(() => {
+    api.get('/config')
+      .then((res) => {
+        if (res.data?.success) setSiteConfig(res.data.data || {})
+      })
+      .catch(() => {})
+  }, [])
+
+  const enableTf = siteConfig ? (siteConfig.payment_enable_tf !== 'false' && siteConfig.payment_enable_tf !== false) : true
+  const enableQris = siteConfig ? (siteConfig.payment_enable_qris === 'true' || siteConfig.payment_enable_qris === true) : true
+  const qrisImageUrl = siteConfig?.payment_qris_image_url || ''
+  const qrisMerchantName = siteConfig?.payment_qris_merchant_name || 'Kohi Sekai Official'
+
+  useEffect(() => {
+    if (!enableTf && enableQris) {
+      setPaymentMethod('qris')
+    } else if (enableTf && !enableQris) {
+      setPaymentMethod('tf')
+    }
+  }, [enableTf, enableQris])
+
+  // Config with fallback (Bank info & QRIS)
   const bankConfig = {
-    bank: 'BCA',
-    rekening: '0902683273',
-    atas_nama: 'Kohi Sekai Official',
-    qris_merchant: 'Kohi Sekai Official'
+    bank: siteConfig?.payment_bank || 'BCA',
+    rekening: siteConfig?.payment_rekening || '0902683273',
+    atas_nama: siteConfig?.payment_atas_nama || 'Kohi Sekai Official',
+    qris_merchant: qrisMerchantName
+  }
+
+  const handleDownloadQris = async () => {
+    if (!qrisImageUrl) return
+    const resolvedUrl = getAssetPath(qrisImageUrl)
+    try {
+      setDownloadingQris(true)
+      const res = await fetch(resolvedUrl)
+      const blob = await res.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = blobUrl
+      a.download = 'QRIS-Kohi-Sekai.png'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(blobUrl)
+    } catch {
+      window.open(resolvedUrl, '_blank', 'noopener,noreferrer')
+    } finally {
+      setDownloadingQris(false)
+    }
   }
 
   const handleCopyRekening = () => {
@@ -676,33 +725,37 @@ const KSMerchCheckoutPage = () => {
 
                       {/* Payment Method Switcher & Details */}
                       <div className="pt-3 border-t border-[#3A2E24] space-y-3">
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setPaymentMethod('tf')}
-                            className={`py-2 px-3 rounded-xl border text-xs font-black uppercase tracking-wider text-center transition-all ${
-                              paymentMethod === 'tf'
-                                ? 'bg-[#E8944A]/10 border-[#E8944A] text-text-primary font-bold'
-                                : 'bg-[#1A1512] border-[#3A2E24] text-text-secondary hover:border-text-secondary/40'
-                            }`}
-                          >
-                            Transfer BCA
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setPaymentMethod('qris')}
-                            className={`py-2 px-3 rounded-xl border text-xs font-black uppercase tracking-wider text-center transition-all ${
-                              paymentMethod === 'qris'
-                                ? 'bg-[#E8944A]/10 border-[#E8944A] text-text-primary font-bold'
-                                : 'bg-[#1A1512] border-[#3A2E24] text-text-secondary hover:border-text-secondary/40'
-                            }`}
-                          >
-                            QRIS Kohi Sekai
-                          </button>
+                        <div className={`grid gap-2 ${enableTf && enableQris ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                          {enableTf && (
+                            <button
+                              type="button"
+                              onClick={() => setPaymentMethod('tf')}
+                              className={`py-2 px-3 rounded-xl border text-xs font-black uppercase tracking-wider text-center transition-all ${
+                                paymentMethod === 'tf'
+                                  ? 'bg-[#E8944A]/10 border-[#E8944A] text-text-primary font-bold'
+                                  : 'bg-[#1A1512] border-[#3A2E24] text-text-secondary hover:border-text-secondary/40'
+                              }`}
+                            >
+                              Transfer {bankConfig.bank}
+                            </button>
+                          )}
+                          {enableQris && (
+                            <button
+                              type="button"
+                              onClick={() => setPaymentMethod('qris')}
+                              className={`py-2 px-3 rounded-xl border text-xs font-black uppercase tracking-wider text-center transition-all ${
+                                paymentMethod === 'qris'
+                                  ? 'bg-[#E8944A]/10 border-[#E8944A] text-text-primary font-bold'
+                                  : 'bg-[#1A1512] border-[#3A2E24] text-text-secondary hover:border-text-secondary/40'
+                              }`}
+                            >
+                              QRIS Kohi Sekai
+                            </button>
+                          )}
                         </div>
 
-                        {/* Transfer BCA Info */}
-                        {paymentMethod === 'tf' && (
+                        {/* Transfer Bank Info */}
+                        {paymentMethod === 'tf' && enableTf && (
                           <div className="p-3.5 rounded-2xl bg-[#1A1512] border border-[#3A2E24] flex items-center justify-between gap-3">
                             <div>
                               <p className="text-[10px] font-mono text-text-secondary uppercase">
@@ -727,14 +780,55 @@ const KSMerchCheckoutPage = () => {
                         )}
 
                         {/* QRIS Barcode */}
-                        {paymentMethod === 'qris' && (
-                          <div className="p-3.5 rounded-2xl bg-[#1A1512] border border-[#3A2E24] flex flex-col items-center text-center space-y-2">
-                            <div className="w-36 h-36 bg-white rounded-xl p-2 border border-[#3A2E24] flex items-center justify-center">
-                              <FaQrcode size={88} className="text-black" />
-                            </div>
-                            <p className="text-xs font-bold text-text-primary">
-                              {bankConfig.qris_merchant}
-                            </p>
+                        {paymentMethod === 'qris' && enableQris && (
+                          <div className="p-3.5 rounded-2xl bg-[#1A1512] border border-[#3A2E24] flex flex-col items-center text-center space-y-2.5">
+                            {qrisImageUrl ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowQrisModal(true)}
+                                  className="group relative rounded-xl overflow-hidden border border-[#3A2E24] bg-white p-2 cursor-zoom-in focus:outline-none focus:border-[#E8944A]"
+                                  title="Klik untuk memperbesar QRIS"
+                                >
+                                  <img
+                                    src={getAssetPath(qrisImageUrl)}
+                                    alt="QRIS Barcode"
+                                    className="w-40 h-40 object-contain"
+                                  />
+                                </button>
+                                <p className="text-xs font-bold text-text-primary">
+                                  {bankConfig.qris_merchant}
+                                </p>
+                                <div className="flex items-center justify-center gap-2 w-full">
+                                  <button
+                                    type="button"
+                                    onClick={() => setShowQrisModal(true)}
+                                    className="flex-1 py-2 px-3 rounded-xl bg-[#241E19] border border-[#3A2E24] hover:border-[#E8944A] text-xs font-bold text-text-primary flex items-center justify-center gap-1.5 transition-colors"
+                                  >
+                                    <FaSearchPlus size={11} />
+                                    <span>Perbesar</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={downloadingQris}
+                                    onClick={handleDownloadQris}
+                                    className="flex-1 py-2 px-3 rounded-xl bg-[#E8944A] hover:bg-[#E8944A]/85 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                                  >
+                                    <FaDownload size={11} />
+                                    <span>{downloadingQris ? 'Mengunduh...' : 'Unduh QRIS'}</span>
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="w-36 h-36 bg-white rounded-xl p-2 border border-[#3A2E24] flex items-center justify-center">
+                                  <FaQrcode size={88} className="text-black" />
+                                </div>
+                                <p className="text-xs font-bold text-text-secondary">
+                                  QRIS belum dikonfigurasi oleh admin.
+                                </p>
+                              </>
+                            )}
                           </div>
                         )}
 
@@ -1063,35 +1157,39 @@ const KSMerchCheckoutPage = () => {
                       3. Pembayaran
                     </p>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('tf')}
-                        className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-center ${
-                          paymentMethod === 'tf'
-                            ? 'bg-[#E8944A] text-white border-[#E8944A] font-black'
-                            : 'bg-[#1A1512] text-text-secondary border-[#3A2E24]'
-                        }`}
-                      >
-                        Transfer BCA
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('qris')}
-                        className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-center ${
-                          paymentMethod === 'qris'
-                            ? 'bg-[#E8944A] text-white border-[#E8944A] font-black'
-                            : 'bg-[#1A1512] text-text-secondary border-[#3A2E24]'
-                        }`}
-                      >
-                        QRIS
-                      </button>
+                    <div className={`grid gap-2 ${enableTf && enableQris ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                      {enableTf && (
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod('tf')}
+                          className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-center ${
+                            paymentMethod === 'tf'
+                              ? 'bg-[#E8944A] text-white border-[#E8944A] font-black'
+                              : 'bg-[#1A1512] text-text-secondary border-[#3A2E24]'
+                          }`}
+                        >
+                          Transfer {bankConfig.bank}
+                        </button>
+                      )}
+                      {enableQris && (
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod('qris')}
+                          className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-center ${
+                            paymentMethod === 'qris'
+                              ? 'bg-[#E8944A] text-white border-[#E8944A] font-black'
+                              : 'bg-[#1A1512] text-text-secondary border-[#3A2E24]'
+                          }`}
+                        >
+                          QRIS
+                        </button>
+                      )}
                     </div>
 
-                    {paymentMethod === 'tf' && (
+                    {paymentMethod === 'tf' && enableTf && (
                       <div className="p-3.5 rounded-xl bg-[#1A1512] border border-[#3A2E24] flex items-center justify-between gap-3">
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Transfer Bank BCA</p>
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Transfer Bank {bankConfig.bank}</p>
                           <p className="text-lg sm:text-xl font-mono font-black text-text-primary tracking-wider mt-0.5">
                             {bankConfig.rekening}
                           </p>
@@ -1108,12 +1206,51 @@ const KSMerchCheckoutPage = () => {
                       </div>
                     )}
 
-                    {paymentMethod === 'qris' && (
-                      <div className="p-3 rounded-xl bg-[#1A1512] border border-[#3A2E24] flex flex-col items-center text-center space-y-1.5">
-                        <div className="w-36 h-36 bg-white rounded-lg p-2 flex items-center justify-center">
-                          <FaQrcode size={80} className="text-black" />
-                        </div>
-                        <p className="text-[11px] font-bold text-text-primary">{bankConfig.qris_merchant}</p>
+                    {paymentMethod === 'qris' && enableQris && (
+                      <div className="p-3 rounded-xl bg-[#1A1512] border border-[#3A2E24] flex flex-col items-center text-center space-y-2.5">
+                        {qrisImageUrl ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => setShowQrisModal(true)}
+                              className="rounded-lg overflow-hidden border border-[#3A2E24] bg-white p-2"
+                              title="Ketuk untuk memperbesar QRIS"
+                            >
+                              <img
+                                src={getAssetPath(qrisImageUrl)}
+                                alt="QRIS Barcode"
+                                className="w-40 h-40 object-contain"
+                              />
+                            </button>
+                            <p className="text-[11px] font-bold text-text-primary">{bankConfig.qris_merchant}</p>
+                            <div className="grid grid-cols-2 gap-2 w-full">
+                              <button
+                                type="button"
+                                onClick={() => setShowQrisModal(true)}
+                                className="min-h-[40px] px-3 rounded-xl bg-[#241E19] border border-[#3A2E24] text-xs font-bold text-text-primary flex items-center justify-center gap-1.5"
+                              >
+                                <FaSearchPlus size={11} />
+                                <span>Perbesar</span>
+                              </button>
+                              <button
+                                type="button"
+                                disabled={downloadingQris}
+                                onClick={handleDownloadQris}
+                                className="min-h-[40px] px-3 rounded-xl bg-[#E8944A] text-xs font-bold text-white flex items-center justify-center gap-1.5 disabled:opacity-50"
+                              >
+                                <FaDownload size={11} />
+                                <span>{downloadingQris ? 'Mengunduh...' : 'Unduh'}</span>
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-36 h-36 bg-white rounded-lg p-2 flex items-center justify-center">
+                              <FaQrcode size={80} className="text-black" />
+                            </div>
+                            <p className="text-[11px] font-bold text-text-secondary">QRIS belum dikonfigurasi oleh admin.</p>
+                          </>
+                        )}
                       </div>
                     )}
 
@@ -1176,6 +1313,51 @@ const KSMerchCheckoutPage = () => {
 
         </div>
       </main>
+
+      {/* QRIS Zoom Modal */}
+      {showQrisModal && qrisImageUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setShowQrisModal(false)}
+        >
+          <div
+            className="bg-[#241E19] border border-[#3A2E24] rounded-2xl p-5 max-w-sm w-full space-y-4 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-black uppercase tracking-wider text-text-primary">
+                QRIS Pembayaran
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowQrisModal(false)}
+                className="w-8 h-8 rounded-lg bg-[#1A1512] border border-[#3A2E24] text-text-secondary hover:text-white flex items-center justify-center"
+              >
+                <FaTimes size={12} />
+              </button>
+            </div>
+            <div className="bg-white rounded-xl p-3 border border-[#3A2E24] inline-block">
+              <img
+                src={getAssetPath(qrisImageUrl)}
+                alt="QRIS Kohi Sekai"
+                className="w-64 h-64 object-contain mx-auto"
+              />
+            </div>
+            <p className="text-xs font-bold text-text-primary uppercase tracking-wider">
+              {bankConfig.qris_merchant}
+            </p>
+            <button
+              type="button"
+              disabled={downloadingQris}
+              onClick={handleDownloadQris}
+              className="w-full py-2.5 px-4 rounded-xl bg-[#E8944A] hover:bg-[#E8944A]/90 text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <FaDownload size={12} />
+              <span>{downloadingQris ? 'Mengunduh...' : 'Unduh Gambar QRIS'}</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       <KSFooter />
     </div>
