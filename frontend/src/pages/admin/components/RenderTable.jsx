@@ -1,9 +1,9 @@
 import React from 'react'
-import { FaEye, FaTrash, FaImage, FaFileAlt, FaSpinner } from 'react-icons/fa'
+import { FaEye, FaEdit, FaTrash, FaImage, FaFileAlt, FaSpinner } from 'react-icons/fa'
 import CustomSelect from './CustomSelect'
 
 // ─── Mobile Card ───────────────────────────────────────────────────────────────
-const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
+const OrderCard = ({ order, isUpdating, onView, onEditOTS, onDelete, onStatusChange }) => {
   const isSpecial = order.events?.type === 'special' || !!order.events?.theme_color
   const themeColor = isSpecial ? (order.events?.theme_color || '#A855F7') : null
 
@@ -34,14 +34,10 @@ const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
       className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl overflow-hidden shadow-lg"
       style={borderStyle}
     >
-      {/* ── TOP: Order Code + Source/Proof ── */}
+      {/* ── TOP: Source/Proof Badges (Order # hidden on web) ── */}
       <div className="px-3.5 pt-3.5 pb-2.5">
         <div className="flex items-center justify-between gap-2">
-          <span className="font-mono text-[11px] font-bold text-[var(--text-secondary)] whitespace-nowrap truncate">
-            {order.order_number}
-          </span>
-
-          <div className="shrink-0 flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 min-w-0">
             {isSpecial && (
               <span
                 className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md border"
@@ -50,6 +46,14 @@ const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
                 Special
               </span>
             )}
+            {order.is_merch && (
+              <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md border border-[var(--primary)]/40 text-[var(--primary)] bg-[var(--primary)]/10">
+                Merch
+              </span>
+            )}
+          </div>
+
+          <div className="shrink-0 flex items-center gap-1.5">
             {order.is_ots ? (
               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)] whitespace-nowrap">
                 {otsSourceLabel} • {paymentLabel}
@@ -124,15 +128,27 @@ const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
             ]}
           />
         </div>
-        <button
-          type="button"
-          onClick={() => onView(order)}
-          className="h-9 px-3 flex items-center justify-center gap-1.5 rounded-xl bg-[var(--surface)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors border border-[var(--border)] text-xs font-bold active:scale-95 shrink-0"
-          title="Detail Order"
-        >
-          <FaEye className="text-xs" />
-          <span>Detail</span>
-        </button>
+        {order.is_ots ? (
+          <button
+            type="button"
+            onClick={() => (onEditOTS ? onEditOTS(order) : onView(order))}
+            className="h-9 px-3 flex items-center justify-center gap-1.5 rounded-xl bg-[var(--surface)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors border border-[var(--border)] text-xs font-bold active:scale-95 shrink-0"
+            title="Edit Order OTS"
+          >
+            <FaEdit className="text-xs" />
+            <span>Edit</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onView(order)}
+            className="h-9 px-3 flex items-center justify-center gap-1.5 rounded-xl bg-[var(--surface)] hover:bg-[var(--primary)]/15 text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors border border-[var(--border)] text-xs font-bold active:scale-95 shrink-0"
+            title="Detail Order"
+          >
+            <FaEye className="text-xs" />
+            <span>Detail</span>
+          </button>
+        )}
         <button
           type="button"
           onClick={() => onDelete(order.id)}
@@ -147,7 +163,7 @@ const OrderCard = ({ order, isUpdating, onView, onDelete, onStatusChange }) => {
 }
 
 // ─── Main RenderTable ──────────────────────────────────────────────────────────
-const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatingOrderIds, onView, onDelete, onStatusChange }) => {
+const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatingOrderIds, onView, onEditOTS, onDelete, onStatusChange }) => {
   return (
     <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-xl overflow-hidden mb-6">
       {/* Header Mobile (1 baris sejajar, simple & mudah dipencet) */}
@@ -202,6 +218,7 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                 order={order}
                 isUpdating={updatingOrderIds?.has(order.id)}
                 onView={onView}
+                onEditOTS={onEditOTS}
                 onDelete={onDelete}
                 onStatusChange={onStatusChange}
               />
@@ -215,7 +232,6 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
         <table className="w-full min-w-[1000px] text-left border-collapse">
           <thead className="bg-[var(--background)] text-[var(--text-secondary)] uppercase text-[11px] font-bold tracking-wider border-b border-[var(--border)]">
             <tr>
-              <th className="px-4 py-3.5">Order #</th>
               <th className="px-4 py-3.5">Nama</th>
               <th className="px-4 py-3.5">Items</th>
               <th className="px-4 py-3.5">Bukti Bayar</th>
@@ -228,14 +244,14 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
           <tbody className="divide-y divide-[var(--border)] text-sm text-[var(--text-secondary)]">
             {loading && (!data || data.length === 0) ? (
               <tr>
-                <td colSpan="8" className="text-center py-12">
+                <td colSpan="7" className="text-center py-12">
                   <FaSpinner className="animate-spin text-3xl text-[var(--primary)] mx-auto mb-2" />
                   <p className="text-xs text-[var(--text-secondary)]">Memuat data order...</p>
                 </td>
               </tr>
             ) : !data || data.length === 0 ? (
               <tr>
-                <td colSpan="8" className="text-center py-12 text-[var(--text-secondary)] text-sm">
+                <td colSpan="7" className="text-center py-12 text-[var(--text-secondary)] text-sm">
                   {emptyMessage}
                 </td>
               </tr>
@@ -261,29 +277,28 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                     className="hover:bg-[var(--primary)]/5 transition-colors duration-150"
                     style={themeColor ? { borderLeft: `4px solid ${themeColor}` } : {}}
                   >
-                    <td className="px-4 py-3.5 font-mono text-xs font-bold text-[var(--text-primary)]">
-                      {order.order_number}
-                      {isSpecial && (
-                        <div className="text-[9px] font-black uppercase tracking-wider mt-0.5" style={{ color: themeColor }}>
-                          Special
-                        </div>
-                      )}
-                      {order.is_merch && (
-                        <div className="text-[9px] font-black uppercase tracking-wider text-[var(--primary)] mt-0.5">
-                          Merch
-                        </div>
-                      )}
-                    </td>
                     <td className="px-4 py-3.5">
                       <div className="font-bold text-[var(--text-primary)]">{order.nama_lengkap}</div>
                       <div className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">
                         {order.whatsapp && order.whatsapp !== '-' ? `WA: ${order.whatsapp}` : order.instagram && order.instagram !== '-' ? `IG: ${order.instagram}` : ''}
                       </div>
-                      {otsSrcBadge && (
-                        <div className="mt-1">
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${otsSrcBadge.cls}`}>
-                            {otsSrcBadge.label}
-                          </span>
+                      {(otsSrcBadge || isSpecial || order.is_merch) && (
+                        <div className="mt-1 flex flex-wrap items-center gap-1">
+                          {otsSrcBadge && (
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${otsSrcBadge.cls}`}>
+                              {otsSrcBadge.label}
+                            </span>
+                          )}
+                          {isSpecial && (
+                            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md border" style={{ color: themeColor, borderColor: themeColor }}>
+                              Special
+                            </span>
+                          )}
+                          {order.is_merch && (
+                            <span className="text-[9px] font-black uppercase tracking-wider text-[var(--primary)] px-1.5 py-0.5 rounded-md border border-[var(--primary)]/35">
+                              Merch
+                            </span>
+                          )}
                         </div>
                       )}
                     </td>
@@ -325,7 +340,7 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                         <span className="text-[var(--text-secondary)] text-xs">-</span>
                       )}
                     </td>
-                    <td className="px-4 py-3.5 font-bold text-[var(--primary)] text-sm">
+                    <td className="px-4 py-3.5 font-bold text-[var(--primary)] text-sm whitespace-nowrap tabular-nums">
                       Rp {order.total_harga?.toLocaleString('id-ID')}
                     </td>
                     <td className="px-4 py-3.5">
@@ -348,13 +363,23 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                     </td>
                     <td className="px-4 py-3.5">
                       <div className="flex items-center justify-center gap-1.5">
-                        <button
-                          onClick={() => onView(order)}
-                          className="text-[var(--text-secondary)] hover:text-[var(--primary)] p-2 rounded-lg hover:bg-[var(--primary)]/10 transition-colors"
-                          title="Detail Order"
-                        >
-                          <FaEye className="text-base" />
-                        </button>
+                        {order.is_ots ? (
+                          <button
+                            onClick={() => (onEditOTS ? onEditOTS(order) : onView(order))}
+                            className="text-[var(--text-secondary)] hover:text-[var(--primary)] p-2 rounded-lg hover:bg-[var(--primary)]/10 transition-colors"
+                            title="Edit Order OTS"
+                          >
+                            <FaEdit className="text-base" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => onView(order)}
+                            className="text-[var(--text-secondary)] hover:text-[var(--primary)] p-2 rounded-lg hover:bg-[var(--primary)]/10 transition-colors"
+                            title="Detail Order"
+                          >
+                            <FaEye className="text-base" />
+                          </button>
+                        )}
                         <button
                           onClick={() => onDelete(order.id)}
                           className="text-[var(--danger)] hover:text-[var(--danger)] p-2 rounded-lg hover:bg-[var(--danger)]/10 transition-colors"

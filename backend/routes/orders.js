@@ -606,6 +606,130 @@ router.post('/ots-user', async (req, res) => {
 
 // Also UPDATE existing OTS ADMIN endpoint to include cheki_type & Cheki Grup validation
 // (in-place edit / override handled above by admin flow, keep endpoint compatible with old items)
+// PUT: Edit an existing OTS order (items, buyer info, payment method, event)
+router.put('/:id/ots', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params
+    const { event_id, nama_lengkap, whatsapp, instagram, catatan, payment_method, items } = req.body
+
+    const { data: existingOrder, error: findErr } = await supabase
+      .from('orders')
+      .select('id, is_ots, event_id')
+      .eq('id', id)
+      .maybeSingle()
+
+    if (findErr) throw findErr
+    if (!existingOrder) {
+      return res.status(404).json({ error: 'Order tidak ditemukan.' })
+    }
+    if (!existingOrder.is_ots) {
+      return res.status(400).json({ error: 'Hanya order OTS yang dapat diedit.' })
+    }
+
+    if (!nama_lengkap || String(nama_lengkap).trim() === '') {
+      return res.status(400).json({ error: 'Nama pembeli wajib diisi.' })
+    }
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Minimal pilih 1 item order.' })
+    }
+
+    const { data: configs } = await supabase
+      .from('config')
+      .select('key, value')
+      .in('key', ['harga_ots_per_member', 'harga_ots_grup', 'harga_cheki_grup_ots'])
+
+    const cfgMap = new Map((configs || []).map(c => [c.key, c.value]))
+    const hargaOtsRegular = Number(cfgMap.get('harga_ots_per_member')) || 40000
+    const hargaOtsWide = Number(cfgMap.get('harga_ots_grup')) || 80000
+    const hargaOtsChekiGrup = Number(cfgMap.get('harga_cheki_grup_ots')) || 170000
+
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    let total_harga = 0
+    const cleanedItems = []
+
+    for (const itm of items) {
+      const type = itm.cheki_type || (itm.member_id === 'grup' || itm.member_id === 'group' ? 'grup' : 'regular')
+      const qty = Math.max(1, parseInt(itm.quantity, 10) || 1)
+      let pricePerUnit = Math.max(0, parseInt(itm.price, 10) || 0)
+      let itemName = itm.item_name || itm.name || 'Cheki Order'
+      let memberIdDb = itm.member_id && UUID_REGEX.test(itm.member_id) ? itm.member_id : null
+
+      if (type === 'grup' || itm.member_id === 'grup' || itm.member_id === 'group') {
+        pricePerUnit = pricePerUnit || hargaOtsChekiGrup
+        memberIdDb = null
+      } else if (type === 'wide') {
+        pricePerUnit = pricePerUnit || hargaOtsWide
+      } else if (type === 'regular') {
+        pricePerUnit = pricePerUnit || hargaOtsRegular
+      }
+
+      total_harga += pricePerUnit * qty
+      cleanedItems.push({
+        order_id: id,
+        member_id: memberIdDb,
+        cheki_type: ['merch', 'grup', 'wide', 'regular'].includes(type) ? type : 'regular',
+        item_name: itemName,
+        price: pricePerUnit,
+        quantity: qty
+      })
+    }
+
+    const updatePayload = {
+      nama_lengkap: String(nama_lengkap).trim(),
+      whatsapp: whatsapp ? String(whatsapp).trim() : '-',
+      instagram: instagram ? String(instagram).trim() : '-',
+      catatan: catatan ? String(catatan).trim() : null,
+      event_id: event_id || existingOrder.event_id,
+      payment_proof_url: payment_method || 'Cash',
+      total_harga
+    }
+
+    const { error: updateErr } = await supabase
+      .from('orders')
+      .update(updatePayload)
+      .eq('id', id)
+
+    if (updateErr) throw updateErr
+
+    const { error: delErr } = await supabase
+      .from('order_items')
+      .delete()
+      .eq('order_id', id)
+
+    if (delErr) throw delErr
+
+    const { error: insErr } = await supabase
+      .from('order_items')
+      .insert(cleanedItems)
+
+    if (insErr) throw insErr
+
+    const { data: updatedOrder, error: fetchErr } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        events (nama, type, theme_color),
+        order_items (
+          id,
+          item_name,
+          price,
+          quantity,
+          cheki_type,
+          member_id
+        )
+      `)
+      .eq('id', id)
+      .single()
+
+    if (fetchErr) throw fetchErr
+
+    res.json({ success: true, data: updatedOrder })
+  } catch (error) {
+    console.error('Error editing OTS order:', error)
+    res.status(500).json({ error: error.message || 'Gagal memperbarui order OTS.' })
+  }
+})
+
 // PATCH: Update order status
 router.patch('/:id/status', authMiddleware, async (req, res) => {
   try {

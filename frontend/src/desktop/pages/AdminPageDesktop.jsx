@@ -18,6 +18,7 @@ import GuideTab from '../../pages/admin/tabs/GuideTab'
 
 import OrderDetailModal from '../../pages/admin/modals/OrderDetailModal'
 import OTSOrderModal from '../../pages/admin/modals/OTSOrderModal'
+import EditOTSOrderModal from '../../pages/admin/modals/EditOTSOrderModal'
 import BulkDeleteModal from '../../pages/admin/modals/BulkDeleteModal'
 import WipeDummyDataModal from '../../pages/admin/modals/WipeDummyDataModal'
 import EventModal from '../../pages/admin/modals/EventModal'
@@ -73,6 +74,8 @@ const AdminPage = () => {
   const [dateTo, setDateTo] = useState(() => localStorage.getItem('admin_date_to') || '')
 
   const [showOTSModal, setShowOTSModal] = useState(false)
+  const [showEditOTSModal, setShowEditOTSModal] = useState(false)
+  const [editingOTSOrder, setEditingOTSOrder] = useState(null)
   const [showEventModal, setShowEventModal] = useState(false)
   const [showOrderDetailModal, setShowOrderDetailModal] = useState(false)
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
@@ -1302,6 +1305,10 @@ const AdminPage = () => {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onViewOrder={viewOrderDetail}
+            onEditOTS={(order) => {
+              setEditingOTSOrder(order)
+              setShowEditOTSModal(true)
+            }}
             onDeleteOrder={handleDeleteOrder}
             onStatusChange={handleStatusChange}
             updatingOrderIds={updatingOrderIds}
@@ -1466,6 +1473,28 @@ const AdminPage = () => {
           onClose={() => setShowOrderDetailModal(false)}
           order={selectedOrder}
           events={events}
+        />
+      )}
+
+      {showEditOTSModal && editingOTSOrder && (
+        <EditOTSOrderModal
+          isOpen={showEditOTSModal}
+          order={editingOTSOrder}
+          members={members}
+          events={events}
+          hargaOtsPerMember={hargaOtsPerMember}
+          hargaOtsGrup={hargaOtsGrup}
+          hargaChekiGrupOts={hargaChekiGrupOts}
+          regularChekiEnabled={regularChekiEnabled}
+          wideChekiEnabled={wideChekiEnabled}
+          chekiGrupEnabled={chekiGrupEnabled}
+          onClose={() => {
+            setShowEditOTSModal(false)
+            setEditingOTSOrder(null)
+          }}
+          onSuccess={() => {
+            fetchOrders()
+          }}
         />
       )}
 

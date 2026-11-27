@@ -27,6 +27,7 @@ const OrdersTab = ({
   searchQuery,
   setSearchQuery,
   onViewOrder,
+  onEditOTS,
   onDeleteOrder,
   onStatusChange,
   updatingOrderIds,
@@ -375,6 +376,7 @@ const OrdersTab = ({
           loading={loading}
           updatingOrderIds={updatingOrderIds}
           onView={onViewOrder}
+          onEditOTS={onEditOTS}
           onDelete={onDeleteOrder}
           onStatusChange={onStatusChange}
         />
@@ -388,6 +390,7 @@ const OrdersTab = ({
           loading={loading}
           updatingOrderIds={updatingOrderIds}
           onView={onViewOrder}
+          onEditOTS={onEditOTS}
           onDelete={onDeleteOrder}
           onStatusChange={onStatusChange}
           action={

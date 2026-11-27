@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState } from 'react'
 import {
   FaBookOpen,
   FaCheckCircle,
@@ -14,7 +14,6 @@ import {
   FaChartBar,
   FaEdit,
   FaArrowRight,
-  FaArrowLeft,
   FaLightbulb,
   FaExclamationTriangle
 } from 'react-icons/fa'
@@ -187,21 +186,6 @@ const GUIDE_SECTIONS = [
 
 const GuideTab = ({ setActiveTab }) => {
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedSection, setSelectedSection] = useState(null)
-  const detailRef = useRef(null)
-
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') setSelectedSection(null)
-    }
-    if (selectedSection) {
-      window.addEventListener('keydown', handleEsc)
-      setTimeout(() => {
-        detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 40)
-    }
-    return () => window.removeEventListener('keydown', handleEsc)
-  }, [selectedSection])
 
   const normalizedQuery = searchQuery.trim().toLowerCase()
   const filteredSections = GUIDE_SECTIONS.filter((sec) => {
@@ -242,10 +226,7 @@ const GuideTab = ({ setActiveTab }) => {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value)
-              if (selectedSection) setSelectedSection(null)
-            }}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Cari panduan, mis: OTS, QRIS, stok..."
             className="w-full pl-10 pr-4 py-3 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)]/60 focus:outline-none focus:border-[var(--primary)] transition-colors"
           />
@@ -273,10 +254,7 @@ const GuideTab = ({ setActiveTab }) => {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value)
-              if (selectedSection) setSelectedSection(null)
-            }}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Cari panduan, mis: OTS, QRIS, stok..."
             className="w-full pl-9 pr-4 py-2.5 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)]/60 focus:outline-none focus:border-[var(--primary)] transition-colors"
           />
@@ -316,147 +294,106 @@ const GuideTab = ({ setActiveTab }) => {
         </div>
       </div>
 
-      {/* Area Konten: Daftar Menu atau Detail Panduan */}
-      {selectedSection ? (
-        <div
-          ref={detailRef}
-          className="bg-[var(--surface)] border border-[var(--primary)]/50 rounded-2xl p-4 sm:p-6 space-y-5 sm:space-y-6 shadow-xl scroll-mt-4"
-        >
-          {/* Tombol Kembali + Header Detail */}
-          <div className="space-y-4 pb-4 border-b border-[var(--border)]">
-            <button
-              type="button"
-              onClick={() => setSelectedSection(null)}
-              className="w-full sm:w-auto inline-flex items-center justify-center sm:justify-start gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-[var(--background)] hover:bg-[var(--border)] border border-[var(--border)] text-sm font-bold text-[var(--text-primary)] transition-colors"
-            >
-              <FaArrowLeft className="text-xs" />
-              <span>Kembali ke Daftar Panduan</span>
-            </button>
-
-            <div className="flex items-start gap-3.5">
-              <div className="w-11 h-11 rounded-xl bg-[var(--primary)]/15 border border-[var(--primary)]/35 flex items-center justify-center text-[var(--primary)] shrink-0">
-                <selectedSection.icon className="text-lg" />
-              </div>
-              <div>
-                <h3 className="text-lg sm:text-xl font-black text-[var(--text-primary)]">
-                  {selectedSection.title}
-                </h3>
-                <p className="text-sm sm:text-[15px] text-[var(--text-secondary)] mt-1 leading-relaxed">
-                  {selectedSection.summary}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Daftar Langkah / Fitur */}
-          <div className="space-y-3">
-            <h4 className="text-base font-bold text-[var(--text-primary)]">
-              {selectedSection.listHeading}
-            </h4>
-            {selectedSection.isOrdered ? (
-              <ol className="space-y-3">
-                {selectedSection.items.map((step, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-3 text-sm sm:text-[15px] text-[var(--text-primary)] leading-relaxed"
-                  >
-                    <span className="w-7 h-7 rounded-full bg-[var(--primary)]/15 border border-[var(--primary)]/35 text-[var(--primary)] font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 mt-0.5">
-                      {i + 1}
-                    </span>
-                    <span>{step}</span>
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <ul className="space-y-2.5">
-                {selectedSection.items.map((item, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-2.5 text-sm sm:text-[15px] text-[var(--text-primary)] leading-relaxed"
-                  >
-                    <span className="text-[var(--primary)] font-bold mt-0.5">•</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* Tips & Hati-hati */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-emerald-500/5 border border-emerald-500/25 rounded-xl p-4 space-y-1.5">
-              <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm sm:text-[15px]">
-                <FaLightbulb />
-                <span>Tips</span>
-              </div>
-              <p className="text-sm sm:text-[15px] text-[var(--text-primary)] leading-relaxed">
-                {selectedSection.tips}
-              </p>
-            </div>
-
-            <div className="bg-red-500/5 border border-red-500/25 rounded-xl p-4 space-y-1.5">
-              <div className="flex items-center gap-2 text-red-400 font-bold text-sm sm:text-[15px]">
-                <FaExclamationTriangle />
-                <span>Hati-hati</span>
-              </div>
-              <p className="text-sm sm:text-[15px] text-[var(--text-primary)] leading-relaxed">
-                {selectedSection.caution}
-              </p>
-            </div>
-          </div>
-
-          {/* Tombol Buka Menu */}
-          {setActiveTab && (
-            <div className="flex justify-end pt-3 border-t border-[var(--border)]">
-              <button
-                type="button"
-                onClick={() => setActiveTab(selectedSection.tabId)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:py-2.5 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-white text-sm font-bold transition-colors shadow-lg"
-              >
-                <span>Buka Menu {selectedSection.title.replace(/^\d+\.\s*/, '')}</span>
-                <FaArrowRight className="text-xs" />
-              </button>
-            </div>
-          )}
-        </div>
-      ) : filteredSections.length === 0 ? (
+      {/* Semua Panduan Langsung Terlihat */}
+      {filteredSections.length === 0 ? (
         <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-8 text-center text-[var(--text-secondary)] text-sm sm:text-[15px] space-y-2">
           <FaExclamationTriangle className="text-amber-400 text-xl mx-auto" />
           <p>Tidak ada panduan yang cocok dengan &ldquo;{searchQuery}&rdquo;.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3">
+        <div className="space-y-4 sm:space-y-5">
           {filteredSections.map((section) => {
             const Icon = section.icon
             return (
-              <button
+              <section
                 key={section.id}
-                type="button"
-                onClick={() => setSelectedSection(section)}
-                className="w-full text-left bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--primary)] rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4 shadow-md transition-colors group"
+                className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-5 shadow-lg"
               >
-                <div className="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-[var(--primary)]/15 border border-[var(--primary)]/35 flex items-center justify-center text-[var(--primary)] shrink-0 mt-0.5 sm:mt-0">
-                    <Icon className="text-sm" />
+                {/* Header Section */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[var(--border)]">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-[var(--primary)]/15 border border-[var(--primary)]/35 flex items-center justify-center text-[var(--primary)] shrink-0">
+                      <Icon className="text-lg" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-black text-[var(--text-primary)]">
+                        {section.title}
+                      </h3>
+                      <p className="text-sm sm:text-[15px] text-[var(--text-secondary)] mt-0.5 leading-relaxed">
+                        {section.summary}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2.5 min-w-0">
-                    <span className="text-base font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors shrink-0">
-                      {section.title}
-                    </span>
-                    <span className="hidden sm:inline text-[var(--text-secondary)]/50">—</span>
-                    <span className="text-sm sm:text-[15px] text-[var(--text-secondary)] leading-snug">
-                      {section.summary}
-                    </span>
-                  </div>
+
+                  {setActiveTab && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab(section.tabId)}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/85 text-white text-xs sm:text-sm font-bold transition-colors shrink-0"
+                    >
+                      <span>Buka Menu {section.title.replace(/^\d+\.\s*/, '')}</span>
+                      <FaArrowRight className="text-xs" />
+                    </button>
+                  )}
                 </div>
 
-                <div className="w-full sm:w-auto pt-2 border-t border-[var(--border)] sm:pt-0 sm:border-t-0 flex justify-end shrink-0">
-                  <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--primary)] group-hover:translate-x-0.5 transition-transform">
-                    <span>Lihat panduan</span>
-                    <FaArrowRight className="text-xs" />
-                  </span>
+                {/* Daftar Langkah / Fitur */}
+                <div className="space-y-3">
+                  <h4 className="text-sm sm:text-base font-bold text-[var(--text-primary)]">
+                    {section.listHeading}
+                  </h4>
+                  {section.isOrdered ? (
+                    <ol className="space-y-2.5">
+                      {section.items.map((step, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-3 text-sm sm:text-[15px] text-[var(--text-primary)] leading-relaxed"
+                        >
+                          <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[var(--primary)]/15 border border-[var(--primary)]/35 text-[var(--primary)] font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 mt-0.5">
+                            {i + 1}
+                          </span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <ul className="space-y-2">
+                      {section.items.map((item, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2.5 text-sm sm:text-[15px] text-[var(--text-primary)] leading-relaxed"
+                        >
+                          <span className="text-[var(--primary)] font-bold mt-0.5">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-              </button>
+
+                {/* Tips & Hati-hati */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="bg-emerald-500/5 border border-emerald-500/25 rounded-xl p-4 space-y-1.5">
+                    <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm sm:text-[15px]">
+                      <FaLightbulb />
+                      <span>Tips</span>
+                    </div>
+                    <p className="text-sm sm:text-[15px] text-[var(--text-primary)] leading-relaxed">
+                      {section.tips}
+                    </p>
+                  </div>
+
+                  <div className="bg-red-500/5 border border-red-500/25 rounded-xl p-4 space-y-1.5">
+                    <div className="flex items-center gap-2 text-red-400 font-bold text-sm sm:text-[15px]">
+                      <FaExclamationTriangle />
+                      <span>Hati-hati</span>
+                    </div>
+                    <p className="text-sm sm:text-[15px] text-[var(--text-primary)] leading-relaxed">
+                      {section.caution}
+                    </p>
+                  </div>
+                </div>
+              </section>
             )
           })}
         </div>
