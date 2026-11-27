@@ -193,7 +193,17 @@ router.get('/:id', cachePublic({ sMaxAge: 10, maxAge: 5, staleWhileRevalidate: 1
 // POST: Create new event (admin only)
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { nama, tanggal, bulan, tahun, lokasi, event_time, cheki_time, is_past, type, theme_name, theme_color, lineup } = req.body
+    const { nama, tanggal, bulan, tahun, lokasi, event_time, cheki_time, is_past, type, theme_name, theme_color, ots_enabled, harga_cheki_po, harga_cheki_ots, lineup } = req.body
+
+    const isSpecial = type === 'special'
+    const parsedPoPrice = isSpecial && harga_cheki_po !== '' && harga_cheki_po !== null && harga_cheki_po !== undefined
+      ? parseInt(String(harga_cheki_po).replace(/\D/g, ''), 10) || null
+      : null
+    const specialOtsEnabled = isSpecial ? Boolean(ots_enabled) : false
+    const rawOtsPrice = isSpecial && harga_cheki_ots !== '' && harga_cheki_ots !== null && harga_cheki_ots !== undefined
+      ? parseInt(String(harga_cheki_ots).replace(/\D/g, ''), 10) || null
+      : null
+    const parsedOtsPrice = specialOtsEnabled ? (rawOtsPrice ?? parsedPoPrice) : null
 
     // Insert event
     const { data: event, error: eventError } = await supabase
@@ -208,9 +218,12 @@ router.post('/', authMiddleware, async (req, res) => {
         cheki_time,
         is_past: Boolean(is_past),
         type: type || 'regular',
-        is_special: type === 'special',
-        theme_name: type === 'special' ? theme_name : null,
-        theme_color: type === 'special' ? theme_color : null,
+        is_special: isSpecial,
+        theme_name: isSpecial ? theme_name : null,
+        theme_color: isSpecial ? theme_color : null,
+        ots_enabled: specialOtsEnabled,
+        harga_cheki_po: parsedPoPrice,
+        harga_cheki_ots: parsedOtsPrice,
         deskripsi: req.body.deskripsi || null,
         event_date: req.body.event_date || null
       })
@@ -262,6 +275,30 @@ router.patch('/:id', authMiddleware, async (req, res) => {
     // Sync is_special with type if type is updated
     if (updates.type) {
       updates.is_special = updates.type === 'special'
+    }
+    const effectiveSpecial = updates.type !== undefined ? updates.type === 'special' : updates.is_special
+    if (effectiveSpecial === false) {
+      updates.ots_enabled = false
+      updates.harga_cheki_po = null
+      updates.harga_cheki_ots = null
+    } else if (
+      updates.ots_enabled !== undefined ||
+      updates.harga_cheki_po !== undefined ||
+      updates.harga_cheki_ots !== undefined
+    ) {
+      const poVal = updates.harga_cheki_po !== '' && updates.harga_cheki_po !== null && updates.harga_cheki_po !== undefined
+        ? parseInt(String(updates.harga_cheki_po).replace(/\D/g, ''), 10) || null
+        : null
+      const otsVal = updates.harga_cheki_ots !== '' && updates.harga_cheki_ots !== null && updates.harga_cheki_ots !== undefined
+        ? parseInt(String(updates.harga_cheki_ots).replace(/\D/g, ''), 10) || null
+        : null
+      if (updates.harga_cheki_po !== undefined) updates.harga_cheki_po = poVal
+      if (updates.ots_enabled !== undefined) updates.ots_enabled = Boolean(updates.ots_enabled)
+      if (updates.ots_enabled === false) {
+        updates.harga_cheki_ots = null
+      } else if (updates.harga_cheki_ots !== undefined || updates.ots_enabled === true) {
+        updates.harga_cheki_ots = otsVal ?? poVal
+      }
     }
 
     // Update event basic info

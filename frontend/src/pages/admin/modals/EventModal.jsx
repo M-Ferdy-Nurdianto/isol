@@ -23,13 +23,18 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
         lineup: existingLineup,
         is_special: editingEvent.is_special || false,
         theme_name: editingEvent.theme_name || '',
-        theme_color: editingEvent.theme_color || '#A855F7'
+        theme_color: editingEvent.theme_color || '#A855F7',
+        ots_enabled: Boolean(editingEvent.ots_enabled),
+        harga_cheki_po: editingEvent.harga_cheki_po ?? '',
+        harga_cheki_ots: editingEvent.harga_cheki_ots ?? ''
       }
     }
     return {
       nama: '', tanggal: '', bulan: '', tahun: new Date().getFullYear(),
       lokasi: '', event_time: '', cheki_time: '', is_past: false,
-      is_special: false, theme_name: '', theme_color: '#A855F7', lineup: []
+      is_special: false, theme_name: '', theme_color: '#A855F7',
+      ots_enabled: false, harga_cheki_po: '', harga_cheki_ots: '',
+      lineup: []
     }
   })
   const [submitting, setSubmitting] = useState(false)
@@ -80,6 +85,15 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
     setSubmitting(true)
 
     try {
+      const poPrice = eventType === 'special' && formData.harga_cheki_po !== '' && formData.harga_cheki_po !== null
+        ? parseInt(String(formData.harga_cheki_po).replace(/\D/g, ''), 10) || null
+        : null
+      const otsEnabled = eventType === 'special' ? Boolean(formData.ots_enabled) : false
+      const rawOtsPrice = eventType === 'special' && formData.harga_cheki_ots !== '' && formData.harga_cheki_ots !== null
+        ? parseInt(String(formData.harga_cheki_ots).replace(/\D/g, ''), 10) || null
+        : null
+      const otsPrice = otsEnabled ? (rawOtsPrice ?? poPrice) : null
+
       if (editingEvent) {
         const payload = {
           nama: formData.nama,
@@ -94,6 +108,9 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
           is_special: eventType === 'special',
           theme_name: eventType === 'special' ? formData.theme_name : null,
           theme_color: eventType === 'special' ? formData.theme_color : null,
+          ots_enabled: otsEnabled,
+          harga_cheki_po: poPrice,
+          harga_cheki_ots: otsPrice,
           lineup: formData.lineup
         }
 
@@ -106,6 +123,9 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
           is_special: eventType === 'special',
           theme_name: eventType === 'special' ? formData.theme_name : null,
           theme_color: eventType === 'special' ? formData.theme_color : null,
+          ots_enabled: otsEnabled,
+          harga_cheki_po: poPrice,
+          harga_cheki_ots: otsPrice,
           lineup: formData.lineup 
         }
         await api.post('/events', payload)
@@ -357,8 +377,54 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                         </div>
                       </div>
 
+                      <div className="space-y-3 pt-2 border-t border-[var(--border)]">
+                        <div>
+                          <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
+                            Harga Spesial PO (Rp)
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="Contoh: 50000 (opsional)"
+                            value={formData.harga_cheki_po}
+                            onChange={(e) => setFormData({...formData, harga_cheki_po: e.target.value.replace(/\D/g, '')})}
+                            className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-xs focus:outline-none focus:border-[var(--primary)]"
+                          />
+                        </div>
+
+                        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={Boolean(formData.ots_enabled)}
+                            onChange={(e) => setFormData({...formData, ots_enabled: e.target.checked})}
+                            className="w-4 h-4 rounded accent-[var(--primary)] cursor-pointer"
+                          />
+                          <span className="text-xs font-bold text-[var(--text-primary)]">
+                            Aktifkan OTS untuk Event Spesial ini
+                          </span>
+                        </label>
+
+                        {formData.ots_enabled && (
+                          <div>
+                            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
+                              Harga Spesial OTS (Rp)
+                            </label>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              placeholder="Kosongkan = otomatis sama dengan harga PO"
+                              value={formData.harga_cheki_ots}
+                              onChange={(e) => setFormData({...formData, harga_cheki_ots: e.target.value.replace(/\D/g, '')})}
+                              className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-xs focus:outline-none focus:border-[var(--primary)]"
+                            />
+                          </div>
+                        )}
+                      </div>
+
                       <p className="text-xs leading-relaxed pt-1" style={{ color: formData.theme_color || '#C084FC' }}>
-                        Tiket cheki pada event bertema khusus ini akan diproses eksklusif sebagai Pre-Order Spesial sesuai warna tema pilihan.
+                        {formData.ots_enabled
+                          ? 'Event spesial ini aktif untuk Pre-Order dan OTS sesuai warna tema pilihan.'
+                          : 'Tiket cheki pada event bertema khusus ini akan diproses eksklusif sebagai Pre-Order Spesial sesuai warna tema pilihan.'}
                       </p>
                     </div>
                   )}
@@ -648,6 +714,50 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                     />
                     <span>Custom</span>
                   </label>
+                </div>
+
+                <div className="space-y-2.5 pt-2 border-t border-[var(--border)]">
+                  <div>
+                    <label className="block text-[11px] font-bold text-[var(--text-secondary)] uppercase mb-1">
+                      Harga Spesial PO (Rp)
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="Contoh: 50000 (opsional)"
+                      value={formData.harga_cheki_po}
+                      onChange={(e) => setFormData({...formData, harga_cheki_po: e.target.value.replace(/\D/g, '')})}
+                      className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl text-xs"
+                    />
+                  </div>
+
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(formData.ots_enabled)}
+                      onChange={(e) => setFormData({...formData, ots_enabled: e.target.checked})}
+                      className="w-4 h-4 rounded accent-[var(--primary)] cursor-pointer"
+                    />
+                    <span className="text-xs font-bold text-[var(--text-primary)]">
+                      Aktifkan OTS Event Spesial
+                    </span>
+                  </label>
+
+                  {formData.ots_enabled && (
+                    <div>
+                      <label className="block text-[11px] font-bold text-[var(--text-secondary)] uppercase mb-1">
+                        Harga Spesial OTS (Rp)
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="Kosongkan = sama dengan harga PO"
+                        value={formData.harga_cheki_ots}
+                        onChange={(e) => setFormData({...formData, harga_cheki_ots: e.target.value.replace(/\D/g, '')})}
+                        className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl text-xs"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             )}

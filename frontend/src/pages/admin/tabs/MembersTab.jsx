@@ -8,7 +8,6 @@ import {
   FaUserCheck, 
   FaUserTimes, 
   FaUsers, 
-  FaPalette,
   FaImage,
   FaImages,
   FaInstagram,
@@ -28,21 +27,6 @@ import Swal from 'sweetalert2'
 import api from '../../../lib/api'
 import { getAssetPath } from '../../../lib/pathUtils'
 import { showToast } from '../../../lib/toast'
-
-const PRESET_COLORS = [
-  { name: 'Amber Crema', hex: '#E8944A' },
-  { name: 'Espresso Roast', hex: '#4A2E18' },
-  { name: 'Warm Latte', hex: '#C68B59' },
-  { name: 'Caramel Macchiato', hex: '#E5A93C' },
-  { name: 'Dark Mocha', hex: '#78350F' },
-  { name: 'Cream Vanilla', hex: '#D7B48D' },
-  { name: 'Cinnamon Brown', hex: '#B45309' },
-  { name: 'Deep Arabica', hex: '#3A2E24' },
-  { name: 'Special Purple', hex: '#A855F7' },
-  { name: 'Coffee Cherry', hex: '#9E1527' },
-  { name: 'Golden Crema', hex: '#FBBF24' },
-  { name: 'Affogato Sweet', hex: '#C9A97E' },
-]
 
 // Helper to resolve images safely with local fallbacks
 const resolveMemberImage = (url, memberId, stageName) => {
@@ -971,55 +955,6 @@ const MembersTab = ({ members = [], onRefresh }) => {
                       </button>
                     )}
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Color Branding Card */}
-            <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-2">
-                  <FaPalette style={{ color: formData.color }} />
-                  Warna Identitas Member (HEX)
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={formData.color || '#E8944A'}
-                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0 p-0"
-                  />
-                  <input
-                    type="text"
-                    value={formData.color || ''}
-                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    placeholder="#E8944A"
-                    className="w-24 px-2.5 py-1 bg-[var(--background)] border border-[var(--border)] rounded-lg text-xs font-mono font-bold text-center focus:outline-none focus:border-[var(--primary)]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <span className="text-[11px] text-[var(--text-secondary)] block mb-2">Preset Palet Warna Idol:</span>
-                <div className="grid grid-cols-6 gap-2">
-                  {PRESET_COLORS.map((preset) => (
-                    <button
-                      key={preset.hex}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, color: preset.hex })}
-                      title={preset.name}
-                      className={`h-9 rounded-xl flex items-center justify-center transition-all ${
-                        formData.color?.toLowerCase() === preset.hex.toLowerCase()
-                          ? 'ring-2 ring-white scale-105 shadow-lg'
-                          : 'opacity-80 hover:opacity-100 hover:scale-102'
-                      }`}
-                      style={{ backgroundColor: preset.hex }}
-                    >
-                      {formData.color?.toLowerCase() === preset.hex.toLowerCase() && (
-                        <FaCheck className="text-[var(--text-primary)] text-xs drop-shadow" />
-                      )}
-                    </button>
-                  ))}
                 </div>
               </div>
             </div>

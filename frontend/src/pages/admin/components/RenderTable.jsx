@@ -231,12 +231,12 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
         <table className="w-full min-w-[1000px] text-left border-collapse">
           <thead className="bg-[var(--background)] text-[var(--text-secondary)] uppercase text-[11px] font-bold tracking-wider border-b border-[var(--border)]">
             <tr>
+              <th className="px-4 py-3.5">Tanggal</th>
               <th className="px-4 py-3.5">Nama</th>
               <th className="px-4 py-3.5">Items</th>
               <th className="px-4 py-3.5">Bukti Bayar</th>
               <th className="px-4 py-3.5">Total</th>
               <th className="px-4 py-3.5">Status</th>
-              <th className="px-4 py-3.5">Tanggal</th>
               <th className="px-4 py-3.5 text-center">Actions</th>
             </tr>
           </thead>
@@ -276,6 +276,11 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                     className="hover:bg-[var(--primary)]/5 transition-colors duration-150"
                     style={themeColor ? { borderLeft: `4px solid ${themeColor}` } : {}}
                   >
+                    <td className="px-4 py-3.5 text-xs text-[var(--text-secondary)] font-medium whitespace-nowrap">
+                      {new Date(order.created_at).toLocaleDateString('id-ID', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                      })}
+                    </td>
                     <td className="px-4 py-3.5">
                       <div className="font-bold text-[var(--text-primary)]">{order.nama_lengkap}</div>
                       <div className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">
@@ -358,11 +363,6 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                           { value: 'completed', label: 'Completed' },
                         ]}
                       />
-                    </td>
-                    <td className="px-4 py-3.5 text-xs text-[var(--text-secondary)] font-medium">
-                      {new Date(order.created_at).toLocaleDateString('id-ID', {
-                        day: '2-digit', month: 'short', year: 'numeric'
-                      })}
                     </td>
                     <td className="px-4 py-3.5">
                       <div className="flex items-center justify-center gap-1.5">

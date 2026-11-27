@@ -534,7 +534,10 @@ const KSShopPage = () => {
   // Regular: harga_per_member config key (harga_cheki_per_member)
   // Wide PO: harga_grup config key (=70k, OTS 80k nanti di OTS form)
   // Cheki Grup PO: harga_cheki_grup_po config key
-  const hargaMember = Number(config?.harga_cheki_per_member) || 40000
+  const defaultHargaMember = Number(config?.harga_cheki_per_member) || 40000
+  const hargaMember = (currentEvent?.is_special || currentEvent?.type === 'special') && Number(currentEvent?.harga_cheki_po) > 0
+    ? Number(currentEvent.harga_cheki_po)
+    : defaultHargaMember
   const hargaWidePo = Number(config?.harga_cheki_grup) || 70000
   const hargaChekiGrupPo = Number(config?.harga_cheki_grup_po) || 150000
   void groupChekiPriceObj

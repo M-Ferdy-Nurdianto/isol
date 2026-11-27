@@ -161,6 +161,18 @@ router.post('/', async (req, res) => {
     const hargaPoWide         = Number(await getConfig('harga_cheki_grup', '70000'))        || 70000
     const hargaPoChekiGrup    = Number(await getConfig('harga_cheki_grup_po', '150000'))   || 150000
 
+    let effectiveHargaPoRegular = hargaPoRegular
+    if (event_id) {
+      const { data: evData } = await supabase
+        .from('events')
+        .select('is_special, type, harga_cheki_po')
+        .eq('id', event_id)
+        .maybeSingle()
+      if (evData && (evData.is_special || evData.type === 'special') && Number(evData.harga_cheki_po) > 0) {
+        effectiveHargaPoRegular = Number(evData.harga_cheki_po)
+      }
+    }
+
     // ── 2. Validasi items per cheki_type + recalc harga (JANGAN PERCAYA CLIENT) ─
     const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
     let total_harga = 0
@@ -206,7 +218,7 @@ router.post('/', async (req, res) => {
         if (!UUID_REGEX.test(itm.member_id)) {
           return res.status(400).json({ error: 'Member tidak valid untuk Regular Cheki.' })
         }
-        pricePerUnit = hargaPoRegular
+        pricePerUnit = effectiveHargaPoRegular
         itemName = itm.name || `Regular Cheki ${itm.member_id}`
         memberIdDb = itm.member_id
       }
@@ -294,6 +306,20 @@ router.post('/ots', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Event ID is required' })
     }
 
+    const { data: eventData } = await supabase
+      .from('events')
+      .select('id, is_special, type, ots_enabled, harga_cheki_po, harga_cheki_ots')
+      .eq('id', event_id)
+      .maybeSingle()
+
+    let effectiveHargaOtsRegular = hargaOtsRegular
+    if (eventData && (eventData.is_special || eventData.type === 'special')) {
+      if (!eventData.ots_enabled) {
+        return res.status(400).json({ error: 'OTS tidak diaktifkan untuk event spesial ini.' })
+      }
+      effectiveHargaOtsRegular = Number(eventData.harga_cheki_ots) || Number(eventData.harga_cheki_po) || hargaOtsRegular
+    }
+
     if (!nama_lengkap || String(nama_lengkap).trim() === '') {
       return res.status(400).json({ error: 'Nama pembeli wajib diisi.' })
     }
@@ -366,7 +392,7 @@ router.post('/ots', authMiddleware, async (req, res) => {
         if (!UUID_REGEX.test(itm.member_id)) {
           return res.status(400).json({ error: 'Member tidak valid untuk Regular Cheki.' })
         }
-        pricePerUnit = hargaOtsRegular
+        pricePerUnit = effectiveHargaOtsRegular
         itemName = itm.name || `Regular Cheki ${itm.member_id}`
         memberIdDb = itm.member_id
       }
@@ -478,6 +504,13 @@ router.post('/ots-user', async (req, res) => {
     if (eventData.is_past) {
       return res.status(400).json({ error: 'Event ini sudah selesai, tidak menerima order OTS.' })
     }
+    let effectiveUserOtsRegular = hargaOtsRegular
+    if (eventData.is_special || eventData.type === 'special') {
+      if (!eventData.ots_enabled) {
+        return res.status(400).json({ error: 'Event spesial ini hanya tersedia untuk Pre-Order.' })
+      }
+      effectiveUserOtsRegular = Number(eventData.harga_cheki_ots) || Number(eventData.harga_cheki_po) || hargaOtsRegular
+    }
     // Cek tanggal event >= hari ini
     const months = { 'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5, 'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11 }
     const evDate = new Date(eventData.tahun, months[eventData.bulan] || 0, eventData.tanggal)
@@ -555,7 +588,7 @@ router.post('/ots-user', async (req, res) => {
         if (!UUID_REGEX.test(itm.member_id)) {
           return res.status(400).json({ error: 'Member tidak valid untuk Regular Cheki.' })
         }
-        pricePerUnit = hargaOtsRegular
+        pricePerUnit = effectiveUserOtsRegular
         itemName = itm.name || `Regular Cheki ${itm.member_id}`
         memberIdDb = itm.member_id
       }

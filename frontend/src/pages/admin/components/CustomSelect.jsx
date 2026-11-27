@@ -85,7 +85,7 @@ const CustomSelect = ({
       case 'paid':
       case 'packing':
       case 'shipped':
-        return 'bg-[var(--primary)]/15 text-[var(--primary)] border-[var(--primary)]/45 hover:bg-[var(--primary)]/25'
+        return 'bg-[#00e5e5]/15 text-[#00e5e5] border-[#00e5e5]/45 hover:bg-[#00e5e5]/25'
       case 'completed':
         return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 hover:bg-emerald-500/30'
       case 'cancelled':
@@ -103,7 +103,7 @@ const CustomSelect = ({
       case 'paid':
       case 'packing':
       case 'shipped':
-        return { dot: 'bg-[var(--primary)]', text: 'text-[var(--primary)]', border: 'border-[var(--primary)]' }
+        return { text: 'text-[#00e5e5]', border: 'border-[#00e5e5]' }
       case 'completed':
         return { dot: 'bg-emerald-400', text: 'text-emerald-300', border: 'border-emerald-400' }
       case 'cancelled':
@@ -181,12 +181,11 @@ const CustomSelect = ({
                 key={String(opt.value)}
                 type="button"
                 onClick={() => handleSelect(opt.value)}
-                className={`w-full text-left px-3.5 py-2 text-xs font-medium transition-colors flex items-center gap-2 ${isSelected
+                className={`w-full text-left px-3.5 py-2 text-xs font-medium transition-colors ${isSelected
                     ? `bg-[var(--surface)] ${optColor.text} font-bold border-l-2 ${optColor.border}`
                     : 'text-[var(--text-secondary)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'
                   }`}
               >
-                <span className={`w-2 h-2 rounded-full shrink-0 ${optColor.dot}`} />
                 <span>{opt.label}</span>
               </button>
             )

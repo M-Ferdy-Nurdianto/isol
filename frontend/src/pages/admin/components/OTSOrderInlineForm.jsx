@@ -45,8 +45,13 @@ const OTSOrderInlineForm = ({
     if (!events || events.length === 0) return []
     const months = { 'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5, 'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11 }
 
-    // Prioritize active (non-past) events, sorted by date
-    const active = events
+    // Prioritize active (non-past) events, excluding special events unless ots_enabled is true
+    const eligible = events.filter(e => {
+      const isSpecial = e.is_special || e.type === 'special'
+      return !isSpecial || Boolean(e.ots_enabled)
+    })
+
+    const active = eligible
       .filter(e => !e.is_past)
       .sort((a, b) => {
         const da = new Date(a.tahun, months[a.bulan] || 0, a.tanggal)
@@ -55,7 +60,7 @@ const OTSOrderInlineForm = ({
       })
 
     if (active.length > 0) return active
-    return events
+    return eligible
   }, [events])
 
   const initialEventId = () => {
@@ -158,6 +163,13 @@ const OTSOrderInlineForm = ({
   }, [formData.items.length, onCartChange])
 
   const selectedEvent = events.find(e => e.id === formData.event_id)
+  const effectiveOtsRegularPrice = (() => {
+    if (selectedEvent && (selectedEvent.is_special || selectedEvent.type === 'special')) {
+      const sp = Number(selectedEvent.harga_cheki_ots) || Number(selectedEvent.harga_cheki_po)
+      if (sp > 0) return sp
+    }
+    return parseInt(hargaOtsPerMember, 10)
+  })()
 
   const isGroupMember = (m) => {
     if (!m) return false
@@ -188,7 +200,7 @@ const OTSOrderInlineForm = ({
     let displayName = ''
 
     if (chekiType === 'regular') {
-      price = parseInt(hargaOtsPerMember, 10)
+      price = effectiveOtsRegularPrice
       displayName = `Regular Cheki ${formatMemberName(member.nama_panggung)}`
     } else if (chekiType === 'wide') {
       price = parseInt(hargaOtsGrup, 10)
@@ -358,7 +370,7 @@ const OTSOrderInlineForm = ({
           <FaUsers className="text-[var(--primary)]" /> Lineup member hadir ({individualMembers.length})
         </h4>
         <div className="flex items-center gap-2 text-[10px] text-[var(--text-secondary)] font-mono flex-wrap justify-end">
-          {regularChekiEnabled && <span>Regular: Rp {parseInt(hargaOtsPerMember, 10).toLocaleString('id-ID')}</span>}
+          {regularChekiEnabled && <span>Regular: Rp {effectiveOtsRegularPrice.toLocaleString('id-ID')}</span>}
           {regularChekiEnabled && wideChekiEnabled && <span className="opacity-40">·</span>}
           {wideChekiEnabled && <span>Wide: Rp {parseInt(hargaOtsGrup, 10).toLocaleString('id-ID')}</span>}
         </div>
@@ -438,7 +450,7 @@ const OTSOrderInlineForm = ({
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {individualMembers.map((member) => {
-                const regularPrice = parseInt(hargaOtsPerMember, 10)
+                const regularPrice = effectiveOtsRegularPrice
                 const widePrice = parseInt(hargaOtsGrup, 10)
                 const selectedRegular = formData.items.find(i => i.member_id === member.id && (i.cheki_type || 'regular') === 'regular')
                 const selectedWide = formData.items.find(i => i.member_id === member.id && (i.cheki_type || 'wide') === 'wide')
