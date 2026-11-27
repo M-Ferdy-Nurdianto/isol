@@ -1333,7 +1333,7 @@ const KSProfilePage = () => {
               <img 
                 src={getAssetPath(currentUser.banner_url)} 
                 alt="Cover" 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover"
                 onError={() => setBannerLoadError(true)}
               />
             ) : (
@@ -1894,7 +1894,7 @@ const KSProfilePage = () => {
                           <img
                             src={getAssetPath(opt.url)}
                             alt={opt.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="w-full h-full object-cover"
                             onError={(e) => {
                               e.target.onerror = null
                               e.target.src = getAssetPath('/images/members/group.webp')
