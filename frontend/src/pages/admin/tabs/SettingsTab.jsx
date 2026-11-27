@@ -4,12 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import api from '../../../lib/api'
 import { showToast } from '../../../lib/toast'
 import ImageUploadDropzone from '../../../components/ui/ImageUploadDropzone'
+import { parsePriceInput, formatPriceDisplay } from '../../../lib/priceInput'
 
-const fmt = (val) => {
-  if (val === undefined || val === null || val === '') return ''
-  const n = String(val).replace(/\D/g, '')
-  return n ? Number(n).toLocaleString('id-ID') : ''
-}
+const fmt = formatPriceDisplay
 const num = (v) => parseInt(String(v || 0).replace(/\D/g, '') || '0', 10)
 
 // ── Shared toggle button ────────────────────────────────────────────────────
@@ -55,7 +52,7 @@ const SettingsTab = ({
   const [qrisPreview, setQrisPreview] = useState(paymentQrisImageUrl || '')
   const [copied, setCopied] = useState(false)
 
-  const handleNumInput = (setter) => (e) => setter(e.target.value.replace(/\D/g, ''))
+  const handleNumInput = (setter) => (e) => setter(parsePriceInput(e.target.value))
 
   // ── Save handlers ──────────────────────────────────────────────────────────
   const saveHarga = () => {

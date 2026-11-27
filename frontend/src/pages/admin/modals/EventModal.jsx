@@ -5,6 +5,7 @@ import api from '../../../lib/api'
 import { formatMemberName } from '../../../lib/memberUtils'
 import { showToast } from '../../../lib/toast'
 import CustomSelect from '../components/CustomSelect'
+import { parsePriceInput, formatPriceDisplay } from '../../../lib/priceInput'
 
 const monthList = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
 const monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
@@ -384,10 +385,10 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                           </label>
                           <input
                             type="text"
-                            inputMode="numeric"
-                            placeholder="Contoh: 50000 (opsional)"
-                            value={formData.harga_cheki_po}
-                            onChange={(e) => setFormData({...formData, harga_cheki_po: e.target.value.replace(/\D/g, '')})}
+                            inputMode="text"
+                            placeholder="Contoh: 50.000 atau 50k"
+                            value={formatPriceDisplay(formData.harga_cheki_po)}
+                            onChange={(e) => setFormData({...formData, harga_cheki_po: parsePriceInput(e.target.value)})}
                             className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-xs focus:outline-none focus:border-[var(--primary)]"
                           />
                         </div>
@@ -411,10 +412,10 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                             </label>
                             <input
                               type="text"
-                              inputMode="numeric"
+                              inputMode="text"
                               placeholder="Kosongkan = otomatis sama dengan harga PO"
-                              value={formData.harga_cheki_ots}
-                              onChange={(e) => setFormData({...formData, harga_cheki_ots: e.target.value.replace(/\D/g, '')})}
+                              value={formatPriceDisplay(formData.harga_cheki_ots)}
+                              onChange={(e) => setFormData({...formData, harga_cheki_ots: parsePriceInput(e.target.value)})}
                               className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-xs focus:outline-none focus:border-[var(--primary)]"
                             />
                           </div>
@@ -723,10 +724,10 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                     </label>
                     <input
                       type="text"
-                      inputMode="numeric"
-                      placeholder="Contoh: 50000 (opsional)"
-                      value={formData.harga_cheki_po}
-                      onChange={(e) => setFormData({...formData, harga_cheki_po: e.target.value.replace(/\D/g, '')})}
+                      inputMode="text"
+                      placeholder="Contoh: 50.000 atau 50k"
+                      value={formatPriceDisplay(formData.harga_cheki_po)}
+                      onChange={(e) => setFormData({...formData, harga_cheki_po: parsePriceInput(e.target.value)})}
                       className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl text-xs"
                     />
                   </div>
@@ -750,10 +751,10 @@ const EventModal = ({ members = [], onClose, onSuccess, editingEvent }) => {
                       </label>
                       <input
                         type="text"
-                        inputMode="numeric"
+                        inputMode="text"
                         placeholder="Kosongkan = sama dengan harga PO"
-                        value={formData.harga_cheki_ots}
-                        onChange={(e) => setFormData({...formData, harga_cheki_ots: e.target.value.replace(/\D/g, '')})}
+                        value={formatPriceDisplay(formData.harga_cheki_ots)}
+                        onChange={(e) => setFormData({...formData, harga_cheki_ots: parsePriceInput(e.target.value)})}
                         className="w-full px-3 py-2 bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl text-xs"
                       />
                     </div>

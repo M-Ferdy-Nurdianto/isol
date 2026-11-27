@@ -52,10 +52,18 @@ router.get('/:id', cachePublic({ sMaxAge: 300, maxAge: 60, staleWhileRevalidate:
 // POST create merchandise (admin only)
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { nama, deskripsi, harga, stok, gambar_url, available, urutan, sizes, size_chart_urls, kategori } = req.body
+    const { nama, deskripsi, harga, stok, gambar_url, available, urutan, sizes, size_prices, size_chart_urls, kategori } = req.body
 
     if (!nama || !harga) {
       return res.status(400).json({ error: 'Nama dan harga wajib diisi' })
+    }
+
+    const sanitizedSizePrices = {}
+    if (size_prices && typeof size_prices === 'object' && !Array.isArray(size_prices)) {
+      Object.entries(size_prices).forEach(([sz, extra]) => {
+        const val = parseInt(String(extra || 0).replace(/\D/g, ''), 10) || 0
+        if (sz && val > 0) sanitizedSizePrices[sz] = val
+      })
     }
 
     const { data, error } = await supabase
@@ -69,6 +77,7 @@ router.post('/', authMiddleware, async (req, res) => {
         available: available !== undefined ? available : true,
         urutan: parseInt(urutan) || 0,
         sizes: sizes || null,
+        size_prices: sanitizedSizePrices,
         size_chart_urls: size_chart_urls || null,
         kategori: kategori || 'baju'
       })
@@ -86,7 +95,7 @@ router.post('/', authMiddleware, async (req, res) => {
 // PUT update merchandise (admin only)
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const { nama, deskripsi, harga, stok, gambar_url, available, urutan, sizes, size_chart_urls, kategori } = req.body
+    const { nama, deskripsi, harga, stok, gambar_url, available, urutan, sizes, size_prices, size_chart_urls, kategori } = req.body
 
     const updateData = {}
     if (nama !== undefined) updateData.nama = nama
@@ -97,6 +106,14 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (available !== undefined) updateData.available = available
     if (urutan !== undefined) updateData.urutan = parseInt(urutan)
     if (sizes !== undefined) updateData.sizes = sizes
+    if (size_prices !== undefined && size_prices && typeof size_prices === 'object' && !Array.isArray(size_prices)) {
+      const sanitizedSizePrices = {}
+      Object.entries(size_prices).forEach(([sz, extra]) => {
+        const val = parseInt(String(extra || 0).replace(/\D/g, ''), 10) || 0
+        if (sz && val > 0) sanitizedSizePrices[sz] = val
+      })
+      updateData.size_prices = sanitizedSizePrices
+    }
     if (size_chart_urls !== undefined) updateData.size_chart_urls = size_chart_urls
     if (kategori !== undefined) updateData.kategori = kategori
 

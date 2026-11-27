@@ -1,6 +1,7 @@
 import React from 'react'
 import { FaPlus, FaEdit, FaTrash, FaTimes, FaCloudUploadAlt, FaImage, FaBox, FaSave, FaArrowLeft, FaTshirt, FaGem } from 'react-icons/fa'
 import ImageUploadDropzone from '../../../components/ui/ImageUploadDropzone'
+import { parsePriceInput, formatPriceDisplay } from '../../../lib/priceInput'
 
 const MerchTab = ({
   merch,
@@ -301,9 +302,9 @@ const MerchTab = ({
                       value={merchHargaRaw}
                       onChange={e => handleHargaChange(e.target.value)}
                       className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-xs focus:outline-none focus:border-[var(--primary)]"
-                      placeholder="150000"
+                      placeholder="150.000 atau 150k"
                     />
-                    <p className="text-[10px] text-[var(--text-secondary)] mt-1">Bisa ketik 150000, 150k, atau 1.5jt</p>
+                    <p className="text-[10px] text-[var(--text-secondary)] mt-1">Bisa ketik 150.000, 150k, Rp 150.000, atau 1.5jt</p>
                     {merchForm.harga && merchHargaRaw && !/^\d+$/.test(merchHargaRaw) && (
                       <p className="text-xs text-[var(--primary)] mt-1 font-semibold">= Rp {Number(merchForm.harga).toLocaleString('id-ID')}</p>
                     )}
@@ -364,6 +365,45 @@ const MerchTab = ({
                         className="w-full px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/50 text-xs focus:outline-none focus:border-[var(--primary)]"
                         placeholder="Atau ketik sendiri (dipisahkan koma, misal: All Size, Free Size)"
                       />
+
+                      {(() => {
+                        const parsedSizes = availableSizes.split(',').map(s => s.trim()).filter(Boolean)
+                        if (parsedSizes.length === 0) return null
+                        return (
+                          <div className="pt-2 space-y-2">
+                            <label className="block text-[11px] font-bold text-[var(--text-secondary)]">
+                              Biaya Tambahan per Ukuran (Opsional, mis: XL +3k)
+                            </label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {parsedSizes.map(sz => {
+                                const extraVal = merchForm.size_prices?.[sz] || ''
+                                return (
+                                  <div key={sz} className="flex items-center gap-2 bg-[var(--background)] border border-[var(--border)] rounded-xl px-3 py-1.5">
+                                    <span className="text-xs font-black text-[var(--primary)] w-12 shrink-0 truncate">{sz}</span>
+                                    <span className="text-[11px] text-[var(--text-secondary)] font-bold shrink-0">+Rp</span>
+                                    <input
+                                      type="text"
+                                      value={formatPriceDisplay(extraVal)}
+                                      onChange={e => {
+                                        const parsed = parsePriceInput(e.target.value)
+                                        setMerchForm(prev => ({
+                                          ...prev,
+                                          size_prices: {
+                                            ...(prev.size_prices || {}),
+                                            [sz]: parsed
+                                          }
+                                        }))
+                                      }}
+                                      placeholder="0 atau 3k"
+                                      className="w-full bg-transparent text-xs font-bold text-[var(--text-primary)] placeholder-[var(--text-secondary)]/50 focus:outline-none"
+                                    />
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )
+                      })()}
                       <p className="text-[10px] text-[var(--text-secondary)] italic">Pilihan ukuran di atas akan otomatis menambahkan atau menghapus dari kolom ini.</p>
                     </>
                   )}

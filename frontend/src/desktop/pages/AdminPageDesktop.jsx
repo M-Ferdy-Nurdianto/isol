@@ -115,7 +115,7 @@ const AdminPage = () => {
   const [merchOrders, setMerchOrders] = useState([])
   const [showMerchForm, setShowMerchForm] = useState(false)
   const [editingMerch, setEditingMerch] = useState(null)
-  const [merchForm, setMerchForm] = useState({ nama: '', deskripsi: '', harga: '', stok: '', available: true, sizes: [], size_chart_urls: [], kategori: 'baju' })
+  const [merchForm, setMerchForm] = useState({ nama: '', deskripsi: '', harga: '', stok: '', available: true, sizes: [], size_prices: {}, size_chart_urls: [], kategori: 'baju' })
   const [merchImageFile, setMerchImageFile] = useState(null)
   const [merchImagePreview, setMerchImagePreview] = useState('')
   const [merchSizeChartFiles, setMerchSizeChartFiles] = useState([null])
@@ -688,12 +688,15 @@ const AdminPage = () => {
   const [merchHargaRaw, setMerchHargaRaw] = useState('')
 
   const handleHargaChange = (val) => {
-    setMerchHargaRaw(val)
     const parsed = parseHarga(val)
     if (parsed !== '') {
+      setMerchHargaRaw(Number(parsed).toLocaleString('id-ID'))
       setMerchForm(f => ({ ...f, harga: parsed }))
     } else if (val === '') {
+      setMerchHargaRaw('')
       setMerchForm(f => ({ ...f, harga: '' }))
+    } else {
+      setMerchHargaRaw(val)
     }
   }
 
@@ -707,10 +710,11 @@ const AdminPage = () => {
         stok: item.stok ?? '',
         available: item.available,
         sizes: item.sizes || [],
+        size_prices: item.size_prices || {},
         size_chart_urls: item.size_chart_urls || [],
         kategori: item.kategori || 'baju'
       })
-      setMerchHargaRaw(String(item.harga))
+      setMerchHargaRaw(item.harga ? Number(item.harga).toLocaleString('id-ID') : '')
       setMerchImagePreview(item.gambar_url || '')
       setAvailableSizes(Array.isArray(item.sizes) ? item.sizes.join(', ') : '')
       setMerchSizeChartPreviews([
@@ -718,7 +722,7 @@ const AdminPage = () => {
       ])
     } else {
       setEditingMerch(null)
-      setMerchForm({ nama: '', deskripsi: '', harga: '', stok: '', available: true, sizes: [], size_chart_urls: [], kategori: 'baju' })
+      setMerchForm({ nama: '', deskripsi: '', harga: '', stok: '', available: true, sizes: [], size_prices: {}, size_chart_urls: [], kategori: 'baju' })
       setMerchHargaRaw('')
       setMerchImagePreview('')
       setAvailableSizes('')
@@ -825,6 +829,7 @@ const AdminPage = () => {
         available: merchForm.available,
         kategori: merchForm.kategori || 'baju',
         sizes: merchForm.kategori === 'aksesoris' ? [] : availableSizes.split(',').map(s => s.trim()).filter(s => s !== ''),
+        size_prices: merchForm.kategori === 'aksesoris' ? {} : (merchForm.size_prices || {}),
         size_chart_urls: merchForm.kategori === 'aksesoris' ? [] : size_chart_urls.filter(url => url !== null)
       }
 

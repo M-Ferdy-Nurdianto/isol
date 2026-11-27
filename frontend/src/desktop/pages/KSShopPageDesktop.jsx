@@ -650,8 +650,10 @@ const KSShopPage = () => {
       return
     }
 
+    const extraSizePrice = selectedSize && selectedMerch.size_prices ? (Number(selectedMerch.size_prices[selectedSize]) || 0) : 0
     const itemToBuy = {
       ...selectedMerch,
+      harga: Number(selectedMerch.harga || 0) + extraSizePrice,
       size: selectedSize || null,
       quantity: merchQty
     }
@@ -1712,20 +1714,23 @@ const KSShopPage = () => {
                       )}
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {selectedMerch.sizes.map(size => (
-                        <button
-                          key={`mob-size-${size}`}
-                          type="button"
-                          onClick={() => setSelectedSize(size)}
-                          className={`min-w-[42px] px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                            selectedSize === size
-                              ? 'bg-[#E8944A] text-white font-black shadow-md'
-                              : 'bg-[#1A1512] text-text-secondary border border-[#3A2E24] hover:border-[#E8944A]/50'
-                          }`}
-                        >
-                          {size}
-                        </button>
-                      ))}
+                      {selectedMerch.sizes.map(size => {
+                        const extra = Number(selectedMerch.size_prices?.[size] || 0)
+                        return (
+                          <button
+                            key={`mob-size-${size}`}
+                            type="button"
+                            onClick={() => setSelectedSize(size)}
+                            className={`min-w-[42px] px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                              selectedSize === size
+                                ? 'bg-[#E8944A] text-white font-black shadow-md'
+                                : 'bg-[#1A1512] text-text-secondary border border-[#3A2E24] hover:border-[#E8944A]/50'
+                            }`}
+                          >
+                            {size}{extra > 0 ? ` (+Rp ${extra.toLocaleString('id-ID')})` : ''}
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
                 )}
@@ -1904,20 +1909,23 @@ const KSShopPage = () => {
                           </button>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {selectedMerch.sizes.map(size => (
-                            <button
-                              key={`desk-size-${size}`}
-                              type="button"
-                              onClick={() => setSelectedSize(size)}
-                              className={`min-w-[48px] px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-                                selectedSize === size
-                                  ? 'bg-[#E8944A] text-white font-black shadow-md'
-                                  : 'bg-[#1A1512] text-text-secondary border border-[#3A2E24] hover:border-[#E8944A]/50'
-                              }`}
-                            >
-                              {size}
-                            </button>
-                          ))}
+                          {selectedMerch.sizes.map(size => {
+                            const extra = Number(selectedMerch.size_prices?.[size] || 0)
+                            return (
+                              <button
+                                key={`desk-size-${size}`}
+                                type="button"
+                                onClick={() => setSelectedSize(size)}
+                                className={`min-w-[48px] px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                                  selectedSize === size
+                                    ? 'bg-[#E8944A] text-white font-black shadow-md'
+                                    : 'bg-[#1A1512] text-text-secondary border border-[#3A2E24] hover:border-[#E8944A]/50'
+                                }`}
+                              >
+                                {size}{extra > 0 ? ` (+Rp ${extra.toLocaleString('id-ID')})` : ''}
+                              </button>
+                            )
+                          })}
                         </div>
                       </div>
                     )}

@@ -319,8 +319,19 @@ const MembersTab = ({ members = [], onRefresh }) => {
         finalBannerImageUrl = await uploadFile(bannerFile, 'banner')
       }
 
+      const generatedSlug = (formData.nama_panggung || '')
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || `member-${Date.now()}`
+
+      const resolvedMemberId = isEditing
+        ? (formData.member_id || editingMember?.member_id || generatedSlug)
+        : generatedSlug
+
       const payload = {
         ...formData,
+        member_id: resolvedMemberId,
         image_url: finalAvatarUrl,
         shop_image_url: finalShopImageUrl,
         banner_image_url: finalBannerImageUrl
@@ -619,18 +630,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
           <div className="lg:col-span-5 space-y-6">
             {/* Foto Utama Card */}
             <div id="card-foto-profil" className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
-              <div className="flex items-center justify-between">
+              <div>
                 <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                   Foto {isGroup ? 'Banner / Cover Utama' : 'Profil Member'}
                 </label>
-                <div className="flex items-center gap-1.5">
-                  <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]">
-                    {isGroup ? '1200 × 675 px (16:9)' : '800 × 800 px (1:1)'}
-                  </span>
-                  <span className="text-[10px] text-[var(--primary)] font-bold bg-[var(--primary)]/10 px-2 py-0.5 rounded-full border border-[var(--primary)]/20">
-                    Drag & Drop Ready
-                  </span>
-                </div>
               </div>
 
               <div
@@ -731,18 +734,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
             {/* Foto Pajangan Shop (Tiket Cheki) Card */}
             <div id="card-foto-shop" className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-4">
-              <div className="flex items-center justify-between">
+              <div>
                 <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
                   Foto Pajangan Shop (Tiket Cheki)
                 </label>
-                <div className="flex items-center gap-1.5">
-                  <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]">
-                    600 × 800 px (3:4)
-                  </span>
-                  <span className="text-[10px] text-[var(--primary)] font-bold bg-[var(--primary)]/10 px-2 py-0.5 rounded-full border border-[var(--primary)]/20">
-                    Tampil di /shop
-                  </span>
-                </div>
               </div>
 
               <div
@@ -843,18 +838,10 @@ const MembersTab = ({ members = [], onRefresh }) => {
 
             {/* Foto Banner Landscape Member (Cover Profil Fan) Card */}
             <div id="card-banner-landscape" className="bg-[var(--surface)] border-2 border-[var(--primary)]/50 hover:border-[var(--primary)] rounded-2xl p-5 shadow-xl space-y-4 transition-all">
-              <div className="flex items-center justify-between">
+              <div>
                 <label className="text-xs font-bold text-[var(--primary)] uppercase tracking-wider flex items-center gap-1.5">
                   <FaImage /> Foto Banner Landscape Member (Cover Profil Fan)
                 </label>
-                <div className="flex items-center gap-1.5">
-                  <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[var(--background)] text-[var(--text-secondary)] border border-[var(--border)]">
-                    1200 × 675 px (16:9)
-                  </span>
-                  <span className="text-[10px] text-[var(--primary)] font-bold bg-[var(--primary)]/20 px-2 py-0.5 rounded-full border border-[var(--primary)]/30">
-                    Pilihan Banner Fan
-                  </span>
-                </div>
               </div>
 
               <div
@@ -970,36 +957,18 @@ const MembersTab = ({ members = [], onRefresh }) => {
                 Identitas Panggung
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
-                    Nama Panggung <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.nama_panggung}
-                    onChange={(e) => setFormData({ ...formData, nama_panggung: e.target.value })}
-                    placeholder="Contoh: Dea"
-                    required
-                    className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
-                    Member ID / Slug <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.member_id}
-                    onChange={(e) => setFormData({ ...formData, member_id: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '') })}
-                    placeholder="Contoh: dea"
-                    required
-                    disabled={isEditing && isGroup}
-                    className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)] disabled:opacity-40"
-                  />
-                  <span className="text-[10px] text-[var(--text-secondary)] mt-1 block">ID unik huruf kecil tanpa spasi (e.g. dea, latte, macchiato).</span>
-                </div>
+              <div>
+                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
+                  Nama Panggung <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.nama_panggung}
+                  onChange={(e) => setFormData({ ...formData, nama_panggung: e.target.value })}
+                  placeholder="Contoh: Dea"
+                  required
+                  className="w-full px-4 py-2.5 bg-[var(--background)] border border-[var(--border)] text-[var(--text-primary)] rounded-xl placeholder-[var(--text-secondary)]/60 text-xs focus:outline-none focus:border-[var(--primary)]"
+                />
               </div>
 
               <div>
@@ -1018,7 +987,7 @@ const MembersTab = ({ members = [], onRefresh }) => {
             {/* Jikoshoukai Card */}
             <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 shadow-lg space-y-3">
               <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-                Jikoshoukai (Salam Perkenalan Panggung)
+                Jikoshoukai
               </label>
               <textarea
                 rows={3}

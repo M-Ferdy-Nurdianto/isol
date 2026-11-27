@@ -33,7 +33,8 @@ export const MerchCartProvider = ({ children }) => {
     if (!item) return
 
     const cartId = size ? `${item.id}-${size}` : String(item.id)
-    const basePrice = Number(item.harga || 0)
+    const extraSizePrice = size && item.size_prices ? (Number(item.size_prices[size]) || 0) : 0
+    const basePrice = Number(item.harga || 0) + extraSizePrice
 
     setCart(prev => {
       const existingIdx = prev.findIndex(i => i.cartId === cartId)
