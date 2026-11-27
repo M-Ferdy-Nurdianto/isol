@@ -1457,131 +1457,89 @@ const KSProfilePage = () => {
                 </button>
               </div>
 
-              {/* Name, ID, Verification, and Titles */}
-              <div className="flex-1 min-w-0 md:pt-16 pb-1">
-                {/* Line 1: Name */}
-                <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight truncate">
-                  {currentUser?.nama || 'Fan'}
-                </h1>
+              {/* Name, ID, Verification, Titles, and Actions */}
+              <div className="flex-1 w-full min-w-0 md:pt-16 pb-1 flex flex-col gap-2.5">
+                {/* Baris 1: Nama + Tombol Aksi Desktop (sejajar vertikal dengan baris nama) */}
+                <div className="flex items-center justify-between gap-4 min-w-0">
+                  <h1 className="text-2xl md:text-3xl font-black text-text-primary tracking-tight truncate min-w-0 flex-1">
+                    {currentUser?.nama || 'Fan'}
+                  </h1>
 
-                {/* Line 2: ID & Verification */}
-                <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                  {/* Desktop Action Buttons: sejajar vertikal dengan nama, tinggi sama, gap 10px */}
+                  <div className="hidden md:flex items-center gap-[10px] shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleOpenProfileModal}
+                      className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-surface hover:bg-background border border-border hover:border-primary/50 text-text-primary hover:text-primary text-xs font-bold transition-all shadow-sm active:scale-95 whitespace-nowrap"
+                    >
+                      <FaUserEdit className="text-primary text-sm shrink-0" />
+                      <span>Informasi Pribadi</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-surface hover:bg-danger/10 border border-danger/30 text-danger text-xs font-bold transition-all shadow-sm active:scale-95 whitespace-nowrap"
+                      title="Keluar dari akun"
+                    >
+                      <FaSignOutAlt className="text-xs shrink-0" />
+                      <span>Keluar</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Baris 2: ID & Badge Fan Terverifikasi */}
+                <div className="flex items-center gap-2.5 flex-wrap min-w-0">
                   <p className="text-text-secondary text-sm font-mono font-medium">
                     ID: {currentUser?.fan_id ? String(currentUser.fan_id).padStart(4, '0') : (currentUser?.id?.split('-')[1] || currentUser?.id?.substring(0,8) || 'Member')}
                   </p>
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-success/10 text-success border border-success/20 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                    <FaCheck className="text-[9px]" /> Fan Terverifikasi
+                    <FaCheck className="text-[9px] shrink-0" /> Fan Terverifikasi
                   </span>
                 </div>
 
-                {/* Line 3: Individual Leaderboard Title Badges (Separated per member/period, color-coded by rank) */}
+                {/* Baris 3: Kumpulan Badge Gelar (wrap rapi, ukuran seragam, warna per peringkat) */}
                 {individualTitles.length > 0 && (
-                  <div className="mt-2.5">
-                    {/* -- MOBILE SPECIFIC: Tampilkan hingga 3 chip terpisah, sisanya "+N" -- */}
-                    <div className="md:hidden flex items-center gap-1.5 flex-wrap">
-                      {individualTitles.slice(0, 3).map((item, idx) => {
-                        const rankStyle = getRankBadgeStyle(item.rank)
-                        return (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setShowTitlesModal(true)}
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm active:scale-95 transition-transform truncate max-w-[230px] ${rankStyle.badge}`}
-                            title="Klik untuk melihat rincian gelar"
-                          >
-                            <FaCrown className={`${rankStyle.icon} text-xs shrink-0`} />
-                            <span className="truncate">{item.displayLabel}</span>
-                          </button>
-                        )
-                      })}
-
-                      {individualTitles.length > 3 && (
+                  <div className="flex items-center gap-1.5 md:gap-2 flex-wrap min-w-0">
+                    {individualTitles.map((item, idx) => {
+                      const rankStyle = getRankBadgeStyle(item.rank)
+                      return (
                         <button
+                          key={idx}
                           type="button"
                           onClick={() => setShowTitlesModal(true)}
-                          className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm bg-surface border-primary/40 text-primary hover:bg-primary/10 shrink-0 active:scale-95 transition-transform"
-                          title="Lihat semua gelar"
+                          className={`inline-flex items-center gap-1.5 h-7 px-2.5 md:px-3 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-wider border shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer max-w-full ${rankStyle.badge}`}
+                          title="Klik untuk melihat rincian gelar"
                         >
-                          +{individualTitles.length - 3}
+                          <FaCrown className={`${rankStyle.icon} text-[11px] shrink-0`} />
+                          <span className="truncate">{item.displayLabel}</span>
                         </button>
-                      )}
-                    </div>
-
-                    {/* -- DESKTOP SPECIFIC: Tampilkan hingga 6 chip terpisah, sisanya "+N Lainnya" -- */}
-                    <div className="hidden md:flex items-center gap-2 flex-wrap">
-                      {individualTitles.slice(0, 6).map((item, idx) => {
-                        const rankStyle = getRankBadgeStyle(item.rank)
-                        return (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setShowTitlesModal(true)}
-                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer max-w-xs truncate ${rankStyle.badge}`}
-                            title="Klik untuk melihat rincian gelar"
-                          >
-                            <FaCrown className={`${rankStyle.icon} text-xs shrink-0`} />
-                            <span className="truncate">{item.displayLabel}</span>
-                          </button>
-                        )
-                      })}
-
-                      {individualTitles.length > 6 && (
-                        <button
-                          type="button"
-                          onClick={() => setShowTitlesModal(true)}
-                          className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm bg-surface border-primary/40 text-primary hover:bg-primary/10 hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
-                          title="Lihat semua title"
-                        >
-                          +{individualTitles.length - 6} Lainnya
-                        </button>
-                      )}
-                    </div>
+                      )
+                    })}
                   </div>
                 )}
 
-                {/* Mobile Action Buttons: Informasi Pribadi & Logout */}
-                <div className="md:hidden mt-3 flex items-center gap-2">
+                {/* Mobile Action Buttons: 1 baris penuh 2 kolom sama lebar, tinggi min 44px */}
+                <div className="md:hidden grid grid-cols-2 gap-2.5 w-full pt-0.5">
                   <button
                     type="button"
                     onClick={handleOpenProfileModal}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-background border border-primary/40 text-primary text-xs font-bold shadow-sm active:scale-95 transition-all"
+                    className="inline-flex items-center justify-center gap-1.5 min-h-[44px] w-full px-3 rounded-xl bg-surface hover:bg-background border border-primary/40 text-primary text-xs font-bold shadow-sm active:scale-95 transition-all"
                   >
-                    <FaUserEdit size={13} />
-                    <span>Informasi Pribadi</span>
+                    <FaUserEdit size={13} className="shrink-0" />
+                    <span className="truncate">Informasi Pribadi</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface hover:bg-danger/10 border border-danger/30 text-danger text-xs font-bold shadow-sm active:scale-95 transition-all"
+                    className="inline-flex items-center justify-center gap-1.5 min-h-[44px] w-full px-3 rounded-xl bg-surface hover:bg-danger/10 border border-danger/30 text-danger text-xs font-bold shadow-sm active:scale-95 transition-all"
                     title="Keluar dari akun"
                   >
-                    <FaSignOutAlt size={11} />
-                    <span>Keluar</span>
+                    <FaSignOutAlt size={12} className="shrink-0" />
+                    <span className="truncate">Keluar</span>
                   </button>
                 </div>
-              </div>
-
-              {/* Desktop Action Buttons: Informasi Pribadi & Logout */}
-              <div className="hidden md:flex items-center gap-2.5 md:pt-16 shrink-0">
-                <button
-                  type="button"
-                  onClick={handleOpenProfileModal}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface hover:bg-background border border-border hover:border-primary/50 text-text-primary hover:text-primary text-xs font-bold transition-all shadow-sm active:scale-95"
-                >
-                  <FaUserEdit className="text-primary text-sm" />
-                  <span>Informasi Pribadi</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-surface hover:bg-danger/10 border border-danger/30 text-danger text-xs font-bold transition-all shadow-sm active:scale-95"
-                  title="Keluar dari akun"
-                >
-                  <FaSignOutAlt className="text-xs" />
-                  <span>Keluar</span>
-                </button>
               </div>
             </div>
           </div>
