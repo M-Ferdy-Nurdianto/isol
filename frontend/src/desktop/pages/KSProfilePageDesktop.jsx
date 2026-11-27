@@ -1025,13 +1025,13 @@ const KSProfilePage = () => {
                         </span>
                       </div>
 
-                      <div className="space-y-1.5 py-1">
+                      <div className="space-y-2 py-1">
                         {(ord.merch_order_items || []).map((it, i) => (
-                          <div key={i} className="flex justify-between items-center text-xs">
-                            <span className="font-bold text-text-primary">
+                          <div key={i} className="flex justify-between items-start gap-3 text-xs">
+                            <span className="font-bold text-text-primary min-w-0 flex-1 leading-snug">
                               {it.quantity}x {it.item_name} {it.size ? `(${it.size})` : ''}
                             </span>
-                            <span className="font-mono text-text-secondary">
+                            <span className="font-mono text-text-secondary whitespace-nowrap shrink-0">
                               Rp {((it.harga || 0) * (it.quantity || 1)).toLocaleString('id-ID')}
                             </span>
                           </div>
@@ -1078,7 +1078,7 @@ const KSProfilePage = () => {
                       )}
 
                       {ord.catatan && (
-                        <p className="text-[11px] text-text-secondary bg-background p-2.5 rounded-xl border border-border">
+                        <p className="text-[11px] text-text-secondary bg-background p-2.5 rounded-xl border border-border break-words [overflow-wrap:anywhere]">
                           <strong className="text-text-primary">Catatan:</strong> {ord.catatan}
                         </p>
                       )}
@@ -1276,26 +1276,26 @@ const KSProfilePage = () => {
                         {order.order_items && order.order_items.length > 0 ? (
                           <div className="space-y-1.5 divide-y divide-border">
                             {order.order_items.map((it, iIdx) => (
-                              <div key={iIdx} className="flex justify-between items-center text-xs pt-1.5 first:pt-0">
-                                <span className="font-bold text-text-primary flex items-center gap-2">
-                                  <span className="px-1.5 py-0.5 rounded bg-primary/20 text-primary font-mono text-[10px] font-black">
+                              <div key={iIdx} className="flex justify-between items-start gap-3 text-xs pt-1.5 first:pt-0">
+                                <span className="font-bold text-text-primary flex items-start gap-2 min-w-0 flex-1 leading-snug">
+                                  <span className="px-1.5 py-0.5 rounded bg-primary/20 text-primary font-mono text-[10px] font-black shrink-0 mt-0.5">
                                     {it.quantity}x
                                   </span>
-                                  <span>{it.item_name}</span>
+                                  <span className="min-w-0 break-words">{it.item_name}</span>
                                 </span>
-                                <span className="font-mono text-zinc-400 font-medium">
+                                <span className="font-mono text-zinc-400 font-medium whitespace-nowrap shrink-0">
                                   Rp {((it.price || 0) * (it.quantity || 1)).toLocaleString('id-ID')}
                                 </span>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <div className="flex justify-between items-center text-xs">
-                            <span className="font-bold text-text-primary flex items-center gap-1.5">
-                              <FaUser className="text-primary text-[10px]" />
-                              <span>{order.members?.nama_panggung ? `2-Shot with ${order.members.nama_panggung}` : 'Tiket Cheki'}</span>
+                          <div className="flex justify-between items-start gap-3 text-xs">
+                            <span className="font-bold text-text-primary flex items-center gap-1.5 min-w-0 flex-1">
+                              <FaUser className="text-primary text-[10px] shrink-0" />
+                              <span className="truncate">{order.members?.nama_panggung ? `2-Shot with ${order.members.nama_panggung}` : 'Tiket Cheki'}</span>
                             </span>
-                            <span className="font-mono text-zinc-400 font-medium">
+                            <span className="font-mono text-zinc-400 font-medium whitespace-nowrap shrink-0">
                               Rp {(order.total_harga || 0).toLocaleString('id-ID')}
                             </span>
                           </div>
@@ -1446,7 +1446,7 @@ const KSProfilePage = () => {
             {/* Avatar & Profile Identity */}
             <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6 -mt-12 md:-mt-16 relative z-10">
               
-              <div className="relative group shrink-0">
+              <div className="relative group shrink-0 w-fit">
                 <div className="w-20 h-20 md:w-32 md:h-32 rounded-2xl border-4 border-surface bg-primary flex items-center justify-center text-white shadow-md overflow-hidden relative">
                   {currentUser?.image_url && !avatarLoadError ? (
                     <img 
@@ -1461,23 +1461,23 @@ const KSProfilePage = () => {
                     </div>
                   )}
                   
-                  {/* Pick Avatar Overlay */}
+                  {/* Pick Avatar Overlay (Desktop hover only) */}
                   <div 
                     onClick={handleOpenAvatarPicker}
-                    className="absolute inset-0 bg-black/40 transition-opacity duration-300 flex items-center justify-center cursor-pointer md:opacity-0 md:group-hover:opacity-100"
+                    className="hidden md:flex absolute inset-0 bg-black/40 transition-opacity duration-300 items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100"
                     title="Pilih foto profil resmi idol"
                   >
-                    <FaCamera className="text-xl md:text-2xl text-white" />
+                    <FaCamera className="text-2xl text-white" />
                   </div>
                 </div>
                 {/* Small camera icon explicitly shown on mobile */}
                 <button 
                   type="button"
                   onClick={handleOpenAvatarPicker}
-                  className="md:hidden absolute -bottom-2 -right-2 w-8 h-8 bg-surface border-2 border-border text-primary rounded-full flex items-center justify-center shadow-sm z-20"
+                  className="md:hidden absolute -bottom-1.5 -right-1.5 w-7 h-7 bg-surface border-2 border-border text-primary rounded-full flex items-center justify-center shadow-sm z-20"
                   title="Pilih foto profil resmi idol"
                 >
-                  <FaCamera className="text-xs" />
+                  <FaCamera className="text-[11px]" />
                 </button>
               </div>
 
