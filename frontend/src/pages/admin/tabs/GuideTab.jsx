@@ -43,7 +43,7 @@ const GUIDE_SECTIONS = [
       'Gunakan filter tab di bagian atas: All, PO, OTS, Special, atau Merch untuk menyaring jenis pesanan.',
       'Pada pesanan PO atau Merch, klik detail/lihat bukti untuk memeriksa foto bukti transfer atau QRIS dari pembeli.',
       'Perbarui status pesanan secara bertahap: Unchecked (baru masuk) -> Checked (pembayaran valid) -> Completed (pesanan selesai/diambil).',
-      'Untuk mencatat Order OTS di lokasi acara, pilih event pada filter terlebih dahulu, lalu isi form Order OTS (nama/akun pembeli, metode bayar Cash/TF/QRIS, dan pilihan member/Wide/Grup).',
+      'Untuk mencatat Order OTS di lokasi acara, pilih event pada filter terlebih dahulu, lalu isi form Order OTS (nama/akun pembeli, metode bayar Cash/QRIS, dan pilihan member/Wide/Grup).',
       'Gunakan tombol Export Data untuk mengunduh laporan transaksi dalam format PDF atau Excel.'
     ],
     tips: 'Pesanan berstatus Checked dan Completed otomatis terhitung di halaman Recap serta masuk ke laporan Export PDF/Excel.',

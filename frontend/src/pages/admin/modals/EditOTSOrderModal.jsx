@@ -9,8 +9,7 @@ import {
   FaSpinner,
   FaUser,
   FaMoneyBillWave,
-  FaQrcode,
-  FaLandmark
+  FaQrcode
 } from 'react-icons/fa'
 import api from '../../../lib/api'
 import { showToast } from '../../../lib/toast'
@@ -166,8 +165,7 @@ const EditOTSOrderModal = ({
 
   const paymentOptions = [
     { id: 'Cash', label: 'Cash', icon: FaMoneyBillWave },
-    { id: 'QR', label: 'QRIS', icon: FaQrcode },
-    { id: 'Transfer', label: 'Transfer', icon: FaLandmark }
+    { id: 'QR', label: 'QRIS', icon: FaQrcode }
   ]
 
   const renderBuyerSection = () => (
@@ -236,7 +234,7 @@ const EditOTSOrderModal = ({
             <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase mb-1.5">
               Metode Pembayaran
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {paymentOptions.map((opt) => {
                 const Icon = opt.icon
                 const active = paymentMethod === opt.id

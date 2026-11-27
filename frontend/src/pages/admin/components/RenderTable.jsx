@@ -1,5 +1,5 @@
 import React from 'react'
-import { FaEye, FaEdit, FaTrash, FaImage, FaFileAlt, FaSpinner } from 'react-icons/fa'
+import { FaEye, FaEdit, FaTrash, FaImage, FaSpinner } from 'react-icons/fa'
 import CustomSelect from './CustomSelect'
 
 // ─── Mobile Card ───────────────────────────────────────────────────────────────
@@ -11,10 +11,10 @@ const OrderCard = ({ order, isUpdating, onView, onEditOTS, onDelete, onStatusCha
     ? { borderLeftColor: themeColor, borderLeftWidth: '3px' }
     : {}
 
-  const contactLine = order.whatsapp && order.whatsapp !== '-'
-    ? `WA: ${order.whatsapp}`
-    : order.instagram && order.instagram !== '-'
-      ? `IG: ${order.instagram}`
+  const contactLine = order.instagram && order.instagram.trim() && order.instagram !== '-'
+    ? `IG: ${order.instagram}`
+    : order.whatsapp && order.whatsapp.trim() && order.whatsapp !== '-'
+      ? `WA: ${order.whatsapp}`
       : null
 
   const paymentMethod = order.payment_proof_url?.startsWith('data:') || order.payment_proof_url?.startsWith('http')
@@ -106,9 +106,8 @@ const OrderCard = ({ order, isUpdating, onView, onEditOTS, onDelete, onStatusCha
           }
         </div>
         {order.catatan && (
-          <div className="mt-2 flex items-start gap-1.5 bg-[var(--background)] border border-[var(--border)] rounded-lg px-2.5 py-1.5">
-            <FaFileAlt className="text-[var(--text-secondary)] text-[10px] mt-0.5 shrink-0" />
-            <span className="text-[11px] text-[var(--text-secondary)] leading-snug">{order.catatan}</span>
+          <div className="mt-2 bg-[#E5A93C] rounded-lg px-2.5 py-1.5">
+            <span className="text-[11px] font-bold text-white leading-snug block">{order.catatan}</span>
           </div>
         )}
       </div>
@@ -280,7 +279,11 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                     <td className="px-4 py-3.5">
                       <div className="font-bold text-[var(--text-primary)]">{order.nama_lengkap}</div>
                       <div className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">
-                        {order.whatsapp && order.whatsapp !== '-' ? `WA: ${order.whatsapp}` : order.instagram && order.instagram !== '-' ? `IG: ${order.instagram}` : ''}
+                        {order.instagram && order.instagram.trim() && order.instagram !== '-'
+                          ? `IG: ${order.instagram}`
+                          : order.whatsapp && order.whatsapp.trim() && order.whatsapp !== '-'
+                            ? `WA: ${order.whatsapp}`
+                            : ''}
                       </div>
                       {(otsSrcBadge || isSpecial || order.is_merch) && (
                         <div className="mt-1 flex flex-wrap items-center gap-1">
@@ -311,8 +314,8 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                           </div>
                         )) || <span className="text-[var(--text-secondary)] text-xs">No items</span>}
                         {order.catatan && (
-                          <div className="mt-1 text-[10px] text-[var(--text-secondary)] bg-[var(--background)] border border-[var(--border)] rounded-md px-2 py-0.5 max-w-[250px] truncate flex items-center gap-1" title={order.catatan}>
-                            <FaFileAlt className="flex-shrink-0 text-[var(--text-secondary)]" /> {order.catatan}
+                          <div className="mt-1 inline-block text-[10px] font-bold text-white bg-[#E5A93C] rounded-md px-2 py-0.5 max-w-[260px] truncate" title={order.catatan}>
+                            {order.catatan}
                           </div>
                         )}
                       </div>

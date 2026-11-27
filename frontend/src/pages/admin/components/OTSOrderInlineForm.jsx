@@ -14,7 +14,6 @@ import {
   FaUserCheck,
   FaUser,
   FaTimesCircle,
-  FaLandmark,
   FaImage
 } from 'react-icons/fa'
 import api from '../../../lib/api'
@@ -70,7 +69,6 @@ const OTSOrderInlineForm = ({
   const defaultPayment = (() => {
     if (paymentEnableCash) return 'Cash'
     if (paymentEnableQris) return 'QR'
-    if (paymentEnableTf) return 'Transfer'
     return 'Cash'
   })()
 
@@ -559,8 +557,7 @@ const OTSOrderInlineForm = ({
   const PaymentSelector = () => (
     <div>
       <label className="block text-xs font-bold text-[var(--text-secondary)] mb-1.5">Metode pembayaran</label>
-      <div className={`grid gap-2.5 ${
-        (paymentEnableCash ? 1 : 0) + (paymentEnableQris ? 1 : 0) + (paymentEnableTf ? 1 : 0) <= 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+      <div className="grid grid-cols-2 gap-2.5">
         {paymentEnableCash && (
           <button
             type="button"
@@ -581,17 +578,6 @@ const OTSOrderInlineForm = ({
             }`}
           >
             <FaQrcode /> QRIS
-          </button>
-        )}
-        {paymentEnableTf && (
-          <button
-            type="button"
-            onClick={() => setFormData({ ...formData, payment_method: 'Transfer' })}
-            className={`py-2.5 px-3 rounded-xl font-bold text-xs border flex items-center justify-center gap-2 transition-all ${
-              formData.payment_method === 'Transfer' ? 'bg-[var(--primary)] text-[var(--text-primary)] border-[var(--primary)] shadow-[0_2px_8px_rgba(232,148,74,0.3)]' : 'bg-[var(--background)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--primary)]/40'
-            }`}
-          >
-            <FaLandmark /> Transfer
           </button>
         )}
       </div>
