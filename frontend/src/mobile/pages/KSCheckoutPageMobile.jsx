@@ -528,7 +528,7 @@ export default function KSCheckoutPageMobile() {
                               className="accent-primary w-4 h-4"
                             />
                             <div>
-                              <span className="text-xs font-black uppercase text-text-primary block">Wide Cheki (16:9)</span>
+                              <span className="text-xs font-black uppercase text-text-primary block">Wide Cheki</span>
                               <span className="text-[10px] text-text-secondary block font-normal">Format Lebar VIP</span>
                             </div>
                           </div>

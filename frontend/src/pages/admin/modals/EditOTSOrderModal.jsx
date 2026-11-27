@@ -89,7 +89,7 @@ const EditOTSOrderModal = ({
     const itemName = isGrup
       ? 'Cheki Grup (Semua Member)'
       : type === 'wide'
-        ? `Wide 2-Shot Cheki 16:9 - ${formatMemberName(member.nama_panggung)}`
+        ? `Wide Cheki - ${formatMemberName(member.nama_panggung)}`
         : `Regular 2-Shot Cheki - ${formatMemberName(member.nama_panggung)}`
 
     setItems((prev) => {

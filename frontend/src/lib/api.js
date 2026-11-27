@@ -25,6 +25,24 @@ const api = axios.create({
   baseURL: API_URL,
 })
 
+// Global mutation loading tracker (blocks spam clicks during POST/PUT/PATCH/DELETE)
+let activeMutationCount = 0
+const loadingListeners = new Set()
+const notifyLoadingListeners = () => {
+  const isLoading = activeMutationCount > 0
+  loadingListeners.forEach((cb) => {
+    try { cb(isLoading) } catch {}
+  })
+}
+
+export const subscribeGlobalLoading = (cb) => {
+  loadingListeners.add(cb)
+  cb(activeMutationCount > 0)
+  return () => loadingListeners.delete(cb)
+}
+
+const MUTATION_METHODS = new Set(['post', 'put', 'patch', 'delete'])
+
 // Debug: Log API URL in production to help troubleshooting
 if (import.meta.env.MODE === 'production') {
   // console.log('[API] Base URL:', API_URL)
@@ -86,12 +104,30 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
+// Track mutating requests for global blocking loading overlay
+api.interceptors.request.use(
+  (config) => {
+    const method = (config.method || 'get').toLowerCase()
+    if (MUTATION_METHODS.has(method) && !config.skipGlobalLoading) {
+      config.__trackedGlobalLoading = true
+      activeMutationCount += 1
+      notifyLoadingListeners()
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
 const rateLimitToastId = 'rate-limit-toast'
 
 let isRedirectingToLogin = false
 
 api.interceptors.response.use(
   (response) => {
+    if (response?.config?.__trackedGlobalLoading) {
+      activeMutationCount = Math.max(0, activeMutationCount - 1)
+      notifyLoadingListeners()
+    }
     // GUEST MODE DATA MASKING:
     // Mask sensitive customer data (name, contact, payment proof) while preserving cheki item details & quantities
     if (isGuestMode() && response?.data) {
@@ -114,6 +150,10 @@ api.interceptors.response.use(
     return response
   },
   (error) => {
+    if (error?.config?.__trackedGlobalLoading) {
+      activeMutationCount = Math.max(0, activeMutationCount - 1)
+      notifyLoadingListeners()
+    }
     const status = error?.response?.status
     const reqUrl = error?.config?.url || ''
 

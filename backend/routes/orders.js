@@ -200,15 +200,15 @@ router.post('/', async (req, res) => {
         itemName = itm.name || 'Cheki Grup (Semua Member)'
         memberIdDb = null
       } else if (type === 'wide') {
-        // ── Wide Cheki (Polaroid 16:9 PER MEMBER ──
+        // ── Wide Cheki PER MEMBER ──
         if (!wideChekiEnabled) {
-          return res.status(400).json({ error: 'Wide Cheki (Polaroid 16:9) saat ini tidak tersedia.' })
+          return res.status(400).json({ error: 'Wide Cheki saat ini tidak tersedia.' })
         }
         if (!UUID_REGEX.test(itm.member_id)) {
           return res.status(400).json({ error: 'Member tidak valid untuk Wide Cheki.' })
         }
         pricePerUnit = hargaPoWide
-        itemName = itm.name || `Wide Cheki (16:9) ${itm.member_id}`
+        itemName = itm.name || `Wide Cheki ${itm.member_id}`
         memberIdDb = itm.member_id
       } else {
         // ── Default: Regular Cheki PER MEMBER ──
@@ -376,13 +376,13 @@ router.post('/ots', authMiddleware, async (req, res) => {
         memberIdDb = null
       } else if (type === 'wide') {
         if (!wideChekiEnabled) {
-          return res.status(400).json({ error: 'Wide Cheki (Polaroid 16:9) saat ini tidak tersedia.' })
+          return res.status(400).json({ error: 'Wide Cheki saat ini tidak tersedia.' })
         }
         if (!UUID_REGEX.test(itm.member_id)) {
           return res.status(400).json({ error: 'Member tidak valid untuk Wide Cheki.' })
         }
         pricePerUnit = hargaOtsWide
-        itemName = itm.name || `Wide Cheki (16:9) ${itm.member_id}`
+        itemName = itm.name || `Wide Cheki ${itm.member_id}`
         memberIdDb = itm.member_id
       } else {
         // Default: Regular Cheki (per member)

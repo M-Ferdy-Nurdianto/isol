@@ -106,7 +106,8 @@ const KSProfilePage = () => {
         const dataUrl = await toPng(receiptDownloadRef.current, {
           quality: 0.95,
           pixelRatio: 2,
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
+          filter: (node) => !node?.classList?.contains('receipt-actions')
         })
         const link = document.createElement('a')
         const orderNum = order.order_number || order.id?.substring(0, 8) || 'receipt'
@@ -1571,6 +1572,7 @@ const KSProfilePage = () => {
         {downloadingOrder && (
           <div ref={receiptDownloadRef}>
             <DigitalReceipt
+              hideActions={true}
               data={{
                 orderNumber: downloadingOrder.order_number || `#${downloadingOrder.id?.substring(0,8)}`,
                 eventName: downloadingOrder.events?.nama || 'Event Kohi Sekai',

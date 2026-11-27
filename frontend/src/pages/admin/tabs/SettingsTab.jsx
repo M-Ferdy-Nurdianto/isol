@@ -183,10 +183,10 @@ const SettingsTab = ({
 
         <div className="border-t border-[var(--border)]" />
 
-        {/* ─ Wide Cheki (Polaroid 16:9) ─────────────────────────────────── */}
+        {/* ─ Wide Cheki ─────────────────────────────────────────────────── */}
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-            <p className="text-sm font-bold text-[var(--text-primary)]">Wide Cheki (Polaroid 16:9)</p>
+            <p className="text-sm font-bold text-[var(--text-primary)]">Wide Cheki</p>
             <Toggle checked={wideChekiEnabled} onChange={() => setWideChekiEnabled(p => !p)} />
           </div>
 
@@ -196,14 +196,14 @@ const SettingsTab = ({
               <div className="relative"><span className={rp}>Rp</span>
                 <input type="text" value={fmt(hargaGrup)} onChange={handleNumInput(setHargaGrup)} disabled={!wideChekiEnabled} className={`${inputCls} pl-11`} placeholder="70.000" />
               </div>
-              <p className="text-[10px] text-[var(--text-secondary)]">Pre-Order · 1x Polaroid 16:9 per member</p>
+              <p className="text-[10px] text-[var(--text-secondary)]">Pre-Order · 1x Wide Cheki per member</p>
             </div>
             <div className="space-y-1.5">
               <label className="block text-xs text-[var(--text-secondary)] font-medium">Wide Cheki OTS — VIP Line</label>
               <div className="relative"><span className={rp}>Rp</span>
                 <input type="text" value={fmt(hargaOtsGrup)} onChange={handleNumInput(setHargaOtsGrup)} disabled={!wideChekiEnabled} className={`${inputCls} pl-11`} placeholder="80.000" />
               </div>
-              <p className="text-[10px] text-[var(--text-secondary)]">On The Spot · 1x Polaroid 16:9 per member</p>
+              <p className="text-[10px] text-[var(--text-secondary)]">On The Spot · 1x Wide Cheki per member</p>
             </div>
           </div>
         </div>

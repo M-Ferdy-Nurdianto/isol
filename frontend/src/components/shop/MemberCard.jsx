@@ -111,7 +111,7 @@ const MemberCard = ({
             >
               <span className="flex items-center gap-1 min-w-0">
                 <FaPhotoFilm className="shrink-0" style={{ fontSize: '8px' }} />
-                <span className="truncate">Wide 16:9</span>
+                <span className="truncate">Wide Cheki</span>
               </span>
               <span className="shrink-0 font-black">
                 Rp {Number(hargaWide).toLocaleString('id-ID')}

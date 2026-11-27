@@ -241,7 +241,7 @@ export function CheckoutProvider({ children }) {
     if (isGroup) {
       memberName = 'Cheki Grup (Semua Member)'
     } else {
-      if (finalChekiType === 'wide') finalLabelPrefix = 'Wide Cheki (16:9)'
+      if (finalChekiType === 'wide') finalLabelPrefix = 'Wide Cheki'
       memberName = `${finalLabelPrefix} ${selectedMember?.nama_panggung || 'Member'}`
     }
 
@@ -381,7 +381,7 @@ export function CheckoutProvider({ children }) {
           const ct = item.cheki_type || (item.ticketType === 'group' ? 'grup' : (item.chekiVariant === 'wide' ? 'wide' : 'regular'))
           let finalName = item.memberName
           if (item.ticketType !== 'group' && !item.memberName.includes('Cheki')) {
-            const prefix = ct === 'wide' ? 'Wide Cheki (16:9)' : 'Regular Cheki'
+            const prefix = ct === 'wide' ? 'Wide Cheki' : 'Regular Cheki'
             finalName = `${prefix} ${item.memberName}`
           }
           return {

@@ -204,7 +204,7 @@ const OTSOrderInlineForm = ({
       displayName = `Regular Cheki ${formatMemberName(member.nama_panggung)}`
     } else if (chekiType === 'wide') {
       price = parseInt(hargaOtsGrup, 10)
-      displayName = `Wide Cheki (16:9) ${formatMemberName(member.nama_panggung)}`
+      displayName = `Wide Cheki ${formatMemberName(member.nama_panggung)}`
     } else if (chekiType === 'grup') {
       price = parseInt(hargaChekiGrupOts, 10)
       displayName = 'Cheki Grup (Semua Member)'
@@ -530,7 +530,7 @@ const OTSOrderInlineForm = ({
                         >
                           <div className="flex items-center gap-1.5 min-w-0">
                             <FaImage className={`text-[10px] shrink-0 ${countWide > 0 ? 'text-amber-400' : 'text-[var(--text-secondary)]'}`} />
-                            <span className="text-[11px] font-bold text-[var(--text-primary)] truncate">Wide (Polaroid 16:9)</span>
+                            <span className="text-[11px] font-bold text-[var(--text-primary)] truncate">Wide Cheki</span>
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
                             <span className="text-[10px] font-bold text-amber-400">

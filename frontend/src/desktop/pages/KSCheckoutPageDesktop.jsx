@@ -178,8 +178,8 @@ const KSCheckoutPageDesktop = () => {
                 </div>
                 {catatan && (
                   <div className="flex justify-between items-start pb-3 border-b border-border">
-                    <span className="text-text-secondary font-medium">Catatan / Request:</span>
-                    <span className="font-bold text-text-primary text-right max-w-xs">{catatan}</span>
+                    <span className="text-text-secondary font-medium shrink-0">Catatan / Request:</span>
+                    <span className="font-bold text-text-primary text-right max-w-xs break-words [overflow-wrap:anywhere]">{catatan}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center pt-1 text-sm">
@@ -467,7 +467,7 @@ const KSCheckoutPageDesktop = () => {
                                   className="accent-primary w-3.5 h-3.5 cursor-pointer"
                                 />
                                 <div>
-                                  <span className="text-xs font-black uppercase text-text-primary block">Wide Cheki (16:9)</span>
+                                  <span className="text-xs font-black uppercase text-text-primary block">Wide Cheki</span>
                                   <span className="text-[10px] text-text-secondary block font-normal">Format Lebar VIP</span>
                                 </div>
                               </div>

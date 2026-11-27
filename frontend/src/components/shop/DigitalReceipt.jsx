@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import { FaDownload, FaChevronLeft, FaExclamationTriangle, FaWhatsapp } from 'react-icons/fa'
 import { toPng } from 'html-to-image'
 
-const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false }) => {
+const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false, hideActions = false }) => {
   const receiptRef = useRef(null)
   const [scale, setScale] = useState(1)
   const [height, setHeight] = useState(0)
@@ -214,7 +214,7 @@ const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false }
           <div className="flex text-sm">
             <span className="w-24 flex-shrink-0">Catatan</span>
             <span className="mr-2">:</span>
-            <span className="italic text-gray-700 break-words">{data.catatan || '-'}</span>
+            <span className="italic text-gray-700 min-w-0 flex-1 break-words [overflow-wrap:anywhere]">{data.catatan || '-'}</span>
           </div>
         </div>
 
@@ -320,6 +320,7 @@ const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false }
         </div>
 
         {/* Actions (Hidden on capture) */}
+        {!hideActions && (
         <div className={`receipt-actions flex flex-col gap-4 w-full mt-auto ${isPreview ? 'pt-4 pb-2' : 'pt-8 pb-4'} px-4 print:hidden`}>
           <button 
             onClick={() => setMaskEnabled(!maskEnabled)}
@@ -350,6 +351,7 @@ const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false }
             </button>
           </div>
         </div>
+        )}
         </div>
       </div>
     </div>

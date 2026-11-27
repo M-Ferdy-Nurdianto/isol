@@ -123,7 +123,7 @@ const KSUserOTSPage = () => {
             <div>
               <p className="text-sm font-bold text-[var(--text-primary)]">Pilih Tiket & Merch</p>
               <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">
-                Tersedia Cheki Regular, Wide 16:9, Cheki Grup, serta Official Merchandise resmi.
+                Tersedia Cheki Regular, Wide Cheki, Cheki Grup, serta Official Merchandise resmi.
               </p>
             </div>
           </div>

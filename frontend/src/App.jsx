@@ -3,6 +3,7 @@ import { useEffect, Suspense, lazy } from 'react'
 import AOS from 'aos'
 import { ToastContainer, Zoom } from 'react-toastify'
 import { RBToastContainer } from './components/ui/RBToast'
+import GlobalLoadingOverlay from './components/ui/GlobalLoadingOverlay'
 import LoadingSpinner from './components/LoadingSpinner'
 
 // Core Public Tab Pages - Eagerly loaded for instantaneous, zero-animation native transitions
@@ -74,6 +75,7 @@ function App() {
   return (
     <ThemeProvider>
       <UIProvider>
+        <GlobalLoadingOverlay />
         <MaintenanceProvider>
           <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <FanAuthProvider>
