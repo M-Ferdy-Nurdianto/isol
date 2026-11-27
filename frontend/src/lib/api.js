@@ -141,6 +141,35 @@ api.interceptors.response.use(
       showToast.error(message, 'Rate Limit')
     }
 
+    // Normalize error.message so UI toasts never display raw HTTP codes like "Request failed with status code 401"
+    const serverMsg = error?.response?.data?.error || error?.response?.data?.message
+    let friendlyMessage = typeof serverMsg === 'string' && serverMsg.trim() ? serverMsg.trim() : ''
+
+    if (!friendlyMessage) {
+      if (error?.code === 'ECONNABORTED') {
+        friendlyMessage = 'Waktu koneksi habis. Silakan coba lagi.'
+      } else if (error?.message === 'Network Error' || !error?.response) {
+        friendlyMessage = 'Koneksi ke server gagal. Periksa jaringan internet Anda.'
+      } else if (status === 400) {
+        friendlyMessage = 'Data yang dimasukkan tidak valid. Periksa kembali isian Anda.'
+      } else if (status === 401) {
+        friendlyMessage = 'Email/username atau password yang Anda masukkan salah.'
+      } else if (status === 403) {
+        friendlyMessage = 'Akses ditolak. Anda tidak memiliki izin untuk aksi ini.'
+      } else if (status === 404) {
+        friendlyMessage = 'Akun atau data yang dicari tidak ditemukan.'
+      } else if (status === 429) {
+        friendlyMessage = 'Terlalu banyak percobaan. Silakan tunggu sebentar lalu coba lagi.'
+      } else if (status >= 500) {
+        friendlyMessage = 'Terjadi gangguan pada server. Silakan coba beberapa saat lagi.'
+      } else {
+        friendlyMessage = 'Terjadi kesalahan. Silakan coba lagi.'
+      }
+    }
+
+    error.userMessage = friendlyMessage
+    error.message = friendlyMessage
+
     return Promise.reject(error)
   }
 )

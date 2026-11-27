@@ -72,6 +72,21 @@ const OrdersTab = ({
   const otsOrders = orders.filter(o => o.is_ots)
   const poOrders = orders.filter(o => !o.is_ots)
 
+  const filteredDropdownEvents = orderSubTab === 'special'
+    ? events.filter(ev => ev.is_special || ev.type === 'special')
+    : events
+
+  React.useEffect(() => {
+    if (orderSubTab === 'special' && eventFilter !== 'all') {
+      const isSpecialSelected = events.some(
+        ev => String(ev.id) === String(eventFilter) && (ev.is_special || ev.type === 'special')
+      )
+      if (!isSpecialSelected) {
+        setEventFilter('all')
+      }
+    }
+  }, [orderSubTab, eventFilter, events, setEventFilter])
+
   const hasActiveFilter = statusFilter !== 'all' || eventFilter !== 'all' || dateFilter !== 'all' || !!searchQuery
 
   const handleResetFilters = () => {
@@ -306,8 +321,8 @@ const OrdersTab = ({
             value={eventFilter}
             onChange={(e) => setEventFilter(e.target.value)}
             options={[
-              { value: 'all', label: 'Semua Event' },
-              ...events.map(ev => ({ value: ev.id, label: `${ev.nama} - ${ev.bulan} ${ev.tahun}` }))
+              { value: 'all', label: orderSubTab === 'special' ? 'Semua Event Spesial' : 'Semua Event' },
+              ...filteredDropdownEvents.map(ev => ({ value: ev.id, label: `${ev.nama} - ${ev.bulan} ${ev.tahun}` }))
             ]}
           />
 
