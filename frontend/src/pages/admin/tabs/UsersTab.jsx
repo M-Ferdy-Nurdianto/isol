@@ -22,6 +22,7 @@ import { showToast, webAlert } from '../../../lib/toast'
 import UserDetailModal from '../modals/UserDetailModal'
 import UserOTSModal from '../modals/UserOTSModal'
 import WipeDummyDataModal from '../modals/WipeDummyDataModal'
+import ImageCropModal from '../../../components/ImageCropModal'
 import { FaTrashAlt } from 'react-icons/fa'
 
 const DEFAULT_FAN_BANNERS = [
@@ -45,6 +46,7 @@ const UsersTab = () => {
   const [bannerTitle, setBannerTitle] = useState('')
   const [bannerUploading, setBannerUploading] = useState(false)
   const [isDraggingBanner, setIsDraggingBanner] = useState(false)
+  const [cropModal, setCropModal] = useState({ isOpen: false, imageSrc: null, originalName: '' })
   const bannerFileRef = useRef(null)
 
   const fetchFanBanners = useCallback(async () => {
@@ -102,18 +104,40 @@ const UsersTab = () => {
     }
   }
 
-  const handleUploadFanBanner = async (e) => {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    await uploadFanBannerFile(file)
+  const openBannerCropper = (file) => {
+    if (!file) return
+    if (!file.type?.startsWith('image/')) {
+      showToast.error('File harus berupa gambar (JPG, PNG, WebP).')
+      return
+    }
+    const imageUrl = URL.createObjectURL(file)
+    setCropModal({ isOpen: true, imageSrc: imageUrl, originalName: file.name })
   }
 
-  const handleBannerDrop = async (e) => {
+  const handleBannerCropClose = () => {
+    if (cropModal.imageSrc) URL.revokeObjectURL(cropModal.imageSrc)
+    setCropModal({ isOpen: false, imageSrc: null, originalName: '' })
+  }
+
+  const handleBannerCropComplete = async (croppedFile) => {
+    const baseName = (cropModal.originalName || 'banner').replace(/\.[^.]+$/, '')
+    const namedFile = new File([croppedFile], `${baseName}.jpg`, { type: croppedFile.type || 'image/jpeg' })
+    handleBannerCropClose()
+    await uploadFanBannerFile(namedFile)
+  }
+
+  const handleUploadFanBanner = (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    openBannerCropper(file)
+  }
+
+  const handleBannerDrop = (e) => {
     e.preventDefault()
     e.stopPropagation()
     setIsDraggingBanner(false)
     const file = e.dataTransfer?.files?.[0]
-    if (file) await uploadFanBannerFile(file)
+    if (file) openBannerCropper(file)
   }
 
   const handleDeleteFanBanner = async (banner) => {
@@ -467,7 +491,7 @@ const UsersTab = () => {
                   : 'Drag & drop gambar banner ke sini, atau klik untuk memilih file'}
             </p>
             <p className="text-[11px] text-[var(--text-secondary)]">
-              Rasio 16:9 (JPG, PNG, WebP)
+              Rasio 3:1 (JPG, PNG, WebP) · Crop & posisikan sebelum unggah
             </p>
           </div>
         </div>
@@ -480,7 +504,7 @@ const UsersTab = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {fanBanners.map((b) => (
               <div key={b.id || b.url} className="bg-[var(--background)] border border-[var(--border)] rounded-xl overflow-hidden flex flex-col">
-                <div className="aspect-[16/9] bg-black/50 overflow-hidden">
+                <div className="aspect-[3/1] bg-black/50 overflow-hidden">
                   <img src={b.url} alt={b.title} className="w-full h-full object-cover" />
                 </div>
                 <div className="p-3 flex items-center justify-between gap-2">
@@ -520,6 +544,15 @@ const UsersTab = () => {
           onSuccess={() => fetchUsers(search)}
         />
       )}
+
+      {/* Crop Banner Modal (3:1) */}
+      <ImageCropModal
+        isOpen={cropModal.isOpen}
+        onClose={handleBannerCropClose}
+        imageSrc={cropModal.imageSrc}
+        aspect={3}
+        onCropComplete={handleBannerCropComplete}
+      />
     </div>
   )
 }

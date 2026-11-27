@@ -1343,7 +1343,7 @@ const KSProfilePage = () => {
         <div className="bg-surface border border-border rounded-3xl shadow-sm overflow-hidden mb-6 sm:mb-8">
           
           {/* Cover Photo - Deep Coffee Frame */}
-          <div className="h-36 sm:h-52 relative group overflow-hidden bg-[#100C0A] border-b-2 border-border">
+          <div className="h-36 sm:h-64 md:h-72 relative group overflow-hidden bg-[#100C0A] border-b-2 border-border">
             {currentUser?.banner_url && !bannerLoadError ? (
               <img 
                 src={getAssetPath(currentUser.banner_url)} 

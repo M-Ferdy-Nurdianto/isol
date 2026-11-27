@@ -226,8 +226,8 @@ router.post('/fan-image', authMiddleware, upload.single('file'), handleMulterErr
     let sharpPipeline = sharp(req.file.buffer)
 
     if (type === 'banner') {
-      // 16:9 Banner (e.g. 1200x675)
-      sharpPipeline = sharpPipeline.resize(1200, 675, {
+      // 3:1 Wide Banner (1500x500) matching /profile cover header
+      sharpPipeline = sharpPipeline.resize(1500, 500, {
         fit: 'cover',
         position: 'center'
       })
