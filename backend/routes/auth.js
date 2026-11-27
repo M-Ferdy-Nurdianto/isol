@@ -8,6 +8,14 @@ import { JWT_SECRET, signToken, verifyToken } from '../config/jwt.js'
 
 const router = express.Router()
 
+const DEFAULT_FAN_BANNERS = [
+  '/images/banners/default-espresso.svg',
+  '/images/banners/default-logo.svg',
+  '/images/banners/default-crema.svg'
+]
+const getRandomDefaultBanner = () =>
+  DEFAULT_FAN_BANNERS[Math.floor(Math.random() * DEFAULT_FAN_BANNERS.length)]
+
 // Hitung sisa detik hingga tanggal 1 bulan berikutnya pukul 00:00 WIB (Asia/Jakarta)
 const getSecondsUntilNextMonthWIB = () => {
   const nowWib = new Date(Date.now() + 7 * 60 * 60 * 1000)
@@ -447,6 +455,7 @@ router.post('/register', async (req, res) => {
           email: cleanEmail,
           whatsapp: cleanWhatsapp || null,
           instagram: cleanInstagram,
+          banner_url: getRandomDefaultBanner(),
           role: 'fan'
         })
         .select()
@@ -785,6 +794,7 @@ router.post('/fan/login', async (req, res) => {
             email: cleanEmail,
             whatsapp: cleanWhatsapp,
             instagram: cleanInstagram ? `@${cleanInstagram}` : null,
+            banner_url: getRandomDefaultBanner(),
             role: 'fan'
           })
           .select()

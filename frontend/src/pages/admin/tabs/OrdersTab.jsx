@@ -469,7 +469,7 @@ const OrdersTab = ({
               <h4 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
                 <FaUsers className="text-[var(--primary)]" />
                 <span>
-                  {remainingCountMode === 'cheki' ? 'Sisa Antrean Cheki per Member' : 'Sisa Antrean Orang per Member'}
+                  {remainingCountMode === 'cheki' ? 'Belum Selesai (Per Cheki)' : 'Belum Selesai (Per Orang)'}
                 </span>
               </h4>
               <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
@@ -487,7 +487,7 @@ const OrdersTab = ({
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                Kurang Cheki
+                Sisa Cheki
               </button>
               <button
                 type="button"
@@ -498,7 +498,7 @@ const OrdersTab = ({
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                Kurang Orang
+                Sisa Orang
               </button>
             </div>
           </div>
@@ -516,7 +516,7 @@ const OrdersTab = ({
                     {stat.name}
                   </span>
                   <span className={`text-xs font-black tabular-nums shrink-0 ${countValue > 0 ? 'text-[var(--primary)]' : 'text-[var(--text-secondary)]'}`}>
-                    kurang {countValue} {unitLabel}
+                    {countValue > 0 ? `${countValue} ${unitLabel} lagi` : `0 ${unitLabel}`}
                   </span>
                 </div>
               )

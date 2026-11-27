@@ -370,11 +370,22 @@ const KSProfilePage = () => {
   const bannerOptions = useMemo(() => {
     const list = [
       {
-        id: 'opt-banner-default',
-        url: '',
+        id: 'opt-banner-default-espresso',
+        url: '/images/banners/default-espresso.svg',
         title: 'Espresso Minimalist',
-        subtitle: 'Default Pattern Dark',
-        isDefault: true
+        subtitle: 'Default Kohi Sekai'
+      },
+      {
+        id: 'opt-banner-default-logo',
+        url: '/images/banners/default-logo.svg',
+        title: 'Kohi Sekai Official Logo',
+        subtitle: 'Logo Resmi Website'
+      },
+      {
+        id: 'opt-banner-default-crema',
+        url: '/images/banners/default-crema.svg',
+        title: 'Warm Crema Roast',
+        subtitle: 'Default Kohi Sekai'
       },
       {
         id: 'opt-banner-group',
