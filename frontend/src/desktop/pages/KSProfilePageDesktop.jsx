@@ -1098,7 +1098,7 @@ const KSProfilePage = () => {
                         <span className="text-xs font-bold text-text-secondary">
                           Total Bayar: <strong className="text-base font-black text-primary font-mono">Rp {(ord.total_harga || 0).toLocaleString('id-ID')}</strong>
                         </span>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-2.5">
                           {ord.payment_proof_url && (
                             <a
                               href={ord.payment_proof_url}
@@ -1109,6 +1109,30 @@ const KSProfilePage = () => {
                               <FaReceipt size={11} /> Bukti Bayar
                             </a>
                           )}
+                          {(isCompleted || isPaid || isPacking || isShipped) ? (
+                            <button
+                              type="button"
+                              onClick={() => handleDirectDownload(ord)}
+                              disabled={downloadingOrderId === (ord.id || ord.order_number)}
+                              className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-95 disabled:opacity-60"
+                            >
+                              {downloadingOrderId === (ord.id || ord.order_number) ? (
+                                <>
+                                  <FaSpinner className="animate-spin text-xs" />
+                                  <span>Mengunduh Nota...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <FaDownload size={12} />
+                                  <span>Unduh Nota</span>
+                                </>
+                              )}
+                            </button>
+                          ) : !isCancelled ? (
+                            <span className="text-xs font-bold text-amber-400/90 bg-amber-500/10 px-3.5 py-2 rounded-xl border border-amber-500/20 inline-block">
+                              Menunggu Verifikasi Admin
+                            </span>
+                          ) : null}
                           {canUserConfirm && !isCancelled && (
                             <button
                               type="button"
@@ -1566,33 +1590,47 @@ const KSProfilePage = () => {
           <div ref={receiptDownloadRef}>
             <DigitalReceipt
               hideActions={true}
-              data={{
-                orderNumber: downloadingOrder.order_number || `#${downloadingOrder.id?.substring(0,8)}`,
-                eventName: downloadingOrder.events?.nama || 'Event Kohi Sekai',
-                eventDate: downloadingOrder.events ? `${downloadingOrder.events.tanggal || ''} ${downloadingOrder.events.bulan || ''} ${downloadingOrder.events.tahun || ''}`.trim() : '-',
-                isSpecial: !!downloadingOrder.events?.is_special,
-                themeColor: downloadingOrder.events?.theme_color || 'var(--primary)',
-                items: downloadingOrder.order_items && downloadingOrder.order_items.length > 0 
-                  ? downloadingOrder.order_items.map(it => ({
-                      name: it.item_name,
-                      quantity: it.quantity,
-                      price: it.price
-                    }))
-                  : [{
-                      name: downloadingOrder.events?.nama || 'Tiket Cheki',
-                      quantity: 1,
-                      price: downloadingOrder.total_harga || 0
-                    }],
-                nama: downloadingOrder.nama_lengkap,
-                kontak: downloadingOrder.whatsapp || downloadingOrder.email || '-',
-                instagram: downloadingOrder.instagram || null,
-                catatan: downloadingOrder.catatan || null,
-                total: downloadingOrder.total_harga || 0,
-                createdAt: new Date(downloadingOrder.created_at).toLocaleString('id-ID', {
-                  day: 'numeric', month: 'numeric', year: 'numeric',
-                  hour: '2-digit', minute: '2-digit'
-                })
-              }}
+              data={(() => {
+                const isMerchOrder = Boolean(downloadingOrder.merch_order_items || downloadingOrder.order_number?.startsWith('KS-MCH') || downloadingOrder.order_number?.startsWith('MERCH'))
+                return {
+                  isMerch: isMerchOrder,
+                  orderNumber: downloadingOrder.order_number || `#${downloadingOrder.id?.substring(0,8)}`,
+                  eventName: isMerchOrder
+                    ? (downloadingOrder.delivery_method === 'shipping' ? 'Merchandise (Pengiriman)' : 'Merchandise (Ambil di Event)')
+                    : (downloadingOrder.events?.nama || 'Event Kohi Sekai'),
+                  eventDate: isMerchOrder
+                    ? new Date(downloadingOrder.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+                    : (downloadingOrder.events ? `${downloadingOrder.events.tanggal || ''} ${downloadingOrder.events.bulan || ''} ${downloadingOrder.events.tahun || ''}`.trim() : '-'),
+                  isSpecial: !isMerchOrder && !!downloadingOrder.events?.is_special,
+                  themeColor: downloadingOrder.events?.theme_color || 'var(--primary)',
+                  items: isMerchOrder
+                    ? (downloadingOrder.merch_order_items || []).map(it => ({
+                        name: it.size ? `${it.item_name} (${it.size})` : it.item_name,
+                        quantity: it.quantity || 1,
+                        price: it.harga || 0
+                      }))
+                    : (downloadingOrder.order_items && downloadingOrder.order_items.length > 0 
+                        ? downloadingOrder.order_items.map(it => ({
+                            name: it.item_name,
+                            quantity: it.quantity,
+                            price: it.price
+                          }))
+                        : [{
+                            name: downloadingOrder.events?.nama || 'Tiket Cheki',
+                            quantity: 1,
+                            price: downloadingOrder.total_harga || 0
+                          }]),
+                  nama: downloadingOrder.nama_lengkap || downloadingOrder.nama_pembeli || currentUser?.nama || 'Fan',
+                  kontak: downloadingOrder.whatsapp || downloadingOrder.email || currentUser?.whatsapp || currentUser?.email || '-',
+                  instagram: downloadingOrder.instagram || currentUser?.instagram || null,
+                  catatan: downloadingOrder.catatan || null,
+                  total: downloadingOrder.total_harga || 0,
+                  createdAt: new Date(downloadingOrder.created_at).toLocaleString('id-ID', {
+                    day: 'numeric', month: 'numeric', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                  })
+                }
+              })()}
               isPreview={false}
             />
           </div>

@@ -42,7 +42,7 @@ const DigitalReceipt = ({ data, payment, onBack, onDownload, isPreview = false, 
 
   // Special theme color logic
   const accentColor = data.isSpecial ? (data.themeColor || '#A855F7') : '#E8944A'
-  const isMerch = data.orderNumber?.startsWith('MERCH')
+  const isMerch = data.isMerch || data.orderNumber?.startsWith('MERCH') || data.orderNumber?.startsWith('KS-MCH')
 
   // Styles for the typewriter/receipt look
   const receiptFontStyle = {
