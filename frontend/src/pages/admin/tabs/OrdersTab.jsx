@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useMemo } from 'react'
 import Swal from 'sweetalert2'
 import { webAlert } from '../../../lib/webAlert'
-import { FaShoppingCart, FaPlus, FaTimes, FaFileExcel, FaBox, FaEye, FaTrash, FaStar, FaTruck, FaClipboardList, FaStore, FaMapMarkerAlt, FaEdit, FaWhatsapp, FaArrowLeft } from 'react-icons/fa'
+import { FaShoppingCart, FaPlus, FaTimes, FaFileExcel, FaBox, FaEye, FaTrash, FaStar, FaTruck, FaClipboardList, FaStore, FaMapMarkerAlt, FaEdit, FaWhatsapp, FaArrowLeft, FaUsers } from 'react-icons/fa'
+import { formatMemberName } from '../../../lib/memberUtils'
 import RenderTable from '../components/RenderTable'
 import CustomSelect from '../components/CustomSelect'
 import ExportModal from '../../../components/ExportModal'
@@ -60,17 +61,33 @@ const OrdersTab = ({
   onRefreshOrders,
   onOtsCartActiveChange
 }) => {
+  const [attendanceFilter, setAttendanceFilter] = useState('all') // 'all' | 'hadir' | 'tidak_hadir'
+  const [remainingCountMode, setRemainingCountMode] = useState('cheki') // 'cheki' | 'orang' (never show both)
+
   // Helper to check if order is from special event
   const isSpecialOrder = (order) => {
     const event = events.find(e => e.id === order.event_id)
     return event && (event.is_special || event.type === 'special')
   }
 
+  const orderHasTidakHadir = (order) =>
+    (order.order_items || []).some((it) => /1-shot|tidak datang/i.test(it.item_name || ''))
+
+  const orderHasHadir = (order) =>
+    (order.order_items || []).some((it) => !/1-shot|tidak datang/i.test(it.item_name || ''))
+
+  const matchesAttendance = (order) => {
+    if (attendanceFilter === 'tidak_hadir') return orderHasTidakHadir(order)
+    if (attendanceFilter === 'hadir') return orderHasHadir(order)
+    return true
+  }
+
   // Filter Logic:
   // OTS orders include ALL OTS orders (regular + special) so venue admins never lose sight of tickets
-  const specialOrders = orders.filter(o => isSpecialOrder(o))
-  const otsOrders = orders.filter(o => o.is_ots)
-  const poOrders = orders.filter(o => !o.is_ots)
+  const specialOrders = orders.filter(o => isSpecialOrder(o) && matchesAttendance(o))
+  const otsOrders = orders.filter(o => o.is_ots && matchesAttendance(o))
+  const poOrders = orders.filter(o => !o.is_ots && matchesAttendance(o))
+  const tidakHadirOrders = orders.filter(o => orderHasTidakHadir(o))
 
   const filteredDropdownEvents = orderSubTab === 'special'
     ? events.filter(ev => ev.is_special || ev.type === 'special')
@@ -87,16 +104,70 @@ const OrdersTab = ({
     }
   }, [orderSubTab, eventFilter, events, setEventFilter])
 
-  const hasActiveFilter = statusFilter !== 'all' || eventFilter !== 'all' || dateFilter !== 'all' || !!searchQuery
+  const hasActiveFilter = statusFilter !== 'all' || eventFilter !== 'all' || dateFilter !== 'all' || attendanceFilter !== 'all' || !!searchQuery
 
   const handleResetFilters = () => {
     setStatusFilter('all')
     setEventFilter('all')
     setDateFilter('all')
+    setAttendanceFilter('all')
     if (setDateFrom) setDateFrom('')
     if (setDateTo) setDateTo('')
     setSearchQuery('')
   }
+
+  // Hitung antrean belum selesai (status checked / paid / approved, belum completed) per member
+  const memberQueueStats = useMemo(() => {
+    const activeMembers = (members || [])
+      .filter(m => m.hadir !== false && m.member_id !== 'group' && m.member_id !== 'kohisekai' && m.member_id !== 'refreshbreeze')
+      .sort((a, b) => (a.order_index ?? 99) - (b.order_index ?? 99))
+
+    const scopeOrders =
+      orderSubTab === 'special'
+        ? specialOrders
+        : orderSubTab === 'ots'
+          ? otsOrders
+          : orderSubTab === 'po'
+            ? poOrders
+            : orderSubTab === 'tidak_hadir'
+              ? tidakHadirOrders
+              : orders.filter(matchesAttendance)
+
+    const pendingQueueOrders = scopeOrders.filter(o => ['checked', 'paid', 'approved'].includes(o.status))
+
+    const stats = activeMembers.map(member => {
+      const mId = String(member.id)
+      const mName = formatMemberName(member.nama_panggung || '').toLowerCase()
+      let chekiCount = 0
+      const peopleSet = new Set()
+
+      pendingQueueOrders.forEach(order => {
+        let orderHasMember = false
+        ;(order.order_items || []).forEach(item => {
+          const itemMemberId = item.member_id ? String(item.member_id) : ''
+          const itemName = (item.item_name || '').toLowerCase()
+          const isMatch = itemMemberId ? itemMemberId === mId : (mName && itemName.includes(mName))
+          if (isMatch) {
+            chekiCount += Number(item.quantity) || 1
+            orderHasMember = true
+          }
+        })
+        if (orderHasMember) {
+          const personKey = order.user_id || (order.nama_lengkap || '').trim().toLowerCase() || order.id
+          peopleSet.add(personKey)
+        }
+      })
+
+      return {
+        id: member.id,
+        name: formatMemberName(member.nama_panggung),
+        chekiCount,
+        peopleCount: peopleSet.size
+      }
+    })
+
+    return stats
+  }, [members, orders, orderSubTab, specialOrders, otsOrders, poOrders, tidakHadirOrders, attendanceFilter])
 
   const [showExportModal, setShowExportModal] = useState(false)
   const [showInlineOTS, setShowInlineOTS] = useState(false)
@@ -227,37 +298,39 @@ const OrdersTab = ({
       )}
       {/* Sub-tabs */}
       <div className="bg-[var(--surface)] border border-[var(--border)] p-1.5 md:p-2 rounded-2xl shadow-xl overflow-hidden">
-        {/* DESKTOP LAYOUT (hidden md:grid): 5 Kolom presisi penuh tanpa scrollbar */}
-        <div className="hidden md:grid grid-cols-5 gap-2">
+        {/* DESKTOP LAYOUT (hidden md:grid): 6 Kolom presisi penuh tanpa scrollbar */}
+        <div className="hidden md:grid grid-cols-6 gap-2">
           {[
             { id: 'all', label: 'All' },
             { id: 'ots', label: 'OTS' },
             { id: 'po', label: 'PO' },
             { id: 'special', label: 'Special' },
+            { id: 'tidak_hadir', label: 'Tidak Hadir' },
             { id: 'merch', label: 'Merch', onClick: () => { setOrderSubTab('merch'); onFetchMerchOrders() } }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={tab.onClick || (() => setOrderSubTab(tab.id))}
-              className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs transition-colors duration-150 ${orderSubTab === tab.id
+              className={`w-full py-2.5 px-3 rounded-xl font-bold text-xs transition-colors duration-150 ${orderSubTab === tab.id
                 ? 'bg-[var(--primary)] text-white shadow-md font-extrabold'
                 : 'text-[var(--text-secondary)] hover:bg-[var(--background)] hover:text-[var(--text-primary)]'
                 }`}
             >
-              <span className="flex items-center justify-center">
+              <span className="flex items-center justify-center truncate">
                 {tab.label}
               </span>
             </button>
           ))}
         </div>
 
-        {/* MOBILE LAYOUT (md:hidden): 5 Tombol proporsional pas di genggaman tanpa scroll */}
-        <div className="md:hidden grid grid-cols-5 gap-1">
+        {/* MOBILE LAYOUT (md:hidden): 3x2 Grid proporsional tanpa kepotong */}
+        <div className="md:hidden grid grid-cols-3 gap-1">
           {[
             { id: 'all', label: 'All' },
             { id: 'ots', label: 'OTS' },
             { id: 'po', label: 'PO' },
             { id: 'special', label: 'Special' },
+            { id: 'tidak_hadir', label: 'Tidak Hadir' },
             { id: 'merch', label: 'Merch', onClick: () => { setOrderSubTab('merch'); onFetchMerchOrders() } }
           ].map(tab => (
             <button
@@ -297,7 +370,7 @@ const OrdersTab = ({
 
       {/* Filters & Actions */}
       <div className="bg-[var(--surface)] p-5 rounded-2xl border border-[var(--border)] shadow-xl space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <input
             type="text"
             placeholder="Cari nama atau order number..."
@@ -323,6 +396,16 @@ const OrdersTab = ({
             options={[
               { value: 'all', label: orderSubTab === 'special' ? 'Semua Event Spesial' : 'Semua Event' },
               ...filteredDropdownEvents.map(ev => ({ value: ev.id, label: `${ev.nama} - ${ev.bulan} ${ev.tahun}` }))
+            ]}
+          />
+
+          <CustomSelect
+            value={attendanceFilter}
+            onChange={(e) => setAttendanceFilter(e.target.value)}
+            options={[
+              { value: 'all', label: 'Semua Kehadiran' },
+              { value: 'hadir', label: 'Hadir (2-Shot)' },
+              { value: 'tidak_hadir', label: 'Tidak Hadir (1-Shot)' }
             ]}
           />
 
@@ -382,7 +465,85 @@ const OrdersTab = ({
         </div>
       </div>
 
+      {/* Member Remaining Queue Counter (Cheki OR Orang — never both simultaneously) */}
+      {orderSubTab !== 'merch' && memberQueueStats.length > 0 && (
+        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-4 sm:p-5 shadow-xl space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h4 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <FaUsers className="text-[var(--primary)]" />
+                <span>
+                  {remainingCountMode === 'cheki' ? 'Sisa Antrean Cheki per Member' : 'Sisa Antrean Orang per Member'}
+                </span>
+              </h4>
+              <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
+                Menghitung pesanan berstatus Checked (lunas, belum Completed).
+              </p>
+            </div>
+
+            <div className="inline-flex p-1 rounded-xl bg-[var(--background)] border border-[var(--border)] self-start sm:self-auto">
+              <button
+                type="button"
+                onClick={() => setRemainingCountMode('cheki')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                  remainingCountMode === 'cheki'
+                    ? 'bg-[var(--primary)] text-white'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                Kurang Cheki
+              </button>
+              <button
+                type="button"
+                onClick={() => setRemainingCountMode('orang')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                  remainingCountMode === 'orang'
+                    ? 'bg-[var(--primary)] text-white'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                Kurang Orang
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            {memberQueueStats.map(stat => {
+              const countValue = remainingCountMode === 'cheki' ? stat.chekiCount : stat.peopleCount
+              const unitLabel = remainingCountMode === 'cheki' ? 'cheki' : 'orang'
+              return (
+                <div
+                  key={stat.id}
+                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[var(--background)] border border-[var(--border)]"
+                >
+                  <span className="text-xs font-bold text-[var(--text-primary)] truncate mr-2">
+                    {stat.name}
+                  </span>
+                  <span className={`text-xs font-black tabular-nums shrink-0 ${countValue > 0 ? 'text-[var(--primary)]' : 'text-[var(--text-secondary)]'}`}>
+                    kurang {countValue} {unitLabel}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Orders Tables */}
+      {orderSubTab === 'tidak_hadir' && (
+        <RenderTable
+          data={tidakHadirOrders}
+          title="List Tidak Hadir (1-Shot / Nitip Pose)"
+          emptyMessage="Tidak ada pesanan 1-Shot (Tidak Hadir)"
+          loading={loading}
+          updatingOrderIds={updatingOrderIds}
+          onView={onViewOrder}
+          onEditOTS={onEditOTS}
+          onDelete={onDeleteOrder}
+          onStatusChange={onStatusChange}
+        />
+      )}
+
       {orderSubTab === 'special' && (
         <RenderTable
           data={specialOrders}

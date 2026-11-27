@@ -4,6 +4,7 @@ import CustomSelect from './CustomSelect'
 
 // ─── Mobile Card ───────────────────────────────────────────────────────────────
 const OrderCard = ({ order, isUpdating, onView, onEditOTS, onDelete, onStatusChange }) => {
+  const hasTidakHadir = (order.order_items || []).some((it) => /1-shot|tidak datang/i.test(it.item_name || ''))
   const isSpecial = order.events?.type === 'special' || !!order.events?.theme_color
   const themeColor = isSpecial ? (order.events?.theme_color || '#A855F7') : null
 
@@ -49,6 +50,11 @@ const OrderCard = ({ order, isUpdating, onView, onEditOTS, onDelete, onStatusCha
             {order.is_merch && (
               <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md border border-[var(--primary)]/40 text-[var(--primary)] bg-[var(--primary)]/10">
                 Merch
+              </span>
+            )}
+            {hasTidakHadir && (
+              <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border border-[var(--border)] text-[var(--text-secondary)] bg-[var(--background)]">
+                Tidak Hadir (1-Shot)
               </span>
             )}
           </div>
@@ -256,7 +262,8 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
               </tr>
             ) : (
               data.map((order) => {
-                const isSpecial = order.events?.type === 'special' || !!order.events?.theme_color
+                const hasTidakHadir = (order.order_items || []).some((it) => /1-shot|tidak datang/i.test(it.item_name || ''))
+  const isSpecial = order.events?.type === 'special' || !!order.events?.theme_color
                 const themeColor = isSpecial ? (order.events?.theme_color || '#A855F7') : null
 
                 // Source & payment badge logic
@@ -290,7 +297,7 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                             ? `WA: ${order.whatsapp}`
                             : ''}
                       </div>
-                      {(otsSrcBadge || isSpecial || order.is_merch) && (
+                      {(otsSrcBadge || isSpecial || order.is_merch || hasTidakHadir) && (
                         <div className="mt-1 flex flex-wrap items-center gap-1">
                           {otsSrcBadge && (
                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${otsSrcBadge.cls}`}>
@@ -305,6 +312,11 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, updatin
                           {order.is_merch && (
                             <span className="text-[9px] font-black uppercase tracking-wider text-[var(--primary)] px-1.5 py-0.5 rounded-md border border-[var(--primary)]/35">
                               Merch
+                            </span>
+                          )}
+                          {hasTidakHadir && (
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--text-secondary)] bg-[var(--background)] px-1.5 py-0.5 rounded-md border border-[var(--border)]">
+                              Tidak Hadir (1-Shot)
                             </span>
                           )}
                         </div>
