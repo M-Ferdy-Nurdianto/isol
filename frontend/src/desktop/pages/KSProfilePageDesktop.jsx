@@ -1923,11 +1923,6 @@ const KSProfilePage = () => {
                                 {opt.subtitle}
                               </span>
                             </div>
-                            {opt.isUploadedLandscape && (
-                              <span className="px-2 py-0.5 rounded bg-primary/20 border border-primary/40 text-primary text-[9px] font-bold shrink-0">
-                                16:9 Official
-                              </span>
-                            )}
                           </div>
                         </>
                       )}
@@ -2041,11 +2036,6 @@ const KSProfilePage = () => {
                                 {opt.subtitle}
                               </span>
                             </div>
-                            {opt.isUploadedLandscape && (
-                              <span className="px-1.5 py-0.5 rounded bg-primary/20 border border-primary/40 text-primary text-[8px] font-bold shrink-0">
-                                16:9
-                              </span>
-                            )}
                           </div>
                         </>
                       )}
